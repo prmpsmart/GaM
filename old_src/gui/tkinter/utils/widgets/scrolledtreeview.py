@@ -1,0 +1,131 @@
+
+from tkinter.ttk import Scrollbar, Frame, Treeview
+from tkinter import Grid, Pack, Place
+import platform
+
+
+py3 = True
+
+def bound_to_mousewheel(event, widget):
+    child = widget.winfo_children()[0]
+    if platform.system() == 'Windows' or platform.system() == 'Darwin':
+        child.bind_all('<MouseWheel>', lambda e: on_mousewheel(e, child))
+        child.bind_all('<Shift-MouseWheel>', lambda e: on_shiftmouse(e, child))
+    else:
+        child.bind_all('<Button-4>', lambda e: on_mousewheel(e, child))
+        child.bind_all('<Button-5>', lambda e: on_mousewheel(e, child))
+        child.bind_all('<Shift-Button-4>', lambda e: on_shiftmouse(e, child))
+        child.bind_all('<Shift-Button-5>', lambda e: on_shiftmouse(e, child))
+
+def unbound_to_mousewheel(event, widget):
+    if platform.system() == 'Windows' or platform.system() == 'Darwin':
+        widget.unbind_all('<MouseWheel>')
+        widget.unbind_all('<Shift-MouseWheel>')
+    else:
+        widget.unbind_all('<Button-4>')
+        widget.unbind_all('<Button-5>')
+        widget.unbind_all('<Shift-Button-4>')
+        widget.unbind_all('<Shift-Button-5>')
+
+def on_mousewheel(event, widget):
+    if platform.system() == 'Windows':
+        widget.yview_scroll(-1*int(event.delta/120),'units')
+    elif platform.system() == 'Darwin':
+        widget.yview_scroll(-1*int(event.delta),'units')
+    else:
+        if event.num == 4:
+            widget.yview_scroll(-1, 'units')
+        elif event.num == 5:
+            widget.yview_scroll(1, 'units')
+
+def on_shiftmouse(event, widget):
+    if platform.system() == 'Windows':
+        widget.xview_scroll(-1*int(event.delta/120), 'units')
+    elif platform.system() == 'Darwin':
+        widget.xview_scroll(-1*int(event.delta), 'units')
+    else:
+        if event.num == 4:
+            widget.xview_scroll(-1, 'units')
+        elif event.num == 5:
+            widget.xview_scroll(1, 'units')
+
+def create_container(func):
+    '''Creates a ttk Frame with a given master, and use this new frame to
+    place the scrollbars and the widget.'''
+    def wrapped(cls, master, **kw):
+        container = Frame(master)
+        container.bind('<Enter>', lambda e: bound_to_mousewheel(e, container))
+        container.bind('<Leave>', lambda e: unbound_to_mousewheel(e, container))
+        return func(cls, container, **kw)
+    return wrapped
+
+# The following code is added to facilitate the Scrolled widgets you specified.
+class AutoScroll:
+    '''Configure the scrollbars for a widget.'''
+
+    def __init__(self, master):
+        #  Rozen. Added the try-except clauses so that this class
+        #  could be used for scrolled entry widget for which vertical
+        #  scrolling is not supported. 5/7/14.
+        try:
+            vsb = Scrollbar(master, orient='vertical', command=self.yview)
+        except:
+            pass
+        hsb = Scrollbar(master, orient='horizontal', command=self.xview)
+
+        #self.configure(yscrollcommand=_autoscroll(vsb),
+        #    xscrollcommand=_autoscroll(hsb))
+        try:
+            self.configure(yscrollcommand=self._autoscroll(vsb))
+        except:
+            pass
+        self.configure(xscrollcommand=self._autoscroll(hsb))
+
+        self.grid(column=0, row=0, sticky='nsew')
+        try:
+            vsb.grid(column=1, row=0, sticky='ns')
+        except:
+            pass
+        hsb.grid(column=0, row=1, sticky='ew')
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_rowconfigure(0, weight=1)
+
+        # Copy geometry methods of master  (taken from ScrolledText.py)
+        if py3:
+            methods = Pack.__dict__.keys() | Grid.__dict__.keys() \
+                  | Place.__dict__.keys()
+        else:
+            methods = Pack.__dict__.keys() + Grid.__dict__.keys() \
+                  + Place.__dict__.keys()
+
+        for meth in methods:
+            if meth[0] != '_' and meth not in ('config', 'configure'):
+                setattr(self, meth, getattr(master, meth))
+
+    @staticmethod
+    def _autoscroll(sbar):
+        '''Hide and show scrollbar as needed.'''
+        def wrapped(first, last):
+            first, last = float(first), float(last)
+            if first <= 0 and last >= 1:
+                sbar.grid_remove()
+            else:
+                sbar.grid()
+            sbar.set(first, last)
+        return wrapped
+
+    def __str__(self):
+        return str(self.master)
+
+class ScrolledTreeView(AutoScroll, Treeview):
+    '''A standard ttk Treeview widget with scrollbars that will
+    automatically show/hide as needed.'''
+    @create_container
+    def __init__(self, master, **kw):
+        Treeview.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
+
+
+
+

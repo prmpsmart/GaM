@@ -1,0 +1,15 @@
+.vscode/
+.spyproject/
+__pycache__/
+database/
+test/
+img/
+test_src/
+test_*[a-z].py
+test.py
+creator.py
+*.log
+*.bat
+*.code-workspace
+*.pyc
+
