@@ -281,7 +281,7 @@ class PRMP_Widget(Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
         
-    def bind_exit(self): self.bind_all('<Control-u>', exit)
+    def bind_exit(self): print(89); self.bind_all('<Control-u>', exit)
     
     def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False):
         
@@ -459,30 +459,37 @@ class PRMP_Button(tk.Button, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_Entry(tk.Entry, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_Frame(tk.Frame, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_Message(tk.Message, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
+
 class PRMP_Text(tk.Text, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):

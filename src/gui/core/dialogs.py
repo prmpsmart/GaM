@@ -96,12 +96,13 @@ class CalendarDialog(PRMP_Dialog):
             self.config(text='', state='disabled', relief='flat', bg=self.empty_bg)
         
         def choosen(self, e=0):
-            if self.notPart: return
-            b4 = CalendarDialog.choosen
-            CalendarDialog.choosen = self
-            if b4: b4.offButton()
-            self.config(bg=self.choosen_bg, fg=self.choosen_fg)
-            if self.day: self.returnMethod(self.day)
+            if self.day: 
+                if self.notPart: return
+                b4 = CalendarDialog.choosen
+                CalendarDialog.choosen = self
+                if b4: b4.offButton()
+                self.config(bg=self.choosen_bg, fg=self.choosen_fg)
+                self.returnMethod(self.day)
     
     def __init__(self, month=None, dest='', title='Calendar Dialog', bg='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', _return=True, **kwargs):
         if month == None: month = DateTime.now()
