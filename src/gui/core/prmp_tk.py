@@ -281,9 +281,7 @@ class PRMP_Widget(Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
         
-    def bind_exit(self):
-        print('ioi')
-        self.bind_all('<Control-u>', exit)
+    def bind_exit(self): self.bind_all('<Control-u>', exit)
     
     def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False):
         

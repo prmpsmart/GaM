@@ -215,7 +215,9 @@ class CalendarDialog(PRMP_Dialog):
     def choosenDay(self, day):
         self._setResult(day)
         if self.dest: self.__dict__[self.dest] = day
-        if self._return: self.destroy()
+        if self._return:
+            CalendarDialog.choosen = None
+            self.destroy()
 
 
 
