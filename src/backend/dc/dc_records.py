@@ -18,6 +18,7 @@ class Rates(DCRecordsManager):
     def __init__(self, accounts, rate):
         super().__init__(accounts, True)
         self.setRate(rate)
+    def __int__(self): return int(self[-1])
     
     def payUpBal(self, rate):
         contributions = int(self.account.contributions)

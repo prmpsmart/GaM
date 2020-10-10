@@ -76,13 +76,13 @@ class ClientAccount(DCAccount):
         remaining = savings - rate
         if int(self.pendingUpfronts) > 0:
             if remaining < upfronts:
-                self.repaidUpfronts.addRecord(remaining)
-                self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts))
+                self.repaidUpfronts.addRecord(remaining, notAdd=True, newRecord=False)
+                self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts), notAdd=True, newRecord=False)
             else:
                 change = remaining - upfronts
-                self.repaidUpfronts.addRecord(upfronts)
-                self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts))
-        else: self.savings.addRecord(int(self.contributions) * rate)
+                self.repaidUpfronts.addRecord(upfronts, notAdd=True, newRecord=False)
+                self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts), notAdd=True, newRecord=False)
+        else: self.savings.addRecord(int(self.contributions) * rate, notAdd=True, newRecord=False)
         self.balances.addRecord(int(self.broughtForwards) + remaining - upfronts - int(self.debits), notAdd=True, newRecord=False)
     
     def addContribution(self, contribution): self.contributions.addContribution(contribution)
