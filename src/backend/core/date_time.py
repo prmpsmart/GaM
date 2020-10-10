@@ -105,7 +105,7 @@ class DateTime(datetime, Mixins):
             elif div > 0:
                 # it means that the new_month falls within the upcoming years
                 return self.createDateTime(self.year + div, mod, self.day)
-            
+        
     def __sub__(self, sub_month):
         if isinstance(sub_month, timedelta): return self.createDateTime(obj=super().__sub__(sub_month))
         
@@ -125,12 +125,21 @@ class DateTime(datetime, Mixins):
                 # since 12 months == 1 year; recent years in the sub_month = sub_month // 12, and the remaining months is sub_month % 12.
                 div, mod =  divmod(sub_month, 12)
                 
-                # therefore, subtract the recent years from the current year, creating a new DateTime with everything else in place except the year
-                year = self.createDateTime(self.year - div, self.month, self.day)
+                if div == 0:
+                    # the sub_month > self.month but < 12
+                    rem = sub_month - self.month
+                    #  first minus its exact month from itself, then minus the remaining months
+                    first = self - self.month
+                    second = first - rem
+                    return second
                 
-                # the remaining months will now fall into the categories of (sub_month < self.month) and ( sub_month == self.month).
-                # it will now look as if it's a loop, the remaining months will now be subtracted from the new year-DateTime, the process will now fall into the first two conditions in the new year-DateTime
-                return year - mod
+                else:
+                    # therefore, subtract the recent years from the current year, creating a new DateTime with everything else in place except the year
+                    # the sub_month is more than 12
+                    year = self.createDateTime(self.year - div, self.month, self.day)
+                    # the remaining months will now fall into the categories of (sub_month < self.month) and ( sub_month == self.month).
+                    # it will now look as if it's a loop, the remaining months will now be subtracted from the new year-DateTime, the process will now fall into the first two conditions in the new year-DateTime
+                    return year - mod
     
     def __str__(self): return self.strftime(self.date_fmt)
     
@@ -320,30 +329,15 @@ class DateTime(datetime, Mixins):
 
     @classmethod
     def getMonth(cls, status="current", y_r=False):
-        if status == "current":
-            now = DateTime.now()
-            month = now.strftime("%B")
-            if y_r: return [month, cls.get_year(status)]
-            else: return month
-        if status == "next":
-            month = MONTHS_NAMES[(MONTHS_NAMES.index(cls.get_month("current")) + 1) % 12]
-            if y_r:
-                if cls.get_month("current") == "December": return [month, cls.get_year(status)]
-                else: return [month, cls.get_year("current")]
-            else: return month
-        if status == "previous":
-            month = MONTHS_NAMES[(MONTHS_NAMES.index(cls.get_month("current")) - 1) % 12]
-            if y_r:
-                if cls.get_month("current") == "January": return [month, cls.get_year(status)]
-                else: return [month, cls.get_year("current")]
-            else: return month
+        if status == "current": return DateTime.now()
+        elif status == "next": return DateTime.now() + 1
+        elif status == "previous": return DateTime.now() - 1
     
     @classmethod
     def getYear(cls, status="current"):
         if status == "current": return "Year_" + cls.curr_year()
         elif status == "next": return "Year_" + str(int(cls.curr_year()) + 1)
         elif status == "previous": return "Year_" + str(int(cls.curr_year()) - 1)
-
 
     @classmethod
     def verifyDateFormat(cls, date): return len(date.split('/')) == 3
@@ -372,7 +366,3 @@ class DateTime(datetime, Mixins):
         monthsDiff = monthFromYearDiff + monthDiff
             
         return monthsDiff
-
-        
-   
-
