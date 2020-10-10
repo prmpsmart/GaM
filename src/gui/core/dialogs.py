@@ -1,7 +1,7 @@
 from tkinter import Button, Entry, Label, Toplevel, Widget, Frame
 from tkinter.dialog import Dialog
 from tkinter.colorchooser import askcolor
-from .window import Window, PRMPToplevel, PRMPTk
+from .prmp_tk import PRMPToplevel, PRMPTk
 from ...backend.core.date_time import DateTime
 
 class PRMPDialog(PRMPToplevel):
