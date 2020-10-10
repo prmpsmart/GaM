@@ -73,18 +73,18 @@ class Contributions(DCRecordsManager):
         if payUpBal != -1:
             if payup == payUpBal: self.account.rates.changeRate(rate)
 
-    def addContribution(self, contribution):
-        if (int(self) + contribution) < 32: self.addRecord(contribution)
+    def addContribution(self, contribution, **kwargs):
+        if (int(self) + contribution) < 32: self.addRecord(contribution, **kwargs)
         else: raise DCErrors.ContributionsError(f'Contributions will be {int(self) + contribution} which is more than 31')
 
 class Debits(DCRecordsManager):
     _shortName = 'deb'
     lowest = Rates.lowest
     
-    def addDebit(self, toDebit):
+    def addDebit(self, toDebit, **kwargs):
         if self.checkMoney(toDebit):
             balance = int(self.account.balances)
-            if toDebit <= balance: self.addRecord(toDebit)
+            if toDebit <= balance: self.addRecord(toDebit, **kwargs)
             else: raise DCErrors.BalancesError(f'Amount to debit is more than balance of {balance}')
 
 class Deficits(DCRecordsManager):

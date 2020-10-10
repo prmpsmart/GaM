@@ -34,8 +34,7 @@ class CoopAccount(Account):
 
 class MemberAccount(CoopAccount):
     
-    def newLoanBond(self, money, proposedLoan, date=None):
-        return self.loanBonds.newLoanBond(money, proposedLoan, date)
+    def newLoanBond(self, money, proposedLoan, **kwargs): return self.loanBonds.newLoanBond(money, proposedLoan, **kwargs)
     
     def balanceAccount(self):
         outLevy = self.levies.outstanding

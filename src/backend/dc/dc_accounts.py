@@ -83,7 +83,7 @@ class ClientAccount(DCAccount):
                 self.repaidUpfronts.addRecord(upfronts)
                 self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts))
         else: self.savings.addRecord(int(self.contributions) * rate)
-        self.balances.addRecord(int(self.broughtForwards) + remaining - upfronts - int(self.debits))
+        self.balances.addRecord(int(self.broughtForwards) + remaining - upfronts - int(self.debits), notAdd=True, newRecord=False)
     
     def addContribution(self, contribution): self.contributions.addContribution(contribution)
     

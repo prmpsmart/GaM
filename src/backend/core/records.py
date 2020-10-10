@@ -294,41 +294,52 @@ class RecordsManager(Mixins):
     def recordDateTuples(self): return [(str(record.date), int(record)) for record in self]
     
     @property
-    def dates(self): return [str(record.date) for record in self]
+    def dates(self): return [record.date for record in self]
     
     def _setRecords(self, records): self.__records = records
     
     def getRecordByDate(self, date): return self.sortRecordsByDate(date)
     
-    def addRecord(self, money, date=None, notAdd=False, **kwargs):
+    def addRecord(self, money, date=None, newRecord=True,notAdd=False, **kwargs):
+        '''
+        money: type int; transaction to be in the record.
+        date: type DateTime; date of the transaction.
+        newRecord: type bool; whether to create a new record or (add/set) to a record already done
+        notAdd: type bool; useful when param newRecord=False, it\'s whether to set the money to a transaction already made or not
+        kwargs: further params that a recordClass might need.
+        '''
         money = int(money)
+        new = False
+        record = None
         # assert money != 0, 'Money must not be zero.'
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
-        if date in list(self.dates):
-            record = self.getRecordByDate(date)
-            if record:
-                if notAdd: record.set(money)
-                else: record.add(money)
+        if newRecord: new = True
         else:
+            if date in list(self.dates):
+                new = False
+                record = self.getRecordByDate(date)
+                if record:
+                    if notAdd: record.set(money)
+                    else: record.add(money)
+            else: new = True
+            
+        if new:
             record = self.recordClass(self, money, date=date, **kwargs)
             self.__records.append(record)
-        
         self.__records.sort()
         
         return record
         
     def updateWithOtherManagers(self, managers):
         total = sum([int(manager) for manager in managers])
-        self.addRecord(total)
+        self.addRecord(total, newRecord=False, notAdd=True)
     
     def removeRecord(self, date):
         for record in self.records:
             if record.date == date: self.records.remove(record)
             del record
-    
-    def removeRecordByDate(self, date):
-        if date in list(self.dates): self.removeRecord(date)
+            return
     
     def removeRecordByIndex(self, index):
         if len(self.records) >= index: del self.records[index]
@@ -472,12 +483,12 @@ class Repayment(Record):
     @property
     def repaymentsManager(self): return self.__repaymentsManager
     
-    def addRepayment(self, repay, date=None):
+    def addRepayment(self, repay, **kwargs):
         if self.paid: raise Errors.RepaymentError(f'{self.className} is already repaid.')
         else:
             if self.outstanding < repay: raise Errors.RepaymentError(f'Outstanding repayments ({self.outstanding}) is less than the repayment given ({repay}).')
             else:
-                repayment = self.repaymentsManager.addRecord(repay, date=date)
+                repayment = self.repaymentsManager.addRecord(repay, **kwargs)
                 if self.paid: self.completed()
                 return repayment
     

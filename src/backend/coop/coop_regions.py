@@ -38,7 +38,7 @@ class Member(CoopRegion):
     @property
     def savings(self): return self.accountsManager.savings
     
-    def newLoanBond(self, money, proposedLoan, date=None): return self.accountsManager.newLoanBond(money, proposedLoan, date)
+    def newLoanBond(self, money, **kwargs): return self.accountsManager.newLoanBond(money, **kwargs)
     
     def balanceAccount(self): return self.accountsManager.balanceAccount()
 

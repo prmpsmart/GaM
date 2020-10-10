@@ -46,9 +46,9 @@ class Levies(Repayment):
             self.manager.savings.addSaving(-(outLevy))
 
     
-    def addLevy(self, repay, date=None):
+    def addLevy(self, repay, **kwargs):
         if self.outstanding == 0: raise CoopErrors.LeviesError('No outstanding levy.')
-        return self.repaymentsManager.addRecord(repay, date=date)
+        return self.repaymentsManager.addRecord(repay, **kwargs)
 
 class LoanInterest(Repayment):
     duing = False
@@ -61,24 +61,23 @@ class LoanInterest(Repayment):
     @property
     def interestRate(self): return self.__interestRate
 
-    def repayInterest(self, interest):
-        self.addRecord
+    def repayInterest(self, interest, **kwargs): return self.addRecord(interest, **kwargs)
 
 class LoanInterests(CoopRepaymentsManager):
     recordClass = LoanInterest
     
     def __init__(self, manager):
         super().__init__(manager)
-        
-        self.addLoanInterest(manager.date)
+        self.addLoanInterest(date=manager.date)
     
-    def addLoanInterest(self, date=None):
+    def addLoanInterest(self, **kwargs):
         interestRate = self.loan.interestRate
         interest = self.loan.outstanding * interestRate
-        self.addRecord(interest, date=date, interestRate=interestRate)
+        self.addRecord(interest, interestRate=interestRate, **kwargs)
         
     @property
     def loan(self): return self.account
+    
     @property
     def paid(self):
         for interest in self:
@@ -104,7 +103,6 @@ class Loan(Repayment):
         del st[-3]
         return '|'.join(st)
         
-
     @property
     def loanBond(self): return self.manager
     @property
@@ -148,8 +146,8 @@ class LoanBond(Repayment):
     @property
     def loan(self): return self.__loan
     
-    def addLoanRepayment(self, money, date=None):
-        if self.loan: return self.loan.addRepayment(money, date)
+    def addLoanRepayment(self, money, **kwargs):
+        if self.loan: return self.loan.addRepayment(money, **kwargs)
     
     @property
     def outstandingLoan(self): return self.loan.outstanding if self.loan else 0
@@ -190,7 +188,7 @@ class LoanBonds(CoopRepaymentsManager):
     @property
     def validLoan(self): return self.region.validLoan
     
-    def newLoanBond(self, money, proposedLoan, date=None):
+    def newLoanBond(self, money, proposedLoan, **kwargs):
         last = self.lastRecord
         go = 1
         if last:
@@ -202,7 +200,7 @@ class LoanBonds(CoopRepaymentsManager):
             elif last.paid: raise CoopErrors.LoanBondsError('There is a paid loan bond with an pending loan.')
             else: raise CoopErrors.LoanBondsError('There is an outstanding loan bond.')
             
-        loanBond = self.addRecord(money, date, proposedLoan=proposedLoan)
+        loanBond = self.addRecord(money,  proposedLoan=proposedLoan, **kwargs)
         return loanBond
 
 class Materials(Repayment):
@@ -210,7 +208,7 @@ class Materials(Repayment):
 
 class Savings(CoopRecordsManager):
     
-    def addSaving(self, savings, date=None): self.addRecord(savings, date)
+    def addSaving(self, savings, **kwargs): self.addRecord(savings, **kwargs)
 
 class Shares(CoopRecordsManager):
     pass
