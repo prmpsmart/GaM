@@ -281,9 +281,11 @@ class PRMP_Widget(Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
         
-    def bind_exit(self): self.bind('<Control-u>', exit)
+    def bind_exit(self):
+        print('ioi')
+        self.bind_all('<Control-u>', exit)
     
-    def setupOfWindow(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace'):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -295,6 +297,8 @@ class PRMP_Widget(Theme):
         self.title(title)
         self.config(bg=bg)
         self.side = side
+        
+        if bind_exit: self.bind_exit()
         
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
         
@@ -339,7 +343,7 @@ class PRMP_Widget(Theme):
             if geometry: self.setGeometry(geometry)
         
         self.setGeometry(self.lastPoints)
-        
+    setupOfWindow = setupOfWidget
 
     def _move(self, event):
         try: self.x, self.y = event.x, event.y
@@ -446,11 +450,11 @@ class PRMP_Widget(Theme):
     def _isDialog(self):
         self.grab_set()
         self.wait_window()
-
-class PRMPTk(Tk, PRMP_Widget):
+PRMP_Window = PRMP_Widget
+class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self): super().__init__()
 
-class PRMPToplevel(Toplevel, PRMP_Widget):
+class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
     def __init__(self, master=None): super().__init__(master)
 
 class PRMP_Button(tk.Button, PRMP_Widget):

@@ -1,13 +1,13 @@
 from tkinter import Button, Entry, Label, Toplevel, Widget, Frame
 from tkinter.dialog import Dialog
 from tkinter.colorchooser import askcolor
-from .prmp_tk import PRMPToplevel, PRMPTk
+from .prmp_tk import PRMP_Toplevel, PRMP_Tk
 from ...backend.core.date_time import DateTime
 
-class PRMPDialog(PRMPToplevel):
+class PRMP_Dialog(PRMP_Toplevel):
     
-    def __init__(self, title=None, **kwargs):
-        super().__init__()
+    def __init__(self, master=None, title=None, **kwargs):
+        super().__init__(master)
         self.setupOfWindow(title=title, **kwargs)
         self.__result = None
         self._setupDialog()
@@ -21,7 +21,7 @@ class PRMPDialog(PRMPToplevel):
     @property
     def result(self): return self.__result
 
-class CalendarDialog(PRMPDialog):
+class CalendarDialog(PRMP_Dialog):
     _both = '◄►'
     _next = '►'
     _previous = '◄'
@@ -225,8 +225,7 @@ class CalendarDialog(PRMPDialog):
 
 
 
-
-class TestDialog(PRMPTk):
+class TestDialog(PRMP_Tk):
     
     def __init__(self, **kwargs):
         super().__init__()
