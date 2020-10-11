@@ -20,13 +20,13 @@ class DCRegionsManager(RegionsManager):
 
 class DCRegion(Region):
     Errors = DCErrors
-    AccountManager = DCAccountsManager
+    AccountsManager = DCAccountsManager
     Manager = DCRegionsManager
     SubRegionsManager = DCRegionsManager
 
 class Client(DCRegion):
     
-    AccountManager = ClientAccountsManager
+    AccountsManager = ClientAccountsManager
     Manager = 'ClientsManager'
     SubRegionsManager = None
     Person = ClientDetail
@@ -72,7 +72,7 @@ class ClientsManager(DCRegionsManager):
 
 class Area(DCRegion):
     
-    AccountManager = AreaAccountsManager
+    AccountsManager = AreaAccountsManager
     Manager = 'AreasManager'
     SubRegionsManager = ClientsManager
     PersonsManager = DC_COsManager

@@ -1,10 +1,19 @@
 from ..office.office_regions import OfficesManager, Region
 from .agam_accounts import AGAMAccountsManager
-from .agam_details import CEOsManager
+from ..core.regions import Person, PersonsManager
+
+class CEO(Person):
+    pass
+
+class CEOsManager(PersonsManager):
+    regionClass = CEO
+
+    def createCEO(self, **kwargs): return self.createPerson(**kwargs)
+    
 
 class AGAM(Region):
     SubRegionsManager = OfficesManager
-    AccountManager = AGAMAccountsManager
+    AccountsManager = AGAMAccountsManager
     PersonsManager = CEOsManager
     
     def __init__(self, manager='AGAM',  name='AGAM'):

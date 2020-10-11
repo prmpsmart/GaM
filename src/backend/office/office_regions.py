@@ -25,16 +25,10 @@ class CoopManagerDetailsManager(PersonsManager):
     
 class OfficeManagerDetailsManager(PersonsManager):
     detailClass = OfficeManagerDetail
-    
-    
-
-
-
-
 
 
 class Office(Region):
-    AccountManager = OfficeAccountsManager
+    AccountsManager = OfficeAccountsManager
     Manager = 'OfficesManager'
     MultiSubRegionsManager = True
     PersonsManager = OfficeManagerDetailsManager
@@ -66,7 +60,7 @@ class OfficesManager(RegionsManager):
         return self.createRegion(date=date, auto=auto, name=name, **kwargs)
 
 class DCOffice(Office):
-    AccountManager = DCOfficeAccountsManager
+    AccountsManager = DCOfficeAccountsManager
     Manager = 'DCOfficesManager'
     SubRegionsManager = AreasManager
     PersonsManager = DCManagerDetailsManager
@@ -83,7 +77,7 @@ class DCOfficesManager(OfficesManager):
         return self.createOffice(name=name, **kwargs)
 
 class CoopOffice(Office):
-    AccountManager = CoopOfficeAccountsManager
+    AccountsManager = CoopOfficeAccountsManager
     Manager = 'CoopOfficesManager'
     SubRegionsManager = UnitsManager
     PersonsManager = CoopManagerDetailsManager

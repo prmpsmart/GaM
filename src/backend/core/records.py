@@ -257,7 +257,7 @@ class RecordsManager(Mixins):
     lowest = 50
     recordClass = Record
     
-    def __init__(self, account):
+    def __init__(self, account, **kwargs):
         self.__account = account
         self.__records = []
     
@@ -373,7 +373,7 @@ class RecordsManager(Mixins):
     @property
     def recordsAsDictShort(self): return [{str(record.date): int(record)} for record in self]
 
-############ Sorting
+    ############ Sorting
     #Date Sorting
     
     def sortRecordsByDate(self, date):
@@ -498,5 +498,12 @@ class Repayment(Record):
 class RepaymentsManager(RecordsManager):
     recordClass = Repayment
 
+class Salary(Record):
+    pass
+
+class SalariesManager(RecordsManager):
+    recordClass = Salary
+    def person(self): return self.account
+    def addSalary(self, salary, date=None): return self.addRecord(salary, date=date)
 
 

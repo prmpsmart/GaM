@@ -1,7 +1,8 @@
 from .accounts import AccountsManager, DateTime, Mixins, Errors
+from .records import Salary, SalariesManager
 
 class Region(Mixins):
-    AccountManager = AccountsManager
+    AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
     PersonsManager = None
@@ -20,18 +21,18 @@ class Region(Mixins):
         self.__location = location
         self.__date = date
         
-        self.__accountsManager = self.AccountManager(self, **kwargs)
+        self.__accountsManager = self.AccountsManager(self, **kwargs)
         
         
         if self.SubRegionsManager or self.MultiSubRegionsManager:
             if self.MultiSubRegionsManager: self.__subRegionsManager = None
             else: self.__subRegionsManager = self.SubRegionsManager(self)
-            self.__detail = None
-            self.__detailsManager = self.PersonsManager(self)
+            self.__person = None
+            self.__personsManager = self.PersonsManager(self)
         else:
             self.__subRegionsManager = None
-            self.__detail = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
-            self.__detailsManager = None
+            self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
+            self.__personsManager = None
     
     def __getitem__(self, num): return self.accountsManager[num]
     def __len__(self): return len(self.accountsManager)
@@ -44,32 +45,32 @@ class Region(Mixins):
     def reignMonthsYears(self): return divmod(self.reignMonths, 12)
     @property
     def gender(self):
-        if self.detail: return self.detail.gender
+        if self.person: return self.person.gender
         else: return str(self)
     @property
     def phone(self):
-        if self.detail: return self.detail.phone
+        if self.person: return self.person.phone
         else: return str(self)
     @property
     def email(self):
-        if self.detail: return self.detail.email
+        if self.person: return self.person.email
         else: return str(self)
     @property
     def address(self):
-        if self.detail: return self.detail.address
+        if self.person: return self.person.address
         else: return str(self)
     @property
     def photo(self):
-        if self.detail: return self.detail.photo
+        if self.person: return self.person.photo
         else: return str(self)
     
     def getRegion(self, **kwargs): return self.subRegionsManager.getRegion(**kwargs)
     @property
     def region(self): return self.manager.region
     @property
-    def detail(self): return self.__detail
+    def person(self): return self.__person
     @property
-    def detailsManager(self): return self.__detailsManager
+    def personsManager(self): return self.__personsManager
     @property
     def location(self): return self.__location
     @property
@@ -86,6 +87,7 @@ class Region(Mixins):
     def lastAccount(self): return self.accountsManager.lastAccount
     @property
     def accountsManager(self): return self.__accountsManager
+    
     def balanceAccounts(self, month=None):
         if month: self.accountsManager.balanceAccount(month)
         else: self.accountsManager.balanceAccounts()
@@ -337,7 +339,13 @@ class PersonsManager(RegionsManager):
     
     def createPerson(self, **kwargs): return self.createRegion(**kwargs)
 
-
+class Staff(Region):
+    AccountsManager = SalariesManager
+    Manager = 'StaffsManager'
+    Person = None
+    def salariesManager(self): return self.accountsManager
+    def paySalary(self, salary, date=None): self.salariesManager.addSalary(salary, date=date)
+    
 
 
 
