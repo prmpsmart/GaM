@@ -1,5 +1,6 @@
-from ..core.records import RecordsManager, DateTime
+from src.backend.core.records import Repayment, DateTime, RecordsManager, RepaymentsManager
 from .dc_errors import DCErrors
+
 
 class DCRecordsManager(RecordsManager):
     _shortName = 'dcrec'
@@ -100,27 +101,19 @@ class Excesses(DCRecordsManager):
     @property
     def excess(self): return self.recordAccount
 
-class PendingUpfronts(DCRecordsManager):
-    _shortName = 'pup'
-    
-    def __init__(self, account):
-        super().__init__(account, True)
-
-class RepaidUpfronts(DCRecordsManager):
-    _shortName = 'rup'
-    
-    def __init__(self, account):
-        super().__init__(account, True)
-
 class Savings(DCRecordsManager):
     _shortName = 'sav'
     
     def __init__(self, account):
         super().__init__(account, True)
 
+class Upfront(Repayment):
+    dueSeason = 'month'
+    dueTime = 1
 
-class Upfronts(DCRecordsManager):
+class Upfronts(RepaymentsManager):
     _shortName = 'upf'
+    recordClass = Upfront
     
     def __init__(self, accounts):
         super().__init__(accounts)
@@ -133,4 +126,3 @@ class Upfronts(DCRecordsManager):
         else:
             self.addRecord(upfront)
             self.account.pendingUpfronts.addRecord(upfront + int(self.account.pendingUpfronts))
-            

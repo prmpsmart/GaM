@@ -106,6 +106,8 @@ class Account(CompareByDate):
     @property
     def recordsManagersAsDictShort(self): return [{recordsManager.shortName: int(recordsManager)} for recordsManager in self]
 
+    def _balanceAccount(self):
+            pass
     def balanceAccount(self): self.notImp()
     
     
@@ -230,7 +232,7 @@ class AccountsManager(Mixins):
         return account
     
     def balanceAccounts(self):
-        for accounts in self: accounts.balanceAccounts()
+        for accounts in self: accounts.balanceAccount()
         return self.accounts
     
     def currentMonthAccounts(self): return self.sortAccountsByMonth(DateTime.now())

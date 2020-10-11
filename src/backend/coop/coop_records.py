@@ -85,7 +85,7 @@ class LoanInterests(CoopRepaymentsManager):
         return True
 
 class Loan(Repayment):
-    dueSeason = 'month'
+    dueSeason = 'year'
     dueTime = 11
     rate = 2
     
