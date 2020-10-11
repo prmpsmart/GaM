@@ -20,7 +20,7 @@ class DCAccount(Account):
         return None
     
     @property
-    def recordsManagers(self): return [self.__broughtForwards, self.__savings, self.__debits, self.__upfronts, self.__pendingUpfronts, self.__repaidUpfronts, self.__balances]
+    def recordsManagers(self): return [self.broughtForwards, self.savings, self.debits, self.upfronts, self.balances]
     
     @property
     def broughtForwards(self): return self.__broughtForwards
@@ -74,21 +74,9 @@ class ClientAccount(DCAccount):
     def ledgerNumber(self): return self.__ledgerNumber
     def _balanceAccount(self, date=None):
         rate = int(self.rates)
-        self.savings.addRecord(int(self.contributions) * rate, date=date)
-        upfronts = int(self.upfronts)
-        savings = int(self.savings)
-        remaining = savings - rate
-        if int(self.pendingUpfronts) > 0:
-            if remaining < upfronts:
-                self.repaidUpfronts.addRecord(remaining, notAdd=True, newRecord=False, date=date)
-                self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts), notAdd=True, newRecord=False, date=date)
-            else:
-                change = remaining - upfronts
-                self.repaidUpfronts.addRecord(upfronts, notAdd=True, newRecord=False, date=date)
-                self.pendingUpfronts.addRecord(upfronts - int(self.repaidUpfronts), notAdd=True, newRecord=False, date=date)
-        else: self.savings.addRecord(int(self.contributions) * rate, notAdd=True, newRecord=False, date=date)
-        self.balances.addRecord(int(self.broughtForwards) + remaining - upfronts - int(self.debits), notAdd=True, newRecord=False, date=date)
-    
+        bal = int(self.broughtForwards) + int(self.savings) - self.upfronts.outstanding - int(self.debits) - self.rate
+        self.balances.addRecord(bal, notAdd=True, newRecord=False, date=date)
+
     def addContribution(self, contribution): self.contributions.addContribution(contribution)
     
     def addDebit(self, debit): self.debits.addDebit(debit)
@@ -126,8 +114,6 @@ class AreaAccount(DCAccount):
         self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
         self.commissions.updateWithOtherManagers([account.rates for account in clientsAccounts])
         self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
-        self.pendingUpfronts.updateWithOtherManagers([account.pendingUpfronts for account in clientsAccounts])
-        self.repaidUpfronts.updateWithOtherManagers([account.repaidUpfronts for account in clientsAccounts])
         self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
         self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
         self.forNextAccount()

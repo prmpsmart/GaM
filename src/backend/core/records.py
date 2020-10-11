@@ -497,6 +497,46 @@ class Repayment(Record):
 
 class RepaymentsManager(RecordsManager):
     recordClass = Repayment
+    
+    @property
+    def paid(self):
+        for upfront in self.records:
+            if not upfront.paid: return False
+        return True
+    
+    @property
+    def outstanding(self):
+        out = 0
+        for record in self.records: out += record.outstanding
+        return out
+    
+    @property
+    def repaid(self):
+        rep = 0
+        for record in self.records: rep += record.repaid
+        return rep
+    
+    def updateWithOtherManagers(self, managers):
+        out, rep = 0, 0
+        for manager in managers:
+            out += manager.outstanding
+            rep += manager.repaid
+        self.outstanding = out
+        self.repaid = rep
+        
+    def addRepayment(self, repay, date=None, **kwargs):
+        outs = self.outstanding
+        if repay > outs: raise Errors.RepaymentError(f'Repay of {repay} is > Outstanding of {outs} ')
+        rem_outs = repay
+        for rep in self.records:
+            if rem_outs:
+                if not rep.paid:
+                    if repay > rep.outstanding:
+                        rem_outs = repay - rep.outstanding
+                        rep.addRepayment(rep.outstanding, date=date, **kwargs)
+                    else:
+                        rep.addRepayment(rem_outs, date=date, **kwargs)
+                    rem_outs = 0
 
 class Salary(Record):
     pass
