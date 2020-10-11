@@ -1,4 +1,4 @@
-from ..core.regions import Region, RegionsManager
+from ..core.regions import Region, RegionsManager, Person
 from .coop_accounts import CoopErrors, CoopAccount, MemberAccount, UnitAccount
 from .coop_details import MemberDetail, CoopCOsManager
 
@@ -11,10 +11,10 @@ class CoopRegionsManager(RegionsManager):
     regionClass = CoopRegion
     # def __str__(self): return f'{self.master} {self.className}'
 
-class Member(CoopRegion):
+class Member(CoopRegion, Person):
     AccountManager = MemberAccount
     Manager = 'MembersManager'
-    Detail = MemberDetail
+    Person = MemberDetail
     
     def __init__(self, manager, name, gender, phone, photo=None, email=None, date=None, **kwargs):
         assert name != None, 'Name can not be empty.'
@@ -59,7 +59,7 @@ class Unit(CoopRegion):
     AccountManager = UnitAccount
     Manager = 'UnitsManager'
     SubRegionsManager = MembersManager
-    DetailsManager = CoopCOsManager
+    PersonsManager = CoopCOsManager
     
     def __init__(self, **kwargs):
         super().__init__(nameFromNumber=True, **kwargs)

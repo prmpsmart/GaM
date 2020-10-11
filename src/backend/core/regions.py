@@ -4,8 +4,8 @@ class Region(Mixins):
     AccountManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
-    DetailsManager = None
-    Detail = None
+    PersonsManager = None
+    Person = None
     MultiSubRegionsManager = False
     
     def __init__(self, manager=None, number=None, name=None, date=None, nameFromNumber=False, location=None, phone=None, **kwargs):
@@ -27,15 +27,15 @@ class Region(Mixins):
             if self.MultiSubRegionsManager: self.__subRegionsManager = None
             else: self.__subRegionsManager = self.SubRegionsManager(self)
             self.__detail = None
-            self.__detailsManager = self.DetailsManager(self)
+            self.__detailsManager = self.PersonsManager(self)
         else:
             self.__subRegionsManager = None
-            self.__detail = self.Detail(manager=self, name=name, date=date, phone=phone, **kwargs)
+            self.__detail = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
             self.__detailsManager = None
     
     def __getitem__(self, num): return self.accountsManager[num]
     def __len__(self): return len(self.accountsManager)
-    def __repr__(self): return f"<{self}>"
+    # def __repr__(self): return f"<{self}>"
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
@@ -170,7 +170,7 @@ class RegionsManager(Mixins):
     def addRegion(self, region): self.__regions.append(region)
     def getRegion(self, number=None, name=None, phone=None, email=None, photo=None):
         ## provide mechanism to scan pictures.
-        for region in self.regions():
+        for region in self.regions:
             if number == region.number: return region
             elif name == region.name: return region
             elif phone == region.phone: return region
@@ -270,6 +270,76 @@ class RegionsManager(Mixins):
         pass
     def sortRegionsAccountsIntoYears(self):
         pass
+
+class Person(Mixins):
+    Manager = 'PersonsManager'
+    
+    __male = 'male', 'm'
+    __female = 'female', 'f'
+    
+    def __init__(self, manager=None, gender='n', phone='', photo='', email='', address='', date=None, name=None, **kwargs):
+        
+        if isinstance(manager, str): pass
+        elif isinstance(manager, Region): self.__date = manager.date
+        else: assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}'
+        gender = gender.lower()
+        
+        if gender in self.__male:  self.__gender = self.__male[0].title()
+        elif gender in self.__female:  self.__gender = self.__female[0].title()
+        
+        else: self.__gender = 'Neutral'
+        
+        self.__name = name
+        self.__phone = phone
+        self.__photo = photo
+        self.__email = email
+        self.__address = address
+        self.__manager = manager
+    
+    def __str__(self): return f'{self.manager} | {self.className}({self.name}) '
+    
+    @property
+    def name(self): 
+        if not self.__name: return self.manager.name
+        return self.__name
+    @property
+    def manager(self): return self.__manager
+    @property
+    def gender(self): return self.__gender
+    @property
+    def address(self): return self.__address
+    @address.setter
+    def address(self, addr):
+        assert addr, 'Address must be str and not empty.'
+        self.__address = addr
+    @property
+    def image(self):
+        pass
+    @property
+    def email(self): return self.__email
+    @email.setter
+    def email(self, em): 
+        # confirm if email is valid
+        self.__email = em
+    @property
+    def phone(self): return self.__phone
+    @phone.setter
+    def phone(self, number):
+        assert number, 'Number must be valid.'
+        # confirm if number is valid
+        self.__phone = number
+    
+    def show(self):
+        pass
+
+class PersonsManager(RegionsManager):
+    regionClass = Person
+    
+    def createPerson(self, **kwargs): return self.createRegion(**kwargs)
+
+
+
+
 
 
 

@@ -1,6 +1,19 @@
-from ..core.regions import Region, RegionsManager
+from ..core.regions import Region, RegionsManager, Person, PersonsManager
 from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, DateTime, CardDues, DCErrors, Rates
-from .dc_details import ClientDetail, DCCOsManager
+
+class ClientDetail(Person):
+    
+    @property
+    def client(self): return self.manager
+
+class DC_CO(Person):
+    'Daily Contribution Cash Officer.'
+
+class DC_COsManager(PersonsManager):
+    regionClass = DC_CO
+    
+    
+    def createDC_CO(self, **kwargs): return self.createPerson(**kwargs)
 
 class DCRegionsManager(RegionsManager):
     pass
@@ -16,7 +29,7 @@ class Client(DCRegion):
     AccountManager = ClientAccountsManager
     Manager = 'ClientsManager'
     SubRegionsManager = None
-    Detail = ClientDetail
+    Person = ClientDetail
     
     def __init__(self, manager, name, date, rate=None, cardDue=False, **kwargs):
         super().__init__(manager=manager, name=name, date=date, rate=rate, **kwargs)
@@ -62,7 +75,7 @@ class Area(DCRegion):
     AccountManager = AreaAccountsManager
     Manager = 'AreasManager'
     SubRegionsManager = ClientsManager
-    DetailsManager = DCCOsManager
+    PersonsManager = DC_COsManager
     
     def __init__(self, manager, number, date=None, autoAccount=True, **kwargs):
         super().__init__(manager, number=number, date=date, nameFromNumber=True, **kwargs)

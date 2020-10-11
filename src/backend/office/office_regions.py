@@ -1,19 +1,43 @@
 from ..core.accounts import AccountsManager, Mixins
-from ..core.regions import RegionsManager, Region
+from ..core.regions import RegionsManager, Region, Person, PersonsManager
 
 from ..dc.dc_regions import AreasManager
 
 from ..coop.coop_regions import UnitsManager
 
 from .office_accounts import CoopOfficeAccount, DCOfficeAccount, CoopOfficeAccountsManager, DCOfficeAccountsManager, OfficeAccountsManager, OfficeAccount
-from .office_details import DCManagerDetailsManager, CoopManagerDetailsManager, OfficeManagerDetailsManager
+
+class DCManagerDetail(Person):
+    pass
+
+class CoopManagerDetail(Person):
+    pass
+
+class OfficeManagerDetail(Person):
+    pass
+
+
+class DCManagerDetailsManager(PersonsManager):
+    detailClass = DCManagerDetail
+    
+class CoopManagerDetailsManager(PersonsManager):
+    detailClass = CoopManagerDetail
+    
+class OfficeManagerDetailsManager(PersonsManager):
+    detailClass = OfficeManagerDetail
+    
+    
+
+
+
+
 
 
 class Office(Region):
     AccountManager = OfficeAccountsManager
     Manager = 'OfficesManager'
     MultiSubRegionsManager = True
-    DetailsManager = OfficeManagerDetailsManager
+    PersonsManager = OfficeManagerDetailsManager
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -45,7 +69,7 @@ class DCOffice(Office):
     AccountManager = DCOfficeAccountsManager
     Manager = 'DCOfficesManager'
     SubRegionsManager = AreasManager
-    DetailsManager = DCManagerDetailsManager
+    PersonsManager = DCManagerDetailsManager
     MultiSubRegionsManager = False
     
     @property
@@ -62,7 +86,7 @@ class CoopOffice(Office):
     AccountManager = CoopOfficeAccountsManager
     Manager = 'CoopOfficesManager'
     SubRegionsManager = UnitsManager
-    DetailsManager = CoopManagerDetailsManager
+    PersonsManager = CoopManagerDetailsManager
     MultiSubRegionsManager = False
     
     @classmethod

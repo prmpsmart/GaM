@@ -5,7 +5,7 @@ from .agam_details import CEOsManager
 class AGAM(Region):
     SubRegionsManager = OfficesManager
     AccountManager = AGAMAccountsManager
-    DetailsManager = CEOsManager
+    PersonsManager = CEOsManager
     
     def __init__(self, manager='AGAM',  name='AGAM'):
         super().__init__(manager=manager, name=name)

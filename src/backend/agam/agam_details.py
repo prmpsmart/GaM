@@ -1,9 +1,9 @@
-from ..core.details import Detail, DetailsManager
+from ..core.regions import Person, PersonsManager
 
-class CEO(Detail):
+class CEO(Person):
     pass
 
-class CEOsManager(DetailsManager):
+class CEOsManager(PersonsManager):
     regionClass = CEO
 
-    def createCEO(self, **kwargs): return self.createDetail(**kwargs)
+    def createCEO(self, **kwargs): return self.createPerson(**kwargs)

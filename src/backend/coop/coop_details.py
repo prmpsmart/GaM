@@ -1,22 +1,22 @@
-from ..core.details import Detail, DetailsManager
+from ..core.regions import Person, PersonsManager
 from .coop_errors import CoopErrors
 
-class MemberDetail(Detail):
+class MemberDetail(Person):
     
     @property
     def member(self): return self.manager
 
 
-class CoopCO(Detail):
+class CoopCO(Person):
     'Cooperative Cash Officer.'
 
-class CoopCOsManager(DetailsManager):
+class CoopCOsManager(PersonsManager):
     regionClass = CoopCO
     def createCoopCo(self, **kwargs): return self.createDetail(**kwargs)
 
-class ThirdPartySuretyDetail:
+class ThirdPartySurety:
     
-    def __init__(self, loanBondDetails, name, dob, maritalStatus, phone, address, officeAddress, religion, homeTown, stateOfOrigin, occupation, knowledgeOfMember, relationshipToMember, photo, date=None):
+    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipToMember='', photo='', date=None):
     
         self.__loanBondDetails = loanBondDetails
         self.__name = None
@@ -33,6 +33,7 @@ class ThirdPartySuretyDetail:
         self.__knowledgeOfMember = knowledgeOfMember
         self.__relationshipToMember = relationshipToMember
         self.__photo = photo
+        
     @property
     def dob(self): return self.__dob
     @property
@@ -100,7 +101,7 @@ class LoanBondDetails:
     def thirdSurety(self): return self.__thirdSurety
     
     def setThirdPartySurety(self, **kwargs): 
-        self.__thirdPartySurety = ThirdPartySuretyDetail(self, **kwargs)
+        self.__thirdPartySurety = ThirdPartySurety(self, **kwargs)
         
     @property
     def unit(self): return self.member.unit
