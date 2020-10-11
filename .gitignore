@@ -13,3 +13,5 @@ creator.py
 *.code-workspace
 *.pyc
 prmpsmart_temp.py
+
+page/

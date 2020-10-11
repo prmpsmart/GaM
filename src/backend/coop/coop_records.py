@@ -1,4 +1,5 @@
-from ..core.records import RecordsManager, DateTime, Repayment, RepaymentsManager
+from ..core.records import RecordsManager, DateTime, Repayment, RepaymentsManager, Loan, LoanBonds, LoanInterests, LoanBond
+
 from .coop_errors import CoopErrors
 
 class CoopRecordsManager(RecordsManager):
@@ -84,124 +85,26 @@ class LoanInterests(CoopRepaymentsManager):
             if not interest.paid: return False
         return True
 
-class Loan(Repayment):
+class CoopLoan(Loan):
     dueSeason = 'year'
     dueTime = 11
     rate = 2
     
-    def __init__(self, loanBond, date, interestRate=.1, dueTime=None):
-        if dueTime: self.dueTime = dueTime
-        
-        super().__init__(loanBond, loanBond.proposedLoan, date)
-        
-        self.__interestRate = interestRate
-        self.__loanInterests = LoanInterests(self)
-    
-    def __str__(self):
-        st = super().__str__()
-        st = st.split('|')
-        del st[-3]
-        return '|'.join(st)
-        
-    @property
-    def loanBond(self): return self.manager
-    @property
-    def interestRate(self): return self.__interestRate
-    @property
-    def loanInterests(self): return self.__loanInterests
-    @property
-    def paidInterests(self): return self.loanInterests.paid
-    
-    def repayInterest(self, repay):
-        assert repay > 0, 'Repay must be more than zero (0).'
-        if self.paid: raise CoopErrors.LoanRepaymentsError('Loan is already repaid.')
-        #  pay interest accordingly first
-        else: pass
-    
-    def addDoubleInterest(self, date=None):
-        if self.isDue:
-            doubleInterest = self.outstanding / 10 * 2
-            self.loanInterestsManager.addLoanInterest(doubleInterest, date)
 
-class LoanBond(Repayment):
+class CoopLoanBond(LoanBond):
     duing = False
     
-    def __init__(self, manager, money, proposedLoan, date=None):
-        super().__init__(manager, money, date)
-        
-        validLoan = manager.validLoan
-        assert validLoan >= proposedLoan, f'Loan {proposedLoan} exceed maximum valid loan of {validLoan}.'
-        
-        self.__grantedDate = None
-        self.__proposedLoan = proposedLoan
-        self.__details = None
-        self.__loan = None
     
     @property
     def unit(self): return self.manager.member.unit
-    
-    @property
-    def proposedLoan(self): return self.__proposedLoan
-    
-    @property
-    def loan(self): return self.__loan
-    
-    def addLoanRepayment(self, money, **kwargs):
-        if self.loan: return self.loan.addRepayment(money, **kwargs)
-    
-    @property
-    def outstandingLoan(self): return self.loan.outstanding if self.loan else 0
-    
-    @property
-    def grantedDate(self): return self.__grantedDate
-    
-    @property
-    def granted(self):
-        if self.paid and self.loan: return True
-        return False
-    
-    @property
-    def paidLoan(self): return self.loan.paid
-    
-    @property
-    def details(self): return self.__details
-    
-    @property
-    def filledLoanBond(self):
-        if self.details: return True
-        else: return False
-    
-    def completed(self):
-        pass
-    
-    def fillLoanBond(self, ):
-        pass
-    
-    def grant(self, interestRate=.1, dueTime=None, date=None):
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
-        self.__loan = Loan(self, date, interestRate=interestRate, dueTime=dueTime)
 
-class LoanBonds(CoopRepaymentsManager):
-    recordClass = LoanBond
+
+class CoopLoanBonds(LoanBonds):
+    recordClass = CoopLoanBond
     
     @property
-    def validLoan(self): return self.region.validLoan
-    
-    def newLoanBond(self, money, proposedLoan, **kwargs):
-        last = self.lastRecord
-        go = 1
-        if last:
-            outstandingLoan = last.outstandingLoan
-            
-            if last.granted:
-                if last.paidLoan: pass
-                elif outstandingLoan: raise CoopErrors.LoanBondsError(f'There is a paid loan bond with an outstanding loan ({outstandingLoan}).')
-            elif last.paid: raise CoopErrors.LoanBondsError('There is a paid loan bond with an pending loan.')
-            else: raise CoopErrors.LoanBondsError('There is an outstanding loan bond.')
-            
-        loanBond = self.addRecord(money,  proposedLoan=proposedLoan, **kwargs)
-        return loanBond
+    def region(self): return self.manager
+
 
 class Materials(Repayment):
     duing = False

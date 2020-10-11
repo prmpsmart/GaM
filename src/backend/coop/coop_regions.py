@@ -1,4 +1,4 @@
-from ..core.regions import Region, RegionsManager, Person, PersonsManager
+from ..core.regions import Region, RegionsManager, Person, PersonsManager, ThirdPartySurety, LoanBondDetails
 from .coop_accounts import CoopErrors, CoopAccount, MemberAccount, UnitAccount
 from .coop_errors import CoopErrors
 
@@ -14,67 +14,19 @@ class CoopCOsManager(PersonsManager):
     regionClass = CoopCO
     def createCoopCo(self, **kwargs): return self.createDetail(**kwargs)
 
-class ThirdPartySurety:
-    
-    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipToMember='', photo='', date=None):
-    
-        self.__loanBondDetails = loanBondDetails
-        self.__name = None
-        
-        self.__dob = dob
-        self.__maritalStatus = maritalStatus
-        self.__phone = phone
-        self.__address = address
-        self.__officeAddress = officeAddress
-        self.__religion = religion
-        self.__homeTown = homeTown
-        self.__stateOfOrigin = stateOfOrigin
-        self.__occupation = occupation
-        self.__knowledgeOfMember = knowledgeOfMember
-        self.__relationshipToMember = relationshipToMember
-        self.__photo = photo
-        
-    @property
-    def dob(self): return self.__dob
-    @property
-    def maritalStatus(self): return self.__maritalStatus
-    @property
-    def photo(self): return self.__photo
-    @property
-    def phone(self): return self.__phone
-    @property
-    def address(self): return self.__address
-    @property
-    def officeAddress(self): return self.__officeAddress
-    @property
-    def religion(self): return self.__religion
-    @property
-    def homeTown(self): return self.__homeTown
-    @property
-    def stateOfOrigin(self): return self.__stateOfOrigin
-    @property
-    def occupation(self): return self.__occupation
-    @property
-    def knowledgeOfMember(self): return self.__knowledgeOfMember
-    @property
-    def relationshipToMember(self): return self.__relationshipToMember
+class CoopThirdPartySurety(ThirdPartySurety):
+    pass
 
-class LoanBondDetails:
-
+class CoopLoanBondDetails(LoanBondDetails):
+    thirdPartySurety = CoopThirdPartySurety
     def __init__(self, loanBond):
     
-        self.__loanBond = loanBond
-        self.__proposedLoan = loanBond.proposedLoan
         self.__firstSurety = None
         self.__secondSurety = None
         self.__thirdSurety = None
-        self.__thirdPartySurety = None
         self.__accountName = None
         self.__accountNumber = None
         self.__bank = None
-        self.__photo = None
-        
-        self.__interest = None
         self.__monthlyRepayment = None
     
     @property
@@ -90,8 +42,6 @@ class LoanBondDetails:
     @property
     def bank(self): return self.__bank
     @property
-    def loanBond(self): return self.__loanBond
-    @property
     def firstSurety(self): return self.__firstSurety
     @property
     def secondSurety(self): return self.__secondSurety
@@ -100,9 +50,6 @@ class LoanBondDetails:
     @property
     def thirdSurety(self): return self.__thirdSurety
     
-    def setThirdPartySurety(self, **kwargs): 
-        self.__thirdPartySurety = ThirdPartySurety(self, **kwargs)
-        
     @property
     def unit(self): return self.member.unit
     

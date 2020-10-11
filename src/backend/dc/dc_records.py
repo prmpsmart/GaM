@@ -76,7 +76,16 @@ class Contributions(DCRecordsManager):
             if payup == payUpBal: self.account.rates.changeRate(rate)
 
     def addContribution(self, contribution, **kwargs):
-        if (int(self) + contribution) < 32: self.addRecord(contribution, **kwargs)
+        if (int(self) + contribution) < 32:
+            sav = contribution * self.account.rate
+            self.addRecord(contribution, **kwargs)
+            if self.account.upfronts.paid: self.account.savings.addSaving(sav, **kwargs)
+            else:
+                out = self.account.upfronts.outstanding
+                if out > sav: self.account.upfronts.repayUpfront(sav)
+                else:
+                    self.account.upfronts.repayUpfront(out)
+                    self.account.savings.addSaving(sav - out, **kwargs)
         else: raise DCErrors.ContributionsError(f'Contributions will be {int(self) + contribution} which is more than 31')
 
 class Debits(DCRecordsManager):
@@ -87,7 +96,7 @@ class Debits(DCRecordsManager):
         if self.checkMoney(toDebit):
             balance = int(self.account.balances)
             if toDebit <= balance: self.addRecord(toDebit, **kwargs)
-            else: raise DCErrors.BalancesError(f'Amount to debit is more than balance of {balance}')
+            else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
 
 class Deficits(DCRecordsManager):
     _shortName = 'def'
@@ -106,6 +115,8 @@ class Savings(DCRecordsManager):
     
     def __init__(self, account):
         super().__init__(account, True)
+    
+    def addSaving(self, saving, **kwargs): self.addRecord(saving, **kwargs)
 
 class Upfront(Repayment):
     dueSeason = 'month'
@@ -129,6 +140,8 @@ class Upfronts(RepaymentsManager):
     def repaidUpfronts(self): return self.repaid
     @property
     def pendingdUpfronts(self): return self.outstanding
+    
+    def repayUpfront(self, upfront, **kwargs): return self.addRepayment(upfront, **kwargs)
     
 
 

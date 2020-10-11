@@ -6,3 +6,5 @@ class Errors:
     class AccountError(Exception): pass
     class AccountsManagerError(Exception): pass
     class RepaymentError(Exception): pass
+    class LoanBondsError(Exception): pass
+    class LoanRepaymentsError(Exception): pass

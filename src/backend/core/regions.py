@@ -345,9 +345,74 @@ class Staff(Region):
     Person = None
     def salariesManager(self): return self.accountsManager
     def paySalary(self, salary, date=None): self.salariesManager.addSalary(salary, date=date)
+
+
+class ThirdPartySurety:
     
+    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipToMember='', photo='', date=None):
+    
+        self.__loanBondDetails = loanBondDetails
+        self.__name = None
+        
+        self.__dob = dob
+        self.__maritalStatus = maritalStatus
+        self.__phone = phone
+        self.__address = address
+        self.__officeAddress = officeAddress
+        self.__religion = religion
+        self.__homeTown = homeTown
+        self.__stateOfOrigin = stateOfOrigin
+        self.__occupation = occupation
+        self.__knowledgeOfMember = knowledgeOfMember
+        self.__relationshipToMember = relationshipToMember
+        self.__photo = photo
+        
+    @property
+    def dob(self): return self.__dob
+    @property
+    def maritalStatus(self): return self.__maritalStatus
+    @property
+    def photo(self): return self.__photo
+    @property
+    def phone(self): return self.__phone
+    @property
+    def address(self): return self.__address
+    @property
+    def officeAddress(self): return self.__officeAddress
+    @property
+    def religion(self): return self.__religion
+    @property
+    def homeTown(self): return self.__homeTown
+    @property
+    def stateOfOrigin(self): return self.__stateOfOrigin
+    @property
+    def occupation(self): return self.__occupation
+    @property
+    def knowledgeOfMember(self): return self.__knowledgeOfMember
+    @property
+    def relationshipToMember(self): return self.__relationshipToMember
 
 
+class LoanBondDetails:
+    thirdPartySurety = ThirdPartySurety
 
-
+    def __init__(self, loanBond):
+    
+        self.__loanBond = loanBond
+        self.__proposedLoan = loanBond.proposedLoan
+        self.__thirdPartySurety = None
+        self.__photo = None
+        
+        self.__interest = None
+    
+    @property
+    def photo(self): return self.__photo
+    @property
+    def interest(self): return self.__interest
+    @property
+    def loanBond(self): return self.__loanBond
+    def proposedLoan(self): return self.__proposedLoan
+    
+    def setThirdPartySurety(self, **kwargs): 
+        self.__thirdPartySurety = self.thirdPartySurety(self, **kwargs)
 

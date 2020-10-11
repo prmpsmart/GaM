@@ -116,7 +116,7 @@ class AreaAccount(DCAccount):
         self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
         self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
         self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
-        self.forNextAccount()
+
 
 class ClientAccountsManager(DCAccountsManager):
     accountClass = ClientAccount
