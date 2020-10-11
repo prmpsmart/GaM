@@ -1,5 +1,9 @@
 class Mixins:
-    _moneySign = ''
+    naira = chr(8358)
+    dollar = chr(36)
+    euro = chr(163)
+    yen = chr(165)
+    _moneySign = naira
     
     def __len__(self):
         try: return len(self[:])

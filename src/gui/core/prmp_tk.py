@@ -470,6 +470,33 @@ class PRMP_Entry(tk.Entry, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
 
+class PRMP_PlaceHolderEntry(PRMP_Entry):
+    def __init__(self, container, placeholder, field_color='', placeholder_color='', **kwargs):
+        super().__init__(container, **kwargs)
+        
+        self.placeholder = placeholder
+
+        self.field_color = field_color or 'yellow'
+        self.placeholder_color = placeholder_color or 'blue'
+
+        self.insert("0", self.placeholder)
+        self.bind("<FocusIn>", self._clear_placeholder)
+        self.bind("<FocusOut>", self._add_placeholder)
+
+    def _clear_placeholder(self, e):
+        if self.get() == self.placeholder:
+            self.delete("0", "end")
+            self["bg"] = 'white'
+            self["fg"] = 'black'
+            
+
+    def _add_placeholder(self, e):
+        if not self.get():
+            self.insert("0", self.placeholder)
+            self["bg"] = self.field_color
+            self["fg"] = self.placeholder_color
+
+
 class PRMP_Frame(tk.Frame, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
@@ -495,6 +522,26 @@ class PRMP_Text(tk.Text, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
 
+
+class ScrollableFrame(tk.Frame):
+    def __init__(self, container, **kwargs):
+        super().__init__(container, **kwargs)
+        canvas = tk.Canvas(self)
+        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+        self.scrollable_frame = tk.Frame(canvas)
+
+        self.scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # self = self.scrollable_frame
+    
+    def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
 
 
 
