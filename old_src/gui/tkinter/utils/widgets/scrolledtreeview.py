@@ -4,7 +4,6 @@ from tkinter import Grid, Pack, Place
 import platform
 
 
-py3 = True
 
 def bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
@@ -59,22 +58,16 @@ def create_container(func):
         return func(cls, container, **kw)
     return wrapped
 
-# The following code is added to facilitate the Scrolled widgets you specified.
 class AutoScroll:
     '''Configure the scrollbars for a widget.'''
 
     def __init__(self, master):
-        #  Rozen. Added the try-except clauses so that this class
-        #  could be used for scrolled entry widget for which vertical
-        #  scrolling is not supported. 5/7/14.
         try:
             vsb = Scrollbar(master, orient='vertical', command=self.yview)
         except:
             pass
         hsb = Scrollbar(master, orient='horizontal', command=self.xview)
 
-        #self.configure(yscrollcommand=_autoscroll(vsb),
-        #    xscrollcommand=_autoscroll(hsb))
         try:
             self.configure(yscrollcommand=self._autoscroll(vsb))
         except:
@@ -91,13 +84,10 @@ class AutoScroll:
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight=1)
 
-        # Copy geometry methods of master  (taken from ScrolledText.py)
-        if py3:
-            methods = Pack.__dict__.keys() | Grid.__dict__.keys() \
+        methods = Pack.__dict__.keys() | Grid.__dict__.keys() \
                   | Place.__dict__.keys()
-        else:
-            methods = Pack.__dict__.keys() + Grid.__dict__.keys() \
-                  + Place.__dict__.keys()
+        # if py2
+        # methods = Pack.__dict__.keys() + Grid.__dict__.keys() + Place.__dict__.keys()
 
         for meth in methods:
             if meth[0] != '_' and meth not in ('config', 'configure'):
