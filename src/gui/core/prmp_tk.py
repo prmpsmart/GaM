@@ -3,6 +3,8 @@ import tkinter as tk, tkinter.ttk as ttk, platform, time
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 
+
+
 # Excerpt from PySimpleGUI theme implementation of his theme.
 class PRMP_Theme:
     
@@ -294,6 +296,56 @@ class PRMP_Font:
     font14 = "-family {Times New Roman} -size 14 -weight bold -slant roman -underline 0 -overstrike 0"
 
 
+class AutoScroll:
+    '''Configure the scrollbars for a widget.'''
+
+    def __init__(self, master):
+        try:
+            vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
+        except:
+            pass
+        hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
+
+        try:
+            self.configure(yscrollcommand=self._autoscroll(vsb))
+        except:
+            pass
+        self.configure(xscrollcommand=self._autoscroll(hsb))
+
+        self.grid(column=0, row=0, sticky='nsew')
+        try:
+            vsb.grid(column=1, row=0, sticky='ns')
+        except:
+            pass
+        hsb.grid(column=0, row=1, sticky='ew')
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_rowconfigure(0, weight=1)
+
+        methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
+                  | tk.Place.__dict__.keys()
+        # if py2
+        # methods = Pack.__dict__.keys() + Grid.__dict__.keys() + Place.__dict__.keys()
+
+        for meth in methods:
+            if meth[0] != '_' and meth not in ('config', 'configure'):
+                setattr(self, meth, getattr(master, meth))
+
+    @staticmethod
+    def _autoscroll(sbar):
+        '''Hide and show scrollbar as needed.'''
+        def wrapped(first, last):
+            first, last = float(first), float(last)
+            if first <= 0 and last >= 1:
+                sbar.grid_remove()
+            else:
+                sbar.grid()
+            sbar.set(first, last)
+        return wrapped
+
+    def __str__(self):
+        return str(self.master)
+
 class PRMP_Widget(PRMP_Theme):
     PRMP_WIDGET = 'Widget'
     _top = 'top'
@@ -364,6 +416,45 @@ class PRMP_Widget(PRMP_Theme):
         
         self.setGeometry(self.lastPoints)
     setupOfWindow = setupOfWidget
+    
+        
+    def on_mousewheel(self, event):
+        if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
+        elif platform.system() == 'Darwin': self.yview_scroll(-1*int(event.delta),'units')
+        else:
+            if event.num == 4:
+                self.yview_scroll(-1, 'units')
+            elif event.num == 5:
+                self.yview_scroll(1, 'units')
+
+    def on_shiftmouse(self, event):
+        if platform.system() == 'Windows': self.xview_scroll(-1*int(event.delta/120), 'units')
+        elif platform.system() == 'Darwin': self.xview_scroll(-1*int(event.delta), 'units')
+        else:
+            if event.num == 4: self.xview_scroll(-1, 'units')
+            elif event.num == 5: self.xview_scroll(1, 'units')
+
+    def bound_to_mousewheel(self, event):
+        child = self.winfo_children()[0]
+        if platform.system() == 'Windows' or platform.system() == 'Darwin':
+            child.bind_all('<MouseWheel>', lambda e: on_mousewheel(e, child))
+            child.bind_all('<Shift-MouseWheel>', lambda e: on_shiftmouse(e, child))
+        else:
+            child.bind_all('<Button-4>', lambda e: on_mousewheel(e, child))
+            child.bind_all('<Button-5>', lambda e: on_mousewheel(e, child))
+            child.bind_all('<Shift-Button-4>', lambda e: on_shiftmouse(e, child))
+            child.bind_all('<Shift-Button-5>', lambda e: on_shiftmouse(e, child))
+
+    def unbound_to_mousewheel(self, event):
+        if platform.system() == 'Windows' or platform.system() == 'Darwin':
+            self.unbind_all('<MouseWheel>')
+            self.unbind_all('<Shift-MouseWheel>')
+        else:
+            self.unbind_all('<Button-4>')
+            self.unbind_all('<Button-5>')
+            self.unbind_all('<Shift-Button-4>')
+            self.unbind_all('<Shift-Button-5>')
+
 
     def _move(self, event):
         try: self.x, self.y = event.x, event.y
@@ -471,6 +562,7 @@ class PRMP_Widget(PRMP_Theme):
         self.grab_set()
         self.wait_window()
 PRMP_Window = PRMP_Widget
+
 class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self): super().__init__()
 
@@ -543,7 +635,6 @@ class PRMP_Text(tk.Text, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, **kwargs)
 
-
 class ScrollableFrame(tk.Frame):
     def __init__(self, container, **kwargs):
         super().__init__(container, **kwargs)
@@ -565,6 +656,26 @@ class ScrollableFrame(tk.Frame):
     def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
 
 
+### ScrolledTreeView
+def on_mousewheel(event, widget):
+    what = 'units'
+    what = 'pages'
+    if platform.system() == 'Windows': widget.yview_scroll(-1*int(event.delta/120),what)
+    elif platform.system() == 'Darwin': widget.yview_scroll(-1*int(event.delta),what)
+    else:
+        if event.num == 4:
+            widget.yview_scroll(-1, what)
+        elif event.num == 5:
+            widget.yview_scroll(1, what)
+
+def on_shiftmouse(event, widget):
+    what = 'units'
+    what = 'pages'
+    if platform.system() == 'Windows': widget.xview_scroll(-1*int(event.delta/120), what)
+    elif platform.system() == 'Darwin': widget.xview_scroll(-1*int(event.delta), what)
+    else:
+        if event.num == 4: widget.xview_scroll(-1, what)
+        elif event.num == 5: widget.xview_scroll(1, what)
 
 def bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]
@@ -587,87 +698,16 @@ def unbound_to_mousewheel(event, widget):
         widget.unbind_all('<Shift-Button-4>')
         widget.unbind_all('<Shift-Button-5>')
 
-def on_mousewheel(event, widget):
-    if platform.system() == 'Windows':
-        widget.yview_scroll(-1*int(event.delta/120),'units')
-    elif platform.system() == 'Darwin':
-        widget.yview_scroll(-1*int(event.delta),'units')
-    else:
-        if event.num == 4:
-            widget.yview_scroll(-1, 'units')
-        elif event.num == 5:
-            widget.yview_scroll(1, 'units')
-
-def on_shiftmouse(event, widget):
-    if platform.system() == 'Windows':
-        widget.xview_scroll(-1*int(event.delta/120), 'units')
-    elif platform.system() == 'Darwin':
-        widget.xview_scroll(-1*int(event.delta), 'units')
-    else:
-        if event.num == 4:
-            widget.xview_scroll(-1, 'units')
-        elif event.num == 5:
-            widget.xview_scroll(1, 'units')
-
 def create_container(func):
     '''Creates a ttk Frame with a given master, and use this new frame to
     place the scrollbars and the widget.'''
     def wrapped(cls, master, **kw):
-        container = tk.Frame(master)
+        container = ttk.Frame(master)
         container.bind('<Enter>', lambda e: bound_to_mousewheel(e, container))
         container.bind('<Leave>', lambda e: unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)
     return wrapped
 
-class AutoScroll:
-    '''Configure the scrollbars for a widget.'''
-
-    def __init__(self, master):
-        try:
-            vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
-        except:
-            pass
-        hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
-
-        try:
-            self.configure(yscrollcommand=self._autoscroll(vsb))
-        except:
-            pass
-        self.configure(xscrollcommand=self._autoscroll(hsb))
-
-        self.grid(column=0, row=0, sticky='nsew')
-        try:
-            vsb.grid(column=1, row=0, sticky='ns')
-        except:
-            pass
-        hsb.grid(column=0, row=1, sticky='ew')
-
-        master.grid_columnconfigure(0, weight=1)
-        master.grid_rowconfigure(0, weight=1)
-
-        methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
-                  | tk.Place.__dict__.keys()
-        # if py2
-        # methods = Pack.__dict__.keys() + Grid.__dict__.keys() + Place.__dict__.keys()
-
-        for meth in methods:
-            if meth[0] != '_' and meth not in ('config', 'configure'):
-                setattr(self, meth, getattr(master, meth))
-
-    @staticmethod
-    def _autoscroll(sbar):
-        '''Hide and show scrollbar as needed.'''
-        def wrapped(first, last):
-            first, last = float(first), float(last)
-            if first <= 0 and last >= 1:
-                sbar.grid_remove()
-            else:
-                sbar.grid()
-            sbar.set(first, last)
-        return wrapped
-
-    def __str__(self):
-        return str(self.master)
 
 class ScrolledTreeView(AutoScroll, ttk.Treeview):
     '''A standard ttk Treeview widget with scrollbars that will
@@ -676,7 +716,6 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
-
 
 class ToolTip(tk.Toplevel):
     def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None, delay=1, follow=True):
@@ -723,8 +762,6 @@ class ToolTip(tk.Toplevel):
     def hide(self, event=None):
         self.visible = 0
         self.withdraw()
-
-
 
 class TwoWidgets(PRMP_LabelFrame):
     

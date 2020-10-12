@@ -5,27 +5,6 @@ import platform
 
 
 
-def bound_to_mousewheel(event, widget):
-    child = widget.winfo_children()[0]
-    if platform.system() == 'Windows' or platform.system() == 'Darwin':
-        child.bind_all('<MouseWheel>', lambda e: on_mousewheel(e, child))
-        child.bind_all('<Shift-MouseWheel>', lambda e: on_shiftmouse(e, child))
-    else:
-        child.bind_all('<Button-4>', lambda e: on_mousewheel(e, child))
-        child.bind_all('<Button-5>', lambda e: on_mousewheel(e, child))
-        child.bind_all('<Shift-Button-4>', lambda e: on_shiftmouse(e, child))
-        child.bind_all('<Shift-Button-5>', lambda e: on_shiftmouse(e, child))
-
-def unbound_to_mousewheel(event, widget):
-    if platform.system() == 'Windows' or platform.system() == 'Darwin':
-        widget.unbind_all('<MouseWheel>')
-        widget.unbind_all('<Shift-MouseWheel>')
-    else:
-        widget.unbind_all('<Button-4>')
-        widget.unbind_all('<Button-5>')
-        widget.unbind_all('<Shift-Button-4>')
-        widget.unbind_all('<Shift-Button-5>')
-
 def on_mousewheel(event, widget):
     if platform.system() == 'Windows':
         widget.yview_scroll(-1*int(event.delta/120),'units')
@@ -47,6 +26,27 @@ def on_shiftmouse(event, widget):
             widget.xview_scroll(-1, 'units')
         elif event.num == 5:
             widget.xview_scroll(1, 'units')
+
+def bound_to_mousewheel(event, widget):
+    child = widget.winfo_children()[0]
+    if platform.system() == 'Windows' or platform.system() == 'Darwin':
+        child.bind_all('<MouseWheel>', lambda e: on_mousewheel(e, child))
+        child.bind_all('<Shift-MouseWheel>', lambda e: on_shiftmouse(e, child))
+    else:
+        child.bind_all('<Button-4>', lambda e: on_mousewheel(e, child))
+        child.bind_all('<Button-5>', lambda e: on_mousewheel(e, child))
+        child.bind_all('<Shift-Button-4>', lambda e: on_shiftmouse(e, child))
+        child.bind_all('<Shift-Button-5>', lambda e: on_shiftmouse(e, child))
+
+def unbound_to_mousewheel(event, widget):
+    if platform.system() == 'Windows' or platform.system() == 'Darwin':
+        widget.unbind_all('<MouseWheel>')
+        widget.unbind_all('<Shift-MouseWheel>')
+    else:
+        widget.unbind_all('<Button-4>')
+        widget.unbind_all('<Button-5>')
+        widget.unbind_all('<Shift-Button-4>')
+        widget.unbind_all('<Shift-Button-5>')
 
 def create_container(func):
     '''Creates a ttk Frame with a given master, and use this new frame to
@@ -81,7 +81,7 @@ class AutoScroll:
             pass
         hsb.grid(column=0, row=1, sticky='ew')
 
-        master.grid_columnconfigure(0, weight=1)
+        master.grid_columnconfigure(0, weight=3)
         master.grid_rowconfigure(0, weight=1)
 
         methods = Pack.__dict__.keys() | Grid.__dict__.keys() \
@@ -90,8 +90,7 @@ class AutoScroll:
         # methods = Pack.__dict__.keys() + Grid.__dict__.keys() + Place.__dict__.keys()
 
         for meth in methods:
-            if meth[0] != '_' and meth not in ('config', 'configure'):
-                setattr(self, meth, getattr(master, meth))
+            if meth[0] != '_' and meth not in ('config', 'configure'):  setattr(self, meth, getattr(master, meth))
 
     @staticmethod
     def _autoscroll(sbar):
@@ -108,12 +107,12 @@ class AutoScroll:
     def __str__(self):
         return str(self.master)
 
-class ScrolledTreeView(AutoScroll, Treeview):
+class ScrolledTreeView(Treeview, AutoScroll):
     '''A standard ttk Treeview widget with scrollbars that will
     automatically show/hide as needed.'''
     @create_container
     def __init__(self, master, **kw):
-        Treeview.__init__(self, master, **kw)
+        super().__init__(master, **kw)
         AutoScroll.__init__(self, master)
 
 
