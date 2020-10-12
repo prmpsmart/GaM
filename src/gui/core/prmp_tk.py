@@ -223,7 +223,7 @@ class PRMP_Theme:
                     input_elements_background_color=colors['INPUT'],
                     button_color=colors['BUTTON'],
                     progress_meter_color=colors['PROGRESS'],
-                    scrollbar_color=(colors['SCROLL']),
+                    scrollbar_color=colors['SCROLL'],
                     element_text_color=colors['TEXT'],
                     input_text_color=colors['TEXT_INPUT'])
             return cls.CURRENT_THEME
@@ -272,9 +272,29 @@ class PRMP_Theme:
             pass
 
 class PRMP_Font:
-    pass
+    fancy = ""
+    font11b = "-family {Times New Roman} -size 11 -weight bold"
+    font8b = "-family {Times New Roman} -size 8 -weight bold"
+    font8 = "-family {Times New Roman} -size 8 "
+    font9 = "-family {Times New Roman} -size 9 "
+    font9b = "-family {Times New Roman} -size 9 -weight bold"
+    font10 = "-family {Courier New} -size 10"
+    font10b = "-family {Times New Roman} -size 10 -weight bold"
+    font22b = "-family {Times New Roman} -size 13 -weight bold"
+    font12b = "-family {Times New Roman} -size 12 -weight bold"
+    font22b = "-family {Times New Roman} -size 13 -weight bold"
+    font14b = "-family {Times New Roman} -size 14 -weight bold"
+    font15b = "-family {Times New Roman} -size 15 -weight bold"
+    font17b = "-family {Times New Roman} -size 16 -weight bold"
+    font17b = "-family {Times New Roman} -size 17 -weight bold"
+    font9 =  "-family {Times New Roman} -size 9 -weight bold -slant roman -underline 0 -overstrike 0"
 
-class PRMP_Widget(Theme):
+    font11u = "-family {Times New Roman} -size 11 -weight bold -slant roman -underline 0 -overstrike 0"
+    font22 = "-family {Times New Roman} -size 22 -weight bold -slant roman -underline 0 -overstrike 0"
+    font14 = "-family {Times New Roman} -size 14 -weight bold -slant roman -underline 0 -overstrike 0"
+
+
+class PRMP_Widget(PRMP_Theme):
     PRMP_WIDGET = 'Widget'
     _top = 'top'
     _left = 'left'
@@ -283,7 +303,7 @@ class PRMP_Widget(Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
         
-    def bind_exit(self): print(89); self.bind_all('<Control-u>', exit)
+    def bind_exit(self): self.bind_all('<Control-u>', exit)
     
     def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False):
         
@@ -658,7 +678,7 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
         AutoScroll.__init__(self, master)
 
 
-class ToolTip(Toplevel):
+class ToolTip(tk.Toplevel):
     def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None, delay=1, follow=True):
         self.wdgt = wdgt
         self.parent = self.wdgt.master
@@ -706,7 +726,7 @@ class ToolTip(Toplevel):
 
 
 
-class TwoWidgets(LabelFrame):
+class TwoWidgets(PRMP_LabelFrame):
     
     def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_TEXT_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_TEXT_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_TEXT_COLOR, justify='left', overrelief="groove", relief="groove", variable=None,  command=None, text='', longent=None, textvariable=None, values=(0,), value='1', from_=.1, to=1, increment=.1, show=None):
         super().__init__(master, text='')

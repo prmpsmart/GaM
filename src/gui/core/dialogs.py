@@ -104,7 +104,7 @@ class CalendarDialog(PRMP_Dialog):
                 self.config(bg=self.choosen_bg, fg=self.choosen_fg)
                 self.returnMethod(self.day)
     
-    def __init__(self, month=None, dest='', title='Calendar Dialog', bg='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', _return=True, **kwargs):
+    def __init__(self, master=None, month=None, dest='', title='Calendar Dialog', bg='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', _return=True, **kwargs):
         if month == None: month = DateTime.now()
         DateTime.checkDateTime(month)
         self.month = month
@@ -136,7 +136,7 @@ class CalendarDialog(PRMP_Dialog):
 
         if self.dest: self.__dict__[self.dest] = None
         
-        super().__init__(title=title, bg=bg, **kwargs)
+        super().__init__(master, title=title, bg=bg, **kwargs)
     
     def _setupDialog(self):
         self.daysButtons = []

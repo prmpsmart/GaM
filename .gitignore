@@ -12,6 +12,7 @@ creator.py
 *.bat
 *.code-workspace
 *.pyc
+*.zip
 prmpsmart_temp.py
 text.txt
 page/
