@@ -80,6 +80,8 @@ class Region(Mixins):
     @property
     def subRegionsManager(self): return self.__subRegionsManager
     @property
+    def regionsManagers(self): return [self.subRegionsManager]
+    @property
     def manager(self): return self.__manager
     @property
     def date(self): return self.__date

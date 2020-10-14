@@ -224,10 +224,6 @@ class CalendarDialog(PRMP_Dialog):
 
 
 
-
-
-
-
 class TestDialog(PRMP_Tk):
     
     def __init__(self, **kwargs):

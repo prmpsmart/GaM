@@ -301,23 +301,23 @@ class AutoScroll:
 
     def __init__(self, master):
         try:
-            vsb = ttk.Scrollbar(master, orient='vertical', command=self.yview)
+            self.vsb = tk.Scrollbar(master, orient='vertical', command=self.yview)
         except:
             pass
-        hsb = ttk.Scrollbar(master, orient='horizontal', command=self.xview)
+        self.hsb = tk.Scrollbar(master, orient='horizontal', command=self.xview)
 
         try:
-            self.configure(yscrollcommand=self._autoscroll(vsb))
+            self.configure(yscrollcommand=self._autoscroll(self.vsb))
         except:
             pass
-        self.configure(xscrollcommand=self._autoscroll(hsb))
+        self.configure(xscrollcommand=self._autoscroll(self.hsb))
 
         self.grid(column=0, row=0, sticky='nsew')
         try:
-            vsb.grid(column=1, row=0, sticky='ns')
+            self.vsb.grid(column=1, row=0, sticky='ns')
         except:
             pass
-        hsb.grid(column=0, row=1, sticky='ew')
+        self.hsb.grid(column=0, row=1, sticky='ew')
 
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight=1)

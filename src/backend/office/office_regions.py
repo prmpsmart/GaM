@@ -44,7 +44,8 @@ class Office(Region):
     def dcOfficesManager(self): return self.__dcOfficesManager
     @property
     def coopOfficesManager(self): return self.__coopOfficesManager
-    
+    @property
+    def regionsManagers(self): return [self.dcOfficesManager, self.coopOfficesManager]
     def setMoneySign(self, sign=0): Mixins._moneySign = sign
 
 class OfficesManager(RegionsManager):
@@ -64,7 +65,6 @@ class DCOffice(Office):
     Manager = 'DCOfficesManager'
     SubRegionsManager = AreasManager
     PersonsManager = DCManagerDetailsManager
-    MultiSubRegionsManager = False
     
     @property
     def areasManager(self): return self.subRegionsManager
@@ -81,7 +81,6 @@ class CoopOffice(Office):
     Manager = 'CoopOfficesManager'
     SubRegionsManager = UnitsManager
     PersonsManager = CoopManagerDetailsManager
-    MultiSubRegionsManager = False
     
     @classmethod
     def addUnit(cls, unit):
