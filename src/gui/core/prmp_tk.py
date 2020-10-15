@@ -357,6 +357,12 @@ class PRMP_Widget(PRMP_Theme):
         
     def bind_exit(self): self.bind_all('<Control-u>', exit)
     
+    @property
+    def className(self): return self.__class__.__name__
+    
+    @property
+    def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
+    
     def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False):
         
         if geo: geometry = geo
@@ -717,7 +723,7 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
-class ToolTip(tk.Toplevel):
+class ToolTip(PRMP_Toplevel):
     def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None, delay=1, follow=True):
         self.wdgt = wdgt
         self.parent = self.wdgt.master
@@ -883,6 +889,4 @@ class CheckCombo(TwoWidgets):
     def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_TEXT_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_TEXT_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_TEXT_COLOR, relief="groove", overrelief='groove', justify='left', variable=None, bordermode='inside', values=(0,), command=None, longent=0, textvariable=None, show=None):
         
         super().__init__(master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='checkbutton', bottom='combobox', bordermode=bordermode, activebackground=activebackground, activeforeground=activebackground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, overrelief=overrelief, text=text, justify=justify, variable=variable, command=command, values=values, orient=orient, func=func, longent=longent, textvariable=textvariable, show=show)
-
-
 
