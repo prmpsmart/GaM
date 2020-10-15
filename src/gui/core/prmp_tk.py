@@ -7,6 +7,7 @@ TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'Lab
 
 # Excerpt from PySimpleGUI theme implementation of his theme.
 class PRMP_Theme:
+    # exerpt from PySimpleGUI theming engine
     
     BLUES = ("#082567", "#0A37A3", "#00345B")
     PURPLES = ("#480656", "#4F2398", "#380474")
@@ -15,14 +16,15 @@ class PRMP_Theme:
     TANS = ("#FFF9D5", "#F4EFCF", "#DDD8BA")
     NICE_BUTTON_COLORS = ((GREENS[3], TANS[0]), ('#000000', '#FFFFFF'), ('#FFFFFF', '#000000'), (YELLOWS[0], PURPLES[1]), (YELLOWS[0], GREENS[3]), (YELLOWS[0], BLUES[2]))
     COLOR_SYSTEM_DEFAULT = '1234567890'
+    COLOR_SYSTEM_DEFAULT = 'SystemButtonFace'
     DEFAULT_BUTTON_COLOR = ('white', BLUES[0])
     OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR = ('white', BLUES[0])
     DEFAULT_ERROR_BUTTON_COLOR = ("#FFFFFF", "#FF0000")
+    DEFAULT_FOREGROUND_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_BACKGROUND_COLOR = None
     DEFAULT_ELEMENT_BACKGROUND_COLOR = None
     DEFAULT_ELEMENT_TEXT_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_TEXT_ELEMENT_BACKGROUND_COLOR = None
-    DEFAULT_TEXT_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_INPUT_ELEMENTS_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_INPUT_TEXT_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_SCROLLBAR_COLOR = None
@@ -31,6 +33,7 @@ class PRMP_Theme:
     DEFAULT_PROGRESS_BAR_COLOR_OFFICIAL = (GREENS[0], '#D0D0D0')
     DEFAULT_HIGHLIGHT_BG = 'white'
     DEFAULT_HIGHLIGHT_BG = '#004080'
+    DEFAULT_FONT = ("Helvetica", 10)
     
     THEMES_DICTS = {
         'SystemDefault': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
@@ -219,14 +222,11 @@ class PRMP_Theme:
                 colors['PROGRESS'] = cls.DEFAULT_PROGRESS_BAR_COLOR_OFFICIAL
             
             cls.setOptions(background_color=colors['BACKGROUND'],
-                    text_element_background_color=colors['BACKGROUND'],
-                    element_background_color=colors['BACKGROUND'],
                     text_color=colors['TEXT'],
                     input_elements_background_color=colors['INPUT'],
                     button_color=colors['BUTTON'],
                     progress_meter_color=colors['PROGRESS'],
                     scrollbar_color=colors['SCROLL'],
-                    element_text_color=colors['TEXT'],
                     input_text_color=colors['TEXT_INPUT'])
             return cls.CURRENT_THEME
         except Exception as er:
@@ -234,7 +234,7 @@ class PRMP_Theme:
             print(f'** Warning - Theme value not valid. Change your theme ({theme}) call. **')
     
     @classmethod
-    def setOptions(cls, button_color=None, progress_meter_color=None, background_color=None, element_background_color=None, text_element_background_color=None, input_elements_background_color=None, input_text_color=None, scrollbar_color=None, text_color=None, element_text_color=None, error_button_color=(None, None)):
+    def setOptions(cls, button_color=None, progress_meter_color=None, background_color=None, input_elements_background_color=None, input_text_color=None, scrollbar_color=None, text_color=None):
 
         if button_color != None: cls.DEFAULT_BUTTON_COLOR = button_color
 
@@ -242,21 +242,13 @@ class PRMP_Theme:
 
         if background_color != None: cls.DEFAULT_BACKGROUND_COLOR = background_color
 
-        if text_element_background_color != None: cls.DEFAULT_TEXT_ELEMENT_BACKGROUND_COLOR = text_element_background_color
-
         if input_elements_background_color != None: cls.DEFAULT_INPUT_ELEMENTS_COLOR = input_elements_background_color
 
-        if element_background_color != None: cls.DEFAULT_ELEMENT_BACKGROUND_COLOR = element_background_color
-
-        if text_color != None: cls.DEFAULT_TEXT_COLOR = text_color
+        if text_color != None: cls.DEFAULT_FOREGROUND_COLOR = text_color
 
         if scrollbar_color != None: cls.DEFAULT_SCROLLBAR_COLOR = scrollbar_color
 
-        if element_text_color != None: cls.DEFAULT_ELEMENT_TEXT_COLOR = element_text_color
-
         if input_text_color is not None: cls.DEFAULT_INPUT_TEXT_COLOR = input_text_color
-
-        if error_button_color != (None, None): cls.DEFAULT_ERROR_BUTTON_COLOR = error_button_color
 
         return True
 
@@ -268,10 +260,455 @@ class PRMP_Theme:
     def addTheme(cls, newThemeame, newThemeDict):
         pass
     
-    def paint(self):
-        theme = PRMP_Theme.THEMES_DICTS[PRMP_Theme.CURRENT_THEME]
-        if self.PRMP_ELEMENT == 'BUTTON':
-            pass
+    def paint(self, **kwargs):
+        theme = PRMP_Theme.setTheme(PRMP_Theme.CURRENT_THEME)
+        font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
+        foreground = kwargs.get('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
+        background = kwargs.get('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
+        wt = widgetType = self.PRMP_ELEMENT
+        ttk = False
+
+        if wt == 'BUTTON':
+            foreground, background = PRMP_Theme.DEFAULT_BUTTON_COLOR
+        elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
+            
+        elif wt in ['Entry', 'Text']:
+            background, foreground = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR, PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
+
+        elif wt in ['Combobox', 'Progressbar']:
+            
+            style = Style()
+            ttk = True
+            if wt == 'Combobox':
+                a, b = PRMP_Theme.DEFAULT_BUTTON_COLOR
+                style.configure('TCombobox', foreground=foreground, selectbackground=background, fieldbackground=background, selectforeground=foreground,  arrowcolor=a,  background=b)
+                style.map('TCombobox', fieldbackground=[('readonly', background)])
+            elif wt == 'Progressbar':
+                s = ttk.Style()
+                a, b = PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR
+                if self.orient == 'h': style_name = "Horizontal.TProgressbar"
+                else: style_name = "Vertical.TProgressbar"
+                style.configure(style_name, background=a, troughcolor=b, troughrelief='groove', borderwidth=2, thickness=1)
+        
+        if ttk == False:
+            self.configure(background='', foreground='', activebackground='', activeforeground='', highlightbackground='', highlightthickness=1, disabledbackground='', disabledforeground='', highlightcolor='')
+
+class PRMP_Style(Style):
+    ttkthemes = ("aquativo", "arc", "black", "blue", "breeze", "clearlooks", "elegance", "equilux", "itft1", "keramik", "kroc", "plastik", "radiance", "scidblue", "scidgreen", "scidgrey", "scidmint", "scidpink", "scidpurple", "scidsand", "smog", "ubuntu", "winxpblue")
+    ttkstyles = ('blue', 'winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+
+    def __init__(self, master=None):
+        super().__init__(master=master)
+        
+        # for theme in self.ttkthemes:
+        #     method = getattr(self, 'create' + theme.title())
+            # method()
+        
+    
+    def getPixs(self, name):
+        name_dict = {}
+        for pix in os.listdir(name):
+            base, ext = os.path.splitext(pix)
+            name_dict[base] = os.path.join(name, pix)
+        return name_dict
+    
+    def getImageKeys(self, name):
+        nameKeys = []
+        for pix in os.listdir(name):
+            base, ext = os.path.splitext(pix)
+            nameKeys.append(base)
+        return nameKeys
+
+    def styleImages(self, name):
+        script = '''
+        set imgdir [file join [file dirname [info script]] %s]
+
+        proc LoadImages {imgdir} {
+            variable I
+            foreach file [glob -directory $imgdir *.gif] {
+                set img [file tail [file rootname $file]]
+                set I($img) [image create photo -file $file -format gif89]
+            }
+        }
+        
+        array set I [LoadImages $imgdir]''' % name
+        self.tk.eval(script)
+        
+        nameKeys = self.getImageKeys(name)
+        
+        imageKeys = {}
+        for key in nameKeys:
+            tkImageName = self.tk.eval(f'return $I({key})')
+            imageKeys[key] = tkImageName
+        
+        return imageKeys
+    
+    def deleteImages(self, name):
+        pass
+        
+    def set_theme(self, theme_name): self.tk.call("ttk::setTheme", theme_name)
+        
+    def createAquativo(self):
+        pass
+    def createArc(self):
+        pass
+    def createBlack(self):
+        disabledfg = "DarkGrey"
+        frame = "#424242"
+        dark = "#222222"
+        darker = "#121212"
+        darkest = "black"
+        lighter = "#626262"
+        lightest = "#ffffff"
+        # selectbg = "#4a6984"
+        selectbg = "blue"
+        # selectfg = "#ffffff"
+        selectfg = "yellow"
+        
+        
+        settings = {
+            '.': {
+                'configure': {
+                    'background': frame, 
+                    'foreground': 'white', 
+                    'bordercolor': darkest, 
+                    'darkcolor': dark, 
+                    'lightcolor': lighter, 
+                    'troughcolor': darker, 
+                    'selectbackground': selectbg, 
+                    'selectforeground': selectfg, 
+                    'selectborderwidth': 0, 
+                    'font': 'TkDefaultFont'
+                },
+                'map': {
+                    'background': [('disabled', frame), ('active', lighter)],
+                    'foreground': [('disabled', disabledfg)],
+                    'selectbackground': [('!focus', darkest)],
+                    'selectforeground': [('!focus', 'white')]
+                }
+            },
+            'TButton': {
+                'configure': {
+                    'width': 8,
+                    'padding': (5, 1), 
+                    'relief': 'raised', 
+                }
+            },
+            'TMenubutton': {
+                'configure': {
+                    'width': 11,
+                    'padding': (5, 1), 
+                    'relief': 'raised', 
+                }
+            },
+            'TCheckbutton': {
+                'configure': {
+                    'indicatorbackground': '#ffffff',
+                    'indicatormargin': (1, 1, 4, 1)
+                }
+            },
+            'TRadiobutton': {
+                'configure': {
+                    'indicatorbackground': '#ffffff',
+                    'indicatormargin': (1, 1, 4, 1)
+                }
+            },
+            'TEntry': {
+                'configure': {
+                    'fieldbackground': 'white',
+                    'foreground': 'black',
+                    'padding': (2, 0)
+                }
+            },
+            'TCombobox': {
+                'configure': {
+                    'fieldbackground': 'white',
+                    'foreground': 'black',
+                    'padding': (2, 0)
+                }
+            },
+            'TNotebook.Tab': {
+                'configure': {
+                    'padding': (6, 2, 6, 2)
+                },
+                'map': {
+                    'background': [('selected', lighter)]
+                }
+            },
+            'Menu': {
+                'map': {
+                    'background': [('active', lighter)],
+                    'foreground': [('disabled', disabledfg)]
+                }
+            },
+            'TreeCtrl': {
+                'configure': {
+                    'background': 'gray30',
+                    'itembackground': ('gray50', 'gray60'),
+                    'itemfill': 'white',
+                    'itemaccentfill': 'yellow'
+                }
+            },
+            'Treeview': {
+                'map': {
+                    'background': [('selected', selectbg)],
+                    'foreground': [('selected', selectfg)]
+                },
+                'configure': {
+                    'fieldbackground': lighter
+                }
+            },
+        }
+        
+        # s = sfs(settings)
+        # print(s)
+        self.theme_create('black', parent='clam', settings=settings)
+        return self
+
+    def createBlue(self):
+        
+        frame = "#6699cc"
+        lighter = "#bcd2e8"
+        window = "#e6f3ff"
+        # window = "red"
+        selectbg = "#2d2d66"
+        # selectbg = "blue"
+        selectfg = "#ffffff"
+        selectfg = "yellow"
+        disabledfg = "#666666"
+
+        imagesDict = self.styleImages('blue')
+        
+        # return
+        settings = {
+            '.': {
+                'configure': {
+                    'borderwidth': 1,
+                    'background': frame,
+                    'fieldbackground': window,
+                    'troughcolor': lighter,
+                    'selectbackground': selectbg,
+                    'selectforeground': selectfg
+                },
+                'map': {
+                    'foreground': [
+                        ('disabled', disabledfg)
+                    ]
+                }
+            },
+            'TButton': {
+                'configure': {
+                    'padding': (10, 0),
+                },
+                'layout': [
+                    ('Button.button', {'children': [
+                        ('Button.focus', {'children': [
+                            ('Button.padding', {'children': [
+                                ('Button.label', None)
+                            ]})
+                        ]})
+                    ]})
+                ],
+            },
+            'button': {
+                'element create': ['image', imagesDict['button-n'], ('pressed', imagesDict['button-p']), ('active', imagesDict['button-h']), {'border': 4, 'sticky': 'ew'}]
+            },
+            'Checkbutton.indicator': {
+                'element create': ['image', imagesDict['check-nu'], 
+                    (('active', '!disabled', 'selected'), imagesDict['check-hc']), 
+                    (('active', '!disabled'), imagesDict['check-hu']), 
+                    (('selected', '!disabled'), imagesDict['check-nc']), {'width': 24, 'sticky': 'w'}]
+            },
+            'Radiobutton.indicator': {
+                'element create': ['image', imagesDict['radio-nu'], 
+                    (('active', '!disabled', 'selected'), imagesDict['radio-hc']), 
+                    (('active', '!disabled'), imagesDict['radio-hu']), 
+                    ('selected', imagesDict['radio-nc']), {'width': 24, 'sticky': 'w'}]
+            },
+            'TMenubutton': {
+                'configure': {
+                    'relief': 'raised',
+                    'padding': (10, 2)
+                },
+            },
+            'Toolbar': {
+                'configure': {
+                    'width': 0,
+                    'relief': 'flat',
+                    'borderwidth': 2,
+                    'padding': 4,
+                    'background': frame,
+                    'foreground': '#000000'
+                },
+                'map': {
+                    'background': [
+                        ('active', selectbg)
+                    ],
+                    'foreground': [
+                        ('active', selectfg)
+                    ],
+                    'relief': [
+                        ('disabled', 'flat'), 
+                        ('selected', 'sunken'), 
+                        ('pressed', 'sunken'), 
+                        ('active', 'raised')
+                    ]
+                }
+            },
+            'TEntry': {
+                'configure': {
+                    'selectborderwidth': 1,
+                    'padding': 2,
+                    'insertwidth': 2,
+                    'font': 'TkTextFont'
+                }
+            },
+            'TCombobox': {
+                'configure': {
+                    'selectborderwidth': 1,
+                    'padding': 2,
+                    'insertwidth': 2,
+                    'font': 'TkTextFont'
+                }
+            },
+            'TNotebook.Tab': {
+                'configure': {
+                    'padding': (4, 2, 4, 2)
+                },
+                'map': {
+                    'background': [
+                        ('selected', frame),
+                        ('active', lighter)
+                    ],
+                    'padding': [
+                        ('selected', (4, 4, 4, 2))
+                    ]
+                }
+            },
+            'TLabel': {
+                'configure': {
+                    'relief': 'solid',
+                    'anchor': 'center',
+                    'font': "-family {Times New Roman} -size 11 -weight bold"
+                },
+                'map': {
+                    'relief': [('!active', 'solid'), ('disabled', 'ridge')],
+                    'foreground': [('!disabled', 'black')],
+                    # 'padding':
+                }
+            },
+            'TLabelframe': {
+                'configure': {
+                    'borderwidth': 2,
+                    'relief': 'groove'
+                }
+            },
+            'Vertical.TScrollbar': {
+                'layout': [
+                    ('Scrollbar.trough', {'children': [
+                        ('Scrollbar.uparrow', {'side': 'top'}),
+                        ('Scrollbar.downarrow', {'side': 'bottom'}),
+                        ('Scrollbar.uparrow', {'side': 'bottom'}),
+                        ('Vertical.Scrollbar.thumb', {'side': 'left', 'expand': 'true', 'sticky': 'ns'})
+                    ]})
+                ]
+            },
+            'Horizontal.TScrollbar': {
+                'layout': [
+                    ('Scrollbar.trough', {'children': [
+                        ('Scrollbar.leftarrow', {'side': 'left'}),
+                        ('Scrollbar.rightarrow', {'side': 'right'}),
+                        ('Scrollbar.leftarrow', {'side': 'right'}),
+                        ('Horizontal.Scrollbar.thumb', {'side': 'left', 'expand': 'true', 'sticky': 'we'})
+                    ]})
+                ]
+            },
+            'Horizontal.Scrollbar.thumb': {
+                'element create': ['image', imagesDict['sb-thumb'], (('pressed', '!disabled'), imagesDict['sb-thumb-p']), {'border': 3}]
+            },
+            'Vertical.Scrollbar.thumb': {
+                'element create': ['image', imagesDict['sb-vthumb'], (('pressed', '!disabled'), imagesDict['sb-vthumb-p']), {'border': 3}]
+            },
+            # element create 133
+            # last for loop
+            # element create 138
+            'Scale.slider': {
+                'element create': ['image', imagesDict['slider'], (('pressed', '!disabled'), imagesDict['slider-p'])]
+            },
+            'Vertical.Scale.slider': {
+                'element create': ['image', imagesDict['vslider'], (('pressed', '!disabled'), imagesDict['vslider-p'])]
+            },
+            'Horizontal.Progress.bar': {
+                'element create': ['image', imagesDict['sb-thumb'], {'border': 2}]
+            },
+            
+            'Vertical.Progress.bar': {
+                'element create': ['image', imagesDict['sb-vthumb'], {'border': 2}]
+            },
+            'Treeview': {
+                'map': {
+                    'background': [
+                        ('selected', selectbg)
+                    ],
+                    'foreground': [
+                        ('selected', selectfg)
+                    ]
+                }
+            }
+        }
+        
+        for sd in ['up', 'down', 'left', 'right']:
+            settings.update({f'{sd}arrow': {
+                'element create': ['image', imagesDict[f'arrow{sd}'], ('disabled', imagesDict[f'arrow{sd}']), ('pressed', imagesDict[f'arrow{sd}-p']), ('active', imagesDict[f'arrow{sd}-h']), {'border': 1, 'sticky': ()}]}})
+        
+        s = sfs(settings)
+        # print(s)
+        self.theme_create('blue', settings=settings)
+        return self
+
+    def createBreeze(self):
+        pass
+    def createClearlooks(self):
+        pass
+    def createElegance(self):
+        pass
+    def createEquilux(self):
+        pass
+    def createItft1(self):
+        pass
+    def createKeramik(self):
+        pass
+    def createKroc(self):
+        pass
+    def createPlastik(self):
+        pass
+    def createRadiance(self):
+        pass
+    def createScidblue(self):
+        pass
+    def createScidgreen(self):
+        pass
+    def createScidgrey(self):
+        pass
+    def createScidmint(self):
+        pass
+    def createScidpink(self):
+        pass
+    def createScidpurple(self):
+        pass
+    def createScidsand(self):
+        pass
+    def createSmog(self):
+        pass
+    def createUbuntu(self):
+        pass
+    def createWinxpblue(self):
+        pass
+    
+    def theme_use(self, theme):
+        if theme in self.ttkthemes: getattr(self, 'create' + theme.title())()
+        super().theme_use(theme)
+
 
 class PRMP_Font:
     fancy = ""
