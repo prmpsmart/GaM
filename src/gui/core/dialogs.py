@@ -1,15 +1,14 @@
-from tkinter import Button, Entry, Label, Toplevel, Widget, Frame
-from tkinter.dialog import Dialog
+
 from tkinter.colorchooser import askcolor
-from .prmp_tk import PRMP_Toplevel, PRMP_Tk
+from .prmp_tk import *
 from ...backend.core.date_time import DateTime
 
-# PRMP_Toplevel = PRMP_Tk
+PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel):
     
     def __init__(self, master=None, title=None, **kwargs):
-        PRMP_Toplevel.__init__(self, master)
+        PRMP_Toplevel.__init__(self)#, master)
         self.setupOfWindow(title=title, **kwargs)
         self.__result = None
         self._setupDialog()
@@ -222,33 +221,15 @@ class CalendarDialog(PRMP_Dialog):
             CalendarDialog.choosen = None
             self.destroy()
 
-
-
-
-
-class TestDialog(PRMP_Tk):
+class PersonDialog(PRMP_Dialog):
     
-    def __init__(self, **kwargs):
-        super().__init__()
-        self.title('Dialog Test')
-        self.attributes('-topmost', 1)
+    def __init__(self, master=None, title=None, **kwargs):
+        super().__init__(master=master, title=title, **kwargs)
         
-        self.lab = Label(self, relief='solid')
-        self.lab.place(relx=0, rely=.2, relh=.2, relw=1)
-        
-        self.but = Button(self, text='test', command=self.set)
-        self.bind('<Return>', self.set)
-        self.bind('<BackSpace>', exit)
-        self.but.place(relx=.3, rely=.7, relh=.2, relw=.4)
-        
-        self.setupOfWindow(**kwargs)
-        
-        self.mainloop()
     
-    def set(self, r=0):
-        date = CalendarDialog(gaw=1, ntb=1, tm=1, tw=0, alp=1, geo=(200, 200), title='Calendar by PRMPSmart', side='center', bg='red', highlight_bg='#004080', highlight_fg='white', header_bg='#004080', header_fg='white', month_bg='#004080', month_fg='white', surf_fg='#004080', year_bg='black', year_fg='white').result
-        self.lab['text'] = str(date)
-
+    def _setupDialog(self):
+        
+        self.name = LabelEntry
 
 
 
