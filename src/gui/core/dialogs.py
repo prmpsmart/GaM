@@ -4,10 +4,12 @@ from tkinter.colorchooser import askcolor
 from .prmp_tk import PRMP_Toplevel, PRMP_Tk
 from ...backend.core.date_time import DateTime
 
+# PRMP_Toplevel = PRMP_Tk
+
 class PRMP_Dialog(PRMP_Toplevel):
     
     def __init__(self, master=None, title=None, **kwargs):
-        super().__init__(master)
+        PRMP_Toplevel.__init__(self, master)
         self.setupOfWindow(title=title, **kwargs)
         self.__result = None
         self._setupDialog()
@@ -30,7 +32,7 @@ class CalendarDialog(PRMP_Dialog):
     choosen = None
     _version_ = '3.3.0' # Alpha by PRMPSmart
     
-    class DayButton(Label):
+    class DayLabel(Label):
         highlight_bg = '#2d18e7'
         highlight_fg = 'white'
         now_fg = 'white'
@@ -125,12 +127,12 @@ class CalendarDialog(PRMP_Dialog):
         self.year_fg = year_fg
         self.year_bg = year_bg
         
-        self.__class__.DayButton.days_fg = days_fg
-        self.__class__.DayButton.days_bg = days_bg
+        self.__class__.DayLabel.days_fg = days_fg
+        self.__class__.DayLabel.days_bg = days_bg
         
-        self.__class__.DayButton.empty_bg = empty_bg
-        self.__class__.DayButton.highlight_bg = highlight_bg
-        self.__class__.DayButton.highlight_fg = highlight_fg
+        self.__class__.DayLabel.empty_bg = empty_bg
+        self.__class__.DayLabel.highlight_bg = highlight_bg
+        self.__class__.DayLabel.highlight_fg = highlight_fg
         
         # colors
 
@@ -164,7 +166,7 @@ class CalendarDialog(PRMP_Dialog):
             m = d % 7
             x = m * w
             if (d != 0) and (m == 0): y += h
-            btn = self.DayButton(self, returnMethod=self.choosenDay, text=d, relief='groove')
+            btn = self.DayLabel(self, returnMethod=self.choosenDay, text=d, relief='groove')
             btn.place(relx=x, rely=y, relw=w, relh=h)
             self.daysButtons.append(btn)
         
@@ -202,10 +204,10 @@ class CalendarDialog(PRMP_Dialog):
         remainingBtns = self.daysButtons[totalDays:]
         for day in monthDates:
             index = monthDates.index(day)
-            dayButton = self.daysButtons[index]
-            if dayButton == self.reset: continue
-            if day.month == self.month.month: dayButton.config(day=day)
-            else: dayButton.empty()
+            DayLabel = self.daysButtons[index]
+            if DayLabel == self.reset: continue
+            if day.month == self.month.month: DayLabel.config(day=day)
+            else: DayLabel.empty()
             
         for btn in remainingBtns:
             if btn == self.reset: continue
