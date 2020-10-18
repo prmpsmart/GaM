@@ -20,8 +20,8 @@ class PRMP_Theme:
     DEFAULT_BUTTON_COLOR = ('white', BLUES[0])
     OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR = ('white', BLUES[0])
     DEFAULT_ERROR_BUTTON_COLOR = ("#FFFFFF", "#FF0000")
-    DEFAULT_FOREGROUND_COLOR = COLOR_SYSTEM_DEFAULT
-    DEFAULT_BACKGROUND_COLOR = None
+    DEFAULT_FOREGROUND_COLOR = 'black'
+    DEFAULT_BACKGROUND_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_ELEMENT_BACKGROUND_COLOR = None
     DEFAULT_ELEMENT_TEXT_COLOR = COLOR_SYSTEM_DEFAULT
     DEFAULT_TEXT_ELEMENT_BACKGROUND_COLOR = None
@@ -33,7 +33,7 @@ class PRMP_Theme:
     DEFAULT_PROGRESS_BAR_COLOR_OFFICIAL = (GREENS[0], '#D0D0D0')
     DEFAULT_HIGHLIGHT_BG = 'white'
     DEFAULT_HIGHLIGHT_BG = '#004080'
-    DEFAULT_FONT =  "-family {Times New Roman} -size 11 -weight bold"
+    DEFAULT_FONT =  'TkDefaultFont -size 12'
     DEFAULT_RELIEF = 'groove'
     THEMES_DICTS = {
         'SystemDefault': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
@@ -353,7 +353,7 @@ class PRMP_Style(ttk.Style):
     ttkstyles = ('blue', 'winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
     def __init__(self, master=None):
-        super().__init__(self, master=master)
+        super().__init__(master=master)
         
         # for theme in self.ttkthemes:
         #     method = getattr(self, 'create' + theme.title())
@@ -862,7 +862,7 @@ class PRMP_Widget(PRMP_Theme):
     
     PRMP_ELEMENT = PRMP_WIDGET
     
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False, nrz=False, notResizable=False):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False, nrz=False, notResizable=False, _return=False):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -873,6 +873,7 @@ class PRMP_Widget(PRMP_Theme):
         if tw: toolWindow = tw
         if noTitleBar: grabAnyWhere = True
         
+        self._return = _return
         self.title(title)
         
         self.side = side
@@ -1291,36 +1292,40 @@ class ToolTip(PRMP_Toplevel):
         self.visible = 0
         self.withdraw()
 
-class TwoWidgets(PRMP_LabelFrame):
+class TwoWidgets(PRMP_Frame):
     
-    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", variable=None,  command=None, text='', longent=None, textvariable=None, values=(0,), value='1', from_=.1, to=1, increment=.1, show=None):
-        super().__init__(self, master, text='')
+    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", variable=None,  command=None, text='', longent=None, textvariable=None, values=(0,), value='1', from_=.1, to=1, increment=.1, show=None, imageFile=None):
+        super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
+        
 
         self.variable = variable
         self.value = value
-        self.top = top
+        self.top = top.lower()
+        self.bottom = bottom.lower()
         self.orient = orient
         self.longent = longent
 
         if top.lower() == 'checkbutton':
             if not command: command = self.checked
-            self.Top = tk.Checkbutton(self, text=text, variable=variable, command=command)
-        elif top.lower() == 'label': self.Top = tk.Label(self, text=text)
+            self.T = self.Top = tk.Checkbutton(self, text=text, variable=variable, command=command)
+        elif top.lower() == 'label': self.T = self.Top = tk.Label(self, text=text)
         elif top.lower() == 'radiobutton': 
             if not command: command = self.checked
-            self.Top = tk.Radiobutton(self, text=text, variable=variable, command=command, value=value)
+            self.T = self.Top = tk.Radiobutton(self, text=text, variable=variable, command=command, value=value)
 
-        if bottom.lower() == 'entry': self.Bottom = tk.Entry(self, textvariable=textvariable, show=show)
+        if bottom.lower() == 'entry': self.B = self.Bottom = tk.Entry(self, textvariable=textvariable, show=show, relief='solid')
         elif bottom.lower() == 'combobox':
-            self.Bottom = ttk.Combobox(self, values=values, textvariable=textvariable, show=show)
-            if func: self.Bottom.bind('<<ComboboxSelected>>', func)
+            self.B = self.Bottom = ttk.Combobox(self, values=values, textvariable=textvariable, show=show)
+            if func: self.B = self.Bottom.bind('<<ComboboxSelected>>', func)
         elif bottom.lower() == 'spinbox':
-            self.Bottom = ttk.Spinbox(self, from_=from_, to=to, increment=increment)
+            self.B = self.Bottom = ttk.Spinbox(self, from_=from_, to=to, increment=increment)
             if func:
                 self.Bottom.bind('<<Increment>>', func)
                 self.Bottom.bind('<<Decrement>>', func)
+        elif bottom.lower() == 'text': self.B = self.Bottom = tk.Text(self, textvariable=textvariable, show=show, relief='solid')
+        elif bottom.lower() == 'image':self.B = self.Bottom = tk.Label(self, relief='solid')
 
         
         self.style()
@@ -1358,60 +1363,82 @@ class TwoWidgets(PRMP_LabelFrame):
             self.Bottom.config(state='normal')
     def set(self, values): self.Bottom.config(values=values)
     def get(self): return self.Bottom.get()
-    def config(self, **kwargs): self.Top.config(**kwargs)
+    def config(self, **kwargs): self.Top.configure(**kwargs)
     def style(self):
         self['background'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
-        if self.top in ['checkbutton', 'radiobutton']: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="ridge", relief="groove")
-        else: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR,  activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', relief="groove")
+        if self.top in ['checkbutton', 'radiobutton']: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="ridge", relief="groove")
+        else: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR,  activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', relief="groove")
 
     def place_widgs(self):
         self.place(relx=self.relx, rely=self.rely, relh=self.relh, relw=self.relw)
         if self.orient == 'h':
             if self.longent: self.relw, self.relwb = .3, .7
             else: self.relwb = self.relw = .5
-            self.Top.place(relx=0, rely=0, relh=1, relw=self.relw)
-            self.Bottom.place(relx=self.relw, rely=0, relh=1, relw=self.relwb)
+            
+            if self.bottom in ['text', 'image']: self.Top.place(relx=0, rely=0, relh=.2, relw=self.relw)
+            else: self.Top.place(relx=0, rely=0, relh=1, relw=self.relw)
+            self.Bottom.place(relx=self.relw, rely=0, relh=.9, relw=self.relwb)
         else:
             self.Top.place(relx=0, rely=0, relw=1, relh=.6)
-            self.Bottom.place(relx=0, rely=.6, relw=1, relh=.4)
+            self.Bottom.place(relx=0, rely=.6, relw=1, relh=.35)
+        return self
 TW = TwoWidgets
-class RadioCombo(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief='groove', variable=None, bordermode='ignore', value=None, values=(0,), command=None, longent=None, textvariable=None, show=None):
-        
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='radiobutton', bottom='combobox', bordermode=bordermode, text=text, orient=orient, activebackground=activebackground, activeforeground=activeforeground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, variable=variable, command=command, values=values, value=value, func=func, longent=longent, textvariable=textvariable, show=show)
-RC = RadioCombo
-class RadioEntry(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', variable=None, value=None,  command=None, activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, orient='h', foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="ridge", relief="groove", bordermode='inside', longent=None, textvariable=None, show=None):
-        
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='radiobutton', bottom='entry', bordermode=bordermode, text=text, orient=orient, activebackground=activebackground, activeforeground=activeforeground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, variable=variable, command=command, value=value, longent=longent, textvariable=textvariable, show=show)
-RE = RadioEntry
-class LabelSpin(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="black", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, relief="groove", justify='left', bordermode='inside', from_=.1, to=1, increment=.1, longent=None, show=None):
 
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='label', bottom='spinbox', bordermode=bordermode, text=text, orient=orient, activebackground=activebackground, activeforeground=activeforeground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, from_=from_, to=to, increment=increment, longent=longent)
+class RadioCombo(TwoWidgets):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, top='radiobutton', bottom='combobox', **kwargs)
+RC = RadioCombo
+
+class RadioEntry(TwoWidgets):
+    def __init__(self, master, **kwargs):
+        
+        super().__init__(master, top='radiobutton', bottom='entry', **kwargs)
+RE = RadioEntry
+
+class LabelSpin(TwoWidgets):
+    def __init__(self, master, **kwargs):
+
+        super().__init__(master, top='label', bottom='spinbox', **kwargs)
 
     def set(self, from_=.1, to=1, increment=.1): self.Bottom.config(from_=from_, to=to, increment=increment)
-LS = LabelSpin
-class LabelEntry(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="black", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, relief="groove", bordermode='inside', longent=None, textvariable=None, show=None):
     
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='label', bottom='entry', bordermode=bordermode, text=text, orient=orient, activebackground=activebackground, activeforeground=activeforeground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, longent=longent, textvariable=textvariable, show=show)
-LB = LabelEntry
-class LabelCombo(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="black", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, relief="groove", bordermode='inside', values=(0,), longent=None, textvariable=None, show=None):
+LS = LabelSpin
 
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='label', bottom='combobox', bordermode=bordermode, text=text, func=func, orient=orient, activebackground=activebackground, activeforeground=activeforeground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, values=values, longent=longent, textvariable=textvariable, show=show)
+class LabelEntry(TwoWidgets):
+    def __init__(self, master, **kwargs):
+    
+        super().__init__(master, top='label', bottom='entry', **kwargs)
+LE = LabelEntry
+
+class LabelText(TwoWidgets):
+    def __init__(self, master, **kwargs):
+    
+        super().__init__(master, top='label', bottom='text', **kwargs)
+LT = LabelText
+
+class LabelCombo(TwoWidgets):
+    def __init__(self, master, **kwargs):
+
+        super().__init__(master, top='label', bottom='combobox', **kwargs)
 LC = LabelCombo
+
 class CheckEntry(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", variable=None, bordermode='inside', command=None, longent=None, textvariable=None, show=None):
+    def __init__(self, master, **kwargs):
         
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='checkbutton', text=text, bottom='entry', bordermode=bordermode, activebackground=activebackground, activeforeground=activebackground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, justify=justify, overrelief=overrelief, relief=relief, variable=variable, command=command, orient=orient, longent=longent, textvariable=textvariable, show=show)
+        super().__init__(master, top='checkbutton', bottom='entry', **kwargs)
 CE = CheckEntry
+
 class CheckCombo(TwoWidgets):
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, text='', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Font.font11b, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, relief="groove", overrelief='groove', justify='left', variable=None, bordermode='inside', values=(0,), command=None, longent=0, textvariable=None, show=None):
+    def __init__(self, master, **kwargs):
         
-        super().__init__(self, master, background=background, relx=relx, rely=rely, relw=relw, relh=relh, top='checkbutton', bottom='combobox', bordermode=bordermode, activebackground=activebackground, activeforeground=activebackground, disabledforeground=disabledforeground, font=PRMP_Font.font11b, foreground=foreground, highlightbackground=highlightbackground, highlightcolor=highlightcolor, relief=relief, overrelief=overrelief, text=text, justify=justify, variable=variable, command=command, values=values, orient=orient, func=func, longent=longent, textvariable=textvariable, show=show)
+        super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
 CC = CheckCombo
+
+class LabelImage(TwoWidgets):
+    def __init__(self, master, **kwargs):
+        
+        super().__init__(master, top='label', bottom='image', **kwargs)
+LI = LabelImage
 
 
 

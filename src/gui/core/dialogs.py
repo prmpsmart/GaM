@@ -8,7 +8,8 @@ PRMP_Toplevel = PRMP_Tk
 class PRMP_Dialog(PRMP_Toplevel):
     
     def __init__(self, master=None, title=None, **kwargs):
-        PRMP_Toplevel.__init__(self)#, master)
+        # PRMP_Toplevel.__init__(self, master)
+        PRMP_Toplevel.__init__(self)
         self.setupOfWindow(title=title, **kwargs)
         self.__result = None
         self._setupDialog()
@@ -105,12 +106,11 @@ class CalendarDialog(PRMP_Dialog):
                 self.config(bg=self.choosen_bg, fg=self.choosen_fg)
                 self.returnMethod(self.day)
     
-    def __init__(self, master=None, month=None, dest='', title='Calendar Dialog', bg='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', _return=True, **kwargs):
+    def __init__(self, master=None, month=None, dest='', title='Calendar Dialog', bg='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', **kwargs):
         if month == None: month = DateTime.now()
         DateTime.checkDateTime(month)
         self.month = month
         self.dest = dest
-        self._return = _return
         # colors
         self.bg = bg
         
@@ -229,7 +229,28 @@ class PersonDialog(PRMP_Dialog):
     
     def _setupDialog(self):
         
-        self.name = LabelEntry
+        self.name = LE(self, text='Name', orient='h', relx=0, rely=0, relh=.04, relw=.4, longent=1, foreground='black').place_widgs()
+        self.name.B.bind('<Return>', self.pri)
+        
+        self.phone = LE(self, text='Phone Number', relx=0, rely=.04, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
+        
+        
+        self.email = LE(self, text='Email', relx=0, rely=.08, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
+        
+        
+        self.address = LT(self, text='Address', relx=0, rely=.12, relh=.2, relw=.4, longent=1, orient='h').place_widgs()
+        
+        
+        
+        
+    
+    def pri(self, *a):
+        return
+    
+        print(self.name.T['font'])
+        self.name.config(text='miracle')
+        print(self.name.get(), self.name.T['text'])
+        
 
 
 
