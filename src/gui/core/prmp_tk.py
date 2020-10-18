@@ -1,5 +1,8 @@
 from random import randint
 import tkinter as tk, tkinter.ttk as ttk, platform, os, time
+from tkinter.filedialog import askopenfilename
+from PIL.ImageTk import PhotoImage, Image
+
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 
@@ -848,7 +851,16 @@ class PRMP_Widget(PRMP_Theme):
     
     def __init__(self, **kwargs):
         self.kwargs = kwargs
+    
+    def bindOverrelief(self, wid, relief):
+        re = wid['relief']
+        def setRelief(e=0): wid['relief'] = relief
+        def resetRelief(e=0): wid['relief'] = re
         
+        wid.bind('<Enter>', setRelief)
+        wid.bind('<Leave>', resetRelief)
+        
+
     def bind_exit(self): self.bind_all('<Control-u>', exit)
     
     @property
@@ -1325,12 +1337,64 @@ class TwoWidgets(PRMP_Frame):
                 self.Bottom.bind('<<Increment>>', func)
                 self.Bottom.bind('<<Decrement>>', func)
         elif bottom.lower() == 'text': self.B = self.Bottom = tk.Text(self, textvariable=textvariable, show=show, relief='solid')
-        elif bottom.lower() == 'image':self.B = self.Bottom = tk.Label(self, relief='solid')
+        elif bottom.lower() == 'image':
+            self.B = self.Bottom = tk.Label(self, relief='solid')
+            self.loadImage(imageFile=imageFile)
+            self.bindMenu(self.B)
 
-        
+        self.rt = None
         self.style()
         self.checked()
-
+    
+    @property
+    def default_dp(self):
+        path = os.path
+        dn = path.dirname
+        dir_ = dn(dn(dn(__file__)))
+        file = path.join(dir_, 'img/profile_pix.png')
+        return file
+        
+    def loadImage(self, e=0, imageFile=None):
+        thumb = (280, 160)
+        if not imageFile: imageFile, thumb = self.default_dp, (150, 150)
+        image = Image.open(imageFile)
+        
+        # image = image.resize()
+        image.thumbnail(thumb)
+        self.image =  PhotoImage(image=image)
+        self.B['image'] = self.image
+    
+    def changeImage(self, e=0):
+        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif}'])
+        self.loadImage(imageFile=file)
+    
+    def bindMenu(self, wid):
+        self.B.bind('<1>', self.delMenu)
+        self.B.bind('<3>', self.showMenu)
+    
+    def delMenu(self, e=0):
+        if self.rt: self.rt.destroy()
+    
+    def showMenu(self, e=0):
+        self.delMenu()
+        # print(e.__dict__)
+        x, y = e.x, e.y
+        x, y = e.x_root, e.y_root
+        self.rt = rt = PRMP_Toplevel()
+        rt.setupOfWidget(gaw=1)
+        rt.overrideredirect(1)
+        lbl = L(rt, text='Remove')
+        lbl.bind('<1>', self.loadImage)
+        lbl.place(relx=.05, rely=0, relh=.5, relw=.9)
+        self.bindOverrelief(lbl, 'groove')
+        
+        lbl2 = L(rt, text='Change')#, overrelief='groove')
+        lbl2.bind('<1>', self.changeImage)
+        lbl2.place(relx=.05, rely=.5, relh=.5, relw=.9)
+        self.bindOverrelief(lbl2, 'groove')
+        
+        rt.attributes('-topmost', 1)
+        rt.geometry(f'50x50+{x}+{y}')
 
     def checked(self):
         if self.variable:
@@ -1437,7 +1501,7 @@ CC = CheckCombo
 class LabelImage(TwoWidgets):
     def __init__(self, master, **kwargs):
         
-        super().__init__(master, top='label', bottom='image', **kwargs)
+        super().__init__(master, top='label', bottom='image', **kwargs, imageFile=r'C:\Users\Administrator\Pictures\PHOTO SHOOT\mm6.jpg')
 LI = LabelImage
 
 

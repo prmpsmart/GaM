@@ -223,36 +223,26 @@ class CalendarDialog(PRMP_Dialog):
 
 class PersonDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title=None, **kwargs):
+    def __init__(self, master=None, title='Person Dialog', person=None, **kwargs):
         super().__init__(master=master, title=title, **kwargs)
-        
+        self.person = person
     
     def _setupDialog(self):
         
-        self.name = LE(self, text='Name', orient='h', relx=0, rely=0, relh=.04, relw=.4, longent=1, foreground='black').place_widgs()
-        self.name.B.bind('<Return>', self.pri)
+        self.name = LE(self, text='Name', orient='h', relx=0, rely=.04, relh=.04, relw=.4, longent=1, foreground='black').place_widgs()
         
-        self.phone = LE(self, text='Phone Number', relx=0, rely=.04, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
-        
-        
-        self.email = LE(self, text='Email', relx=0, rely=.08, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
+        self.phone = LE(self, text='Phone Number', relx=0, rely=.08, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
         
         
-        self.address = LT(self, text='Address', relx=0, rely=.12, relh=.2, relw=.4, longent=1, orient='h').place_widgs()
+        self.email = LE(self, text='Email', relx=0, rely=.12, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
+        
+        
+        self.address = LT(self, text='Address', relx=0, rely=.16, relh=.2, relw=.4, longent=1, orient='h').place_widgs()
+        
+        self.image = LI(self, relx=.44, rely=.04, relh=.3, relw=.56, longent=1, orient='h', text='Profile Picture').place_widgs()
         
         
         
-        
-    
-    def pri(self, *a):
-        return
-    
-        print(self.name.T['font'])
-        self.name.config(text='miracle')
-        print(self.name.get(), self.name.T['text'])
-        
-
-
 
 
 
