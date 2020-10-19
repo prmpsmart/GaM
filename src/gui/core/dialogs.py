@@ -3,26 +3,6 @@ from tkinter.colorchooser import askcolor
 from .prmp_tk import *
 from ...backend.core.date_time import DateTime
 
-PRMP_Toplevel = PRMP_Tk
-
-class PRMP_Dialog(PRMP_Toplevel):
-    
-    def __init__(self, master=None, title=None, **kwargs):
-        # PRMP_Toplevel.__init__(self, master)
-        PRMP_Toplevel.__init__(self)
-        self.setupOfWindow(title=title, **kwargs)
-        self.__result = None
-        self._setupDialog()
-        self._isDialog()
-        
-    def _setupDialog(self):
-        'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
-    
-    def _setResult(self, result): self.__result = result
-    
-    @property
-    def result(self): return self.__result
-
 class CalendarDialog(PRMP_Dialog):
     _both = '◄►'
     _next = '►'
@@ -229,17 +209,22 @@ class PersonDialog(PRMP_Dialog):
     
     def _setupDialog(self):
         
-        self.name = LE(self, text='Name', orient='h', relx=0, rely=.04, relh=.04, relw=.4, longent=1, foreground='black').place_widgs()
+        self.contact = LF(self, text='Contact Details')
+        self.contact.place(x=10, y=10, h=200, w=200)
         
-        self.phone = LE(self, text='Phone Number', relx=0, rely=.08, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
+        self.name = LE(self.contact,  text='Name', orient='h', relx=.05, rely=0, relh=.15, relw=.9, longent=1, foreground='black').place_widgs()
+        # self.name.paint()
+        self.phone = LE(self.contact,  text='Phone Number', relx=.05, rely=.17, relh=.15, relw=.9, longent=0, orient='h').place_widgs()
         
         
-        self.email = LE(self, text='Email', relx=0, rely=.12, relh=.04, relw=.4, longent=0, orient='h').place_widgs()
+        self.email = LE(self.contact,  text='Email', relx=.05, rely=.34, relh=.15, relw=.9, longent=1, orient='h').place_widgs()
         
         
-        self.address = LT(self, text='Address', relx=0, rely=.16, relh=.2, relw=.4, longent=1, orient='h').place_widgs()
+        self.address = LT(self.contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
         
-        self.image = LI(self, relx=.44, rely=.04, relh=.3, relw=.56, longent=1, orient='h', text='Profile Picture').place_widgs()
+        self.image = LI(self, relx=.44, rely=.04, relh=.3, relw=.53, longent=1, orient='h', text='Profile Picture', ilh=.18).place_widgs()
+        
+        self.childWidgets += [self.contact]
         
         
         
