@@ -1,6 +1,7 @@
 from random import randint
 import tkinter as tk, tkinter.ttk as ttk, platform, os, time
 from tkinter.filedialog import askopenfilename
+import tkinter.messagebox as msgbox
 from PIL.ImageTk import PhotoImage, Image
 
 
@@ -256,7 +257,6 @@ class PRMP_Theme:
 
         return True
 
-    
     @classmethod
     def themesList(cls): return sorted(list(cls.THEMES_DICTS.keys()))
     
@@ -350,6 +350,8 @@ class PRMP_Theme:
         else: self.configure(background=background)
         
         for child in self.childWidgets: child.paint()
+        
+        return self
         
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
@@ -855,9 +857,11 @@ class PRMP_Widget(PRMP_Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
     
-    def __init__(self, **kwargs):
+    def __init__(self, window=False, **kwargs):
         self.kwargs = kwargs
         self.childWidgets = []
+        
+        if window: self.setupOfWidget(**kwargs)
     
     def bindOverrelief(self, wid, relief):
         re = wid['relief']
@@ -1100,15 +1104,16 @@ class PRMP_Widget(PRMP_Theme):
 PRMP_Window = PRMP_Widget
 
 class PRMP_Tk(tk.Tk, PRMP_Widget):
-    def __init__(self):
+    def __init__(self, **kwargs):
         tk.Tk.__init__(self)
-        PRMP_Widget.__init__(self)
+        PRMP_Widget.__init__(self, window=True, **kwargs)
         
 Tk = PTk = PRMP_Tk
 class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
-    def __init__(self, master=None):
+    def __init__(self, master=None, **kwargs):
         tk.Toplevel.__init__(self, master)
-        PRMP_Widget.__init__(self)
+        PRMP_Widget.__init__(self, window=True, **kwargs)
+        
 Top = Toplevel = PTop = PRMP_Toplevel
 class PRMP_Button(tk.Button, PRMP_Widget):
     
@@ -1213,6 +1218,18 @@ class ScrollableFrame(PRMP_Frame):
     
     def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
 
+
+def show(title=None, msg=None, which=None):
+    if which == 'error': msgbox.showerror(title, msg)
+    elif which == 'info': msgbox.showinfo('Information', msg)
+    elif which == 'warn': msgbox.showwarning('Warning', msg)
+    
+def confirm(title=None, msg=None, num=None):
+    if num == 1: return msgbox.askyesno(title, msg)
+    if num == 2: return msgbox.askquestion(title, msg)
+    if num == 3: return msgbox.askokcancel(title, msg)
+    if num == 4: return msgbox.askretrycancel(title, msg)
+    if num == 5: return msgbox.askyesnocancel(title, msg)
 
 ### ScrolledTreeView
 def on_mousewheel(event, widget):
@@ -1404,15 +1421,14 @@ class TwoWidgets(PRMP_Frame):
         # print(e.__dict__)
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PRMP_Toplevel()
-        rt.setupOfWidget(gaw=1)
+        rt = PRMP_Toplevel(gaw=1).paint()
         rt.overrideredirect(1)
-        lbl = L(rt, text='Remove')
+        lbl = L(rt, text='Remove').paint()
         lbl.bind('<1>', self.loadImage)
         lbl.place(relx=.05, rely=0, relh=.5, relw=.9)
         self.bindOverrelief(lbl, 'groove')
         
-        lbl2 = L(rt, text='Change')#, overrelief='groove')
+        lbl2 = L(rt, text='Change').paint()
         lbl2.bind('<1>', self.changeImage)
         lbl2.place(relx=.05, rely=.5, relh=.5, relw=.9)
         self.bindOverrelief(lbl2, 'groove')
@@ -1430,28 +1446,36 @@ class TwoWidgets(PRMP_Frame):
                 self.Top['foreground'] = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
 
     def get_top(self): return self.Top
+    
     def get_bottom(self): return self.Bottom
+    
     def disabled(self, wh=''):
         if wh == 't': self.Top.config(state='disabled')
         elif wh == 'b': self.Bottom.config(state='disabled')
         else:
             self.Top.config(state='disabled')
             self.Bottom.config(state='disabled')
+    
     def active(self, wh=''):
         if wh == 't': self.Top.config(state='active')
         elif wh == 'b': self.Bottom.config(state='active')
         else:
             self.Top.config(state='active')
             self.Bottom.config(state='active')
+    
     def normal(self, wh=''):
         if wh == 't': self.Top.config(state='normal')
         elif wh == 'b': self.Bottom.config(state='normal')
         else:
             self.Top.config(state='normal')
             self.Bottom.config(state='normal')
+    
     def set(self, values): self.Bottom.config(values=values)
+    
     def get(self): return self.Bottom.get()
+    
     def config(self, **kwargs): self.Top.configure(**kwargs)
+    
     def style(self):
         self['background'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
         if self.top in ['checkbutton', 'radiobutton']: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="ridge", relief="groove")
@@ -1522,10 +1546,64 @@ class CheckCombo(TwoWidgets):
         super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
 CC = CheckCombo
 
-class LabelImage(TwoWidgets):
-    def __init__(self, master, **kwargs):
+class LabelImage(PRMP_Label):
+    def __init__(self, master, imageFile=r'C:\Users\Administrator\Pictures\PHOTO SHOOT\mm6.jpg', **kwargs):
+        super().__init__(master, **kwargs)
+        self.rt = None
+        self.bindMenu()
+        self.loadImage(imageFile=imageFile)
+        self.bindEntryHighlight()
         
-        super().__init__(master, top='label', bottom='image', **kwargs, imageFile=r'C:\Users\Administrator\Pictures\PHOTO SHOOT\mm6.jpg')
+    @property
+    def default_dp(self):
+        path = os.path
+        dn = path.dirname
+        dir_ = dn(dn(dn(__file__)))
+        file = path.join(dir_, 'img/profile_pix.png')
+        return file
+        
+    def loadImage(self, e=0, imageFile=None):
+        thumb = (200, 170)
+        if not imageFile:
+            if not confirm('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ', 1): return
+            imageFile, thumb = self.default_dp, (150, 150)
+        image = Image.open(imageFile)
+        
+        # image = image.resize()
+        image.thumbnail(thumb)
+        self.image =  PhotoImage(image=image)
+        self['image'] = self.image
+    
+    def changeImage(self, e=0):
+        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif}'])
+        self.loadImage(imageFile=file)
+    
+    def bindMenu(self):
+        self.bind('<1>', self.delMenu)
+        self.bind('<3>', self.showMenu)
+        self.bind('<Double-1>', self.showMenu)
+    
+    def delMenu(self, e=0):
+        if self.rt:
+            self.rt.destroy()
+            del self.rt
+            self.rt = None
+    
+    def showMenu(self, e=0):
+        self.delMenu()
+        x, y = e.x, e.y
+        x, y = e.x_root, e.y_root
+        self.rt = rt = PRMP_Toplevel().paint()
+        rt.overrideredirect(1)
+        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken').paint()
+        lbl.place(relx=0, rely=0, relh=.5, relw=1)
+        
+        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken').paint()
+        lbl2.place(relx=0, rely=.5, relh=.5, relw=1)
+        
+        rt.attributes('-topmost', 1)
+        rt.geometry(f'50x50+{x}+{y}')
+
 LI = LabelImage
 
 
@@ -1533,10 +1611,9 @@ PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel):
     
-    def __init__(self, master=None, title=None, **kwargs):
-        # PRMP_Toplevel.__init__(self, master)
-        PRMP_Toplevel.__init__(self)
-        self.setupOfWindow(title=title, **kwargs)
+    def __init__(self, master=None, **kwargs):
+        # PRMP_Toplevel.__init__(self, master, **kwargs)
+        PRMP_Toplevel.__init__(self, **kwargs)
         self.__result = None
         self._setupDialog()
         self.paint()

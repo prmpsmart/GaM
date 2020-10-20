@@ -203,14 +203,14 @@ class CalendarDialog(PRMP_Dialog):
 
 class PersonDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Person Dialog', person=None, **kwargs):
-        super().__init__(master=master, title=title, **kwargs)
+    def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 220), **kwargs):
+        super().__init__(master=master, title=title, geo=geo, **kwargs)
         self.person = person
     
     def _setupDialog(self):
         
         self.contact = LF(self, text='Contact Details')
-        self.contact.place(x=10, y=10, h=200, w=200)
+        self.contact.place(x=10, y=10, h=200, w=250)
         
         self.name = LE(self.contact,  text='Name', orient='h', relx=.05, rely=0, relh=.15, relw=.9, longent=1, foreground='black').place_widgs()
         # self.name.paint()
@@ -222,9 +222,10 @@ class PersonDialog(PRMP_Dialog):
         
         self.address = LT(self.contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
         
-        self.image = LI(self, relx=.44, rely=.04, relh=.3, relw=.53, longent=1, orient='h', text='Profile Picture', ilh=.18).place_widgs()
+        self.image = LI(self)
+        self.image.place(x=270, y=20, h=190, w=220)
         
-        self.childWidgets += [self.contact]
+        self.childWidgets += [self.contact, self.image]
         
         
         
