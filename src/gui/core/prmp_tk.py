@@ -727,7 +727,7 @@ class PRMP_Style(ttk.Style):
             settings.update({f'{sd}arrow': {
                 'element create': ['image', imagesDict[f'arrow{sd}'], ('disabled', imagesDict[f'arrow{sd}']), ('pressed', imagesDict[f'arrow{sd}-p']), ('active', imagesDict[f'arrow{sd}-h']), {'border': 1, 'sticky': ()}]}})
         
-        s = sfs(settings)
+        # s = sfs(settings)
         # print(s)
         self.theme_create('blue', settings=settings)
         return self
@@ -1339,13 +1339,15 @@ class ToolTip(PRMP_Toplevel):
 
 class TwoWidgets(PRMP_Frame):
     
-    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", variable=None,  command=None, text='', longent=None, textvariable=None, values=(0,), value='1', from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0):
+    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=None, values=(0,), value=None, from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
         
 
-        self.variable = variable
+        
+        self.variable = tk.StringVar()
+        
         self.value = value
         self.ilh = ilh
         self.top = top.lower()
@@ -1361,16 +1363,16 @@ class TwoWidgets(PRMP_Frame):
             if not command: command = self.checked
             self.Top = PRMP_Radiobutton(self, text=text, variable=variable, command=command, value=value)
 
-        if bottom.lower() == 'entry': self.Bottom = PRMP_Entry(self, textvariable=textvariable, show=show)
+        if bottom.lower() == 'entry': self.Bottom = PRMP_Entry(self, show=show)
         elif bottom.lower() == 'combobox':
-            self.Bottom = ttk.Combobox(self, values=values, textvariable=textvariable, show=show)
+            self.Bottom = ttk.Combobox(self, values=values, show=show)
             if func: self.Bottom.bind('<<ComboboxSelected>>', func)
         elif bottom.lower() == 'spinbox':
             self.Bottom = ttk.Spinbox(self, from_=from_, to=to, increment=increment)
             if func:
                 self.Bottom.bind('<<Increment>>', func)
                 self.Bottom.bind('<<Decrement>>', func)
-        elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, textvariable=textvariable, show=show)
+        elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, show=show)
         elif bottom.lower() == 'image':
             self.Bottom = PRMP_Label(self)
             self.loadImage(imageFile=imageFile)
@@ -1384,7 +1386,7 @@ class TwoWidgets(PRMP_Frame):
         
         self.childWidgets += [self.T, self.B]
         
-        self.checked()
+        if self.value and self.variable: self.checked()
         self.paint()
     
     @property
@@ -1524,8 +1526,10 @@ LE = LabelEntry
 
 class LabelText(TwoWidgets):
     def __init__(self, master, **kwargs):
-    
         super().__init__(master, top='label', bottom='text', **kwargs)
+    
+    def get(self): return self.B.get('1.0', 'end').strip('\n')
+        
 LT = LabelText
 
 class LabelCombo(TwoWidgets):

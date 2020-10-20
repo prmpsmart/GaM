@@ -201,9 +201,11 @@ class CalendarDialog(PRMP_Dialog):
             CalendarDialog.choosen = None
             self.destroy()
 
+
+
 class PersonDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 220), **kwargs):
+    def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 260), **kwargs):
         super().__init__(master=master, title=title, geo=geo, **kwargs)
         self.person = person
     
@@ -216,19 +218,29 @@ class PersonDialog(PRMP_Dialog):
         # self.name.paint()
         self.phone = LE(self.contact,  text='Phone Number', relx=.05, rely=.17, relh=.15, relw=.9, longent=0, orient='h').place_widgs()
         
-        
         self.email = LE(self.contact,  text='Email', relx=.05, rely=.34, relh=.15, relw=.9, longent=1, orient='h').place_widgs()
-        
         
         self.address = LT(self.contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
         
         self.image = LI(self)
         self.image.place(x=270, y=20, h=190, w=220)
         
-        self.childWidgets += [self.contact, self.image]
+        self.submit = B(self, text='Submit', command=self.processInput)
+        self.submit.place(relx=.4, rely=.9, relh=.1, relw=.2)
         
+        self.childWidgets += [self.contact, self.image, self.submit]
+    
+    def processInput(self):
+        result = {'name': self.name.get(), 'phone': self.phone.get(), 'email': self.email.get(), 'address': self.address.get()}#, 'image': self.image.imageData}
+        self._setResult(result)
         
-        
+        print(self.result)
+
+
+
+
+
+
 
 
 
