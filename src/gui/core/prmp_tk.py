@@ -1,9 +1,15 @@
-from random import randint
-import tkinter as tk, tkinter.ttk as ttk, platform, os, time
-from tkinter.filedialog import askopenfilename
+import os
+import platform
+import time
+import tkinter as tk
 import tkinter.messagebox as msgbox
-from PIL.ImageTk import PhotoImage, Image
+import tkinter.ttk as ttk
+from base64 import b64decode, b64encode
+from io import BytesIO
+from random import randint
+from tkinter.filedialog import askopenfilename
 
+from PIL.ImageTk import Image, PhotoImage
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 
@@ -870,12 +876,22 @@ class PRMP_Widget(PRMP_Theme):
         
         wid.bind('<Enter>', setRelief)
         wid.bind('<Leave>', resetRelief)
-        
+    
+    def disabled(self): self['state'] = 'disabled'
+    def normal(self): self['state'] = 'normal'
+    
+    def addExitButton(self):
+        geo = self.kwargs.get('geo')
+        if geo:
+            x = geo[0]
+            xbtn = B(self, text='X', command=self.destroy)
+            xbtn.place(x=x-20, y=0, h=20, w=20)
+            self.childWidgets.append(xbtn)
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
         
 
-    def bind_exit(self): self.bind_all('<Control-u>', exit)
+    def bindExit(self): self.bind_all('<Control-u>', exit)
     
     @property
     def className(self): return self.__class__.__name__
@@ -1339,14 +1355,12 @@ class ToolTip(PRMP_Toplevel):
 
 class TwoWidgets(PRMP_Frame):
     
-    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=None, values=(0,), value=None, from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0):
+    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=None, values=(0,), value=None, from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0, variable=None):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
         
 
-        
-        self.variable = tk.StringVar()
         
         self.value = value
         self.ilh = ilh
@@ -1372,11 +1386,7 @@ class TwoWidgets(PRMP_Frame):
             if func:
                 self.Bottom.bind('<<Increment>>', func)
                 self.Bottom.bind('<<Decrement>>', func)
-        elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, show=show)
-        elif bottom.lower() == 'image':
-            self.Bottom = PRMP_Label(self)
-            self.loadImage(imageFile=imageFile)
-            self.bindMenu(self.Bottom)
+        elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, show=show, variable=variable)
         
         self.B = self.Bottom
         self.T = self.Top
@@ -1389,55 +1399,6 @@ class TwoWidgets(PRMP_Frame):
         if self.value and self.variable: self.checked()
         self.paint()
     
-    @property
-    def default_dp(self):
-        path = os.path
-        dn = path.dirname
-        dir_ = dn(dn(dn(__file__)))
-        file = path.join(dir_, 'img/profile_pix.png')
-        return file
-        
-    def loadImage(self, e=0, imageFile=None):
-        thumb = (280, 160)
-        if not imageFile: imageFile, thumb = self.default_dp, (150, 150)
-        image = Image.open(imageFile)
-        
-        # image = image.resize()
-        image.thumbnail(thumb)
-        self.image =  PhotoImage(image=image)
-        self.Bottom['image'] = self.image
-    
-    def changeImage(self, e=0):
-        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif}'])
-        self.loadImage(imageFile=file)
-    
-    def bindMenu(self, wid):
-        self.Bottom.bind('<1>', self.delMenu)
-        self.Bottom.bind('<3>', self.showMenu)
-    
-    def delMenu(self, e=0):
-        if self.rt: self.rt.destroy()
-    
-    def showMenu(self, e=0):
-        self.delMenu()
-        # print(e.__dict__)
-        x, y = e.x, e.y
-        x, y = e.x_root, e.y_root
-        rt = PRMP_Toplevel(gaw=1).paint()
-        rt.overrideredirect(1)
-        lbl = L(rt, text='Remove').paint()
-        lbl.bind('<1>', self.loadImage)
-        lbl.place(relx=.05, rely=0, relh=.5, relw=.9)
-        self.bindOverrelief(lbl, 'groove')
-        
-        lbl2 = L(rt, text='Change').paint()
-        lbl2.bind('<1>', self.changeImage)
-        lbl2.place(relx=.05, rely=.5, relh=.5, relw=.9)
-        self.bindOverrelief(lbl2, 'groove')
-        
-        rt.attributes('-topmost', 1)
-        rt.geometry(f'50x50+{x}+{y}')
-
     def checked(self):
         if self.variable:
             if self.variable.get() == self.value:
@@ -1472,7 +1433,11 @@ class TwoWidgets(PRMP_Frame):
             self.Top.config(state='normal')
             self.Bottom.config(state='normal')
     
-    def set(self, values): self.Bottom.config(values=values)
+    def set(self, values):
+        if self.bottom == 'combobox': self.Bottom.config(values=values)
+        elif self.bottom == 'entry': self.Bottom.insert(0, values)
+        elif self.bottom == 'text': self.Bottom.insert(0.0, values)
+        else: self.Bottom.config(text=values)
     
     def get(self): return self.Bottom.get()
     
@@ -1489,7 +1454,7 @@ class TwoWidgets(PRMP_Frame):
             if self.longent: self.relw, self.relwb = .3, .7
             else: self.relwb = self.relw = .5
             
-            if self.bottom in ['text', 'image']: self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.relw)
+            if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.relw)
             else: self.Top.place(relx=0, rely=0, relh=1, relw=self.relw)
             self.Bottom.place(relx=self.relw + .02, rely=0, relh=.945, relw=self.relwb - .02)
         else:
@@ -1551,12 +1516,21 @@ class CheckCombo(TwoWidgets):
 CC = CheckCombo
 
 class LabelImage(PRMP_Label):
-    def __init__(self, master, imageFile=r'C:\Users\Administrator\Pictures\PHOTO SHOOT\mm6.jpg', **kwargs):
+    def __init__(self, master, imageFile=None, **kwargs):
         super().__init__(master, **kwargs)
         self.rt = None
+        self.data = None
         self.bindMenu()
-        self.loadImage(imageFile=imageFile)
+        self.loadImage(imageFile=imageFile, start=1)
         self.bindEntryHighlight()
+    
+    def disabled(self):
+        super().disabled()
+        self.unBindMenu()
+    
+    def normal(self):
+        super().normal()
+        self.bindMenu()
         
     @property
     def default_dp(self):
@@ -1565,18 +1539,21 @@ class LabelImage(PRMP_Label):
         dir_ = dn(dn(dn(__file__)))
         file = path.join(dir_, 'img/profile_pix.png')
         return file
-        
-    def loadImage(self, e=0, imageFile=None):
+    
+    def loadImage(self, e=0, imageFile=None, start=0):
         thumb = (200, 170)
         if not imageFile:
-            if not confirm('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ', 1): return
+            if start: pass
+            elif not confirm('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ', 1): return
             imageFile, thumb = self.default_dp, (150, 150)
         image = Image.open(imageFile)
-        
+        self.storeImage(imageFile)
         # image = image.resize()
         image.thumbnail(thumb)
         self.image =  PhotoImage(image=image)
         self['image'] = self.image
+    
+    def set(self, imageFile): self.loadImage(imageFile=imageFile, start=1)
     
     def changeImage(self, e=0):
         file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif}'])
@@ -1586,6 +1563,23 @@ class LabelImage(PRMP_Label):
         self.bind('<1>', self.delMenu)
         self.bind('<3>', self.showMenu)
         self.bind('<Double-1>', self.showMenu)
+    
+    def unBindMenu(self):
+        self.unbind('<1>')
+        self.unbind('<3>')
+        self.unbind('<Double-1>')
+    
+
+    def storeImage(self, imageFile):
+        self.data = b64encode(open(imageFile, 'rb').read())
+        
+    def getImage(self):
+        if self.data: return b64decode(self.data)
+        
+    def getImageFile(self):
+        if self.data: return BytesIO(self.getImage())
+    
+    get = getImageFile
     
     def delMenu(self, e=0):
         if self.rt:
@@ -1615,21 +1609,82 @@ PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, values={}, edit=False, **kwargs):
         # PRMP_Toplevel.__init__(self, master, **kwargs)
         PRMP_Toplevel.__init__(self, **kwargs)
         self.__result = None
+        self.resultsWidgets = []
+        self.edit = False
         self._setupDialog()
         self.paint()
-        self._isDialog()
+        self.preFill(**values)
         
+        self.edit = edit
+        if values: self.editInput()
+        
+        self._isDialog()
+    
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
     
-    def _setResult(self, result): self.__result = result
-    
     @property
     def result(self): return self.__result
+    
+    def _setResult(self, result): self.__result = result
+    
+    def addSubmitButton(self, command=None):
+        geo = self.kwargs.get('geo')
+        if geo:
+            x, y = geo[:2]
+            xbtn = B(self, text='Submit', command=command)
+            xbtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
+            self.childWidgets.append(xbtn)
+    
+    def addEditButton(self, command=None):
+        geo = self.kwargs.get('geo')
+        if geo:
+            x, y = geo[:2]
+            self.editBtn = xbtn = B(self, text='Edit', command=self.editInput)
+            xbtn.place(x=70 , y=y-40, h=30, w=60)
+            self.childWidgets.append(xbtn)
+        
+    def preFill(self, **values):
+        for key, value in values.items():
+            if key in self.resultsWidgets:
+                wid = self.__dict__.get(key)
+                if wid:
+                    wid.set(value)
+        self.values = values
+    
+    def processInput(self):
+        result = {}
+        self.resultsWidgets.sort()
+        for widgetName in self.resultsWidgets:
+            wid = self.__dict__.get(widgetName)
+            if wid:
+                result[widgetName] = wid.get()
+        self._setResult(result)
+        
+        self.destroy()
+        print(self.result)
+        
+    def editInput(self):
+        if self.edit:
+            for widgetName in self.resultsWidgets:
+                wid = self.__dict__.get(widgetName)
+                if wid: wid.normal()
+            self.editBtn['background'] = 'blue'
+            self.edit = False
+        else: 
+            for widgetName in self.resultsWidgets:
+                wid = self.__dict__.get(widgetName)
+                if wid: wid.disabled()
+            self.editBtn.paint()
+            self.edit = True
+
+
+
+
 
 
 

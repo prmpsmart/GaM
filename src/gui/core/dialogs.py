@@ -210,31 +210,27 @@ class PersonDialog(PRMP_Dialog):
         self.person = person
     
     def _setupDialog(self):
+        self.addExitButton()
+        self.addSubmitButton(self.processInput)
+        self.addEditButton(self.editInput)
+        contact = LF(self, text='Contact Details')
+        contact.place(x=10, y=10, h=200, w=250)
         
-        self.contact = LF(self, text='Contact Details')
-        self.contact.place(x=10, y=10, h=200, w=250)
-        
-        self.name = LE(self.contact,  text='Name', orient='h', relx=.05, rely=0, relh=.15, relw=.9, longent=1, foreground='black').place_widgs()
+        self.name = LE(contact,  text='Name', orient='h', relx=.05, rely=0, relh=.15, relw=.9, longent=1, foreground='black').place_widgs()
         # self.name.paint()
-        self.phone = LE(self.contact,  text='Phone Number', relx=.05, rely=.17, relh=.15, relw=.9, longent=0, orient='h').place_widgs()
+        self.phone = LE(contact,  text='Phone Number', relx=.05, rely=.17, relh=.15, relw=.9, longent=0, orient='h').place_widgs()
         
-        self.email = LE(self.contact,  text='Email', relx=.05, rely=.34, relh=.15, relw=.9, longent=1, orient='h').place_widgs()
+        self.email = LE(contact,  text='Email', relx=.05, rely=.34, relh=.15, relw=.9, longent=1, orient='h').place_widgs()
         
-        self.address = LT(self.contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
+        self.address = LT(contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
         
         self.image = LI(self)
         self.image.place(x=270, y=20, h=190, w=220)
         
-        self.submit = B(self, text='Submit', command=self.processInput)
-        self.submit.place(relx=.4, rely=.9, relh=.1, relw=.2)
-        
-        self.childWidgets += [self.contact, self.image, self.submit]
+        self.childWidgets += [contact, self.image]
+        self.resultsWidgets = ['name', 'phone', 'email', 'image', 'address']
     
-    def processInput(self):
-        result = {'name': self.name.get(), 'phone': self.phone.get(), 'email': self.email.get(), 'address': self.address.get()}#, 'image': self.image.imageData}
-        self._setResult(result)
-        
-        print(self.result)
+    
 
 
 
