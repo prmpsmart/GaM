@@ -205,16 +205,16 @@ class CalendarDialog(PRMP_Dialog):
 
 class PersonDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 260), **kwargs):
-        super().__init__(master=master, title=title, geo=geo, **kwargs)
+    def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 280), **kwargs):
+        super().__init__(master=master, title=title, geo=geo, _return=1, ntb=9, nrz=9, tm=1, **kwargs)
         self.person = person
     
     def _setupDialog(self):
-        self.addExitButton()
+        self.addTitleBar(self.titleText)
         self.addSubmitButton(self.processInput)
         self.addEditButton(self.editInput)
         contact = LF(self, text='Contact Details')
-        contact.place(x=10, y=10, h=200, w=250)
+        contact.place(x=10, y=30, h=200, w=250)
         
         self.name = LE(contact,  text='Name', orient='h', relx=.05, rely=0, relh=.15, relw=.9, longent=1, foreground='black').place_widgs()
         # self.name.paint()
@@ -225,7 +225,7 @@ class PersonDialog(PRMP_Dialog):
         self.address = LT(contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
         
         self.image = LI(self)
-        self.image.place(x=270, y=20, h=190, w=220)
+        self.image.place(x=270, y=40, h=190, w=220)
         
         self.childWidgets += [contact, self.image]
         self.resultsWidgets = ['name', 'phone', 'email', 'image', 'address']

@@ -1,7 +1,12 @@
-from ..core.dialogs import Person_Dialog
+from ..core.dialogs import PersonDialog
 
-class NewClientDialog(Person_Dialog):
+class NewClientDialog(PersonDialog):
     
-    def __init__(self, person=None):
-        super().__init__()
+    def __init__(self, master=None, title='New Client Dialog', **kwargs):
+        super().__init__(master=master, title=title, **kwargs)
+
+
+
+
+
 

@@ -3,6 +3,7 @@ import platform
 import time
 import tkinter as tk
 import tkinter.messagebox as msgbox
+from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from base64 import b64decode, b64encode
 from io import BytesIO
@@ -43,7 +44,7 @@ class PRMP_Theme:
     DEFAULT_PROGRESS_BAR_COLOR_OFFICIAL = (GREENS[0], '#D0D0D0')
     DEFAULT_HIGHLIGHT_BG = 'white'
     DEFAULT_HIGHLIGHT_BG = '#004080'
-    DEFAULT_FONT =  'TkDefaultFont'
+    
     DEFAULT_RELIEF = 'groove'
     THEMES_DICTS = {
         'SystemDefault': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
@@ -201,6 +202,20 @@ class PRMP_Theme:
     
     CURRENT_THEME = 'Dark Blue 3'
     
+    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 4, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    DEFAULT_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    DEFAULT_TITLE_FONT = {'family': 'Lucida Calligraphy', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    
+    
     
     @classmethod
     def setTheme(cls, theme, force=False):
@@ -272,17 +287,12 @@ class PRMP_Theme:
         total = len(themes)
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
-    @classmethod
-    def addTheme(cls, newThemeame, newThemeDict):
-        pass
-    
 
     def paint(self):
         kwargs = self.kwargs.copy()
         
         
         theme = PRMP_Theme.setTheme(PRMP_Theme.CURRENT_THEME)
-        font = kwargs.pop('font', PRMP_Theme.DEFAULT_FONT)
         
         foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
         background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -310,7 +320,6 @@ class PRMP_Theme:
                         background=background,
                         borderwidth=borderwidth,
                         disabledforeground=disabledforeground,
-                        font=font,
                         foreground=foreground,
                         highlightbackground=highlightbackground,
                         highlightcolor=highlightcolor,
@@ -319,7 +328,7 @@ class PRMP_Theme:
             
             self.configure(**_dict)
         
-        elif wt == 'LabelFrame': self.configure(background=background, foreground=foreground, relief=relief, **kwargs, font=font, borderwidth=borderwidth,)
+        elif wt == 'LabelFrame': self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth,)
             
         elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
             
@@ -329,7 +338,6 @@ class PRMP_Theme:
             _dict = dict(background=background,
                         borderwidth=borderwidth,
                         # disabledforeground=disabledforeground,
-                        font=font,
                         foreground=foreground,
                         highlightbackground=highlightbackground,
                         highlightcolor=highlightcolor,
@@ -362,7 +370,7 @@ class PRMP_Theme:
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
         self.paint()
-
+PTh = PRMP_Theme
 
 class PRMP_Style(ttk.Style):
     # exerpt from ttkthemes
@@ -863,11 +871,23 @@ class PRMP_Widget(PRMP_Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
     
-    def __init__(self, window=False, **kwargs):
+    def __init__(self, window=False, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
         self.kwargs = kwargs
         self.childWidgets = []
+        self.font = None
         
         if window: self.setupOfWidget(**kwargs)
+        
+        try:
+            if font: self.useFont(font)
+        except: pass
+        
+        self.paint()
+    
+    def useFont(self, font=None):
+        if font: self.font = Font(**font)
+        if self.font: self['font'] = self.font
+        return self
     
     def bindOverrelief(self, wid, relief):
         re = wid['relief']
@@ -878,15 +898,18 @@ class PRMP_Widget(PRMP_Theme):
         wid.bind('<Leave>', resetRelief)
     
     def disabled(self): self['state'] = 'disabled'
+    
     def normal(self): self['state'] = 'normal'
     
-    def addExitButton(self):
-        geo = self.kwargs.get('geo')
-        if geo:
-            x = geo[0]
-            xbtn = B(self, text='X', command=self.destroy)
-            xbtn.place(x=x-20, y=0, h=20, w=20)
-            self.childWidgets.append(xbtn)
+    def addTitleBar(self, title):
+        fr = F(self)
+        self.titleBar = L(fr, text=title, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
+        self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
+        
+        xbtn = B(fr, text='X', command=self.destroy)
+        xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
+        fr.place(x=0, y=0, h=25, relw=1)
+        self.childWidgets.append(fr)
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
         
@@ -899,7 +922,6 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def PRMP_WIDGET(self):
         a = self.className.replace('PRMP_', '')
-        # a = self.className.split('_')[-1]
         return a
     
     PRMP_ELEMENT = PRMP_WIDGET    
@@ -916,6 +938,7 @@ class PRMP_Widget(PRMP_Theme):
         if noTitleBar: grabAnyWhere = True
         
         self._return = _return
+        self.titleText = title
         self.title(title)
         
         self.side = side
@@ -970,7 +993,6 @@ class PRMP_Widget(PRMP_Theme):
     
     setupOfWindow = setupOfWidget
     
-        
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
         elif platform.system() == 'Darwin': self.yview_scroll(-1*int(event.delta),'units')
@@ -1123,34 +1145,38 @@ class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Widget.__init__(self, window=True, **kwargs)
-        
+
 Tk = PTk = PRMP_Tk
+
 class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         tk.Toplevel.__init__(self, master)
         PRMP_Widget.__init__(self, window=True, **kwargs)
-        
-Top = Toplevel = PTop = PRMP_Toplevel
+Top = Toplevel = PTp = PRMP_Toplevel
+
 class PRMP_Button(tk.Button, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+        PRMP_Widget.__init__(self, font=font, **kwargs)
+        
 B = Button = PB = PRMP_Button
+
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, **kwargs):
         tk.Checkbutton.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+        PRMP_Widget.__init__(self, font=font, **kwargs)
 Cb = PCb = Checkbutton = PRMP_Checkbutton
+
 class PRMP_Entry(tk.Entry, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         tk.Entry.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
         self.bindEntryHighlight()
-        
 E = PE = Entry = PRMP_Entry
+
 class PRMP_PlaceHolderEntry(PRMP_Entry):
     def __init__(self, container, placeholder, field_color='', placeholder_color='', **kwargs):
         super().__init__(container, **kwargs)
@@ -1181,20 +1207,22 @@ class PRMP_Frame(tk.Frame, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+        PRMP_Widget.__init__(self, font=None, **kwargs)
 F = PF = Frame = PRMP_Frame
+
 class PRMP_Label(tk.Label, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, **kwargs):
         tk.Label.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+        PRMP_Widget.__init__(self, font=font, **kwargs)
+        
 L = PL = Label = PRMP_Label
+
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, **kwargs):
         tk.LabelFrame.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self)
-        
+        PRMP_Widget.__init__(self, font=font)
 LF = LabelFrame = PRMP_LabelFrame
 class PRMP_Message(tk.Message, PRMP_Widget):
     
@@ -1208,11 +1236,13 @@ class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
         tk.Radiobutton.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
 Rb = PRb = Radiobutton = PRMP_Radiobutton
+
 class PRMP_Text(tk.Text, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         tk.Text.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
+PTx = PRMP_Text
 
 class ScrollableFrame(PRMP_Frame):
     def __init__(self, container, **kwargs):
@@ -1360,8 +1390,6 @@ class TwoWidgets(PRMP_Frame):
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
         
-
-        
         self.value = value
         self.ilh = ilh
         self.top = top.lower()
@@ -1397,7 +1425,7 @@ class TwoWidgets(PRMP_Frame):
         self.childWidgets += [self.T, self.B]
         
         if self.value and self.variable: self.checked()
-        self.paint()
+        
     
     def checked(self):
         if self.variable:
@@ -1520,17 +1548,18 @@ class LabelImage(PRMP_Label):
         super().__init__(master, **kwargs)
         self.rt = None
         self.data = None
+        
         self.bindMenu()
         self.loadImage(imageFile=imageFile, start=1)
         self.bindEntryHighlight()
     
     def disabled(self):
-        super().disabled()
         self.unBindMenu()
+        super().disabled()
     
     def normal(self):
-        super().normal()
         self.bindMenu()
+        super().normal()
         
     @property
     def default_dp(self):
@@ -1562,12 +1591,12 @@ class LabelImage(PRMP_Label):
     def bindMenu(self):
         self.bind('<1>', self.delMenu)
         self.bind('<3>', self.showMenu)
-        self.bind('<Double-1>', self.showMenu)
+        # self.bind('<Double-1>', self.showMenu)
     
     def unBindMenu(self):
         self.unbind('<1>')
         self.unbind('<3>')
-        self.unbind('<Double-1>')
+        # self.unbind('<Double-1>')
     
 
     def storeImage(self, imageFile):
@@ -1591,12 +1620,12 @@ class LabelImage(PRMP_Label):
         self.delMenu()
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PRMP_Toplevel().paint()
+        self.rt = rt = PTp(self)
         rt.overrideredirect(1)
-        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken').paint()
+        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=None)
         lbl.place(relx=0, rely=0, relh=.5, relw=1)
         
-        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken').paint()
+        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=None)
         lbl2.place(relx=0, rely=.5, relh=.5, relw=1)
         
         rt.attributes('-topmost', 1)
@@ -1609,9 +1638,10 @@ PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel):
     
-    def __init__(self, master=None, values={}, edit=False, **kwargs):
+    def __init__(self, master=None, values={}, **kwargs):
         # PRMP_Toplevel.__init__(self, master, **kwargs)
         PRMP_Toplevel.__init__(self, **kwargs)
+        
         self.__result = None
         self.resultsWidgets = []
         self.edit = False
@@ -1619,8 +1649,8 @@ class PRMP_Dialog(PRMP_Toplevel):
         self.paint()
         self.preFill(**values)
         
-        self.edit = edit
-        if values: self.editInput()
+        self.edit = False if values else True
+        self.editInput()
         
         self._isDialog()
     
