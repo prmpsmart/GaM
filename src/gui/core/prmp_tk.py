@@ -890,6 +890,12 @@ class PRMP_Widget(PRMP_Theme):
         
         self.paint()
     
+    @property
+    def remainFromTitleBar(self):
+        y = self.kwargs.get('geo')[1]
+        h = (y - 25) / y
+        return h
+    
     def useFont(self, font=None):
         if font: self.font = Font(**font)
         if self.font: self['font'] = self.font
@@ -1166,24 +1172,51 @@ B = Button = PB = PRMP_Button
 
 class PRMP_DateButton(B):
     def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, **kwargs):
-        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
         self.date = None
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
         self.DT = DateTime
+        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
     
     def action(self):
-        self.date = self.CD(geo=(300, 200)).result
-        self['text'] = self.date
+        self.date = self.CD.generate(geo=(300, 200)).result
+        self.set(str(self.date))
     
     def get(self): return self.date
     
     def set(self, date):
         if '-' in date: d, m, y = date.split('-')
         elif '/' in date: d, m, y = date.split('/')
+        else: return
         self.date = self.DT.createDateTime(int(y), int(m), int(d))
         self['text'] = self.date
-PDb = PRMP_DateButton
+PDB = PRMP_DateButton
+
+
+class PRMP_RegionButton(B):
+    
+    def __init__(self, master=None, region=None, **kwargs):
+        super().__init__(master, command=self.openDetails, **kwargs)
+        self.region = region
+        self.set(region)
+        self.bindEntryHighlight()
+    
+    def openDetails(self):
+        
+        # open RegionDetailsDialog
+        pass
+    
+    def get(self): return self.region
+    
+    def set(self, region=None):
+        if region:
+            self.region = region
+            self['text'] = region.name
+
+PRB = PRMP_RegionButton
+
+
+
 
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
@@ -1440,6 +1473,7 @@ class TwoWidgets(PRMP_Frame):
                 self.Bottom.bind('<<Increment>>', func)
                 self.Bottom.bind('<<Decrement>>', func)
         elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, show=show, variable=variable)
+        elif bottom.lower() == 'regionbutton': self.Bottom = PRMP_RegionButton(self,)
         
         self.B = self.Bottom
         self.T = self.Top
@@ -1654,18 +1688,21 @@ class LabelImage(PRMP_Label):
         rt.geometry(f'50x50+{x}+{y}')
 LI = LabelImage
 
-class LabelRegionButton:
+class LabelRegionButton(TwoWidgets):
     
     def __init__(self, master=None, region=None, **kwargs):
-        super().__init__(master, **kwargs)
+        super().__init__(master, top='label', bottom='regionbutton', command=self.openDetails, **kwargs)
         self.region = region
         self.loadRegion(region)
         self.bindEntryHighlight()
     
     def loadRegion(self, region=None):
-        if region:
-            pass
+        if region: self['text'] = region.name
+    
+    def openDetails(self):
+        
         # open RegionDetailsDialog
+        pass
 
 LRB = LabelRegionButton
 

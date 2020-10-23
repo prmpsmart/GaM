@@ -93,6 +93,8 @@ class CoopOffice(Office):
 class CoopOfficesManager(OfficesManager):
     regionClass = CoopOffice
     
-    def createCoopOffice(self, **kwargs): return self.createOffice(**kwargs)
+    def createCoopOffice(self, **kwargs): 
+        office = self.createOffice(**kwargs)
+        return office
 
 

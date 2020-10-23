@@ -9,7 +9,7 @@ class Region(Mixins):
     Person = None
     MultiSubRegionsManager = False
     
-    def __init__(self, manager=None, number=None, name=None, date=None, nameFromNumber=False, location=None, phone=None, **kwargs):
+    def __init__(self, manager=None, number=None, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, **kwargs):
         if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
         
         if date == None: date = DateTime.now()
@@ -17,6 +17,7 @@ class Region(Mixins):
         
         self.__manager = manager
         self.__number = number
+        self.__sup = sup
         self.__name = name if not nameFromNumber else f'{self.className} {number}'
         self.__location = location
         self.__date = date
@@ -38,6 +39,28 @@ class Region(Mixins):
     def __len__(self): return len(self.accountsManager)
     
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
+    
+    @property
+    def sup(self): return self.__sup
+    
+    @property
+    def sups(self):
+        ss = []
+        sup = self.sup
+        try:
+            while True:
+                ss.append(sup)
+                sup = sup.sup
+        except:
+            xx = ss[:-1]
+            zz = list(reversed(xx))
+            return zz
+    
+    @property
+    def hierachy(self): return self.sups + [self]
+    
+    @property
+    def hierachyNames(self): return [d.name for d in self.hierachy]
     
     @property
     def reignMonths(self): return self.date - DateTime.now() + 1
@@ -164,14 +187,19 @@ class RegionsManager(Mixins):
     def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
     
     @property
+    
     def master(self): return self.__master
     @property
     def region(self): return self.master
+    
     @property
     def date(self): return self.__master.date
+    
     @property
     def regions(self): return self.__regions
+    
     def addRegion(self, region): self.__regions.append(region)
+    
     def getRegion(self, number=None, name=None, phone=None, email=None, photo=None):
         ## provide mechanism to scan pictures.
         for region in self.regions:
@@ -187,7 +215,7 @@ class RegionsManager(Mixins):
     
     def createRegion(self, date=None, auto=None, **kwargs):
         if (DateTime.checkDateTime(date, dontRaise=True) == False) and (auto == True): date = DateTime.createDateTime(auto=auto)
-        region = self.regionClass(manager=self, date=date, number=len(self)+1, **kwargs)
+        region = self.regionClass(manager=self, date=date, number=len(self)+1, sup=self.region, **kwargs)
         
         self.addRegion(region)
         return region
@@ -195,6 +223,7 @@ class RegionsManager(Mixins):
     def regionExists(self, **kwargs):
         if self.getRegion(**kwargs): return True
         return False
+    
 
  ########## Sorting
   # SubRegions

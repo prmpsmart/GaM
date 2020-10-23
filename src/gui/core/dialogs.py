@@ -128,8 +128,7 @@ class CalendarDialog(PRMP_Dialog):
     
     def _setupDialog(self):
         self.addTitleBar(self.titleText)
-        y = self.kwargs.get('geo')[1]
-        h = (y - 25) / y
+        h = self.remainFromTitleBar
         
         self.daysButtons = []
         fr = F(self)
@@ -238,8 +237,8 @@ class PersonDialog(PRMP_Dialog):
         contact = LF(self, text='Contact Details')
         contact.place(x=10, y=30, h=200, w=250)
         
-        self.name = LE(contact,  text='Name', orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25, foreground='black')
-        # self.name.paint()
+        self.name = LE(contact,  text='Name', orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
+        
         self.phone = LE(contact,  text='Phone Number', relx=.02, rely=.17, relh=.15, relw=.96, longent=.5, orient='h')
         
         self.email = LE(contact,  text='Email', relx=.02, rely=.34, relh=.15, relw=.96, longent=.25, orient='h')
@@ -255,8 +254,8 @@ class PersonDialog(PRMP_Dialog):
 
 class RegionDetailsDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, region=None, title='Region Details Dialog', geo=(300, 300), **kwargs):
-        super().__init__(master=master, geo=geo, **kwargs)
+    def __init__(self, master=None, region=None, title='Region Details Dialog', geo=(550, 600), **kwargs):
+        super().__init__(master=master, title=title, geo=geo, **kwargs)
         self.region = region
     
     def _setupDialog(self):
@@ -264,11 +263,27 @@ class RegionDetailsDialog(PRMP_Dialog):
         self.addSubmitButton(self.processInput)
         self.addEditButton(self.editInput)
         
-        self.office = None
-        self.department = None
-        self.head = None
-        self.sub = None
-        self.account = None
+        hierachy = LF(self, text='Hierachy')
+        hierachy.place(x=10, y=30, h=150, w=300)
+        
+        self.office = LRB(hierachy,  text='Office', orient='h', relx=.02, rely=0, relh=.23, relw=.96, longent=.3)
+        
+        self.department = LRB(hierachy,  text='Department', orient='h', relx=.02, rely=.25, relh=.23, relw=.96, longent=.35)
+        
+        self.sup = LRB(hierachy,  text='Superscript', orient='h', relx=.02, rely=.5, relh=.23, relw=.96, longent=.35)
+        
+        self.sub = LRB(hierachy,  text='Subscript', orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3)
+        
+        # self.account = LRB(hierachy,  text='Office', orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
+        
+        self.image = LI(self)
+        self.image.place(x=320, y=40, h=190, w=220)
+        
+        account = LF(self, text='Account')
+        account.place(x=10, y=190, h=270, w=280)
+        
+        self.childWidgets += [account, hierachy, self.image]
+        self.resultsWidgets = ['office', 'department', 'sup', 'image', 'sub']
         
     def loadRegion(self, region):
         pass

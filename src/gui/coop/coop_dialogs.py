@@ -11,7 +11,7 @@ class ThirdPartySuretyDialog(PersonDialog):
         other = LF(self, text='Other Details')
         other.place(relx=.02, y=230, h=290, relw=.96)
         
-        self.dob = LD(other, text='Date of Birth', orient='h', longent=.5, relx=.01, rely=0, relh=.1, relw=.5)
+        self.dob = LDB(other, text='Date of Birth', orient='h', longent=.5, relx=.01, rely=0, relh=.1, relw=.5)
         self.religion = LE(other, text='Religion', orient='h', longent=.35, relx=.59, rely=0, relh=.1, relw=.4)
         self.maritalStatus = LE(other, text='Marital Status', orient='h', relx=.01, rely=.11, relh=.1, relw=.5)
         self.occupation = LE(other, text='Occupation', orient='h', relx=.01, rely=.22, relh=.1, relw=.6, longent=.35)
