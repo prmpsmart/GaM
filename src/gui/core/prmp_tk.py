@@ -313,7 +313,8 @@ class PRMP_Theme:
         ttk = False
 
         if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
-            if wt == 'Button':
+            if wt in ['Button', 'Radiobutton', 'Checkbutton']:
+                # print(wt, self)
                 col = PRMP_Theme.DEFAULT_BUTTON_COLOR
                 if isinstance(col, tuple):
                     if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
@@ -889,6 +890,17 @@ class PRMP_Widget(PRMP_Theme):
         except: pass
         
         self.paint()
+    
+    def bindOnFg(self, wid):
+        wid.on = True
+        def action(e):
+            if wid.on:
+                wid['bg'] = 'blue'
+                wid.on = False
+            else:
+                wid.paint()
+                wid.on = True
+        wid.bind('<1>', action)
     
     @property
     def remainFromTitleBar(self):
@@ -1720,17 +1732,22 @@ class PRMP_Dialog(PRMP_Toplevel):
         PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
         
         self.__result = None
+        self.editVar = tk.StringVar()
         self.resultsWidgets = []
         self._return = _return
+        
         self._setupDialog()
         self.paint()
         self.preFill(**values)
         self.default()
-        self.edit = False if values else True
+        
+        if values: self.editVar.set('1')
+        else: self.editVar.set('0')
         try: self.editInput()
         except: pass
         
-        self._isDialog()
+        # self._isDialog()
+        self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
@@ -1754,7 +1771,7 @@ class PRMP_Dialog(PRMP_Toplevel):
         geo = self.kwargs.get('geo')
         if geo:
             x, y = geo[:2]
-            self.editBtn = xbtn = B(self, text='Edit', command=self.editInput)
+            self.editBtn = xbtn = Cb(self, text='Edit', command=self.editInput, variable=self.editVar)
             xbtn.place(x=10 , y=y-40, h=30, w=60)
             self.childWidgets.append(xbtn)
         
@@ -1779,7 +1796,7 @@ class PRMP_Dialog(PRMP_Toplevel):
         print(self.result)
         
     def editInput(self):
-        if self.edit:
+        if self.editVar.get() == '1':
             for widgetName in self.resultsWidgets:
                 wid = self.__dict__.get(widgetName)
                 if wid: wid.normal()

@@ -282,11 +282,19 @@ class RegionDetailsDialog(PRMP_Dialog):
         account = LF(self, text='Account')
         account.place(x=10, y=190, h=270, w=280)
         
-        self.childWidgets += [account, hierachy, self.image]
+        self.newVar = tk.StringVar()
+        self.newVar.set('0')
+        new = PCb(self, text='New Dialog', variable=self.newVar)
+        new.place(relx=.8, y=240, h=30, relw=.19)
+        self.bindOnFg(new)
+        
+        self.childWidgets += [new, account, hierachy, self.image]
         self.resultsWidgets = ['office', 'department', 'sup', 'image', 'sub']
         
-    def loadRegion(self, region):
-        pass
+    def loadRegion(self, region=None):
+        if region:
+            self.region = region
+            self.titleBar.config(text=f'{self.region} Details Dialog')
         
         
 
