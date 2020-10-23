@@ -1654,9 +1654,22 @@ class LabelImage(PRMP_Label):
         rt.geometry(f'50x50+{x}+{y}')
 LI = LabelImage
 
-class LabelRegionButton
+class LabelRegionButton:
+    
+    def __init__(self, master=None, region=None, **kwargs):
+        super().__init__(master, **kwargs)
+        self.region = region
+        self.loadRegion(region)
+        self.bindEntryHighlight()
+    
+    def loadRegion(self, region=None):
+        if region:
+            pass
+        # open RegionDetailsDialog
 
 LRB = LabelRegionButton
+
+
 
 
 

@@ -264,7 +264,14 @@ class RegionDetailsDialog(PRMP_Dialog):
         self.addSubmitButton(self.processInput)
         self.addEditButton(self.editInput)
         
+        self.office = None
+        self.department = None
+        self.head = None
+        self.sub = None
+        self.account = None
         
+    def loadRegion(self, region):
+        pass
         
         
 

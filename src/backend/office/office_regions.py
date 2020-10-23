@@ -63,6 +63,7 @@ class OfficesManager(RegionsManager):
 class DCOffice(Office):
     AccountsManager = DCOfficeAccountsManager
     Manager = 'DCOfficesManager'
+    MultiSubRegionsManager = False
     SubRegionsManager = AreasManager
     PersonsManager = DCManagerDetailsManager
     
@@ -80,6 +81,7 @@ class CoopOffice(Office):
     AccountsManager = CoopOfficeAccountsManager
     Manager = 'CoopOfficesManager'
     SubRegionsManager = UnitsManager
+    MultiSubRegionsManager = False
     PersonsManager = CoopManagerDetailsManager
     
     @classmethod

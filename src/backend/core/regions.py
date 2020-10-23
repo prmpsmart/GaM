@@ -36,7 +36,7 @@ class Region(Mixins):
     
     def __getitem__(self, num): return self.accountsManager[num]
     def __len__(self): return len(self.accountsManager)
-    # def __repr__(self): return f"<{self}>"
+    
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
