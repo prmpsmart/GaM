@@ -351,7 +351,7 @@ class Staff(Region):
 
 class ThirdPartySurety:
     
-    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipToMember='', photo='', date=None):
+    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipWithMember='', photo='', date=None):
     
         self.__loanBondDetails = loanBondDetails
         self.__name = None
@@ -366,7 +366,7 @@ class ThirdPartySurety:
         self.__stateOfOrigin = stateOfOrigin
         self.__occupation = occupation
         self.__knowledgeOfMember = knowledgeOfMember
-        self.__relationshipToMember = relationshipToMember
+        self.__relationshipWithMember = relationshipWithMember
         self.__photo = photo
         
     @property
@@ -392,7 +392,7 @@ class ThirdPartySurety:
     @property
     def knowledgeOfMember(self): return self.__knowledgeOfMember
     @property
-    def relationshipToMember(self): return self.__relationshipToMember
+    def relationshipWithMember(self): return self.__relationshipWithMember
 
 
 class LoanBondDetails:

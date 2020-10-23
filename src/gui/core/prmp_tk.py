@@ -26,7 +26,6 @@ class PRMP_Theme:
     YELLOWS = ("#F3FB62", "#F0F595")
     TANS = ("#FFF9D5", "#F4EFCF", "#DDD8BA")
     NICE_BUTTON_COLORS = ((GREENS[3], TANS[0]), ('#000000', '#FFFFFF'), ('#FFFFFF', '#000000'), (YELLOWS[0], PURPLES[1]), (YELLOWS[0], GREENS[3]), (YELLOWS[0], BLUES[2]))
-    COLOR_SYSTEM_DEFAULT = '1234567890'
     COLOR_SYSTEM_DEFAULT = 'SystemButtonFace'
     DEFAULT_BUTTON_COLOR = ('white', BLUES[0])
     OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR = ('white', BLUES[0])
@@ -46,6 +45,7 @@ class PRMP_Theme:
     DEFAULT_HIGHLIGHT_BG = '#004080'
     
     DEFAULT_RELIEF = 'groove'
+    
     THEMES_DICTS = {
         'SystemDefault': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
         'SystemDefaultForReal': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': COLOR_SYSTEM_DEFAULT, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
@@ -77,9 +77,9 @@ class PRMP_Theme:
         'SandyBeach': {'BACKGROUND': '#efeccb', 'TEXT': '#012f2f', 'INPUT': '#e6d3a8', 'SCROLL': '#e6d3a8', 'TEXT_INPUT': '#012f2f', 'BUTTON': ('#FFFFFF', '#046380'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE},
         'TealMono': {'BACKGROUND': '#a8cfdd', 'TEXT': '#000000', 'INPUT': '#dfedf2', 'SCROLL': '#dfedf2', 'TEXT_INPUT': '#000000', 'BUTTON': ('#FFFFFF', '#183440'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE},
         
-        'Default':   {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
-        'Default1':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': COLOR_SYSTEM_DEFAULT, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
-        'DefaultNoMoreNagging':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
+        'Default':   {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': 'black', 'SCROLL': 'black', 'BUTTON': 'black', 'PROGRESS': 'black'},
+        'Default1':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': 'black', 'PROGRESS': 'black'},
+        'DefaultNoMoreNagging':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': 'black', 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': 'black'},
         'LightBlue': {'BACKGROUND': '#E3F2FD', 'TEXT': '#000000', 'INPUT': '#86A8FF', 'TEXT_INPUT': '#000000', 'SCROLL': '#86A8FF', 'BUTTON': ('#FFFFFF', '#5079D3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#FF0266', 'ACCENT2': '#FF5C93', 'ACCENT3': '#C5003C'},
         'LightGrey': {'BACKGROUND': '#FAFAFA', 'TEXT': '#000000', 'INPUT': '#004EA1', 'TEXT_INPUT': '#FFFFFF', 'SCROLL': '#5EA7FF', 'BUTTON': ('#FFFFFF', '#0079D3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#FF0266', 'ACCENT2': '#FF5C93', 'ACCENT3': '#C5003C'},
         'LightGrey1': {'BACKGROUND': '#ffffff', 'TEXT': '#1a1a1b', 'INPUT': '#dae0e6', 'TEXT_INPUT': '#222222', 'SCROLL': '#a5a4a4', 'BUTTON': ('#FFFFFF', '#0079d3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#ff5414', 'ACCENT2': '#33a8ff', 'ACCENT3': '#dbf0ff'},
@@ -200,7 +200,7 @@ class PRMP_Theme:
         'DarkBrown7' : {'BACKGROUND': '#2c2417', 'TEXT': '#baa379', 'INPUT': '#baa379', 'TEXT_INPUT': '#000000', 'SCROLL': '#392e1c', 'BUTTON': ('#000000', '#baa379'), 'PROGRESS': ('#baa379','#453923'), 'SLIDER_DEPTH': 1},
         'Python': {'BACKGROUND': '#3d7aab', 'TEXT': '#ffde56', 'INPUT': '#295273', 'TEXT_INPUT': '#ffde56', 'SCROLL': '#295273', 'BUTTON': ('#ffde56', '#295273'), 'PROGRESS': ('#ffde56','#295273'), 'SLIDER_DEPTH': 1}}
     
-    CURRENT_THEME = 'Dark Blue 3'
+    CURRENT_THEME = 'DarkBlue3'
     
     DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
@@ -213,9 +213,6 @@ class PRMP_Theme:
     DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
-    
-    
-    
     
     @classmethod
     def setTheme(cls, theme, force=False):
@@ -296,8 +293,8 @@ class PRMP_Theme:
         
         foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
         background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
-        activebackground = kwargs.pop('activebackground', background)
-        activeforeground = kwargs.pop('activeforeground', foreground)
+        activebackground = kwargs.pop('activebackground', foreground)
+        activeforeground = kwargs.pop('activeforeground', background)
         highlightbackground = kwargs.pop('highlightbackground', background)
         highlightcolor = kwargs.pop('highlightcolor', foreground)
         disabledforeground = kwargs.pop('disabledforeground', foreground)
@@ -306,6 +303,13 @@ class PRMP_Theme:
         
         relief = kwargs.pop('relief',  PRMP_Theme.DEFAULT_RELIEF)
         wt = widgetType = self.PRMP_ELEMENT
+        
+        if kwargs.get('asEntry') != None:
+            asEntry = kwargs.pop('asEntry')
+            wt = 'Entry'
+            self.configure(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background)
+            
+        
         ttk = False
 
         if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
@@ -347,7 +351,6 @@ class PRMP_Theme:
             self.configure(**_dict)
 
         elif wt in ['Combobox', 'Progressbar']:
-            
             style = ttk.Style()
             ttk = True
             if wt == 'Combobox':
@@ -370,6 +373,9 @@ class PRMP_Theme:
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
         self.paint()
+    
+    @classmethod
+    def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
 PTh = PRMP_Theme
 
 class PRMP_Style(ttk.Style):
@@ -926,7 +932,7 @@ class PRMP_Widget(PRMP_Theme):
     
     PRMP_ELEMENT = PRMP_WIDGET    
     
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bg='SystemButtonFace', bind_exit=False, nrz=False, notResizable=False, _return=False):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -937,7 +943,6 @@ class PRMP_Widget(PRMP_Theme):
         if tw: toolWindow = tw
         if noTitleBar: grabAnyWhere = True
         
-        self._return = _return
         self.titleText = title
         self.title(title)
         
@@ -1136,16 +1141,14 @@ class PRMP_Widget(PRMP_Theme):
     def _isDialog(self):
         self.attributes('-toolwindow', 1)
         self.resizable(0, 0)
-        self.grab_set()
+        # self.grab_set()
         self.wait_window()
-
 PRMP_Window = PRMP_Widget
 
 class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Widget.__init__(self, window=True, **kwargs)
-
 Tk = PTk = PRMP_Tk
 
 class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
@@ -1156,11 +1159,31 @@ Top = Toplevel = PTp = PRMP_Toplevel
 
 class PRMP_Button(tk.Button, PRMP_Widget):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=font, **kwargs)
-        
+        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, **kwargs)
 B = Button = PB = PRMP_Button
+
+class PRMP_DateButton(B):
+    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, **kwargs):
+        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
+        self.date = None
+        from .dialogs import CalendarDialog, DateTime
+        self.CD = CalendarDialog
+        self.DT = DateTime
+    
+    def action(self):
+        self.date = self.CD(geo=(300, 200)).result
+        self['text'] = self.date
+    
+    def get(self): return self.date
+    
+    def set(self, date):
+        if '-' in date: d, m, y = date.split('-')
+        elif '/' in date: d, m, y = date.split('/')
+        self.date = self.DT.createDateTime(int(y), int(m), int(d))
+        self['text'] = self.date
+PDb = PRMP_DateButton
 
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
@@ -1215,7 +1238,6 @@ class PRMP_Label(tk.Label, PRMP_Widget):
     def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, **kwargs):
         tk.Label.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, font=font, **kwargs)
-        
 L = PL = Label = PRMP_Label
 
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
@@ -1224,6 +1246,7 @@ class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
         tk.LabelFrame.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, font=font)
 LF = LabelFrame = PRMP_LabelFrame
+
 class PRMP_Message(tk.Message, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
@@ -1269,7 +1292,7 @@ def show(title=None, msg=None, which=None):
     if which == 'error': msgbox.showerror(title, msg)
     elif which == 'info': msgbox.showinfo('Information', msg)
     elif which == 'warn': msgbox.showwarning('Warning', msg)
-    
+
 def confirm(title=None, msg=None, num=None):
     if num == 1: return msgbox.askyesno(title, msg)
     if num == 2: return msgbox.askquestion(title, msg)
@@ -1385,7 +1408,7 @@ class ToolTip(PRMP_Toplevel):
 
 class TwoWidgets(PRMP_Frame):
     
-    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=None, values=(0,), value=None, from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0, variable=None):
+    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=.5, values=(0,), value=None, from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0, variable=None):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
@@ -1406,6 +1429,8 @@ class TwoWidgets(PRMP_Frame):
             self.Top = PRMP_Radiobutton(self, text=text, variable=variable, command=command, value=value)
 
         if bottom.lower() == 'entry': self.Bottom = PRMP_Entry(self, show=show)
+        elif bottom.lower() == 'button': self.Bottom = PRMP_Button(self)
+        elif bottom.lower() == 'datebutton': self.Bottom = PRMP_DateButton(self)
         elif bottom.lower() == 'combobox':
             self.Bottom = ttk.Combobox(self, values=values, show=show)
             if func: self.Bottom.bind('<<ComboboxSelected>>', func)
@@ -1426,6 +1451,7 @@ class TwoWidgets(PRMP_Frame):
         
         if self.value and self.variable: self.checked()
         
+        self.place_widgs()
     
     def checked(self):
         if self.variable:
@@ -1465,6 +1491,7 @@ class TwoWidgets(PRMP_Frame):
         if self.bottom == 'combobox': self.Bottom.config(values=values)
         elif self.bottom == 'entry': self.Bottom.insert(0, values)
         elif self.bottom == 'text': self.Bottom.insert(0.0, values)
+        elif self.bottom == 'datebutton': self.Bottom.set(values)
         else: self.Bottom.config(text=values)
     
     def get(self): return self.Bottom.get()
@@ -1479,27 +1506,21 @@ class TwoWidgets(PRMP_Frame):
     def place_widgs(self):
         self.place(relx=self.relx, rely=self.rely, relh=self.relh, relw=self.relw)
         if self.orient == 'h':
-            if self.longent: self.relw, self.relwb = .3, .7
-            else: self.relwb = self.relw = .5
-            
-            if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.relw)
-            else: self.Top.place(relx=0, rely=0, relh=1, relw=self.relw)
-            self.Bottom.place(relx=self.relw + .02, rely=0, relh=.945, relw=self.relwb - .02)
+            if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.longent)
+            else: self.Top.place(relx=0, rely=0, relh=1, relw=self.longent)
+            self.Bottom.place(relx=self.longent + .02, rely=0, relh=.945, relw=1 - self.longent - .02)
         else:
-            self.Top.place(relx=0, rely=0, relw=1, relh=.6)
-            self.Bottom.place(relx=0, rely=.6, relw=1, relh=.35)
+            self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
+            self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
         return self
 TW = TwoWidgets
 
 class RadioCombo(TwoWidgets):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, top='radiobutton', bottom='combobox', **kwargs)
+    def __init__(self, master, **kwargs): super().__init__(master, top='radiobutton', bottom='combobox', **kwargs)
 RC = RadioCombo
 
 class RadioEntry(TwoWidgets):
-    def __init__(self, master, **kwargs):
-        
-        super().__init__(master, top='radiobutton', bottom='entry', **kwargs)
+    def __init__(self, master, **kwargs): super().__init__(master, top='radiobutton', bottom='entry', **kwargs)
 RE = RadioEntry
 
 class LabelSpin(TwoWidgets):
@@ -1512,9 +1533,7 @@ class LabelSpin(TwoWidgets):
 LS = LabelSpin
 
 class LabelEntry(TwoWidgets):
-    def __init__(self, master, **kwargs):
-    
-        super().__init__(master, top='label', bottom='entry', **kwargs)
+    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='entry', **kwargs)
 LE = LabelEntry
 
 class LabelText(TwoWidgets):
@@ -1522,7 +1541,6 @@ class LabelText(TwoWidgets):
         super().__init__(master, top='label', bottom='text', **kwargs)
     
     def get(self): return self.B.get('1.0', 'end').strip('\n')
-        
 LT = LabelText
 
 class LabelCombo(TwoWidgets):
@@ -1532,16 +1550,20 @@ class LabelCombo(TwoWidgets):
 LC = LabelCombo
 
 class CheckEntry(TwoWidgets):
-    def __init__(self, master, **kwargs):
-        
-        super().__init__(master, top='checkbutton', bottom='entry', **kwargs)
+    def __init__(self, master, **kwargs): super().__init__(master, top='checkbutton', bottom='entry', **kwargs)
 CE = CheckEntry
 
 class CheckCombo(TwoWidgets):
-    def __init__(self, master, **kwargs):
-        
-        super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
+    def __init__(self, master, **kwargs): super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
 CC = CheckCombo
+
+class LabelButton(TwoWidgets):
+    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='button',**kwargs)
+LB = LabelButton
+
+class LabelDateButton(TwoWidgets):
+    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='datebutton',**kwargs)
+LDB = LabelDateButton
 
 class LabelImage(PRMP_Label):
     def __init__(self, master, imageFile=None, **kwargs):
@@ -1630,27 +1652,33 @@ class LabelImage(PRMP_Label):
         
         rt.attributes('-topmost', 1)
         rt.geometry(f'50x50+{x}+{y}')
-
 LI = LabelImage
+
+class LabelRegionButton
+
+LRB = LabelRegionButton
+
+
 
 
 PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel):
     
-    def __init__(self, master=None, values={}, **kwargs):
+    def __init__(self, master=None, values={}, _return=True, **kwargs):
         # PRMP_Toplevel.__init__(self, master, **kwargs)
-        PRMP_Toplevel.__init__(self, **kwargs)
+        PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
         
         self.__result = None
         self.resultsWidgets = []
-        self.edit = False
+        self._return = _return
         self._setupDialog()
         self.paint()
         self.preFill(**values)
-        
+        self.default()
         self.edit = False if values else True
-        self.editInput()
+        try: self.editInput()
+        except: pass
         
         self._isDialog()
     
@@ -1659,6 +1687,8 @@ class PRMP_Dialog(PRMP_Toplevel):
     
     @property
     def result(self): return self.__result
+    
+    def default(self): pass
     
     def _setResult(self, result): self.__result = result
     
@@ -1675,7 +1705,7 @@ class PRMP_Dialog(PRMP_Toplevel):
         if geo:
             x, y = geo[:2]
             self.editBtn = xbtn = B(self, text='Edit', command=self.editInput)
-            xbtn.place(x=70 , y=y-40, h=30, w=60)
+            xbtn.place(x=10 , y=y-40, h=30, w=60)
             self.childWidgets.append(xbtn)
         
     def preFill(self, **values):

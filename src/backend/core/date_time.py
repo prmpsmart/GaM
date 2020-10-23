@@ -104,6 +104,12 @@ class DateTime(datetime, Mixins):
                 return self.createDateTime(self.year, months, self.day)
             elif div > 0:
                 # it means that the new_month falls within the upcoming years
+                if not mod:
+                    # it means self.month = 12 and sub_month *12
+                    mod = 12
+                    # the resulting month is 12
+                    div -= 1
+                    # since self.month = 12 and sub_month *12 therefore div is having an additional self.month 12 in it
                 return self.createDateTime(self.year + div, mod, self.day)
         
     def __sub__(self, sub_month):
@@ -215,7 +221,7 @@ class DateTime(datetime, Mixins):
         else: dayNum = day
         
         year, month, day = int(year), int(monthNum), int(dayNum)
-        
+
         return cls(year, month, day)
 
     @property

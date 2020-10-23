@@ -12,7 +12,7 @@ class CalendarDialog(PRMP_Dialog):
     choosen = None
     _version_ = '3.3.0' # Alpha by PRMPSmart
     
-    class DayLabel(Label):
+    class DayLabel(L):
         highlight_bg = '#2d18e7'
         highlight_fg = 'white'
         now_fg = 'white'
@@ -24,10 +24,10 @@ class CalendarDialog(PRMP_Dialog):
         choosen_bg = 'black'
         days_fg = 'white'
         days_bg = 'black'
-        notPart = False
+        notPart = False # for buttons not part of the days button
         
-        def __init__(self, master=None, returnMethod=None, cnf={}, **kw):
-            super().__init__(master=master, cnf=cnf, bg=self.days_bg, fg=self.days_fg, **kw)
+        def __init__(self, master=None, returnMethod=None,  **kw):
+            super().__init__(master=master, background=self.days_bg, foreground=self.days_fg, font=PTh.DEFAULT_FONT, **kw)
             self.day = None
             
             self.returnMethod = returnMethod
@@ -39,17 +39,17 @@ class CalendarDialog(PRMP_Dialog):
         def onButton(self, e=0):
             if self.notPart: return
             if self.day:
-                if self.now: self.config(bg=self.now_highlight_bg, fg=self.now_highlight_fg)
-                elif CalendarDialog.choosen == self: self.config(bg=self.highlight_bg, fg=self.highlight_fg)
-                else: self.config(bg=self.highlight_bg, fg=self.highlight_fg)
+                if self.now: self.config(background=self.now_highlight_bg, foreground=self.now_highlight_fg)
+                elif CalendarDialog.choosen == self: self.config(background=self.highlight_bg, foreground=self.highlight_fg)
+                else: self.config(background=self.highlight_bg, foreground=self.highlight_fg)
         
         def offButton(self, e=0):
             if self.notPart: return
-            if self == CalendarDialog.choosen: self.config(bg=self.choosen_bg, fg=self.choosen_fg)
-            elif self.now: self.config(bg=self.now_bg, fg=self.now_fg)
+            if self == CalendarDialog.choosen: self.config(background=self.choosen_bg, foreground=self.choosen_fg)
+            elif self.now: self.config(background=self.now_bg, foreground=self.now_fg)
             else:
-                if self.day: self.config(bg=self.days_bg, fg=self.days_fg)
-                else: self.config(bg=self.empty_bg)
+                if self.day: self.config(background=self.days_bg, foreground='red' if self.redDay else self.days_fg)
+                else: self.config(background=self.empty_bg)
         
         def config(self, day=None, command=None, notPart=False, **kwargs):
             self.notPart = notPart
@@ -58,24 +58,28 @@ class CalendarDialog(PRMP_Dialog):
                 self.unbind('<ButtonPress-1>')
                 self.bind('<ButtonPress-1>', command)
             
-            bg, fg = kwargs.get('bg'), kwargs.get('fg')
-            if fg: self.fg = fg
-            if bg: self.bg = bg
+            background, foreground = kwargs.get('background'), kwargs.get('foreground')
             super().config(**kwargs)
+            
+            if foreground:
+                self['foreground'] = foreground
+            if background:
+                self['bg'] = background
         
         @property
         def now(self): return self.day == DateTime.now()
         
         def changeDay(self, day):
             now = DateTime.now()
-            if day == now: self.config(bg=self.now_bg, fg=self.now_fg)
+            if day == now: self.config(background=self.now_bg, foreground=self.now_fg)
             self.day = day
+            self.redDay = day.dayName in ['Saturday', 'Sunday']
             self.config(text=self.day.dayNum, state='normal', relief='groove')
             self.offButton()
         
         def empty(self):
             self.day = None
-            self.config(text='', state='disabled', relief='flat', bg=self.empty_bg)
+            self.config(text='', state='disabled', relief='flat', background=self.empty_bg)
         
         def choosen(self, e=0):
             if self.day: 
@@ -83,16 +87,18 @@ class CalendarDialog(PRMP_Dialog):
                 b4 = CalendarDialog.choosen
                 CalendarDialog.choosen = self
                 if b4: b4.offButton()
-                self.config(bg=self.choosen_bg, fg=self.choosen_fg)
+                self.config(background=self.choosen_bg, foreground=self.choosen_fg)
                 self.returnMethod(self.day)
     
-    def __init__(self, master=None, month=None, dest='', title='Calendar Dialog', bg='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', **kwargs):
+    def __init__(self, master=None, month=None, dest='', title='Calendar Dialog', background='SystemButtonFace', header_fg='black', header_bg='SystemButtonFace',  month_fg='black', month_bg='SystemButtonFace',  year_fg='black', year_bg='SystemButtonFace',  days_fg='black', days_bg='SystemButtonFace', highlight_fg='white', highlight_bg='#2d18e7', surf_fg='black', surf_bg='SystemButtonFace', empty_bg='SystemButtonFace', **kwargs):
+        
         if month == None: month = DateTime.now()
         DateTime.checkDateTime(month)
+        
         self.month = month
         self.dest = dest
         # colors
-        self.bg = bg
+        self.background = background
         
         self.surf_bg = surf_bg
         self.surf_fg = surf_fg
@@ -117,26 +123,35 @@ class CalendarDialog(PRMP_Dialog):
 
         if self.dest: self.__dict__[self.dest] = None
         
-        super().__init__(master, title=title, bg=bg, **kwargs)
+        super().__init__(master, title=title, **kwargs)
+        
     
     def _setupDialog(self):
+        self.addTitleBar(self.titleText)
+        y = self.kwargs.get('geo')[1]
+        h = (y - 25) / y
+        
         self.daysButtons = []
+        fr = F(self)
+        fr.place(x=0, y=25, relh=h, relw=1)
         header_relief = 'groove'
-        Button(self, text=self._backward, command=self.previousYear, relief=header_relief, bg=self.surf_bg, fg=self.surf_fg).place(relx=0, rely=0, relw=.12, relh=.1)
-        Button(self, text=self._previous, command=self.previousMonth, relief=header_relief, bg=self.surf_bg, fg=self.surf_fg).place(relx=.12, rely=0, relw=.12, relh=.1)
-        self.monthNameLbl = Label(self, text=self.month.monthName, relief=header_relief, bg=self.month_bg, fg=self.month_fg)
+        Button(fr, text=self._backward, command=self.previousYear, relief=header_relief, background=self.surf_bg, foreground=self.surf_fg).place(relx=0, rely=0, relw=.12, relh=.1)
+        Button(fr, text=self._previous, command=self.previousMonth, relief=header_relief, background=self.surf_bg, foreground=self.surf_fg).place(relx=.12, rely=0, relw=.12, relh=.1)
+        self.monthNameLbl = Label(fr, text=self.month.monthName, relief=header_relief, background=self.month_bg, foreground=self.month_fg)
         self.monthNameLbl.place(relx=.24, rely=0, relw=.36, relh=.1)
-        self.yearLbl = Label(self, text=self.month.year, relief=header_relief, bg=self.year_bg, fg=self.year_fg)
+        self.yearLbl = Label(fr, text=self.month.year, relief=header_relief, background=self.year_bg, foreground=self.year_fg)
         self.yearLbl.place(relx=.6, rely=0, relw=.16, relh=.1)
-        Button(self, text=self._next, command=self.nextMonth, relief=header_relief, bg=self.surf_bg, fg=self.surf_fg).place(relx=.76, rely=0, relw=.12, relh=.1)
-        Button(self, text=self._forward, command=self.nextYear, relief=header_relief, bg=self.surf_bg, fg=self.surf_fg).place(relx=.88, rely=0, relw=.12, relh=.1)
+        Button(fr, text=self._next, command=self.nextMonth, relief=header_relief, background=self.surf_bg, foreground=self.surf_fg).place(relx=.76, rely=0, relw=.12, relh=.1)
+        Button(fr, text=self._forward, command=self.nextYear, relief=header_relief, background=self.surf_bg, foreground=self.surf_fg).place(relx=.88, rely=0, relw=.12, relh=.1)
         
         col = 0
         daysAbbrs = [DateTime.daysAbbr[-1]] + DateTime.daysAbbr[:-1]
         w = 1/7
         for dayAbbr in daysAbbrs:
             x = col * w
-            Label(self, text=dayAbbr, relief='groove', bg=self.header_bg, fg=self.header_fg).place(relx=x, rely=.1, relw=w, relh=.15)
+            d = L(fr, text=dayAbbr, relief='groove', background=self.header_bg, foreground=self.header_fg)
+            d.place(relx=x, rely=.1, relw=w, relh=.15)
+            self.childWidgets.append(d)
             col += 1
         
         h = .75 / 6
@@ -145,14 +160,17 @@ class CalendarDialog(PRMP_Dialog):
             m = d % 7
             x = m * w
             if (d != 0) and (m == 0): y += h
-            btn = self.DayLabel(self, returnMethod=self.choosenDay, text=d, relief='groove')
+            btn = self.DayLabel(fr, returnMethod=self.choosenDay, text=d, relief='groove')
             btn.place(relx=x, rely=y, relw=w, relh=h)
             self.daysButtons.append(btn)
+            
+        self.childWidgets += self.daysButtons
+        self.childWidgets += [fr]
         
         self.reset = self.daysButtons[-4]
-        self.reset.config(command=self.resetDate, text='☂', bg='red', fg='white', notPart=1)
-        
-        self.updateDays()
+        self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', notPart=1)
+    
+    def default(self): self.updateDays()
     
     def resetDate(self, e=0):
         self.month = DateTime.now()
@@ -185,14 +203,15 @@ class CalendarDialog(PRMP_Dialog):
             index = monthDates.index(day)
             DayLabel = self.daysButtons[index]
             if DayLabel == self.reset: continue
+            
             if day.month == self.month.month: DayLabel.config(day=day)
             else: DayLabel.empty()
-            
+
         for btn in remainingBtns:
             if btn == self.reset: continue
             btn.empty()
         
-        for dayBtn in self.daysButtons: dayBtn.offButton()
+        # for dayBtn in self.daysButtons: dayBtn.offButton()
     
     def choosenDay(self, day):
         self._setResult(day)
@@ -201,36 +220,53 @@ class CalendarDialog(PRMP_Dialog):
             CalendarDialog.choosen = None
             self.destroy()
 
+    @classmethod
+    def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PTh.DEFAULT_BACKGROUND_COLOR, header_fg=PTh.DEFAULT_BUTTON_COLOR[0], header_bg=PTh.DEFAULT_BUTTON_COLOR[1],  month_fg=PTh.DEFAULT_BUTTON_COLOR[1], month_bg=PTh.DEFAULT_BUTTON_COLOR[0],  year_fg=PTh.DEFAULT_BUTTON_COLOR[1], year_bg=PTh.DEFAULT_BUTTON_COLOR[0],  days_fg=PTh.DEFAULT_BACKGROUND_COLOR, days_bg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_fg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_bg=PTh.DEFAULT_BACKGROUND_COLOR, surf_fg=PTh.DEFAULT_BUTTON_COLOR[0], surf_bg=PTh.DEFAULT_BUTTON_COLOR[1], empty_bg=PTh.DEFAULT_BUTTON_COLOR[0], **kwargs)
 
 
 class PersonDialog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 280), **kwargs):
-        super().__init__(master=master, title=title, geo=geo, _return=1, ntb=9, nrz=9, tm=1, **kwargs)
+        super().__init__(master=master, title=title, geo=geo,  **kwargs)
         self.person = person
     
     def _setupDialog(self):
         self.addTitleBar(self.titleText)
         self.addSubmitButton(self.processInput)
         self.addEditButton(self.editInput)
+        
         contact = LF(self, text='Contact Details')
         contact.place(x=10, y=30, h=200, w=250)
         
-        self.name = LE(contact,  text='Name', orient='h', relx=.05, rely=0, relh=.15, relw=.9, longent=1, foreground='black').place_widgs()
+        self.name = LE(contact,  text='Name', orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25, foreground='black')
         # self.name.paint()
-        self.phone = LE(contact,  text='Phone Number', relx=.05, rely=.17, relh=.15, relw=.9, longent=0, orient='h').place_widgs()
+        self.phone = LE(contact,  text='Phone Number', relx=.02, rely=.17, relh=.15, relw=.96, longent=.5, orient='h')
         
-        self.email = LE(contact,  text='Email', relx=.05, rely=.34, relh=.15, relw=.9, longent=1, orient='h').place_widgs()
+        self.email = LE(contact,  text='Email', relx=.02, rely=.34, relh=.15, relw=.96, longent=.25, orient='h')
         
-        self.address = LT(contact,  text='Address', relx=.05, rely=.51, relh=.47, relw=.9, longent=1, orient='h').place_widgs()
+        self.address = LT(contact,  text='Address', relx=.02, rely=.51, relh=.47, relw=.96, longent=.3, orient='h')
         
         self.image = LI(self)
         self.image.place(x=270, y=40, h=190, w=220)
         
         self.childWidgets += [contact, self.image]
         self.resultsWidgets = ['name', 'phone', 'email', 'image', 'address']
+
+
+class RegionDetailsDialog(PRMP_Dialog):
     
+    def __init__(self, master=None, region=None, title='Region Details Dialog', geo=(300, 300), **kwargs):
+        super().__init__(master=master, geo=geo, **kwargs)
+        self.region = region
     
+    def _setupDialog(self):
+        self.addTitleBar(self.titleText)
+        self.addSubmitButton(self.processInput)
+        self.addEditButton(self.editInput)
+        
+        
+        
+        
 
 
 
