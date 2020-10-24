@@ -1477,20 +1477,22 @@ class ToolTip(PRMP_Toplevel):
         self.visible = 0
         self.withdraw()
 
-
-class LabelImage(PRMP_Label):
-    def __init__(self, master, imageFile=None, **kwargs):
-        super().__init__(master, **kwargs)
+class ImageWidget:
+    def __init__(self, imageFile=None, thumb=None, resize=None):
         self.rt = None
         self.data = None
+        self.thumb = thumb or (200, 170)
+        self.resize = resize or (100, 100)
         from .dialogs import PMB
         from .pics import Pngs
+        
         self.PMB = PMB
         self.default_dp = Pngs.get('profile_pix')
         
         self.bindMenu()
         self.loadImage(imageFile=imageFile, start=1)
         self.bindEntryHighlight()
+    
     
     def disabled(self):
         self.unBindMenu()
@@ -1501,15 +1503,16 @@ class LabelImage(PRMP_Label):
         super().normal()
     
     def loadImage(self, e=0, imageFile=None, start=0):
-        thumb = (200, 170)
         if not imageFile:
             if start: pass
             elif not self.PMB('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ').result: return
             imageFile = self.default_dp
         image = Image.open(imageFile)
         self.storeImage(imageFile)
-        if imageFile.endswith('.xbm'): image = image.resize((100, 100))
-        else: image.thumbnail(thumb)
+        
+        if imageFile.endswith('.xbm'): image = image.resize(self.resize)
+        else: image.thumbnail(self.thumb)
+        
         self.image =  PhotoImage(image=image)
         self['image'] = self.image
     
@@ -1561,6 +1564,12 @@ class LabelImage(PRMP_Label):
         
         rt.attributes('-topmost', 1)
         rt.geometry(f'50x50+{x}+{y}')
+
+class LabelImage(PRMP_Label, ImageWidget):
+    def __init__(self, master, imageFile=None, resize=None, thumb=None, **kwargs):
+        PRMP_Label.__init__(self, master, **kwargs)
+        ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
+    
 LI = LabelImage
 
 class FillWindow:
