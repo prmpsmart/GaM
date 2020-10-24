@@ -4,6 +4,8 @@ __pycache__/
 database/
 test/
 img/
+xbms/
+pngs/
 test_src/
 test_*[a-z].py
 test.py

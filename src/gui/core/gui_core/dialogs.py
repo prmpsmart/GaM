@@ -7,7 +7,7 @@ PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel, FillWindow):
     
-    def __init__(self, master=None, values={}, _return=True, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, **kwargs):
         # PRMP_Toplevel.__init__(self, master, **kwargs)
         PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
         
@@ -300,18 +300,17 @@ class CalendarDialog(PRMP_Dialog):
 
 
 class PRMP_MsgBox(PRMP_Toplevel):
-    
-    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', cancel=0, **kwargs):
-        super().__init__(title=title, geo=geo, ntb=1, **kwargs)
-        # super().__init__(master=master, title=title, geo=geo, ntb=1, **kwargs)
+    _bitmaps = ['info', 'question', 'error', 'warning']
+    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, **kwargs):
+        super().__init__(title=title, geo=geo, ntb=1, tm=1, **kwargs)
         
-        self.value = None
+        self.__result = None
         self.addTitleBar()
         
         self.label = L(self, text=message, bitmap='')
         self.label.place(relx=0, rely=.15, relh=.6, relw=1)
-        self.bitmap = L(self.label, bitmap='question')
-        self.bitmap.place(relx=.8, rely=.05, relh=.4, relw=.15)
+        self.bitmap = L(self.label, bitmap=_type, relief='flat')
+        self.bitmap.place(relx=.84, rely=.2, relh=.6, relw=.15)
 
         self.yes = PRMP_Button(self, text='Yes', command=self.yesCom)
         self.yes.place(relx=.06, rely=.8, relh=.15, relw=.17)
@@ -326,15 +325,17 @@ class PRMP_MsgBox(PRMP_Toplevel):
         
         self._isDialog()
         # self.mainloop()
-    
+    @property
+    def result(self): return self.__result
+    def _setResult(self, result): self.__result = result
     def yesCom(self):
-        self.value = True
+        self._setResult(True)
         self.destroy()
     def cancelCom(self):
-        self.value = None
+        self._setResult(None)
         self.destroy()
     def noCom(self):
-        self.value = False
+        self._setResult(False)
         self.destroy()
     
 PMB = PRMP_MsgBox

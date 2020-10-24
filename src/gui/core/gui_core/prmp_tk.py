@@ -1477,6 +1477,8 @@ class LabelImage(PRMP_Label):
         super().__init__(master, **kwargs)
         self.rt = None
         self.data = None
+        from .dialogs import PMB
+        self.PMB = PMB
         
         self.bindMenu()
         self.loadImage(imageFile=imageFile, start=1)
@@ -1493,16 +1495,15 @@ class LabelImage(PRMP_Label):
     @property
     def default_dp(self):
         path = os.path
-        dn = path.dirname
-        dir_ = dn(dn(dn(dn(__file__))))
-        file = path.join(dir_, 'img/profile_pix.png')
+        dir_ = path.dirname(__file__)
+        file = path.join(dir_, 'pngs/profile_pix.png')
         return file
     
     def loadImage(self, e=0, imageFile=None, start=0):
         thumb = (200, 170)
         if not imageFile:
             if start: pass
-            elif not confirm('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ', 1): return
+            elif not self.PMB('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ').result: return
             imageFile, thumb = self.default_dp, (150, 150)
         image = Image.open(imageFile)
         self.storeImage(imageFile)
@@ -1551,10 +1552,10 @@ class LabelImage(PRMP_Label):
         x, y = e.x_root, e.y_root
         self.rt = rt = PTp(self)
         rt.overrideredirect(1)
-        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=Font(**PTh.DEFAULT_MENU_FONT))
+        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
         lbl.place(relx=0, rely=0, relh=.5, relw=1)
         
-        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=Font(**PTh.DEFAULT_MENU_FONT))
+        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
         lbl2.place(relx=0, rely=.5, relh=.5, relw=1)
         
         rt.attributes('-topmost', 1)
