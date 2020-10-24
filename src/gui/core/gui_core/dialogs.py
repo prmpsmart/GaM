@@ -1,7 +1,83 @@
 
-from tkinter.colorchooser import askcolor
+from ....backend.core.date_time import DateTime
 from .prmp_tk import *
-from ...backend.core.date_time import DateTime
+
+
+PRMP_Toplevel = PRMP_Tk
+
+class PRMP_Dialog(PRMP_Toplevel, FillWindow):
+    
+    def __init__(self, master=None, values={}, _return=True, **kwargs):
+        # PRMP_Toplevel.__init__(self, master, **kwargs)
+        PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
+        
+        self.__result = None
+        
+        self.resultsWidgets = []
+        self._return = _return
+        
+        self._setupDialog()
+        self.paint()
+        self.default()
+        
+        FillWindow.__init__(self, values=values)
+        
+        try:
+            if values: self.editBtn.var.set('1')
+            else: self.editBtn.var.set('0')
+            self.editInput()
+        except: pass
+        
+        # self._isDialog()
+        self.mainloop()
+    
+    def _setupDialog(self):
+        'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
+    
+    @property
+    def result(self): return self.__result
+    
+    def default(self): pass
+    
+    def _setResult(self, result): self.__result = result
+    
+    def addSubmitButton(self, command=None):
+        geo = self.kwargs.get('geo')
+        if geo:
+            x, y = geo[:2]
+            xbtn = B(self, text='Submit', command=command)
+            xbtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
+            self.childWidgets.append(xbtn)
+    
+    def addEditButton(self, command=None):
+        geo = self.kwargs.get('geo')
+        if geo:
+            x, y = geo[:2]
+            self.editBtn = xbtn = Cb(self, text='Edit', command=self.editInput)
+            xbtn.place(x=10 , y=y-40, h=30, w=60)
+            self.childWidgets.append(xbtn)
+    
+    def processInput(self):
+        result = {}
+        self.resultsWidgets.sort()
+        for widgetName in self.resultsWidgets:
+            wid = self.__dict__.get(widgetName)
+            if wid:
+                result[widgetName] = wid.get()
+        self._setResult(result)
+        
+        self.destroy()
+        print(self.result)
+        
+    def editInput(self):
+        if self.editBtn.var.get() == '1':
+            for widgetName in self.resultsWidgets:
+                wid = self.__dict__.get(widgetName)
+                if wid: wid.normal()
+        else: 
+            for widgetName in self.resultsWidgets:
+                wid = self.__dict__.get(widgetName)
+                if wid: wid.disabled()
 
 class CalendarDialog(PRMP_Dialog):
     _both = '◄►'
@@ -221,88 +297,5 @@ class CalendarDialog(PRMP_Dialog):
 
     @classmethod
     def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PTh.DEFAULT_BACKGROUND_COLOR, header_fg=PTh.DEFAULT_BUTTON_COLOR[0], header_bg=PTh.DEFAULT_BUTTON_COLOR[1],  month_fg=PTh.DEFAULT_BUTTON_COLOR[1], month_bg=PTh.DEFAULT_BUTTON_COLOR[0],  year_fg=PTh.DEFAULT_BUTTON_COLOR[1], year_bg=PTh.DEFAULT_BUTTON_COLOR[0],  days_fg=PTh.DEFAULT_BACKGROUND_COLOR, days_bg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_fg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_bg=PTh.DEFAULT_BACKGROUND_COLOR, surf_fg=PTh.DEFAULT_BUTTON_COLOR[0], surf_bg=PTh.DEFAULT_BUTTON_COLOR[1], empty_bg=PTh.DEFAULT_BUTTON_COLOR[0], **kwargs)
-
-
-class PersonDialog(PRMP_Dialog):
-    
-    def __init__(self, master=None, title='Person Dialog', person=None, geo=(500, 280), **kwargs):
-        super().__init__(master=master, title=title, geo=geo,  **kwargs)
-        self.person = person
-    
-    def _setupDialog(self):
-        self.addTitleBar(self.titleText)
-        self.addSubmitButton(self.processInput)
-        self.addEditButton(self.editInput)
-        
-        contact = LF(self, text='Contact Details')
-        contact.place(x=10, y=30, h=200, w=250)
-        
-        self.name = LE(contact,  text='Name', orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
-        
-        self.phone = LE(contact,  text='Phone Number', relx=.02, rely=.17, relh=.15, relw=.96, longent=.5, orient='h')
-        
-        self.email = LE(contact,  text='Email', relx=.02, rely=.34, relh=.15, relw=.96, longent=.25, orient='h')
-        
-        self.address = LT(contact,  text='Address', relx=.02, rely=.51, relh=.47, relw=.96, longent=.3, orient='h')
-        
-        self.image = LI(self)
-        self.image.place(x=270, y=40, h=190, w=220)
-        
-        self.childWidgets += [contact, self.image]
-        self.resultsWidgets = ['name', 'phone', 'email', 'image', 'address']
-
-
-class RegionDetailsDialog(PRMP_Dialog):
-    
-    def __init__(self, master=None, region=None, title='Region Details Dialog', geo=(550, 600), **kwargs):
-        super().__init__(master=master, title=title, geo=geo, **kwargs)
-        self.region = region
-    
-    def _setupDialog(self):
-        self.addTitleBar(self.titleText)
-        self.addSubmitButton(self.processInput)
-        self.addEditButton(self.editInput)
-        
-        hierachy = LF(self, text='Hierachy')
-        hierachy.place(x=10, y=30, h=150, w=300)
-        
-        self.office = LRB(hierachy,  text='Office', orient='h', relx=.02, rely=0, relh=.23, relw=.96, longent=.3)
-        
-        self.department = LRB(hierachy,  text='Department', orient='h', relx=.02, rely=.25, relh=.23, relw=.96, longent=.35)
-        
-        self.sup = LRB(hierachy,  text='Superscript', orient='h', relx=.02, rely=.5, relh=.23, relw=.96, longent=.35)
-        
-        self.sub = LRB(hierachy,  text='Subscript', orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3)
-        
-        # self.account = LRB(hierachy,  text='Office', orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
-        
-        self.image = LI(self)
-        self.image.place(x=320, y=40, h=190, w=220)
-        
-        account = LF(self, text='Account')
-        account.place(x=10, y=190, h=270, w=280)
-        
-        self.newVar = tk.StringVar()
-        self.newVar.set('0')
-        new = PCb(self, text='New Dialog', variable=self.newVar)
-        new.place(relx=.8, y=240, h=30, relw=.19)
-        self.bindOnFg(new)
-        
-        self.childWidgets += [new, account, hierachy, self.image]
-        self.resultsWidgets = ['office', 'department', 'sup', 'image', 'sub']
-        
-    def loadRegion(self, region=None):
-        if region:
-            self.region = region
-            self.titleBar.config(text=f'{self.region} Details Dialog')
-        
-        
-
-
-
-
-
-
-
 
 

@@ -1,4 +1,4 @@
-from ..core.dialogs import PersonDialog
+from ..core.agam_dialogs import PersonDialog
 
 class NewClientDialog(PersonDialog):
     

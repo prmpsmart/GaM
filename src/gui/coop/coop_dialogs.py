@@ -1,4 +1,6 @@
-from ..core.dialogs import *
+from ..core.agam_dialogs import *
+from ..core.gui_core.two_widgets import *
+
 
 class ThirdPartySuretyDialog(PersonDialog):
     

@@ -204,7 +204,7 @@ class PRMP_Theme:
     
     DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
-    DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 4, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
@@ -271,7 +271,7 @@ class PRMP_Theme:
         if scrollbar_color != None: cls.DEFAULT_SCROLLBAR_COLOR = scrollbar_color
 
         if input_text_color is not None: cls.DEFAULT_INPUT_TEXT_COLOR = input_text_color
-        # print(button_color)
+        
 
         return True
 
@@ -310,16 +310,16 @@ class PRMP_Theme:
             self.configure(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background)
             
         
-        ttk = False
-
         if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
+            
             if wt in ['Button', 'Radiobutton', 'Checkbutton']:
-                # print(wt, self)
+                font = Font(**kwargs.pop('font', PTh.DEFAULT_BUTTON_FONT))
                 col = PRMP_Theme.DEFAULT_BUTTON_COLOR
                 if isinstance(col, tuple):
                     if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
                     if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
                 else: foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR
+            else: font = Font(**kwargs.pop('font', PTh.DEFAULT_LABEL_FONT))
             _dict = dict(activebackground=activebackground,
                         activeforeground=activeforeground,
                         background=background,
@@ -328,12 +328,15 @@ class PRMP_Theme:
                         foreground=foreground,
                         highlightbackground=highlightbackground,
                         highlightcolor=highlightcolor,
+                        font=font,
                         highlightthickness=highlightthickness,
                         relief=relief, **kwargs)
             
             self.configure(**_dict)
         
-        elif wt == 'LabelFrame': self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth,)
+        elif wt == 'LabelFrame':
+            font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
+            self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
             
         elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
             
@@ -353,11 +356,15 @@ class PRMP_Theme:
 
         elif wt in ['Combobox', 'Progressbar']:
             style = ttk.Style()
-            ttk = True
+            
+            self.configure(background=background)
             if wt == 'Combobox':
+                
                 a, b = PRMP_Theme.DEFAULT_BUTTON_COLOR
-                style.configure('TCombobox', foreground=foreground, selectbackground=background, fieldbackground=background, selectforeground=foreground,  arrowcolor=a,  background=b)
-                style.map('TCombobox', fieldbackground=[('readonly', background)])
+                style.configure('m.TCombobox', foreground=foreground, selectbackground=background, fieldbackground=background, selectforeground=foreground,  arrowcolor=a,  background=b)
+                style.map('m.TCombobox', fieldbackground=[('readonly', background)])
+                self.config(style='m.TCombobox')
+                
             elif wt == 'Progressbar':
                 s = ttk.Style()
                 a, b = PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR
@@ -548,7 +555,7 @@ class PRMP_Style(ttk.Style):
         }
         
         # s = sfs(settings)
-        # print(s)
+        
         self.theme_create('black', parent='clam', settings=settings)
         return self
 
@@ -749,7 +756,7 @@ class PRMP_Style(ttk.Style):
                 'element create': ['image', imagesDict[f'arrow{sd}'], ('disabled', imagesDict[f'arrow{sd}']), ('pressed', imagesDict[f'arrow{sd}-p']), ('active', imagesDict[f'arrow{sd}-h']), {'border': 1, 'sticky': ()}]}})
         
         # s = sfs(settings)
-        # print(s)
+        
         self.theme_create('blue', settings=settings)
         return self
 
@@ -878,28 +885,24 @@ class PRMP_Widget(PRMP_Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
     
-    def __init__(self, window=False, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
+    def __init__(self, window=False, **kwargs):
         self.kwargs = kwargs
         self.childWidgets = []
         self.font = None
         
         if window: self.setupOfWidget(**kwargs)
-        
         try:
-            if font: self.useFont(font)
+            font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
+            
+            self.useFont(font)
         except: pass
         
         self.paint()
     
     def bindOnFg(self, wid):
-        wid.on = True
         def action(e):
-            if wid.on:
-                wid['bg'] = 'blue'
-                wid.on = False
-            else:
-                wid.paint()
-                wid.on = True
+            if wid.var.get() == '0': wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_BUTTON_COLOR
+            else: wid.paint()
         wid.bind('<1>', action)
     
     @property
@@ -911,6 +914,7 @@ class PRMP_Widget(PRMP_Theme):
     def useFont(self, font=None):
         if font: self.font = Font(**font)
         if self.font: self['font'] = self.font
+        
         return self
     
     def bindOverrelief(self, wid, relief):
@@ -925,9 +929,9 @@ class PRMP_Widget(PRMP_Theme):
     
     def normal(self): self['state'] = 'normal'
     
-    def addTitleBar(self, title):
+    def addTitleBar(self, title=''):
         fr = F(self)
-        self.titleBar = L(fr, text=title, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
+        self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
         self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
         
         xbtn = B(fr, text='X', command=self.destroy)
@@ -950,7 +954,7 @@ class PRMP_Widget(PRMP_Theme):
     
     PRMP_ELEMENT = PRMP_WIDGET    
     
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, **kwargs):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -1175,6 +1179,7 @@ class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
         PRMP_Widget.__init__(self, window=True, **kwargs)
 Top = Toplevel = PTp = PRMP_Toplevel
 
+
 class PRMP_Button(tk.Button, PRMP_Widget):
     
     def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, **kwargs):
@@ -1227,15 +1232,27 @@ class PRMP_RegionButton(B):
 
 PRB = PRMP_RegionButton
 
-
-
-
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, **kwargs):
-        tk.Checkbutton.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=font, **kwargs)
+    def __init__(self, master=None, **kwargs):
+        self.var = tk.StringVar()
+        
+        tk.Checkbutton.__init__(self, master=master, variable=self.var, **kwargs)
+        PRMP_Widget.__init__(self, **kwargs)
+        
+        self.var.set('0')
+        self.bindOnFg(self)
+
 Cb = PCb = Checkbutton = PRMP_Checkbutton
+
+class PRMP_Combobox(ttk.Combobox, PRMP_Widget):
+    
+    def __init__(self, master=None, **kwargs):
+        
+        ttk.Combobox.__init__(self, master=master, **kwargs)
+        PRMP_Widget.__init__(self, **kwargs)
+        
+Cx = PCx = Combobox = PRMP_Combobox
 
 class PRMP_Entry(tk.Entry, PRMP_Widget):
     
@@ -1275,7 +1292,7 @@ class PRMP_Frame(tk.Frame, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
         tk.Frame.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=None, **kwargs)
+        PRMP_Widget.__init__(self, **kwargs)
 F = PF = Frame = PRMP_Frame
 
 class PRMP_Label(tk.Label, PRMP_Widget):
@@ -1311,6 +1328,44 @@ class PRMP_Text(tk.Text, PRMP_Widget):
         tk.Text.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
 PTx = PRMP_Text
+
+
+class PRMP_MsgBox(Top):
+    
+    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', cancel=0, **kwargs):
+        super().__init__(master=master, geo=geo, ntb=1, **kwargs)
+        
+        self.value = None
+        self.addTitleBar()
+        
+        self.label = L(self, text=message)
+        self.label.place(relx=0, rely=0.15, relh=.6, width=324)
+
+        self.yes = B(self, text='', command=self.yesCom)
+        self.yes.place(relx=0.059, rely=0.74, height=28, width=59)
+
+        if cancel:
+            self.cancel = B(self, text='', command=self.cancelCom)
+            self.cancel.place(relx=0.769, rely=0.769, height=28, width=59)
+
+        self.no = B(self, text='', command=self.noCom)
+        self.no.place(relx=0.414, rely=0.769, height=28, width=59)
+        
+        
+        self._isDialog()
+    
+    def yesCom(self):
+        self.value = True
+        self.destroy()
+    def cancelCom(self):
+        self.value = None
+        self.destroy()
+    def noCom(self):
+        self.value = False
+        self.destroy()
+    
+PMB = PRMP_MsgBox
+
 
 class ScrollableFrame(PRMP_Frame):
     def __init__(self, container, **kwargs):
@@ -1451,165 +1506,6 @@ class ToolTip(PRMP_Toplevel):
         self.visible = 0
         self.withdraw()
 
-class TwoWidgets(PRMP_Frame):
-    
-    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=.5, values=(0,), value=None, from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0, variable=None):
-        super().__init__(master)
-        
-        self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
-        
-        self.value = value
-        self.ilh = ilh
-        self.top = top.lower()
-        self.bottom = bottom.lower()
-        self.orient = orient
-        self.longent = longent
-
-        if top.lower() == 'checkbutton':
-            if not command: command = self.checked
-            self.Top = PRMP_Checkbutton(self, text=text, variable=variable, command=command)
-        elif top.lower() == 'label': self.Top = PRMP_Label(self, text=text)
-        elif top.lower() == 'radiobutton': 
-            if not command: command = self.checked
-            self.Top = PRMP_Radiobutton(self, text=text, variable=variable, command=command, value=value)
-
-        if bottom.lower() == 'entry': self.Bottom = PRMP_Entry(self, show=show)
-        elif bottom.lower() == 'button': self.Bottom = PRMP_Button(self)
-        elif bottom.lower() == 'datebutton': self.Bottom = PRMP_DateButton(self)
-        elif bottom.lower() == 'combobox':
-            self.Bottom = ttk.Combobox(self, values=values, show=show)
-            if func: self.Bottom.bind('<<ComboboxSelected>>', func)
-        elif bottom.lower() == 'spinbox':
-            self.Bottom = ttk.Spinbox(self, from_=from_, to=to, increment=increment)
-            if func:
-                self.Bottom.bind('<<Increment>>', func)
-                self.Bottom.bind('<<Decrement>>', func)
-        elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, show=show, variable=variable)
-        elif bottom.lower() == 'regionbutton': self.Bottom = PRMP_RegionButton(self,)
-        
-        self.B = self.Bottom
-        self.T = self.Top
-
-        self.rt = None
-        self.bindOverrelief(self.B, 'solid')
-        
-        self.childWidgets += [self.T, self.B]
-        
-        if self.value and self.variable: self.checked()
-        
-        self.place_widgs()
-    
-    def checked(self):
-        if self.variable:
-            if self.variable.get() == self.value:
-                self.normal('b')
-                self.Top['foreground'] = 'blue'
-            else:
-                self.disabled('b')
-                self.Top['foreground'] = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
-
-    def get_top(self): return self.Top
-    
-    def get_bottom(self): return self.Bottom
-    
-    def disabled(self, wh=''):
-        if wh == 't': self.Top.config(state='disabled')
-        elif wh == 'b': self.Bottom.config(state='disabled')
-        else:
-            self.Top.config(state='disabled')
-            self.Bottom.config(state='disabled')
-    
-    def active(self, wh=''):
-        if wh == 't': self.Top.config(state='active')
-        elif wh == 'b': self.Bottom.config(state='active')
-        else:
-            self.Top.config(state='active')
-            self.Bottom.config(state='active')
-    
-    def normal(self, wh=''):
-        if wh == 't': self.Top.config(state='normal')
-        elif wh == 'b': self.Bottom.config(state='normal')
-        else:
-            self.Top.config(state='normal')
-            self.Bottom.config(state='normal')
-    
-    def set(self, values):
-        if self.bottom == 'combobox': self.Bottom.config(values=values)
-        elif self.bottom == 'entry': self.Bottom.insert(0, values)
-        elif self.bottom == 'text': self.Bottom.insert(0.0, values)
-        elif self.bottom == 'datebutton': self.Bottom.set(values)
-        else: self.Bottom.config(text=values)
-    
-    def get(self): return self.Bottom.get()
-    
-    def config(self, **kwargs): self.Top.configure(**kwargs)
-    
-    def style(self):
-        self['background'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
-        if self.top in ['checkbutton', 'radiobutton']: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="ridge", relief="groove")
-        else: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR,  activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', relief="groove")
-
-    def place_widgs(self):
-        self.place(relx=self.relx, rely=self.rely, relh=self.relh, relw=self.relw)
-        if self.orient == 'h':
-            if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.longent)
-            else: self.Top.place(relx=0, rely=0, relh=1, relw=self.longent)
-            self.Bottom.place(relx=self.longent + .02, rely=0, relh=.945, relw=1 - self.longent - .02)
-        else:
-            self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
-            self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
-        return self
-TW = TwoWidgets
-
-class RadioCombo(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='radiobutton', bottom='combobox', **kwargs)
-RC = RadioCombo
-
-class RadioEntry(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='radiobutton', bottom='entry', **kwargs)
-RE = RadioEntry
-
-class LabelSpin(TwoWidgets):
-    def __init__(self, master, **kwargs):
-
-        super().__init__(master, top='label', bottom='spinbox', **kwargs)
-
-    def set(self, from_=.1, to=1, increment=.1): self.Bottom.config(from_=from_, to=to, increment=increment)
-    
-LS = LabelSpin
-
-class LabelEntry(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='entry', **kwargs)
-LE = LabelEntry
-
-class LabelText(TwoWidgets):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, top='label', bottom='text', **kwargs)
-    
-    def get(self): return self.B.get('1.0', 'end').strip('\n')
-LT = LabelText
-
-class LabelCombo(TwoWidgets):
-    def __init__(self, master, **kwargs):
-
-        super().__init__(master, top='label', bottom='combobox', **kwargs)
-LC = LabelCombo
-
-class CheckEntry(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='checkbutton', bottom='entry', **kwargs)
-CE = CheckEntry
-
-class CheckCombo(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
-CC = CheckCombo
-
-class LabelButton(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='button',**kwargs)
-LB = LabelButton
-
-class LabelDateButton(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='datebutton',**kwargs)
-LDB = LabelDateButton
 
 class LabelImage(PRMP_Label):
     def __init__(self, master, imageFile=None, **kwargs):
@@ -1690,124 +1586,27 @@ class LabelImage(PRMP_Label):
         x, y = e.x_root, e.y_root
         self.rt = rt = PTp(self)
         rt.overrideredirect(1)
-        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=None)
+        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=Font(**PTh.DEFAULT_MENU_FONT))
         lbl.place(relx=0, rely=0, relh=.5, relw=1)
         
-        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=None)
+        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=Font(**PTh.DEFAULT_MENU_FONT))
         lbl2.place(relx=0, rely=.5, relh=.5, relw=1)
         
         rt.attributes('-topmost', 1)
         rt.geometry(f'50x50+{x}+{y}')
 LI = LabelImage
 
-class LabelRegionButton(TwoWidgets):
+class FillWindow:
     
-    def __init__(self, master=None, region=None, **kwargs):
-        super().__init__(master, top='label', bottom='regionbutton', command=self.openDetails, **kwargs)
-        self.region = region
-        self.loadRegion(region)
-        self.bindEntryHighlight()
-    
-    def loadRegion(self, region=None):
-        if region: self['text'] = region.name
-    
-    def openDetails(self):
-        
-        # open RegionDetailsDialog
-        pass
-
-LRB = LabelRegionButton
-
-
-
-
-
-
-PRMP_Toplevel = PRMP_Tk
-
-class PRMP_Dialog(PRMP_Toplevel):
-    
-    def __init__(self, master=None, values={}, _return=True, **kwargs):
-        # PRMP_Toplevel.__init__(self, master, **kwargs)
-        PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
-        
-        self.__result = None
-        self.editVar = tk.StringVar()
-        self.resultsWidgets = []
-        self._return = _return
-        
-        self._setupDialog()
-        self.paint()
+    def __init__(self, values={}):
         self.preFill(**values)
-        self.default()
-        
-        if values: self.editVar.set('1')
-        else: self.editVar.set('0')
-        try: self.editInput()
-        except: pass
-        
-        # self._isDialog()
-        self.mainloop()
     
-    def _setupDialog(self):
-        'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
-    
-    @property
-    def result(self): return self.__result
-    
-    def default(self): pass
-    
-    def _setResult(self, result): self.__result = result
-    
-    def addSubmitButton(self, command=None):
-        geo = self.kwargs.get('geo')
-        if geo:
-            x, y = geo[:2]
-            xbtn = B(self, text='Submit', command=command)
-            xbtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
-            self.childWidgets.append(xbtn)
-    
-    def addEditButton(self, command=None):
-        geo = self.kwargs.get('geo')
-        if geo:
-            x, y = geo[:2]
-            self.editBtn = xbtn = Cb(self, text='Edit', command=self.editInput, variable=self.editVar)
-            xbtn.place(x=10 , y=y-40, h=30, w=60)
-            self.childWidgets.append(xbtn)
-        
     def preFill(self, **values):
         for key, value in values.items():
             if key in self.resultsWidgets:
                 wid = self.__dict__.get(key)
-                if wid:
-                    wid.set(value)
+                if wid: wid.set(value)
         self.values = values
-    
-    def processInput(self):
-        result = {}
-        self.resultsWidgets.sort()
-        for widgetName in self.resultsWidgets:
-            wid = self.__dict__.get(widgetName)
-            if wid:
-                result[widgetName] = wid.get()
-        self._setResult(result)
-        
-        self.destroy()
-        print(self.result)
-        
-    def editInput(self):
-        if self.editVar.get() == '1':
-            for widgetName in self.resultsWidgets:
-                wid = self.__dict__.get(widgetName)
-                if wid: wid.normal()
-            self.editBtn['background'] = 'blue'
-            self.edit = False
-        else: 
-            for widgetName in self.resultsWidgets:
-                wid = self.__dict__.get(widgetName)
-                if wid: wid.disabled()
-            self.editBtn.paint()
-            self.edit = True
 
 
 
