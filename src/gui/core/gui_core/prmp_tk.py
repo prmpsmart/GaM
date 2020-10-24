@@ -10,7 +10,7 @@ from io import BytesIO
 from random import randint
 from tkinter.filedialog import askopenfilename
 
-from PIL.ImageTk import Image, PhotoImage
+from PIL.ImageTk import Image, PhotoImage, BitmapImage
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 
@@ -203,6 +203,7 @@ class PRMP_Theme:
     CURRENT_THEME = 'DarkBlue3'
     
     DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
@@ -956,7 +957,7 @@ class PRMP_Widget(PRMP_Theme):
     
     PRMP_ELEMENT = PRMP_WIDGET    
     
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, **kwargs):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, **kwargs):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -965,10 +966,14 @@ class PRMP_Widget(PRMP_Theme):
         if nrz: notResizable = nrz
         if alp: alpha = alp
         if tw: toolWindow = tw
-        if noTitleBar: grabAnyWhere = True
         
         self.titleText = title
         self.title(title)
+        
+        if atb:
+            self.addTitleBar()
+            noTitleBar = 1
+            
         
         self.side = side
         
@@ -985,6 +990,7 @@ class PRMP_Widget(PRMP_Theme):
             self.state('withdrawn')
             self.overrideredirect(1)
             self.state('normal')
+        
         
         self.lastPoints = [0, 0, 0, 0]
         self._geometry = geometry
@@ -1478,7 +1484,9 @@ class LabelImage(PRMP_Label):
         self.rt = None
         self.data = None
         from .dialogs import PMB
+        from .pics import Pngs
         self.PMB = PMB
+        self.default_dp = Pngs.get('profile_pix')
         
         self.bindMenu()
         self.loadImage(imageFile=imageFile, start=1)
@@ -1491,31 +1499,24 @@ class LabelImage(PRMP_Label):
     def normal(self):
         self.bindMenu()
         super().normal()
-        
-    @property
-    def default_dp(self):
-        path = os.path
-        dir_ = path.dirname(__file__)
-        file = path.join(dir_, 'pngs/profile_pix.png')
-        return file
     
     def loadImage(self, e=0, imageFile=None, start=0):
         thumb = (200, 170)
         if not imageFile:
             if start: pass
             elif not self.PMB('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ').result: return
-            imageFile, thumb = self.default_dp, (150, 150)
+            imageFile = self.default_dp
         image = Image.open(imageFile)
         self.storeImage(imageFile)
-        # image = image.resize()
-        image.thumbnail(thumb)
+        if imageFile.endswith('.xbm'): image = image.resize((100, 100))
+        else: image.thumbnail(thumb)
         self.image =  PhotoImage(image=image)
         self['image'] = self.image
     
     def set(self, imageFile): self.loadImage(imageFile=imageFile, start=1)
     
     def changeImage(self, e=0):
-        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif}'])
+        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
         self.loadImage(imageFile=file)
     
     def bindMenu(self):
@@ -1574,7 +1575,7 @@ class FillWindow:
                 if wid: wid.set(value)
         self.values = values
 
-
+FW = FillWindow
 
 
 
