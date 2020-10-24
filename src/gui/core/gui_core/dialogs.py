@@ -23,8 +23,8 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
         FillWindow.__init__(self, values=values)
         
         try:
-            if values: self.editBtn.var.set('1')
-            else: self.editBtn.var.set('0')
+            if values: self.editBtn.var.set('0')
+            else: self.editBtn.var.set('1')
             self.editInput()
         except: pass
         
@@ -297,5 +297,47 @@ class CalendarDialog(PRMP_Dialog):
 
     @classmethod
     def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PTh.DEFAULT_BACKGROUND_COLOR, header_fg=PTh.DEFAULT_BUTTON_COLOR[0], header_bg=PTh.DEFAULT_BUTTON_COLOR[1],  month_fg=PTh.DEFAULT_BUTTON_COLOR[1], month_bg=PTh.DEFAULT_BUTTON_COLOR[0],  year_fg=PTh.DEFAULT_BUTTON_COLOR[1], year_bg=PTh.DEFAULT_BUTTON_COLOR[0],  days_fg=PTh.DEFAULT_BACKGROUND_COLOR, days_bg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_fg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_bg=PTh.DEFAULT_BACKGROUND_COLOR, surf_fg=PTh.DEFAULT_BUTTON_COLOR[0], surf_bg=PTh.DEFAULT_BUTTON_COLOR[1], empty_bg=PTh.DEFAULT_BUTTON_COLOR[0], **kwargs)
+
+
+class PRMP_MsgBox(PRMP_Toplevel):
+    
+    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', cancel=0, **kwargs):
+        super().__init__(title=title, geo=geo, ntb=1, **kwargs)
+        # super().__init__(master=master, title=title, geo=geo, ntb=1, **kwargs)
+        
+        self.value = None
+        self.addTitleBar()
+        
+        self.label = L(self, text=message, bitmap='')
+        self.label.place(relx=0, rely=.15, relh=.6, relw=1)
+        self.bitmap = L(self.label, bitmap='question')
+        self.bitmap.place(relx=.8, rely=.05, relh=.4, relw=.15)
+
+        self.yes = PRMP_Button(self, text='Yes', command=self.yesCom)
+        self.yes.place(relx=.06, rely=.8, relh=.15, relw=.17)
+
+        if cancel:
+            self.cancel = B(self, text='Cancel', command=self.cancelCom)
+            self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
+
+        self.no = B(self, text='No', command=self.noCom)
+        self.no.place(relx=.77, rely=.8, relh=.15, relw=.17)
+        
+        
+        self._isDialog()
+        # self.mainloop()
+    
+    def yesCom(self):
+        self.value = True
+        self.destroy()
+    def cancelCom(self):
+        self.value = None
+        self.destroy()
+    def noCom(self):
+        self.value = False
+        self.destroy()
+    
+PMB = PRMP_MsgBox
+
 
 

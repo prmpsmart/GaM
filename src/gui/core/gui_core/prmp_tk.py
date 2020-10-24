@@ -304,15 +304,15 @@ class PRMP_Theme:
         relief = kwargs.pop('relief',  PRMP_Theme.DEFAULT_RELIEF)
         wt = widgetType = self.PRMP_ELEMENT
         
-        if kwargs.get('asEntry') != None:
+        asEntry = kwargs.get('asEntry')
+        if asEntry != None:
             asEntry = kwargs.pop('asEntry')
-            wt = 'Entry'
+            wt = 'Entry' if asEntry else wt
             self.configure(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background)
             
         
         if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
-            
-            if wt in ['Button', 'Radiobutton', 'Checkbutton']:
+            if wt != 'Label':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_BUTTON_FONT))
                 col = PRMP_Theme.DEFAULT_BUTTON_COLOR
                 if isinstance(col, tuple):
@@ -343,6 +343,7 @@ class PRMP_Theme:
         elif wt in ['Entry', 'Text']:
             if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
             if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
+            font = Font(**kwargs.pop('font', PTh.DEFAULT_FONT))
             _dict = dict(background=background,
                         borderwidth=borderwidth,
                         # disabledforeground=disabledforeground,
@@ -350,7 +351,9 @@ class PRMP_Theme:
                         highlightbackground=highlightbackground,
                         highlightcolor=highlightcolor,
                         highlightthickness=highlightthickness,
-                        relief=relief, **kwargs)
+                        relief=relief, 
+                        font=font,
+                        **kwargs)
             
             self.configure(**_dict)
 
@@ -893,7 +896,6 @@ class PRMP_Widget(PRMP_Theme):
         if window: self.setupOfWidget(**kwargs)
         try:
             font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
-            
             self.useFont(font)
         except: pass
         
@@ -1330,43 +1332,6 @@ class PRMP_Text(tk.Text, PRMP_Widget):
 PTx = PRMP_Text
 
 
-class PRMP_MsgBox(Top):
-    
-    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', cancel=0, **kwargs):
-        super().__init__(master=master, geo=geo, ntb=1, **kwargs)
-        
-        self.value = None
-        self.addTitleBar()
-        
-        self.label = L(self, text=message)
-        self.label.place(relx=0, rely=0.15, relh=.6, width=324)
-
-        self.yes = B(self, text='', command=self.yesCom)
-        self.yes.place(relx=0.059, rely=0.74, height=28, width=59)
-
-        if cancel:
-            self.cancel = B(self, text='', command=self.cancelCom)
-            self.cancel.place(relx=0.769, rely=0.769, height=28, width=59)
-
-        self.no = B(self, text='', command=self.noCom)
-        self.no.place(relx=0.414, rely=0.769, height=28, width=59)
-        
-        
-        self._isDialog()
-    
-    def yesCom(self):
-        self.value = True
-        self.destroy()
-    def cancelCom(self):
-        self.value = None
-        self.destroy()
-    def noCom(self):
-        self.value = False
-        self.destroy()
-    
-PMB = PRMP_MsgBox
-
-
 class ScrollableFrame(PRMP_Frame):
     def __init__(self, container, **kwargs):
         super().__init__(container, **kwargs)
@@ -1529,7 +1494,7 @@ class LabelImage(PRMP_Label):
     def default_dp(self):
         path = os.path
         dn = path.dirname
-        dir_ = dn(dn(dn(__file__)))
+        dir_ = dn(dn(dn(dn(__file__))))
         file = path.join(dir_, 'img/profile_pix.png')
         return file
     
