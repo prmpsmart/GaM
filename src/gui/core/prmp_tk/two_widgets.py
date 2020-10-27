@@ -22,12 +22,8 @@ class TwoWidgets(PRMP_Frame):
         bottom_wid = self.bottom_widgets[bottom]
         
         events = self.events.get(bottom) if func else None
-
-        if top.lower() in ['checkbutton', 'radiobutton']:
-            if not command: command = self.checked
-            self.Top = top_wid(self, command=command, **topKwargs)
-            
-        else: self.Top = top_wid(self, **topKwargs)
+        
+        self.Top = top_wid(self, command=command if command else self.checked, **topKwargs)
         
         bottom_defaults = self.bottom_defaults.copy() if bottom in ['label', 'datebutton'] else {}
         bottom_defaults.update(bottomKwargs)
@@ -40,7 +36,7 @@ class TwoWidgets(PRMP_Frame):
         self.B = self.Bottom
         self.T = self.Top
         
-        self.value, self.variable = self.T.val, self.T.var
+        self.val, self.var = self.value, self.variable = self.T.val, self.T.var
 
         self.rt = None
         try: self.bindOverrelief(self.B, 'solid')
@@ -52,11 +48,18 @@ class TwoWidgets(PRMP_Frame):
         
         self.place_widgs()
     
-    def checked(self):
-        if self.variable:
-            if self.variable.get() == self.value: self.normal('b')
-            else:  self.disabled('b')
+    def light(self):
+        self.normal('b')
+        self.T.light()
     
+    def unlight(self):
+        self.disabled('b')
+        self.T.unlight()
+    
+    def toggleSwitch(self):
+        self.onFg = False
+        if self.toggleGroup: self.T.bind('<1>', self.switchGroup)
+        
     def disabled(self, wh=''):
         if wh == 't': self.Top.config(state='disabled')
         elif wh == 'b': self.Bottom.config(state='disabled')

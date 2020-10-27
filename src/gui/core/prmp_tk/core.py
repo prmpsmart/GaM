@@ -845,6 +845,8 @@ class PRMP_Widget(PRMP_Theme):
         self.childWidgets = []
         self.font = None
         
+        self.toggleGroup = []
+        
         self.val = self.value = kwargs.get('value', '1')
         self.var = self.variable = kwargs.get('variable')
         
@@ -860,24 +862,41 @@ class PRMP_Widget(PRMP_Theme):
     
     def set(self, values): self.config(text=values)
     
-    def toggleSwitch(self, wid=None):
-        if not wid: wid = self
-        wt = wid.PRMP_ELEMENT
-        
-        wid.onFg = False
-        def light(): wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_FOREGROUND_COLOR, PRMP_Theme.DEFAULT_BACKGROUND_COLOR
-        
-        def action(e):
-            val = wid.var.get()
-            if wid.onFg == False:
-                light()
-                wid.onFg = True
-            elif wt == 'Radiobutton' and val == wid.value: light()
+    def light(self): self.configure(bg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, fg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
+    
+    def unlight(self): self.paint()
+    
+    def switchOne(self, e=0):
+        val = self.var.get()
+        if self.onFg == False:
+            self.light()
+            self.onFg = True
+        elif self.PRMP_ELEMENT == 'Radiobutton' and val == self.value: self.light()
+        elif val not in ['1', self.value]: self.light()
+        else: self.unlight()
+    
+    def checked(self):
+        if self.variable:
+            if self.variable.get() == self.value: self.light()
+            else: self.unlight()
+    
+    def switchGroup(self, e):
+        for w in self.toggleGroup:
+            if w == self: self.light()
+            else: w.unlight()
+    
+    def toggleSwitch(self):
+        self.onFg = False
+        if self.toggleGroup: self.bind('<1>', self.switchGroup)
+        else: self.bind('<1>', self.switchOne)
 
-            elif val not in ['1', wid.value]: light()
+    def addToggleGroup(self, group=[]):
+        if group:
+            self.toggleGroup = group
+            self.toggleSwitch()
             
-            else: wid.paint()
-        wid.bind('<1>', action)
+    def setRadioGroups(self, group):
+        for one in group: one.addToggleGroup(group)
     
     @property
     def remainFromTitleBar(self):
@@ -1309,7 +1328,6 @@ class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
         tk.Radiobutton.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
         
-        self.toggleSwitch()
         
 Rb = PRb = Radiobutton = PRMP_Radiobutton
 

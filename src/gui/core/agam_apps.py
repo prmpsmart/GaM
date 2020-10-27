@@ -20,13 +20,13 @@ class RegionDetails(PRMP_Tk, FillWindow):
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
         
-        self.office = RC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'office', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.23, relw=.96, longent=.3)
+        self.office = RC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'off', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.23, relw=.96, longent=.3)
         
-        self.department = CC(self.hierachy,  topKwargs={'text': 'Department'}, orient='h', relx=.02, rely=.25, relh=.23, relw=.96, longent=.35)
+        self.department = RC(self.hierachy,  topKwargs={'text': 'Department', 'value': 'dep', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.25, relh=.23, relw=.96, longent=.35)
         
-        self.sup = CC(self.hierachy,  topKwargs={'text': 'Superscript'}, orient='h', relx=.02, rely=.5, relh=.23, relw=.96, longent=.35)
+        self.sup = RC(self.hierachy,  topKwargs={'text': 'Superscript', 'value': 'sup', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.5, relh=.23, relw=.96, longent=.35)
         
-        self.sub = CC(self.hierachy,  topKwargs={'text': 'Subscript'}, orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3)
+        self.sub = RC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3)
         
         # workers in the region or the individual 
         persons = PCb(self, text='Persons', command=self.showPersons)
@@ -41,6 +41,8 @@ class RegionDetails(PRMP_Tk, FillWindow):
         self.childWidgets += [persons, new, self.hierachy, self.image]
         self.resultsWidgets = ['office', 'department', 'sup', 'image', 'sub']
         
+        self.setRadioGroups([self.office, self.department, self.sub, self.sup])
+
     
     def showPersons(self):
         pass
