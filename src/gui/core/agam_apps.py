@@ -9,6 +9,7 @@ class RegionDetails(PRMP_Tk, FillWindow):
         self.region = region
         self.setupApp()
         self.fill()
+        
         self.mainloop()
     
     def setupApp(self):
@@ -42,6 +43,7 @@ class RegionDetails(PRMP_Tk, FillWindow):
         self.resultsWidgets = ['office', 'department', 'sup', 'image', 'sub']
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
+        
 
     
     def showPersons(self):

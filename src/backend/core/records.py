@@ -30,16 +30,16 @@ def numWithCommas(num):
 
 class Record(CompareByDate):
     
-    def __init__(self, manager, money, date=None, detail=''):
+    def __init__(self, manager, money, date=None, details=''):
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         self.__money = money
         self.__manager = manager
         self.__date = date
-        self.__detail = detail
+        self.__details = details
     
     def __int__(self): return self.money
-    def __str__(self): return f' {self.manager} | {self.className}({self.date}) | {self.moneyWithSign}'
+    def __str__(self): return f' {self.manager} | {self.className}({self.date} , {self.moneyWithSign} , {self.details})'
 
     @property
     def manager(self): return self.__manager
@@ -50,7 +50,9 @@ class Record(CompareByDate):
     @property
     def date(self): return self.__date
     @property
-    def detail(self): return self.__detail
+    def details(self): return self.__details
+    @details.setter
+    def details(self, detail): self.__details = detail
     @property
     def numWithCommas(self): return numWithCommas(self.money)
     def set(self, money): self.__money = money
@@ -317,7 +319,9 @@ class RecordsManager(Mixins):
         money = int(money)
         new = False
         record = None
-        # assert money != 0, 'Money must not be zero.'
+        
+        assert money != 0, 'Money must not be zero.'
+        
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         if newRecord: new = True

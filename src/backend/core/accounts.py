@@ -56,7 +56,7 @@ class Account(CompareByDate):
     def __init__(self, manager=None, date=None, previous=None, number=0, **kwargs):
         assert manager != None, 'No manager passed.'
         self.__manager = manager
-        if date == None: date = DateTime.createDateTime(auto=1)
+        if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         self.__date = date
         self.__nextAccount = None

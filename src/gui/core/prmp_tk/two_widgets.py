@@ -6,6 +6,7 @@ class TwoWidgets(PRMP_Frame):
     top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
     bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox}
     events = {'combobox': ['<<ComboboxSelected>>'], 'spinbox': ['<<Increment>>', '<<Decrement>>']}
+    top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
     def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}):
@@ -23,12 +24,14 @@ class TwoWidgets(PRMP_Frame):
         
         events = self.events.get(bottom) if func else None
         
-        self.Top = top_wid(self, command=command if command else self.checked, **topKwargs)
+        if top in ['checkbutton', 'radiobutton']:
+            topKwargs = dict(command=command if command else self.checked, **topKwargs, **self.top_defaults)
+            
+        self.Top = top_wid(self, **topKwargs)
         
-        bottom_defaults = self.bottom_defaults.copy() if bottom in ['label', 'datebutton'] else {}
-        bottom_defaults.update(bottomKwargs)
         
-        self.Bottom = bottom_wid(self, **bottom_defaults)
+        bottomKwargs.update(self.bottom_defaults.copy() if bottom in ['label', 'datebutton'] else {})
+        self.Bottom = bottom_wid(self, **bottomKwargs)
         
         if events:
             for event in events: self.Bottom.bind(event, func)
@@ -119,6 +122,7 @@ LS = LabelSpin
 
 class LabelEntry(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='entry', **kwargs)
+    
 LE = LabelEntry
 
 class LabelText(TwoWidgets):

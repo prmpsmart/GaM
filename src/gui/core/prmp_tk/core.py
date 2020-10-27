@@ -13,6 +13,7 @@ from tkinter.filedialog import askopenfilename
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
+TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
 
 
@@ -305,6 +306,11 @@ class PRMP_Theme:
         relief = kwargs.pop('relief',  PRMP_Theme.DEFAULT_RELIEF)
         wt = widgetType = self.PRMP_ELEMENT
         
+        asLabel = kwargs.get('asLabel')
+        if asLabel != None:
+            asLabel = kwargs.pop('asLabel')
+            wt = 'Label' if asLabel else wt
+        
         asEntry = kwargs.get('asEntry')
         if asEntry != None:
             asEntry = kwargs.pop('asEntry')
@@ -359,8 +365,10 @@ class PRMP_Theme:
             self.configure(**_dict)
 
         elif wt in ['Combobox', 'Progressbar']:
+            if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
+            if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
             style = ttk.Style()
-            
+            style.theme_use(TTK_THEMES[1])
             self.configure(background=background)
             if wt == 'Combobox':
                 
@@ -1186,7 +1194,7 @@ Top = Toplevel = PTp = PRMP_Toplevel
 
 class PRMP_Button(tk.Button, PRMP_Widget):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, tip=None, tipGeo=None, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **kwargs)
 B = Button = PB = PRMP_Button
@@ -1239,11 +1247,11 @@ PRB = PRMP_RegionButton
 
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, asLabel=False, **kwargs):
         self.var = tk.StringVar()
         
         tk.Checkbutton.__init__(self, master=master, variable=self.var, **kwargs)
-        PRMP_Widget.__init__(self, variable=self.var,**kwargs)
+        PRMP_Widget.__init__(self, variable=self.var, asLabel=asLabel, **kwargs)
         
         self.var.set('0')
         self.toggleSwitch()
@@ -1305,8 +1313,9 @@ F = PF = Frame = PRMP_Frame
 class PRMP_Label(tk.Label, PRMP_Widget):
     
     def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, **kwargs):
-        tk.Label.__init__(self, master=master, tipGeo=tipGeo, **kwargs)
-        PRMP_Widget.__init__(self, font=font, tip=tip, **kwargs)
+        tk.Label.__init__(self, master=master, **kwargs)
+        PRMP_Widget.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **kwargs)
+        
 L = PL = Label = PRMP_Label
 
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
@@ -1324,9 +1333,9 @@ class PRMP_Message(tk.Message, PRMP_Widget):
 
 class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, asLabel=False, **kwargs):
         tk.Radiobutton.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+        PRMP_Widget.__init__(self, asLabel=asLabel, **kwargs)
         
         
 Rb = PRb = Radiobutton = PRMP_Radiobutton

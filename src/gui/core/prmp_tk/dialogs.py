@@ -1,6 +1,7 @@
 
 from ....backend.core.date_time import DateTime
 from .core import *
+from .pics import Xbms
 
 
 PRMP_Toplevel = PRMP_Tk
@@ -309,7 +310,7 @@ class PRMP_MsgBox(PRMP_Toplevel):
         
         self.label = L(self, text=message, bitmap='')
         self.label.place(relx=0, rely=.15, relh=.6, relw=1)
-        self.bitmap = L(self.label, bitmap=_type, relief='flat')
+        self.bitmap = L(self.label, bitmap=self.getType(_type), relief='flat')
         self.bitmap.place(relx=.84, rely=.2, relh=.6, relw=.15)
 
         self.yes = PRMP_Button(self, text='Yes', command=self.yesCom)
@@ -324,7 +325,13 @@ class PRMP_MsgBox(PRMP_Toplevel):
         
         
         self._isDialog()
-        # self.mainloop()
+    def getType(self, _type):
+        if _type in self._bitmaps: return _type
+        elif _type in self._xbms: return f'@{self._xbms[_type]}'
+    
+    @property
+    def _xbms(self): return Xbms.filesDict()
+    
     @property
     def result(self): return self.__result
     def _setResult(self, result): self.__result = result
@@ -337,6 +344,7 @@ class PRMP_MsgBox(PRMP_Toplevel):
     def noCom(self):
         self._setResult(False)
         self.destroy()
+
 PMB = PRMP_MsgBox
 
 
