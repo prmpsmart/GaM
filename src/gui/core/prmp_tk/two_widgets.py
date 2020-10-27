@@ -13,7 +13,6 @@ class TwoWidgets(PRMP_Frame):
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
         
-        self.value = topKwargs.get('value', '1')
         self.ilh = ilh
         self.top = top.lower()
         self.bottom = bottom.lower()
@@ -41,8 +40,7 @@ class TwoWidgets(PRMP_Frame):
         self.B = self.Bottom
         self.T = self.Top
         
-        try: self.variable = self.T.var
-        except: self.variable = topKwargs.get('variable', None)
+        self.value, self.variable = self.T.val, self.T.var
 
         self.rt = None
         try: self.bindOverrelief(self.B, 'solid')
@@ -56,8 +54,7 @@ class TwoWidgets(PRMP_Frame):
     
     def checked(self):
         if self.variable:
-            if self.variable.get() == self.value:
-                self.normal('b')
+            if self.variable.get() == self.value: self.normal('b')
             else:  self.disabled('b')
     
     def disabled(self, wh=''):

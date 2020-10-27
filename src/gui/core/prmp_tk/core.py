@@ -845,6 +845,9 @@ class PRMP_Widget(PRMP_Theme):
         self.childWidgets = []
         self.font = None
         
+        self.val = self.value = kwargs.get('value', '1')
+        self.var = self.variable = kwargs.get('variable')
+        
         if window: self.setupOfWidget(**kwargs)
         try:
             font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
@@ -857,9 +860,12 @@ class PRMP_Widget(PRMP_Theme):
     
     def set(self, values): self.config(text=values)
     
-    def bindOnFg(self, wid):
+    def bindOnFg(self, wid=None):
+        # return
+        if not wid: wid = self
         def action(e):
-            if wid.var.get() == '0': wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_BUTTON_COLOR
+            if wid.var.get() not in  ['1', wid.value]: wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_FOREGROUND_COLOR, PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+            # if wid.var.get() in  ['1', wid.value]: wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_BUTTON_COLOR
             else: wid.paint()
         wid.bind('<1>', action)
     
@@ -1208,10 +1214,10 @@ class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
         self.var = tk.StringVar()
         
         tk.Checkbutton.__init__(self, master=master, variable=self.var, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+        PRMP_Widget.__init__(self, variable=self.var,**kwargs)
         
         self.var.set('0')
-        self.bindOnFg(self)
+        self.bindOnFg()
 
 Cb = PCb = Checkbutton = PRMP_Checkbutton
 
@@ -1292,6 +1298,9 @@ class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         tk.Radiobutton.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
+        
+        self.bindOnFg()
+        
 Rb = PRb = Radiobutton = PRMP_Radiobutton
 
 class PRMP_Text(tk.Text, PRMP_Widget):
