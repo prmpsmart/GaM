@@ -1,6 +1,6 @@
 
 from ....backend.core.date_time import DateTime
-from .prmp_tk import *
+from .core import *
 
 
 PRMP_Toplevel = PRMP_Tk
@@ -298,7 +298,6 @@ class CalendarDialog(PRMP_Dialog):
     @classmethod
     def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PTh.DEFAULT_BACKGROUND_COLOR, header_fg=PTh.DEFAULT_BUTTON_COLOR[0], header_bg=PTh.DEFAULT_BUTTON_COLOR[1],  month_fg=PTh.DEFAULT_BUTTON_COLOR[1], month_bg=PTh.DEFAULT_BUTTON_COLOR[0],  year_fg=PTh.DEFAULT_BUTTON_COLOR[1], year_bg=PTh.DEFAULT_BUTTON_COLOR[0],  days_fg=PTh.DEFAULT_BACKGROUND_COLOR, days_bg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_fg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_bg=PTh.DEFAULT_BACKGROUND_COLOR, surf_fg=PTh.DEFAULT_BUTTON_COLOR[0], surf_bg=PTh.DEFAULT_BUTTON_COLOR[1], empty_bg=PTh.DEFAULT_BUTTON_COLOR[0], **kwargs)
 
-
 class PRMP_MsgBox(PRMP_Toplevel):
     _bitmaps = ['info', 'question', 'error', 'warning']
     def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, **kwargs):
@@ -337,7 +336,6 @@ class PRMP_MsgBox(PRMP_Toplevel):
     def noCom(self):
         self._setResult(False)
         self.destroy()
-    
 PMB = PRMP_MsgBox
 
 

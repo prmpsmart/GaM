@@ -2,7 +2,7 @@ import os
 import platform
 import time
 import tkinter as tk
-import tkinter.messagebox as msgbox
+from functools import partial
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from base64 import b64decode, b64encode
@@ -388,6 +388,7 @@ class PRMP_Theme:
     
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
+    
 PTh = PRMP_Theme
 
 class PRMP_Style(ttk.Style):
@@ -806,7 +807,7 @@ class PRMP_Style(ttk.Style):
     def theme_use(self, theme):
         if theme in self.ttkthemes: getattr(self, 'create' + theme.title())()
         super().theme_use(theme)
-
+PS = PRMP_Style
 
 class PRMP_Font:
     fancy = ""
@@ -829,57 +830,7 @@ class PRMP_Font:
     font11u = "-family {Times New Roman} -size 11 -weight bold -slant roman -underline 0 -overstrike 0"
     font22 = "-family {Times New Roman} -size 22 -weight bold -slant roman -underline 0 -overstrike 0"
     font14 = "-family {Times New Roman} -size 14 -weight bold -slant roman -underline 0 -overstrike 0"
-
-
-class AutoScroll:
-    '''Configure the scrollbars for a widget.'''
-
-    def __init__(self, master):
-        try:
-            self.vsb = tk.Scrollbar(master, orient='vertical', command=self.yview)
-        except:
-            pass
-        self.hsb = tk.Scrollbar(master, orient='horizontal', command=self.xview)
-
-        try:
-            self.configure(yscrollcommand=self._autoscroll(self.vsb))
-        except:
-            pass
-        self.configure(xscrollcommand=self._autoscroll(self.hsb))
-
-        self.grid(column=0, row=0, sticky='nsew')
-        try:
-            self.vsb.grid(column=1, row=0, sticky='ns')
-        except:
-            pass
-        self.hsb.grid(column=0, row=1, sticky='ew')
-
-        master.grid_columnconfigure(0, weight=1)
-        master.grid_rowconfigure(0, weight=1)
-
-        methods = tk.Pack.__dict__.keys() | tk.Grid.__dict__.keys() \
-                  | tk.Place.__dict__.keys()
-        # if py2
-        # methods = Pack.__dict__.keys() + Grid.__dict__.keys() + Place.__dict__.keys()
-
-        for meth in methods:
-            if meth[0] != '_' and meth not in ('config', 'configure'):
-                setattr(self, meth, getattr(master, meth))
-
-    @staticmethod
-    def _autoscroll(sbar):
-        '''Hide and show scrollbar as needed.'''
-        def wrapped(first, last):
-            first, last = float(first), float(last)
-            if first <= 0 and last >= 1:
-                sbar.grid_remove()
-            else:
-                sbar.grid()
-            sbar.set(first, last)
-        return wrapped
-
-    def __str__(self):
-        return str(self.master)
+PF = PRMP_Font
 
 class PRMP_Widget(PRMP_Theme):
     _top = 'top'
@@ -889,7 +840,7 @@ class PRMP_Widget(PRMP_Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
     
-    def __init__(self, window=False, **kwargs):
+    def __init__(self, window=False, tip=None, tipGeo=(300, 40), **kwargs):
         self.kwargs = kwargs
         self.childWidgets = []
         self.font = None
@@ -900,7 +851,11 @@ class PRMP_Widget(PRMP_Theme):
             self.useFont(font)
         except: pass
         
+        if tip: self.addTip(tip, tipGeo=tipGeo)
+        
         self.paint()
+    
+    def set(self, values): self.config(text=values)
     
     def bindOnFg(self, wid):
         def action(e):
@@ -1027,6 +982,10 @@ class PRMP_Widget(PRMP_Theme):
         self.setGeometry(self.lastPoints)
     
     setupOfWindow = setupOfWidget
+    
+    def addTip(self, tip='Tip', tipGeo=(100, 20), font=PTh.DEFAULT_FONT, delay=0, follow=True):
+        from .commons import ToolTip
+        ToolTip(self, msg=tip, tipGeo=tipGeo, font=font, delay=delay, follow=follow, bg=PTh.DEFAULT_BACKGROUND_COLOR)
     
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
@@ -1175,11 +1134,13 @@ class PRMP_Widget(PRMP_Theme):
         self.wait_window()
 PRMP_Window = PRMP_Widget
 
+
 class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Widget.__init__(self, window=True, **kwargs)
 Tk = PTk = PRMP_Tk
+
 
 class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
@@ -1190,10 +1151,11 @@ Top = Toplevel = PTp = PRMP_Toplevel
 
 class PRMP_Button(tk.Button, PRMP_Widget):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, tip=None, tipGeo=None, **kwargs):
         tk.Button.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, **kwargs)
+        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **kwargs)
 B = Button = PB = PRMP_Button
+
 
 class PRMP_DateButton(B):
     def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, **kwargs):
@@ -1259,30 +1221,27 @@ class PRMP_Combobox(ttk.Combobox, PRMP_Widget):
         
         ttk.Combobox.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
-        
+    
+    def set(self, values): self['values'] = values
+
 Cx = PCx = Combobox = PRMP_Combobox
 
 class PRMP_Entry(tk.Entry, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, placeholder='', field_color='', placeholder_color='', **kwargs):
         tk.Entry.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
         self.bindEntryHighlight()
-E = PE = Entry = PRMP_Entry
-
-class PRMP_PlaceHolderEntry(PRMP_Entry):
-    def __init__(self, container, placeholder, field_color='', placeholder_color='', **kwargs):
-        super().__init__(container, **kwargs)
         
-        self.placeholder = placeholder
-
-        self.field_color = field_color or 'yellow'
-        self.placeholder_color = placeholder_color or 'blue'
-
-        self.insert("0", self.placeholder)
-        self.bind("<FocusIn>", self._clear_placeholder)
-        self.bind("<FocusOut>", self._add_placeholder)
-
+        if placeholder:
+            self.placeholder = placeholder
+            self.field_color = field_color or 'yellow'
+            self.placeholder_color = placeholder_color or 'blue'
+            self.insert("0", self.placeholder)
+            self.bind("<FocusIn>", self._clear_placeholder)
+            self.bind("<FocusOut>", self._add_placeholder)
+    
+    
     def _clear_placeholder(self, e):
         if self.get() == self.placeholder:
             self.delete("0", "end")
@@ -1295,6 +1254,11 @@ class PRMP_PlaceHolderEntry(PRMP_Entry):
             self.insert("0", self.placeholder)
             self["bg"] = self.field_color
             self["fg"] = self.placeholder_color
+    
+    def set(self, values): self.insert(0, values)
+
+E = PE = Entry = PRMP_Entry
+
 
 class PRMP_Frame(tk.Frame, PRMP_Widget):
     
@@ -1305,9 +1269,9 @@ F = PF = Frame = PRMP_Frame
 
 class PRMP_Label(tk.Label, PRMP_Widget):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, **kwargs):
-        tk.Label.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=font, **kwargs)
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, **kwargs):
+        tk.Label.__init__(self, master=master, tipGeo=tipGeo, **kwargs)
+        PRMP_Widget.__init__(self, font=font, tip=tip, **kwargs)
 L = PL = Label = PRMP_Label
 
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
@@ -1335,147 +1299,11 @@ class PRMP_Text(tk.Text, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         tk.Text.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
+    
+    def set(self, values): self.insert(0.0, values)
+    
 PTx = PRMP_Text
 
-
-class ScrollableFrame(PRMP_Frame):
-    def __init__(self, container, **kwargs):
-        super().__init__(container, **kwargs)
-        canvas = tk.Canvas(self)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
-        self.scrollable_frame = tk.Frame(canvas)
-
-        self.scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
-
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        
-        # self = self.scrollable_frame
-    
-    def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
-
-
-def show(title=None, msg=None, which=None):
-    if which == 'error': msgbox.showerror(title, msg)
-    elif which == 'info': msgbox.showinfo('Information', msg)
-    elif which == 'warn': msgbox.showwarning('Warning', msg)
-
-def confirm(title=None, msg=None, num=None):
-    if num == 1: return msgbox.askyesno(title, msg)
-    if num == 2: return msgbox.askquestion(title, msg)
-    if num == 3: return msgbox.askokcancel(title, msg)
-    if num == 4: return msgbox.askretrycancel(title, msg)
-    if num == 5: return msgbox.askyesnocancel(title, msg)
-
-### ScrolledTreeView
-def on_mousewheel(event, widget):
-    what = 'units'
-    what = 'pages'
-    if platform.system() == 'Windows': widget.yview_scroll(-1*int(event.delta/120),what)
-    elif platform.system() == 'Darwin': widget.yview_scroll(-1*int(event.delta),what)
-    else:
-        if event.num == 4:
-            widget.yview_scroll(-1, what)
-        elif event.num == 5:
-            widget.yview_scroll(1, what)
-
-def on_shiftmouse(event, widget):
-    what = 'units'
-    what = 'pages'
-    if platform.system() == 'Windows': widget.xview_scroll(-1*int(event.delta/120), what)
-    elif platform.system() == 'Darwin': widget.xview_scroll(-1*int(event.delta), what)
-    else:
-        if event.num == 4: widget.xview_scroll(-1, what)
-        elif event.num == 5: widget.xview_scroll(1, what)
-
-def bound_to_mousewheel(event, widget):
-    child = widget.winfo_children()[0]
-    if platform.system() == 'Windows' or platform.system() == 'Darwin':
-        child.bind_all('<MouseWheel>', lambda e: on_mousewheel(e, child))
-        child.bind_all('<Shift-MouseWheel>', lambda e: on_shiftmouse(e, child))
-    else:
-        child.bind_all('<Button-4>', lambda e: on_mousewheel(e, child))
-        child.bind_all('<Button-5>', lambda e: on_mousewheel(e, child))
-        child.bind_all('<Shift-Button-4>', lambda e: on_shiftmouse(e, child))
-        child.bind_all('<Shift-Button-5>', lambda e: on_shiftmouse(e, child))
-
-def unbound_to_mousewheel(event, widget):
-    if platform.system() == 'Windows' or platform.system() == 'Darwin':
-        widget.unbind_all('<MouseWheel>')
-        widget.unbind_all('<Shift-MouseWheel>')
-    else:
-        widget.unbind_all('<Button-4>')
-        widget.unbind_all('<Button-5>')
-        widget.unbind_all('<Shift-Button-4>')
-        widget.unbind_all('<Shift-Button-5>')
-
-def create_container(func):
-    '''Creates a ttk Frame with a given master, and use this new frame to
-    place the scrollbars and the widget.'''
-    def wrapped(cls, master, **kw):
-        container = ttk.Frame(master)
-        container.bind('<Enter>', lambda e: bound_to_mousewheel(e, container))
-        container.bind('<Leave>', lambda e: unbound_to_mousewheel(e, container))
-        return func(cls, container, **kw)
-    return wrapped
-
-class ScrolledTreeView(AutoScroll, ttk.Treeview):
-    '''A standard ttk Treeview widget with scrollbars that will
-    automatically show/hide as needed.'''
-    @create_container
-    def __init__(self, master, **kw):
-        ttk.Treeview.__init__(self, master, **kw)
-        AutoScroll.__init__(self, master)
-
-class ToolTip(PRMP_Toplevel):
-    def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None, delay=1, follow=True):
-        self.wdgt = wdgt
-        self.parent = self.wdgt.master
-        super().__init__(self.parent, background='black', padx=1, pady=1)
-        self.withdraw()
-        self.overrideredirect(True)
-        self.msgVar = tk.StringVar()
-        if msg is None: self.msgVar.set('No message provided')
-        else: self.msgVar.set(msg)
-        self.msgFunc = msgFunc
-        self.delay = delay
-        self.follow = follow
-        self.visible = 0
-        self.lastMotion = 0
-        tk.Message(self, textvariable=self.msgVar, background='yellow', font=tooltip_font, aspect=1000).grid()
-        self.wdgt.bind('<Enter>', self.spawn, '+')
-        self.wdgt.bind('<Leave>', self.hide, '+')
-        self.wdgt.bind('<Motion>', self.move, '+')
-
-    def spawn(self, event=None):
-        self.visible = 1
-        self.after(int(self.delay * 1000), self.show)
-
-    def show(self):
-        if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
-        if self.visible == 2: self.deiconify()
-
-    def move(self, event):
-        self.lastMotion = time.time()
-        if self.follow is False:
-            self.withdraw()
-            self.visible = 1
-        self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-        
-        #To get the present event coordinates
-        print(event.x_root,event.y_root)
-        
-        try: self.msgVar.set(self.msgFunc())
-        except: pass
-        self.after(int(self.delay * 1000), self.show)
-
-    def hide(self, event=None):
-        self.visible = 0
-        self.withdraw()
 
 class ImageWidget:
     def __init__(self, imageFile=None, thumb=None, resize=None):
@@ -1492,6 +1320,8 @@ class ImageWidget:
         self.bindMenu()
         self.loadImage(imageFile=imageFile, start=1)
         self.bindEntryHighlight()
+        
+        self.set = partial(ImageWidget.set, self)
     
     
     def disabled(self):
@@ -1523,8 +1353,8 @@ class ImageWidget:
         self.loadImage(imageFile=file)
     
     def bindMenu(self):
-        self.bind('<1>', self.delMenu)
-        self.bind('<3>', self.showMenu)
+        self.bind('<1>', self.delMenu, '+')
+        self.bind('<3>', self.showMenu, '+')
         # self.bind('<Double-1>', self.showMenu)
     
     def unBindMenu(self):
@@ -1565,12 +1395,12 @@ class ImageWidget:
         rt.attributes('-topmost', 1)
         rt.geometry(f'50x50+{x}+{y}')
 
-class LabelImage(PRMP_Label, ImageWidget):
-    def __init__(self, master, imageFile=None, resize=None, thumb=None, **kwargs):
+class ImageLabel(PRMP_Label, ImageWidget):
+    def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
         PRMP_Label.__init__(self, master, **kwargs)
         ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
     
-LI = LabelImage
+IL = ImageLabel
 
 class FillWindow:
     
@@ -1583,6 +1413,7 @@ class FillWindow:
                 wid = self.__dict__.get(key)
                 if wid: wid.set(value)
         self.values = values
+    
 
 FW = FillWindow
 

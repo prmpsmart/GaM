@@ -1,10 +1,14 @@
-from .prmp_tk import *
+from .core import *
 from ....backend.core.date_time import DateTime
 
 
 class TwoWidgets(PRMP_Frame):
+    top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
+    bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox}
+    events = {'combobox': ['<<ComboboxSelected>>'], 'spinbox': ['<<Increment>>', '<<Decrement>>']}
+    bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, relx=0, rely=0, relw=0, relh=0, top='', bottom='', bordermode='inside', func=None, orient='v', activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PTh.DEFAULT_LABEL_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="groove", relief="groove", command=None, text='', longent=.5, values=(0,), value='1', from_=.1, to=1, increment=.1, show=None, imageFile=None, ilh=0):
+    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, value='1', ilh=0, topKwargs={}, bottomKwargs={}):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
@@ -15,29 +19,24 @@ class TwoWidgets(PRMP_Frame):
         self.bottom = bottom.lower()
         self.orient = orient
         self.longent = longent
+        top_wid = self.top_widgets[top]
+        bottom_wid = self.bottom_widgets[bottom]
+        
+        events = self.events.get(bottom) if func else None
 
-        if top.lower() == 'checkbutton':
+        if top.lower() in ['checkbutton', 'radiobutton']:
+            if not command: command = self.checked
+            self.Top = top_wid(self, command=command, **topKwargs)
             
-            if not command: command = self.checked
-            self.Top = PRMP_Checkbutton(self, text=text, command=command, font=font)
-        elif top.lower() == 'label': self.Top = PRMP_Label(self, text=text, font=font)
-        elif top.lower() == 'radiobutton': 
-            if not command: command = self.checked
-            self.Top = PRMP_Radiobutton(self, text=text, command=command, value=value, font=font)
-
-        if bottom.lower() == 'entry': self.Bottom = PRMP_Entry(self, show=show)
-        elif bottom.lower() == 'button': self.Bottom = PRMP_Button(self)
-        elif bottom.lower() == 'datebutton': self.Bottom = PRMP_DateButton(self)
-        elif bottom.lower() == 'combobox':
-            self.Bottom = PRMP_Combobox(self, values=values, show=show)
-            if func: self.Bottom.bind('<<ComboboxSelected>>', func)
-        elif bottom.lower() == 'spinbox':
-            self.Bottom = ttk.Spinbox(self, from_=from_, to=to, increment=increment)
-            if func:
-                self.Bottom.bind('<<Increment>>', func)
-                self.Bottom.bind('<<Decrement>>', func)
-        elif bottom.lower() == 'text': self.Bottom = PRMP_Text(self, show=show)
-        elif bottom.lower() == 'regionbutton': self.Bottom = PRMP_RegionButton(self,)
+        else: self.Top = top_wid(self, **topKwargs)
+        
+        bottom_defaults = self.bottom_defaults.copy() if bottom in ['label', 'datebutton'] else {}
+        bottom_defaults.update(bottomKwargs)
+        
+        self.Bottom = bottom_wid(self, **bottom_defaults)
+        
+        if events:
+            for event in events: self.Bottom.bind(event, func)
         
         self.B = self.Bottom
         self.T = self.Top
@@ -82,21 +81,11 @@ class TwoWidgets(PRMP_Frame):
             self.Top.config(state='normal')
             self.Bottom.config(state='normal')
     
-    def set(self, values):
-        if self.bottom == 'combobox': self.Bottom.config(values=values)
-        elif self.bottom == 'entry': self.Bottom.insert(0, values)
-        elif self.bottom == 'text': self.Bottom.insert(0.0, values)
-        elif self.bottom == 'datebutton': self.Bottom.set(values)
-        else: self.Bottom.config(text=values)
+    def set(self, values): self.Bottom.set(values)
     
     def get(self): return self.Bottom.get()
     
     def config(self, **kwargs): self.Top.configure(**kwargs)
-    
-    def style(self):
-        self['background'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
-        if self.top in ['checkbutton', 'radiobutton']: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, font=PRMP_Theme.DEFAULT_FONT, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', overrelief="ridge", relief="groove")
-        else: self.Top.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR,  activebackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, activeforeground="blue", disabledforeground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlightbackground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, highlightcolor=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, justify='left', relief="groove")
 
     def place_widgs(self):
         self.place(relx=self.relx, rely=self.rely, relh=self.relh, relw=self.relw)
@@ -108,6 +97,7 @@ class TwoWidgets(PRMP_Frame):
             self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
             self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
         return self
+    
 TW = TwoWidgets
 
 class RadioCombo(TwoWidgets):
@@ -178,27 +168,8 @@ class LabelButton(TwoWidgets):
 LB = LabelButton
 
 class LabelDateButton(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='datebutton',**kwargs)
+    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='datebutton', **kwargs)
     
 LDB = LabelDateButton
 
-# ?? removing soon
-
-class LabelRegionButton(TwoWidgets):
-    
-    def __init__(self, master=None, region=None, **kwargs):
-        super().__init__(master, top='label', bottom='regionbutton', command=self.openDetails, **kwargs)
-        self.region = region
-        self.loadRegion(region)
-        self.bindEntryHighlight()
-    
-    def loadRegion(self, region=None):
-        if region: self['text'] = region.name
-    
-    def openDetails(self):
-        
-        # open RegionDetailsDialog
-        pass
-
-LRB = LabelRegionButton
 

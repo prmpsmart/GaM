@@ -1,4 +1,4 @@
-from .gui_core.two_widgets import *
+from .prmp_tk.two_widgets import *
 import tkinter.ttk as ttk
 import tkinter as tk
 
@@ -58,7 +58,7 @@ class RegionDetails(PRMP_Tk, FillWindow):
         new = PCb(self, text='New Dialog ?')
         new.place(x=225, y=190, h=24, w=120)
         
-        self.image = LI(self)
+        self.image = IL(self)
         self.image.place(x=360, y=40, h=170, w=230)
         
         account = LF(self, text='Account')
