@@ -8,12 +8,12 @@ class TwoWidgets(PRMP_Frame):
     events = {'combobox': ['<<ComboboxSelected>>'], 'spinbox': ['<<Increment>>', '<<Decrement>>']}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, value='1', ilh=0, topKwargs={}, bottomKwargs={}):
+    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
         
-        self.value = value
+        self.value = topKwargs.get('value', '1')
         self.ilh = ilh
         self.top = top.lower()
         self.bottom = bottom.lower()
@@ -42,7 +42,7 @@ class TwoWidgets(PRMP_Frame):
         self.T = self.Top
         
         try: self.variable = self.T.var
-        except: self.variable = None
+        except: self.variable = topKwargs.get('variable', None)
 
         self.rt = None
         try: self.bindOverrelief(self.B, 'solid')

@@ -10,6 +10,7 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
     def __init__(self, master=None, _return=True, values={}, **kwargs):
         # PRMP_Toplevel.__init__(self, master, **kwargs)
         PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
+        FillWindow.__init__(self, values=values)
         
         self.__result = None
         
@@ -17,10 +18,10 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
         self._return = _return
         
         self._setupDialog()
+        self.fill()
         self.paint()
         self.default()
         
-        FillWindow.__init__(self, values=values)
         
         try:
             if values: self.editBtn.var.set('0')

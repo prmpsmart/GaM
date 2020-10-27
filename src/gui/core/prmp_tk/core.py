@@ -1404,15 +1404,17 @@ IL = ImageLabel
 
 class FillWindow:
     
-    def __init__(self, values={}):
-        self.preFill(**values)
+    def __init__(self, values={}): self.values = values
     
-    def preFill(self, **values):
-        for key, value in values.items():
-            if key in self.resultsWidgets:
-                wid = self.__dict__.get(key)
-                if wid: wid.set(value)
-        self.values = values
+    def fill(self, values={}):
+        if values:
+            for key, value in values.items():
+                if key in self.resultsWidgets:
+                    wid = self.__dict__.get(key)
+                    if wid: wid.set(value)
+            self.values = values
+        else:
+            if self.values: self.fill(self.values)
     
 
 FW = FillWindow

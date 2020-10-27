@@ -29,6 +29,8 @@ class PersonDialog(PRMP_Dialog):
         
         self.childWidgets += [contact, self.image]
         self.resultsWidgets = ['name', 'phone', 'email', 'image', 'address']
+        
+        
 
  
 
