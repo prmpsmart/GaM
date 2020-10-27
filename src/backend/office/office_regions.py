@@ -66,7 +66,8 @@ class DCOffice(Office):
     MultiSubRegionsManager = False
     SubRegionsManager = AreasManager
     PersonsManager = DCManagerDetailsManager
-    
+    @property
+    def regionsManagers(self): return [self.subRegionsManager]
     @property
     def areasManager(self): return self.subRegionsManager
 
@@ -84,17 +85,19 @@ class CoopOffice(Office):
     MultiSubRegionsManager = False
     PersonsManager = CoopManagerDetailsManager
     
-    @classmethod
     def addUnit(cls, unit):
         pass
+    @property
+    def regionsManagers(self): return [self.subRegionsManager]
     @property
     def unitsManager(self): return self.subRegionsManager
 
 class CoopOfficesManager(OfficesManager):
     regionClass = CoopOffice
     
-    def createCoopOffice(self, **kwargs): 
-        office = self.createOffice(**kwargs)
+    def createCoopOffice(self, **kwargs):
+        name = f'{self.master.name} COOP Office'
+        office = self.createOffice(name=name, **kwargs)
         return office
 
 

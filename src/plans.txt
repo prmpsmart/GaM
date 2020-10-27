@@ -1,0 +1,6 @@
+ 
+# accounts, 
+# on top there should be sort and search LabelFrames
+#   for coop:
+#       recordmanagers, once clicked shows the records (scrollabe Frame with LabelLabel children, with tip = record.details) on the right
+#       

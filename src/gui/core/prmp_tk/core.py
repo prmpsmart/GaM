@@ -211,13 +211,14 @@ class PRMP_Theme:
     DEFAULT_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_TITLE_FONT = {'family': 'Lucida Calligraphy', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_STATUS_FONT = {'family': 'Lucida Calligraphy', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     @classmethod
-    def setTheme(cls, theme, force=False):
+    def setTheme(cls, theme):
         # normalize available l&f values
         lf_values = [item.lower() for item in cls.themesList()]
         # option 1
@@ -287,11 +288,30 @@ class PRMP_Theme:
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
 
+    
+    def prevTheme(self):
+        cur = self.CURRENT_THEME
+        ths = self.themesList()
+        ind = ths.index(cur)
+        print(ind)
+        if (ind + 1) == len(ths): self.setTheme(ths[0])
+        else: self.setTheme(ths[ind + 1])
+        self.paint()
+    
+    def nextTheme(self):
+        cur = self.CURRENT_THEME
+        ths = self.themesList()
+        ind = ths.index(cur)
+        if ind == 0: self.setTheme(ths[-1])
+        else: self.setTheme(ths[ind - 1])
+        self.paint()
+    
     def paint(self):
         kwargs = self.kwargs.copy()
         
         
-        theme = PRMP_Theme.setTheme(PRMP_Theme.CURRENT_THEME)
+        theme = PRMP_Theme.currentThemeDict()
+        # print(theme)
         
         foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
         background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -848,9 +868,21 @@ class PRMP_Widget(PRMP_Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
     
+    upArrow = '<'
+    downArrow = '>'
+    x_btn1 = 'X'
+    x_btn2 = '#'
+    upArrow = chr(11014)
+    downArrow = chr(11015)
+    x_btn1 = chr(10060)
+    x_btn2 = chr(10062)
+    
     def __init__(self, window=False, tip=None, tipGeo=(300, 40), **kwargs):
         self.kwargs = kwargs
-        self.childWidgets = []
+        
+        self.__childWidgets = []
+        self.__resultsWidgets = []
+        
         self.font = None
         
         self.toggleGroup = []
@@ -867,6 +899,25 @@ class PRMP_Widget(PRMP_Theme):
         if tip: self.addTip(tip, tipGeo=tipGeo)
         
         self.paint()
+    
+    def addChildWidgets(self, child):
+        if child not in self.__childWidgets:
+            if isinstance(child, list):
+                for ch in child: self.addChildWidgets(ch)
+            else: self.__childWidgets.append(child)
+    
+    @property
+    def childWidgets(self): return self.__childWidgets
+    
+    def addResultsWidgets(self, child):
+        if child not in self.__resultsWidgets:
+            if isinstance(child, list):
+                for ch in child: self.addResultsWidgets(ch)
+            else: self.__resultsWidgets.append(child)
+    
+    @property
+    def resultsWidgets(self): return self.__resultsWidgets
+    
     
     def set(self, values): self.config(text=values)
     
@@ -931,14 +982,36 @@ class PRMP_Widget(PRMP_Theme):
     def normal(self): self['state'] = 'normal'
     
     def addTitleBar(self, title=''):
+        if self.titleBar:
+            self.titleBar.set(title)
+            return
         fr = F(self)
         self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
         self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
         
-        xbtn = B(fr, text='X', command=self.destroy)
+        xbtn = B(fr, text=self.x_btn2, command=self.destroy)
         xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
         fr.place(x=0, y=0, h=25, relw=1)
-        self.childWidgets.append(fr)
+        fr.addChildWidgets(xbtn)
+        self.addChildWidgets(fr)
+    
+    def addStatusBar(self):
+        if self.statusBar: return
+        fr = F(self)
+        self.statusBar = L(fr, text='Status' or self.statusText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_STATUS_FONT)
+        self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
+        
+        up = B(fr, text=self.upArrow, command=self.prevTheme)
+        up.place(relx=.92, rely=0, relh=1, relw=.04)
+        down = B(fr, text=self.downArrow, command=self.nextTheme)
+        down.place(relx=.96, rely=0, relh=1, relw=.04)
+        
+        y = self.kwargs.get('geo')[1]
+        fr.place(x=0, y=y - 25, h=25, relw=1)
+        
+        # fr.addChildWidgets([up, down])
+        self.addChildWidgets(fr)
+    
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
         
@@ -955,7 +1028,7 @@ class PRMP_Widget(PRMP_Theme):
     
     PRMP_ELEMENT = PRMP_WIDGET    
     
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, **kwargs):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, asb=0, **kwargs):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -968,9 +1041,12 @@ class PRMP_Widget(PRMP_Theme):
         self.titleText = title
         self.title(title)
         
-        if atb:
-            self.addTitleBar()
-            noTitleBar = 1
+        self.titleBar = None
+        self.statusBar = None
+        
+        if atb: self.addTitleBar(); noTitleBar = 1
+            
+        if asb: self.addStatusBar()
             
         
         self.side = side
@@ -1459,8 +1535,9 @@ class FillWindow:
                     wid = self.__dict__.get(key)
                     if wid: wid.set(value)
             self.values = values
+            return True
         else:
-            if self.values: self.fill(self.values)
+            if self.values: return self.fill(self.values)
     
 
 FW = FillWindow

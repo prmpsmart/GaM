@@ -10,12 +10,11 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
     
     def __init__(self, master=None, _return=True, values={}, **kwargs):
         # PRMP_Toplevel.__init__(self, master, **kwargs)
-        PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, **kwargs)
+        PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, gaw=1, **kwargs)
         FillWindow.__init__(self, values=values)
         
         self.__result = None
         
-        self.resultsWidgets = []
         self._return = _return
         
         self._setupDialog()

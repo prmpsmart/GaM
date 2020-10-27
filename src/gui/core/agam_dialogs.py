@@ -27,10 +27,20 @@ class PersonDialog(PRMP_Dialog):
         self.image = IL(self)
         self.image.place(x=270, y=40, h=190, w=220)
         
-        self.childWidgets += [contact, self.image]
-        self.resultsWidgets = ['name', 'phone', 'email', 'image', 'address']
+        self.addChildWidgets([contact, self.image])
+        self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address'])
         
+class RecordDialog(PRMP_Dialog):
+    
+    def __init__(self, master=None, title='Record Dialog', region=None, geo=(500, 280), **kwargs):
         
+        if region: title = f'{region.className} {title}'
+        
+        super().__init__(master=master, title=title, geo=geo,  **kwargs)
+        self.region = region
+    
+    def _setupDialog(self):
+        self.addTitleBar(self.titleText)
 
  
 

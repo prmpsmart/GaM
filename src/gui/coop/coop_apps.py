@@ -13,5 +13,5 @@ class CoopRegionDetails(RegionDetails):
         account.place(x=10, y=220, h=370, w=780)
         
         
-        self.childWidgets += [account]
-        # self.resultsWidgets += []
+        self.addChildWidgets([account])
+        # self.addResultsWidgets([])

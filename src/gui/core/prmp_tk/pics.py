@@ -36,7 +36,7 @@ class Pics:
     @classmethod
     def get(cls, bitmap):
         filesL = cls.files()
-        print(filesL)
+        
         if isinstance(bitmap, int):
             try: return filesL[bitmap]
             except: files[0]
