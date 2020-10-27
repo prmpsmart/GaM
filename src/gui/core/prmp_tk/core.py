@@ -235,6 +235,8 @@ class PRMP_Theme:
         selection = cls.themesList()[ix]
         
         cls.CURRENT_THEME = selection
+        
+        
         try:
             colors = cls.THEMES_DICTS[selection]
 
@@ -288,29 +290,28 @@ class PRMP_Theme:
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
 
-    
     def prevTheme(self):
-        cur = self.CURRENT_THEME
-        ths = self.themesList()
+        cur = PRMP_Theme.CURRENT_THEME
+        ths = PRMP_Theme.themesList()
         ind = ths.index(cur)
         print(ind)
-        if (ind + 1) == len(ths): self.setTheme(ths[0])
-        else: self.setTheme(ths[ind + 1])
+        next_ = ind + 1
+        if next_ == len(ths): PRMP_Theme.setTheme(ths[0])
+        else: PRMP_Theme.setTheme(ths[next_])
         self.paint()
     
     def nextTheme(self):
-        cur = self.CURRENT_THEME
-        ths = self.themesList()
+        cur = PRMP_Theme.CURRENT_THEME
+        ths = PRMP_Theme.themesList()
         ind = ths.index(cur)
-        if ind == 0: self.setTheme(ths[-1])
-        else: self.setTheme(ths[ind - 1])
+        if ind == 0: PRMP_Theme.setTheme(ths[-1])
+        else: PRMP_Theme.setTheme(ths[ind - 1])
         self.paint()
     
     def paint(self):
         kwargs = self.kwargs.copy()
         
-        
-        theme = PRMP_Theme.currentThemeDict()
+        # theme = PRMP_Theme.currentThemeDict()
         # print(theme)
         
         foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
