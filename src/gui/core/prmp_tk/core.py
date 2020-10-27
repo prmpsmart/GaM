@@ -319,7 +319,7 @@ class PRMP_Theme:
             
         
         if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
-            if wt != 'Label':
+            if wt == 'Button':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_BUTTON_FONT))
                 col = PRMP_Theme.DEFAULT_BUTTON_COLOR
                 if isinstance(col, tuple):
