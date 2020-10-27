@@ -860,12 +860,22 @@ class PRMP_Widget(PRMP_Theme):
     
     def set(self, values): self.config(text=values)
     
-    def bindOnFg(self, wid=None):
-        # return
+    def toggleSwitch(self, wid=None):
         if not wid: wid = self
+        wt = wid.PRMP_ELEMENT
+        
+        wid.onFg = False
+        def light(): wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_FOREGROUND_COLOR, PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+        
         def action(e):
-            if wid.var.get() not in  ['1', wid.value]: wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_FOREGROUND_COLOR, PRMP_Theme.DEFAULT_BACKGROUND_COLOR
-            # if wid.var.get() in  ['1', wid.value]: wid['bg'], wid['fg'] = PRMP_Theme.DEFAULT_BUTTON_COLOR
+            val = wid.var.get()
+            if wid.onFg == False:
+                light()
+                wid.onFg = True
+            elif wt == 'Radiobutton' and val == wid.value: light()
+
+            elif val not in ['1', wid.value]: light()
+            
             else: wid.paint()
         wid.bind('<1>', action)
     
@@ -1217,7 +1227,7 @@ class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
         PRMP_Widget.__init__(self, variable=self.var,**kwargs)
         
         self.var.set('0')
-        self.bindOnFg()
+        self.toggleSwitch()
 
 Cb = PCb = Checkbutton = PRMP_Checkbutton
 
@@ -1299,7 +1309,7 @@ class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
         tk.Radiobutton.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
         
-        self.bindOnFg()
+        self.toggleSwitch()
         
 Rb = PRb = Radiobutton = PRMP_Radiobutton
 
