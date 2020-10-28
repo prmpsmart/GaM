@@ -1,7 +1,8 @@
 
 # Extentions widgets
 import tkinter as tk, tkinter.ttk as ttk, platform, time
-from .usefuls import create_container
+from .usefuls import create_container, bound_to_mousewheel
+from .core import PRMP_Frame, PRMP_Scrollbar, PRMP_Canvas
 
 
 class AutoScroll:
@@ -66,23 +67,44 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
 
 
 class ScrollableFrame(PRMP_Frame):
-    def __init__(self, container, **kwargs):
-        super().__init__(container, **kwargs)
-        canvas = tk.Canvas(self)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
-        self.scrollable_frame = tk.Frame(canvas)
+    
+    def __init__(self, master, **kwargs):
+        super().__init__(master)
+        
+        self.canvas = canvas = PRMP_Canvas(self)
+        
+        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=canvas.xview)
+        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=canvas.yview)
+        
+        self.scrollable_frame = PRMP_Frame(canvas)
 
-        self.scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        self.scrollable_frame.bind("<Configure>", self.changeFrameBox)
 
         canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
 
+        xscrollbar.pack(side="bottom", fill="x")
         canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        yscrollbar.pack(side="right", fill="y")
+        
+        # bound_to_mousewheel(0, self.canvas)
+        bound_to_mousewheel(0, self)
+        # bound_to_mousewheel(0, self.scrollable_frame)
+        # self.scrollable_frame.bind('<MouseWheel>', yscrollbar.set)
+        # self.canvas.bind('<MouseWheel>', yscrollbar.set)
         
         # self = self.scrollable_frame
     
+    def changeFrameBox(self, e=0): self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+    
     def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
+
+SF = ScrollableFrame
+
+
+
+
+
 
 

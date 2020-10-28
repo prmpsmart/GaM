@@ -415,9 +415,11 @@ class PRMP_Theme:
 
         else: self.configure(background=background)
         
-        for child in self.childWidgets: child.paint()
+        children = self.winfo_children()
+        for child in children: child.paint()
+
         
-        if self.var and self.var.get() == self.val: self.checked()
+        if self.var and self.var.get() == self.val: self.checked(1)
         
         return self
         
@@ -888,7 +890,6 @@ class PRMP_Widget(PRMP_Theme):
     def __init__(self, window=False, tip=None, tipGeo=(300, 40), **kwargs):
         self.kwargs = kwargs
         
-        self.__childWidgets = []
         self.__resultsWidgets = []
         
         self.font = None
@@ -909,15 +910,6 @@ class PRMP_Widget(PRMP_Theme):
         
         self.config = partial(PRMP_Widget.config, self)
         # self.paint()
-    
-    def addChildWidgets(self, child):
-        if child not in self.__childWidgets:
-            if isinstance(child, (list, tuple)):
-                for ch in child: self.addChildWidgets(ch)
-            else: self.__childWidgets.append(child)
-    
-    @property
-    def childWidgets(self): return self.__childWidgets
     
     def addResultsWidgets(self, child):
         if child not in self.__resultsWidgets:
@@ -944,12 +936,13 @@ class PRMP_Widget(PRMP_Theme):
         elif val not in ['1', self.value]: self.light()
         else: self.unlight()
     
-    def checked(self):
+    def checked(self, e=0):
         if self.variable:
             if self.variable.get() == self.value: self.light()
             else: self.unlight()
     
     def switchGroup(self, e):
+        self.var.set(self.val)
         for w in self.toggleGroup:
             if w == self: self.light()
             else: w.unlight()
@@ -1002,8 +995,6 @@ class PRMP_Widget(PRMP_Theme):
         xbtn = B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
         fr.place(x=0, y=0, h=25, relw=1)
-        fr.addChildWidgets([self.titleBar, xbtn])
-        self.addChildWidgets(fr)
     
     def prevTheme(self):
         theme, index = self._prevTheme()
@@ -1030,8 +1021,6 @@ class PRMP_Widget(PRMP_Theme):
         # fr.place(x=0, y=y - 25, h=25, relw=1)
         self.placeStatusBar()
         
-        fr.addChildWidgets([self.statusBar, up, down])
-        self.addChildWidgets(fr)
     
     def placeStatusBar(self):
         if self.statusBar:
@@ -1042,7 +1031,7 @@ class PRMP_Widget(PRMP_Theme):
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
         
 
-    def bindExit(self): self.bind_all('<Control-u>', exit)
+    def bindExit(self): self.bind_all('<Control-/>', exit)
     
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
@@ -1295,7 +1284,6 @@ class PRMP_Widget(PRMP_Theme):
         self.wait_window()
 PRMP_Window = PRMP_Widget
 
-
 class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self, **kwargs):
         tk.Tk.__init__(self)
@@ -1362,6 +1350,14 @@ class PRMP_RegionButton(B):
             self['text'] = region.name
 
 PRB = PRMP_RegionButton
+
+class PRMP_Canvas(tk.Canvas, PRMP_Widget):
+    
+    def __init__(self, master=None, **kwargs):
+        tk.Canvas.__init__(self, master=master, **kwargs)
+        PRMP_Widget.__init__(self, **kwargs)
+    
+Ca = PCa = Canvas = PRMP_Canvas
 
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
@@ -1463,6 +1459,14 @@ class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
         
 Rb = PRb = Radiobutton = PRMP_Radiobutton
 
+class PRMP_Scrollbar(ttk.Scrollbar, PRMP_Widget):
+    
+    def __init__(self, master=None, **kwargs):
+        ttk.Scrollbar.__init__(self, master, **kwargs)
+        PRMP_Widget.__init__(self, **kwargs)
+        
+        PS = PRMP_Scrollbar
+
 class PRMP_Text(tk.Text, PRMP_Widget):
     
     def __init__(self, master=None, **kwargs):
@@ -1555,7 +1559,6 @@ class ImageWidget:
         
         btn2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
         btn2.place(relx=0, rely=.5, relh=.5, relw=1)
-        rt.addChildWidgets((btn1, btn2))
         rt.attributes('-topmost', 1)
         # rt.geometry(f'50x50+{x}+{y}')
         rt.paint()

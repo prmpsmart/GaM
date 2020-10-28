@@ -125,8 +125,6 @@ class RegionDetails(PRMP_Tk, FillWindow):
         self.sub = RRC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged])
         self.sup.addReceiver(self.sub.receiver)
         
-        self.hierachy.addChildWidgets([self.office, self.department, self.sup, self.sub])
-        
         # workers in the region or the individual 
         persons = B(self, text='Persons', command=self.showPersons)
         persons.place(x=0, y=190, h=24, w=90)
@@ -146,8 +144,6 @@ class RegionDetails(PRMP_Tk, FillWindow):
        # subregions
         self.subRegions = LF(self, text='Sub Regions')
         
-        self.addChildWidgets([persons, switch, new, self.hierachy, self.image, self.accounts, self.subRegions])
-        
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
@@ -155,7 +151,8 @@ class RegionDetails(PRMP_Tk, FillWindow):
     def showPersons(self):
         if self.personDialog: self.personDialog.destroy()
         if self.region:
-            if self.region.level == 5: self.personDialog = PersonDialog(values=self.region.person.values, side='center')
+            if self.region.level == 5:
+                self.personDialog = PersonDialog(values=self.region.person.values, side='center')
     
     def switch(self):
         # to switch between subregions and accounts

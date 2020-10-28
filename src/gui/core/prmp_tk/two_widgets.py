@@ -44,8 +44,6 @@ class TwoWidgets(PRMP_Frame):
         try: self.bindOverrelief(self.B, 'solid')
         except: pass
         
-        self.addChildWidgets([self.T, self.B])
-        
         if self.value and self.variable: self.checked()
         
         self.place_widgs()

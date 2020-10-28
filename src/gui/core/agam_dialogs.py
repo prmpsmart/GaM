@@ -29,8 +29,7 @@ class PersonDialog(PRMP_Dialog):
         
         self.image = IL(self)
         self.image.place(x=270, y=40, h=190, w=220)
-        contact.addChildWidgets([self.name, self.phone, self.email, self.address, self.gender])
-        self.addChildWidgets([contact, self.image])
+
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender'])
 PD = PersonDialog
 
