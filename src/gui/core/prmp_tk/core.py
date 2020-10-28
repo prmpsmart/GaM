@@ -391,12 +391,15 @@ class PRMP_Theme:
             
             self.configure(**_dict)
 
-        elif wt in ['Combobox', 'Progressbar']:
+        elif wt in ['Combobox', 'Progressbar', 'Scrollbar']:
             if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
             if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
             style = ttk.Style()
             style.theme_use(TTK_THEMES[1])
-            self.configure(background=background)
+            
+            try: self.configure(background=background)
+            except: pass
+            
             if wt == 'Combobox':
                 col = PRMP_Theme.DEFAULT_BUTTON_COLOR
                 if isinstance(col, (tuple, list)):
@@ -404,7 +407,7 @@ class PRMP_Theme:
                 else: a, b = PRMP_Theme.DEFAULT_BUTTON_COLOR, PRMP_Theme.DEFAULT_FOREGROUND_COLOR
                 style.configure('m.TCombobox', foreground=foreground, selectbackground=background, fieldbackground=background, selectforeground=foreground,  arrowcolor=a,  background=b)
                 style.map('m.TCombobox', fieldbackground=[('readonly', background)])
-                self.config(style='m.TCombobox')
+                self.configure(style='m.TCombobox')
                 
             elif wt == 'Progressbar':
                 s = ttk.Style()

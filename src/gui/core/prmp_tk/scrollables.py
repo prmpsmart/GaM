@@ -69,9 +69,10 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
 class ScrollableFrame(PRMP_Frame):
     
     def __init__(self, master, **kwargs):
-        super().__init__(master)
+        super().__init__(master, **kwargs)
         
         self.canvas = canvas = PRMP_Canvas(self)
+        canvas.place(relx=0, rely=0, relh=.95, relw=.95)
         
         xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=canvas.xview)
         yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=canvas.yview)
@@ -80,22 +81,17 @@ class ScrollableFrame(PRMP_Frame):
 
         self.scrollable_frame.bind("<Configure>", self.changeFrameBox)
 
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n")
 
         canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
 
         xscrollbar.pack(side="bottom", fill="x")
-        canvas.pack(side="left", fill="both", expand=True)
+
         yscrollbar.pack(side="right", fill="y")
         
-        # bound_to_mousewheel(0, self.canvas)
         bound_to_mousewheel(0, self)
-        # bound_to_mousewheel(0, self.scrollable_frame)
-        # self.scrollable_frame.bind('<MouseWheel>', yscrollbar.set)
-        # self.canvas.bind('<MouseWheel>', yscrollbar.set)
         
-        # self = self.scrollable_frame
-    
+        
     def changeFrameBox(self, e=0): self.canvas.configure(scrollregion=self.canvas.bbox("all"))
     
     def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
