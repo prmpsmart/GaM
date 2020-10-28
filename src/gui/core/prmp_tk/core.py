@@ -5,11 +5,8 @@ import tkinter as tk
 from functools import partial
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
-from base64 import b64decode, b64encode
-from io import BytesIO
 from random import randint
 from tkinter.filedialog import askopenfilename
-
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
@@ -17,9 +14,9 @@ TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnati
 
 
 
-# Excerpt from PySimpleGUI theme implementation of his theme.
+# Excerpt from PRMPSMART theme implementation of his theme.
 class PRMP_Theme:
-    # exerpt from PySimpleGUI theming engine
+    # exerpt from PRMPSMART theming engine
     
     BLUES = ("#082567", "#0A37A3", "#00345B")
     PURPLES = ("#480656", "#4F2398", "#380474")
@@ -29,7 +26,7 @@ class PRMP_Theme:
     NICE_BUTTON_COLORS = ((GREENS[3], TANS[0]), ('#000000', '#FFFFFF'), ('#FFFFFF', '#000000'), (YELLOWS[0], PURPLES[1]), (YELLOWS[0], GREENS[3]), (YELLOWS[0], BLUES[2]))
     COLOR_SYSTEM_DEFAULT = 'SystemButtonFace'
     DEFAULT_BUTTON_COLOR = ('white', BLUES[0])
-    OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR = ('white', BLUES[0])
+    OFFICIAL_PRMPSMART_BUTTON_COLOR = ('white', BLUES[0])
     DEFAULT_ERROR_BUTTON_COLOR = ("#FFFFFF", "#FF0000")
     DEFAULT_FOREGROUND_COLOR = 'black'
     DEFAULT_BACKGROUND_COLOR = COLOR_SYSTEM_DEFAULT
@@ -48,7 +45,7 @@ class PRMP_Theme:
     DEFAULT_RELIEF = 'groove'
     
     THEMES_DICTS = {
-        'SystemDefault': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
+        'SystemDefault': {'BACKGROUND': OFFICIAL_PRMPSMART_BUTTON_COLOR[1], 'TEXT': OFFICIAL_PRMPSMART_BUTTON_COLOR[0], 'INPUT': OFFICIAL_PRMPSMART_BUTTON_COLOR[1], 'TEXT_INPUT': 'yellow', 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': OFFICIAL_PRMPSMART_BUTTON_COLOR, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
         'SystemDefaultForReal': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': COLOR_SYSTEM_DEFAULT, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
         'SystemDefault1': {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': COLOR_SYSTEM_DEFAULT, 'INPUT': COLOR_SYSTEM_DEFAULT, 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': COLOR_SYSTEM_DEFAULT, 'PROGRESS': COLOR_SYSTEM_DEFAULT},
         'Material1': {'BACKGROUND': '#E3F2FD', 'TEXT': '#000000', 'INPUT': '#86A8FF', 'TEXT_INPUT': '#000000', 'SCROLL': '#86A8FF', 'BUTTON': ('#FFFFFF', '#5079D3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#FF0266', 'ACCENT2': '#FF5C93', 'ACCENT3': '#C5003C'},
@@ -80,7 +77,7 @@ class PRMP_Theme:
         
         'Default':   {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': 'black', 'SCROLL': 'black', 'BUTTON': 'black', 'PROGRESS': 'black'},
         'Default1':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': COLOR_SYSTEM_DEFAULT, 'BUTTON': 'black', 'PROGRESS': 'black'},
-        'DefaultNoMoreNagging':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': 'black', 'BUTTON': OFFICIAL_PYSIMPLEGUI_BUTTON_COLOR, 'PROGRESS': 'black'},
+        'DefaultNoMoreNagging':  {'BACKGROUND': COLOR_SYSTEM_DEFAULT, 'TEXT': 'black', 'INPUT': 'black', 'TEXT_INPUT': COLOR_SYSTEM_DEFAULT, 'SCROLL': 'black', 'BUTTON': OFFICIAL_PRMPSMART_BUTTON_COLOR, 'PROGRESS': 'black'},
         'LightBlue': {'BACKGROUND': '#E3F2FD', 'TEXT': '#000000', 'INPUT': '#86A8FF', 'TEXT_INPUT': '#000000', 'SCROLL': '#86A8FF', 'BUTTON': ('#FFFFFF', '#5079D3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#FF0266', 'ACCENT2': '#FF5C93', 'ACCENT3': '#C5003C'},
         'LightGrey': {'BACKGROUND': '#FAFAFA', 'TEXT': '#000000', 'INPUT': '#004EA1', 'TEXT_INPUT': '#FFFFFF', 'SCROLL': '#5EA7FF', 'BUTTON': ('#FFFFFF', '#0079D3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#FF0266', 'ACCENT2': '#FF5C93', 'ACCENT3': '#C5003C'},
         'LightGrey1': {'BACKGROUND': '#ffffff', 'TEXT': '#1a1a1b', 'INPUT': '#dae0e6', 'TEXT_INPUT': '#222222', 'SCROLL': '#a5a4a4', 'BUTTON': ('#FFFFFF', '#0079d3'), 'PROGRESS': DEFAULT_PROGRESS_BAR_COMPUTE, 'ACCENT1': '#ff5414', 'ACCENT2': '#33a8ff', 'ACCENT3': '#dbf0ff'},
@@ -208,7 +205,8 @@ class PRMP_Theme:
     
     DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
-    DEFAULT_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 14, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_SMALL_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_TITLE_FONT = {'family': 'Lucida Calligraphy', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     DEFAULT_STATUS_FONT = {'family': 'Lucida Calligraphy', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
@@ -290,23 +288,27 @@ class PRMP_Theme:
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
 
-    def prevTheme(self):
+    def _prevTheme(self):
         cur = PRMP_Theme.CURRENT_THEME
         ths = PRMP_Theme.themesList()
         ind = ths.index(cur)
-        print(ind)
         next_ = ind + 1
-        if next_ == len(ths): PRMP_Theme.setTheme(ths[0])
-        else: PRMP_Theme.setTheme(ths[next_])
+        if next_ == len(ths): next_ = 0
+        theme = ths[next_]
+        PRMP_Theme.setTheme(theme)
         self.paint()
+        return [theme, next_]
     
-    def nextTheme(self):
+    def _nextTheme(self):
         cur = PRMP_Theme.CURRENT_THEME
         ths = PRMP_Theme.themesList()
         ind = ths.index(cur)
-        if ind == 0: PRMP_Theme.setTheme(ths[-1])
-        else: PRMP_Theme.setTheme(ths[ind - 1])
+        prev = ind - 1
+        if ind == -1: prev = len(ths) - 1
+        theme = ths[prev]
+        PRMP_Theme.setTheme(theme)
         self.paint()
+        return [theme, prev]
     
     def paint(self):
         kwargs = self.kwargs.copy()
@@ -337,16 +339,20 @@ class PRMP_Theme:
             asEntry = kwargs.pop('asEntry')
             wt = 'Entry' if asEntry else wt
             self.configure(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background)
-            
         
+        oneColor = True
+        col = PRMP_Theme.DEFAULT_BUTTON_COLOR
+        if isinstance(col, tuple): oneColor = False
+        else: background, foreground = 'white', 'black'
+            
         if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
+            
             if wt == 'Button':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_BUTTON_FONT))
-                col = PRMP_Theme.DEFAULT_BUTTON_COLOR
-                if isinstance(col, tuple):
+                if oneColor == False:
                     if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
                     if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
-                else: foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR
+
             else: font = Font(**kwargs.pop('font', PTh.DEFAULT_LABEL_FONT))
             _dict = dict(activebackground=activebackground,
                         activeforeground=activeforeground,
@@ -392,8 +398,10 @@ class PRMP_Theme:
             style.theme_use(TTK_THEMES[1])
             self.configure(background=background)
             if wt == 'Combobox':
-                
-                a, b = PRMP_Theme.DEFAULT_BUTTON_COLOR
+                col = PRMP_Theme.DEFAULT_BUTTON_COLOR
+                if isinstance(col, (tuple, list)):
+                    a, b = col
+                else: a, b = PRMP_Theme.DEFAULT_BUTTON_COLOR, PRMP_Theme.DEFAULT_FOREGROUND_COLOR
                 style.configure('m.TCombobox', foreground=foreground, selectbackground=background, fieldbackground=background, selectforeground=foreground,  arrowcolor=a,  background=b)
                 style.map('m.TCombobox', fieldbackground=[('readonly', background)])
                 self.config(style='m.TCombobox')
@@ -409,11 +417,10 @@ class PRMP_Theme:
         
         for child in self.childWidgets: child.paint()
         
+        if self.var and self.var.get() == self.val: self.checked()
+        
         return self
         
-    def config(self, **kwargs):
-        self.kwargs.update(kwargs)
-        self.paint()
     
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
@@ -886,6 +893,7 @@ class PRMP_Widget(PRMP_Theme):
         
         self.font = None
         
+        
         self.toggleGroup = []
         
         self.val = self.value = kwargs.get('value', '1')
@@ -899,11 +907,12 @@ class PRMP_Widget(PRMP_Theme):
         
         if tip: self.addTip(tip, tipGeo=tipGeo)
         
-        self.paint()
+        self.config = partial(PRMP_Widget.config, self)
+        # self.paint()
     
     def addChildWidgets(self, child):
         if child not in self.__childWidgets:
-            if isinstance(child, list):
+            if isinstance(child, (list, tuple)):
                 for ch in child: self.addChildWidgets(ch)
             else: self.__childWidgets.append(child)
     
@@ -912,7 +921,7 @@ class PRMP_Widget(PRMP_Theme):
     
     def addResultsWidgets(self, child):
         if child not in self.__resultsWidgets:
-            if isinstance(child, list):
+            if isinstance(child, (list, tuple)):
                 for ch in child: self.addResultsWidgets(ch)
             else: self.__resultsWidgets.append(child)
     
@@ -990,11 +999,21 @@ class PRMP_Widget(PRMP_Theme):
         self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
         self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
         
-        xbtn = B(fr, text=self.x_btn2, command=self.destroy)
+        xbtn = B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
         fr.place(x=0, y=0, h=25, relw=1)
-        fr.addChildWidgets(xbtn)
+        fr.addChildWidgets([self.titleBar, xbtn])
         self.addChildWidgets(fr)
+    
+    def prevTheme(self):
+        theme, index = self._prevTheme()
+        self.editStatus(f'Theme({theme}) | Index({index}) ')
+        
+    def nextTheme(self):
+        theme, index = self._nextTheme()
+        self.editStatus(f'Theme({theme}) | Index({index})')
+    
+    def editStatus(self, text): self.statusBar.set(text)
     
     def addStatusBar(self):
         if self.statusBar: return
@@ -1002,16 +1021,22 @@ class PRMP_Widget(PRMP_Theme):
         self.statusBar = L(fr, text='Status' or self.statusText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_STATUS_FONT)
         self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
         
-        up = B(fr, text=self.upArrow, command=self.prevTheme)
+        up = B(fr, text=self.upArrow, command=self.prevTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         up.place(relx=.92, rely=0, relh=1, relw=.04)
-        down = B(fr, text=self.downArrow, command=self.nextTheme)
+        down = B(fr, text=self.downArrow, command=self.nextTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         down.place(relx=.96, rely=0, relh=1, relw=.04)
         
-        y = self.kwargs.get('geo')[1]
-        fr.place(x=0, y=y - 25, h=25, relw=1)
+        # y = self.kwargs.get('geo')[1]
+        # fr.place(x=0, y=y - 25, h=25, relw=1)
+        self.placeStatusBar()
         
-        # fr.addChildWidgets([up, down])
+        fr.addChildWidgets([self.statusBar, up, down])
         self.addChildWidgets(fr)
+    
+    def placeStatusBar(self):
+        if self.statusBar:
+            y = self.kwargs.get('geo')[1]
+            self.statusBar.master.place(x=0, y=y - 25, h=25, relw=1)
     
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
@@ -1019,6 +1044,10 @@ class PRMP_Widget(PRMP_Theme):
 
     def bindExit(self): self.bind_all('<Control-u>', exit)
     
+    def config(self, **kwargs):
+        self.kwargs.update(kwargs)
+        self.configure(**kwargs)
+        # self.paint()
     @property
     def className(self): return self.__class__.__name__
     
@@ -1066,11 +1095,20 @@ class PRMP_Widget(PRMP_Theme):
             self.overrideredirect(1)
             self.state('normal')
         
+        self.placeOnScreen(side, geometry)
+
         
-        self.lastPoints = [0, 0, 0, 0]
-        self._geometry = geometry
+    setupOfWindow = setupOfWidget
         
+    def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
+        if len(geometry) == 4:
+            self.lastPoints = geometry
+            side = None
+            
+        else: self.lastPoints = [0, 0, 0, 0]
+        
+        self._geometry = geometry
         
         if side:
             if '-' in side:
@@ -1097,11 +1135,10 @@ class PRMP_Widget(PRMP_Theme):
                 funcs = {self._top: self.topOfScreen, self._left: self.leftOfScreen, self._right: self.rightOfScreen, self._bottom: self.bottomOfScreen, self._center: self.centerOfScreen}
             funcs[main_side]()
         else:
-            if geometry: self.setGeometry(geometry)
+            if geometry: self.setGeometry(self._geometry)
         
         self.setGeometry(self.lastPoints)
     
-    setupOfWindow = setupOfWidget
     
     def addTip(self, tip='Tip', tipGeo=(100, 20), font=PTh.DEFAULT_FONT, delay=0, follow=True):
         from .commons import ToolTip
@@ -1172,7 +1209,7 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def getXY(self):
         if self._geometry: return self._geometry[:3]
-        return (200, 200)
+        return (400, 300)
     
     def _pointsToCenterOfScreen(self, x, y):
         screen_x, screen_y = self.screenwidth(), self.screenheight()
@@ -1201,6 +1238,10 @@ class PRMP_Widget(PRMP_Theme):
         points = self.pointsToCenterOfScreen
         points[-1] = 50
         self.setGeometry(points)
+    
+    def changeGeometry(self, geo=(400, 300)):
+        self.kwargs.update({'geo': geo, 'geometry': geo})
+        self.placeOnScreen(side=self.side, geometry=geo)
         
     def centerOfScreen(self): self.setGeometry(self.pointsToCenterOfScreen)
         
@@ -1342,7 +1383,12 @@ class PRMP_Combobox(ttk.Combobox, PRMP_Widget):
         ttk.Combobox.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
     
-    def set(self, values): self['values'] = values
+    def changeValues(self, values): self['values'] = values
+    
+    def set(self, value):
+        self.delete(0, '')
+        self.insert(0, value)
+    
 
 Cx = PCx = Combobox = PRMP_Combobox
 
@@ -1431,13 +1477,14 @@ PTx = PRMP_Text
 class ImageWidget:
     def __init__(self, imageFile=None, thumb=None, resize=None):
         self.rt = None
-        self.data = None
+        self.__image = None
         self.thumb = thumb or (200, 170)
         self.resize = resize or (100, 100)
         from .dialogs import PMB
-        from .pics import Pngs
+        from .pics import Pngs, ImageFile
         
         self.PMB = PMB
+        self.IF = ImageFile
         self.default_dp = Pngs.get('profile_pix')
         
         self.bindMenu()
@@ -1461,9 +1508,13 @@ class ImageWidget:
             elif not self.PMB('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ').result: return
             imageFile = self.default_dp
         image = Image.open(imageFile)
-        self.storeImage(imageFile)
         
-        if imageFile.endswith('.xbm'): image = image.resize(self.resize)
+        if isinstance(imageFile, str): imageFile = self.IF(imageFile)
+        elif not isinstance(imageFile, self.IF): raise ValueError(f' imageFile must be [ImageFile, str] not {imageFile}.')
+        
+        self.__image = imageFile
+        
+        if imageFile.ext == '.xbm': image = image.resize(self.resize)
         else: image.thumbnail(self.thumb)
         
         self.image =  PhotoImage(image=image)
@@ -1485,17 +1536,7 @@ class ImageWidget:
         self.unbind('<3>')
         # self.unbind('<Double-1>')
     
-
-    def storeImage(self, imageFile):
-        self.data = b64encode(open(imageFile, 'rb').read())
-        
-    def getImage(self):
-        if self.data: return b64decode(self.data)
-        
-    def getImageFile(self):
-        if self.data: return BytesIO(self.getImage())
-    
-    get = getImageFile
+    def get(self): return self.__image
     
     def delMenu(self, e=0):
         if self.rt:
@@ -1507,16 +1548,17 @@ class ImageWidget:
         self.delMenu()
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PTp(self)
+        self.rt = rt = PTp(self, geo=(50, 50, x, y))
         rt.overrideredirect(1)
-        lbl = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
-        lbl.place(relx=0, rely=0, relh=.5, relw=1)
+        btn1 = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
+        btn1.place(relx=0, rely=0, relh=.5, relw=1)
         
-        lbl2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
-        lbl2.place(relx=0, rely=.5, relh=.5, relw=1)
-        
+        btn2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
+        btn2.place(relx=0, rely=.5, relh=.5, relw=1)
+        rt.addChildWidgets((btn1, btn2))
         rt.attributes('-topmost', 1)
-        rt.geometry(f'50x50+{x}+{y}')
+        # rt.geometry(f'50x50+{x}+{y}')
+        rt.paint()
 
 class ImageLabel(PRMP_Label, ImageWidget):
     def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):

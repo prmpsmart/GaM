@@ -1,5 +1,6 @@
 
 from os import path, walk
+from io import BytesIO
 
 
 class Pics:
@@ -45,10 +46,18 @@ class Pics:
             try: return files[bitmap]
             except: filesL[0]
 
-
 class Xbms(Pics):
     subDir = 'xbms'
     
 class Pngs(Pics):
     subDir = 'pngs'
+
+class ImageFile(BytesIO):
+    
+    def __init__(self, fileName):
+        super().__init__(open(fileName, 'rb').read())
+        self.name = path.basename(fileName)
+        self.ext = path.splitext(self.name)[1]
+    
+    def __str__(self): return f'ImageFile({self.name})'
     

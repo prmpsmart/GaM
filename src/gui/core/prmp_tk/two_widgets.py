@@ -5,7 +5,7 @@ from ....backend.core.date_time import DateTime
 class TwoWidgets(PRMP_Frame):
     top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
     bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox}
-    events = {'combobox': ['<<ComboboxSelected>>'], 'spinbox': ['<<Increment>>', '<<Decrement>>']}
+    events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
@@ -49,6 +49,7 @@ class TwoWidgets(PRMP_Frame):
         if self.value and self.variable: self.checked()
         
         self.place_widgs()
+        
     def clicked(self, e=0): return self.B.get()
     
     def light(self):
@@ -89,6 +90,8 @@ class TwoWidgets(PRMP_Frame):
     
     def get(self): return self.Bottom.get()
     
+    def changeValues(self, values): self.Bottom.changeValues(values)
+    
     def config(self, **kwargs): self.Top.configure(**kwargs)
 
     def place_widgs(self):
@@ -101,6 +104,7 @@ class TwoWidgets(PRMP_Frame):
             self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
             self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
         return self
+    
     
 TW = TwoWidgets
 
@@ -140,22 +144,6 @@ class LabelCombo(TwoWidgets):
         
         self.choosen = None
     
-    def set(self, values):
-        
-        # use a dict mechanism, show only the key
-        # so when a key is choosen, we get the real value using that key
-        # the key is the region / account name
-        '''
-        in the case of account
-        [account] [combobox (showing the account managers {dc} which in turn shows the recordmanagers / recordmanagers {directly in coop})]
-        clicking one above will update the records list on the right
-        
-        '''
-        pass
-    
-    def get(self):
-        pass
-    
 LC = LabelCombo
 
 class CheckEntry(TwoWidgets):
@@ -165,7 +153,7 @@ CE = CheckEntry
 class CheckCombo(TwoWidgets):
     def __init__(self, master, **kwargs):
         super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
-        
+
 CC = CheckCombo
 
 class LabelButton(TwoWidgets):

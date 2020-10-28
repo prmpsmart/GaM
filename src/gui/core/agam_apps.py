@@ -1,39 +1,31 @@
-from .prmp_tk.two_widgets import *
+from .agam_dialogs import *
 
 class RegionRadioCombo(RC):
     
-    def __init__(self, master=None, region=None, reciever=None, regionLevel=5, **kwargs):
+    def __init__(self, master=None, region=None, regionLevel=5, recievers=[], **kwargs):
         super().__init__(master, **kwargs)
         
         self.subRegionDict = {}
         self.set(region)
         self.choosen = None
-        self._receiver = None
+        self._receivers = recievers
         self.regionLevel = regionLevel
     
-    def setReciever(self, reciever): self._receiver = reciever
+    def addReceiver(self, receiver):
+        if receiver not in self._receivers: self._receivers.append(receiver)
+        elif isinstance(receiver, (list, tuple)): 
+            for recv in receiver: self.addReceiver(recv)
     
     def clicked(self, e=0):
         val = super().clicked()
         regVal = self.subRegionDict.get(val)
-        if self._receiver: self._receiver(self, regVal)
+        if self._receivers:
+            for recv in self._receivers: recv((self, regVal))
     
     def get(self):
         if self.B.get() in self.subRegionDict:
             pass
         else: return self.choosen
-    
-    def _set(self, region):
-        if region:
-            rm = region.regionsManagers
-            regs = len(rm)
-            if rm[0] == None:
-                print('member/client')
-            elif regs == 1: self.setKeys(rm[0])
-                
-            elif regs == 2:
-                pass
-            self.region = region
     
     def set(self, region):
         if region:
@@ -44,7 +36,8 @@ class RegionRadioCombo(RC):
                 
             self.region = region
     
-    def receiver(self, wid, region):
+    def receiver(self, tup):
+        wid, region = tup
         self.var.set(self.val)
         wid.unlight()
         self.light()
@@ -63,14 +56,16 @@ class RegionRadioCombo(RC):
             for region in sub:
                 try: number = region.number
                 except: number = sub.index(region) + 1
-                name = f'{number})  {region.name} '
+                name = f'{number})  {region.name}'
                 self.subRegionDict[name] = region
         else: self.subRegionDict[region.name] = region
     
     def setKeys(self, region=None):
         if region: self.processRegionSubs(region)
         keys = self.getSubKeys()
-        self.B.set(keys)
+        if keys:
+            self.changeValues(keys)
+            self.B.set(keys[0])
         
     def getSubKeys(self):
         keys = list(self.subRegionDict.keys())
@@ -82,78 +77,124 @@ RRC = RegionRadioCombo
 
 class RegionDetails(PRMP_Tk, FillWindow):
     
-    def __init__(self, region=None, title='Region Details', geo=(600, 250), values={}, **kwargs):
-        PRMP_Tk.__init__(self, title=title, geo=geo, gaw=1, ntb=1, **kwargs)
+    def __init__(self, title='Region Details', geo=(600, 250), values={}, **kwargs):
+        PRMP_Tk.__init__(self, title=title, geo=geo, gaw=1, ntb=1, tm=1, **kwargs)
         FillWindow.__init__(self, values=values)
         
-        self.region = region
+        self.region = None
+        self.personDialog = None
+        self.switchState = None
         self.setupApp()
         self.fill()
-        
+        self.paint()
         self.mainloop()
-    
-    # def fill(self, values={}):
-    #     if super().fill(values):
         
-    #         if self.region:
-    #             sups = self.region.sups
-    #             first = sups[0]
-                
+    def regionChanged(self, region):
+        region = region[1]
+        if not region: return
+        text = ''
+        hie = region.hierachy
+        for reg in hie[1:]:
+            if len(hie) > 2 and reg == hie[2]: name = reg.name.split(hie[1].name)[1]
+            else: name = reg.name
+            text += name + ' | '
+        te = text.split('|')[:-1]
+        text = ' | '.join(te)# + 'details.'
+        self.region = region
+        self.titleBar.set(text)
     
     def setupApp(self):
         self.addTitleBar()
         self.addStatusBar()
-        
+       
+       # hierachy
         self.hierachy = LF(self, text='Hierachy')
-        self.hierachy.place(x=10, y=30, h=150, w=335)
+        self.hierachy.place(relx=0, y=30, h=150, w=335)
         
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
         
-        self.office = RRC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'off', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.23, relw=.96, longent=.3, regionLevel=1)
+        self.office = RRC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'off', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.23, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged])
         
-        self.department = RRC(self.hierachy,  topKwargs={'text': 'Department', 'value': 'dep', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.25, relh=.23, relw=.96, longent=.35, regionLevel=2)
-        self.office.setReciever(self.department.receiver)
+        self.department = RRC(self.hierachy,  topKwargs={'text': 'Department', 'value': 'dep', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.25, relh=.23, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged])
+        self.office.addReceiver(self.department.receiver)
         
-        self.sup = RRC(self.hierachy,  topKwargs={'text': 'Superscript', 'value': 'sup', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.5, relh=.23, relw=.96, longent=.35, regionLevel=3)
-        self.department.setReciever(self.sup.receiver)
+        self.sup = RRC(self.hierachy,  topKwargs={'text': 'Superscript', 'value': 'sup', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.5, relh=.23, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged])
+        self.department.addReceiver(self.sup.receiver)
         
-        self.sub = RRC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3, regionLevel=4)
-        self.sup.setReciever(self.sub.receiver)
+        self.sub = RRC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.23, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged])
+        self.sup.addReceiver(self.sub.receiver)
+        
+        self.hierachy.addChildWidgets([self.office, self.department, self.sup, self.sub])
         
         # workers in the region or the individual 
-        persons = PCb(self, text='Persons', command=self.showPersons)
-        persons.place(x=10, y=190, h=24, w=90)
+        persons = B(self, text='Persons', command=self.showPersons)
+        persons.place(x=0, y=190, h=24, w=90)
         
-        switch = PCb(self, text='Switch?', command=self.switch)
-        switch.place(x=120, y=190, h=24, w=90)
+        switch = B(self, text='Switch?', command=self.switch)
+        switch.place(x=110, y=190, h=24, w=90)
         
         new = PCb(self, text='New Dialog ?')
-        new.place(x=225, y=190, h=24, w=120)
+        new.place(x=215, y=190, h=24, w=120)
        
         
         self.image = IL(self)
         self.image.place(x=360, y=40, h=170, w=230)
+    
+       # accounts
+        self.accounts = LF(self, text='Accounts')
+       # subregions
+        self.subRegions = LF(self, text='Sub Regions')
         
-        self.addChildWidgets([persons, switch, new, self.hierachy, self.image])
+        self.addChildWidgets([persons, switch, new, self.hierachy, self.image, self.accounts, self.subRegions])
         
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
         
     def showPersons(self):
-        pass
+        if self.personDialog: self.personDialog.destroy()
+        if self.region:
+            if self.region.level == 5: self.personDialog = PersonDialog(values=self.region.person.values, side='center')
     
     def switch(self):
         # to switch between subregions and accounts
-        pass
+        if self.switchState == None:
+            self.showSubRegionsContainer()
+            self.switchState = True
+            
+        elif self.switchState == True:
+            self.showAccountsContainer()
+            self.switchState = False
+            
+        elif self.switchState == False:
+            self.unExpand()
+            self.switchState = None
         
     def loadRegion(self, region=None, account=1):
         if region:
             self.region = region
             self.titleBar.config(text=f'{self.region} Details Dialog')
         
-       
+    def unExpand(self):
+        self.changeGeometry((600, 250))
+        self.accounts.place_forget()
+        self.placeStatusBar()
+        
+    def expand(self):
+        self.changeGeometry((800, 600))
+        self.placeStatusBar()
+        
+    def showSubRegionsContainer(self):
+        self.subRegions.place(relx=0, y=220, h=350, relw=1)
+        self.expand()
+        
+    def showAccountsContainer(self):
+        self.subRegions.place_forget()
+        self.accounts.place(relx=0, y=220, h=350, relw=1)
+        self.expand()
+        
+        
 
 
 

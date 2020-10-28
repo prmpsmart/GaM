@@ -89,7 +89,7 @@ class Area(DCRegion):
     @property
     def totalClients(self): return len(self)
     def clientsInMonth(self, month): return self.clientsManager.clientsInMonth(month)
-    def createClient(self, name, rate, cardDue=False): return self.clientsManager.createClient(name=name, rate=rate, cardDue=cardDue)
+    def createClient(self, name, rate, cardDue=False, **kwargs): return self.clientsManager.createClient(name=name, rate=rate, cardDue=cardDue, **kwargs)
 
 class AreasManager(DCRegionsManager):
     regionClass = Area

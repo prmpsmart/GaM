@@ -4,13 +4,12 @@ from .core import *
 from .pics import Xbms
 
 
-PRMP_Toplevel = PRMP_Tk
+# PRMP_Toplevel = PRMP_Tk
 
 class PRMP_Dialog(PRMP_Toplevel, FillWindow):
     
     def __init__(self, master=None, _return=True, values={}, **kwargs):
-        # PRMP_Toplevel.__init__(self, master, **kwargs)
-        PRMP_Toplevel.__init__(self, ntb=9, nrz=0, tm=1, gaw=1, **kwargs)
+        PRMP_Toplevel.__init__(self, master, ntb=9, nrz=0, tm=1, gaw=1, **kwargs)
         FillWindow.__init__(self, values=values)
         
         self.__result = None

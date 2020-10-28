@@ -128,11 +128,11 @@ class ClientAccountsManager(DCAccountsManager):
     @property
     def startRate(self): return self.__startRate
     
-    def createAccount(self, date=None, rate=0, auto=False):
+    def createAccount(self, date=None, rate=0, auto=False, **kwargs):
         lastAccount = self.lastAccount
         lastLedgerNumber = lastAccount.ledgerNumber if lastAccount else 0
         ledgerNumber = lastLedgerNumber + 1
-        return super().createAccount(date=date, rate=rate, auto=auto, ledgerNumber=ledgerNumber)
+        return super().createAccount(date=date, rate=rate, auto=auto, ledgerNumber=ledgerNumber, **kwargs)
 
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
@@ -156,7 +156,7 @@ class AreaAccountsManager(DCAccountsManager):
     @property
     def clientsManager(self): return self.region.clientsManager
     
-    def createAccount(self, date=None, auto=True): return super().createAccount(date=date, auto=auto)
+    def createAccount(self, date=None, auto=True, **kwargs): return super().createAccount(date=date, auto=auto, **kwargs)
     
     def sortClientsAccountsByMonth(self, month): return self.sortSubRegionsAccountsByMonth(month)
 

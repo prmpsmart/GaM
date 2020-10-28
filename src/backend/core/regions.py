@@ -1,5 +1,6 @@
 from .accounts import AccountsManager, DateTime, Mixins, Errors
 from .records import Salary, SalariesManager
+import os
 
 class Region(Mixins):
     AccountsManager = AccountsManager
@@ -57,6 +58,9 @@ class Region(Mixins):
             return zz
     
     @property
+    def level(self): return len(self.hierachy)
+    
+    @property
     def hierachy(self): return self.sups + [self]
     
     @property
@@ -83,8 +87,8 @@ class Region(Mixins):
         if self.person: return self.person.address
         else: return str(self)
     @property
-    def photo(self):
-        if self.person: return self.person.photo
+    def image(self):
+        if self.person: return self.person.image
         else: return str(self)
     
     def getRegion(self, **kwargs): return self.subRegionsManager.getRegion(**kwargs)
@@ -200,7 +204,7 @@ class RegionsManager(Mixins):
     
     def addRegion(self, region): self.__regions.append(region)
     
-    def getRegion(self, number=None, name=None, phone=None, email=None, photo=None):
+    def getRegion(self, number=None, name=None, phone=None, email=None, image=None):
         ## provide mechanism to scan pictures.
         for region in self.regions:
             if number == region.number: return region
@@ -310,7 +314,7 @@ class Person(Mixins):
     __male = 'male', 'm'
     __female = 'female', 'f'
     
-    def __init__(self, manager=None, gender='n', phone='', photo='', email='', address='', date=None, name=None, **kwargs):
+    def __init__(self, manager=None, gender='n', phone='', image=None, email='', address='', date=None, name=None, **kwargs):
         
         if isinstance(manager, str): pass
         elif isinstance(manager, Region): self.__date = manager.date
@@ -324,12 +328,19 @@ class Person(Mixins):
         
         self.__name = name
         self.__phone = phone
-        self.__photo = photo
+        if image:
+            from ...gui.core.prmp_tk.pics import ImageFile
+            assert os.path.isfile(image) and os.path.splitext(image)[1] in ['.png', 'jpeg', '.jpg', '.gif', '.xbm'], f'{image} file given is not a valid picture file.'
+            self.__image = ImageFile(image)
+        else: self.__image = None
         self.__email = email
         self.__address = address
         self.__manager = manager
     
-    def __str__(self): return f'{self.manager} | {self.className}({self.name}) '
+    def __str__(self): return f'{self.manager} | {self.className}({self.name})'
+    
+    @property
+    def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
     
     @property
     def name(self): 
@@ -346,8 +357,7 @@ class Person(Mixins):
         assert addr, 'Address must be str and not empty.'
         self.__address = addr
     @property
-    def image(self):
-        pass
+    def image(self): return self.__image
     @property
     def email(self): return self.__email
     @email.setter
@@ -380,7 +390,7 @@ class Staff(Region):
 
 class ThirdPartySurety:
     
-    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipWithMember='', photo='', date=None):
+    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipWithMember='', image='', date=None):
     
         self.__loanBondDetails = loanBondDetails
         self.__name = None
@@ -396,14 +406,14 @@ class ThirdPartySurety:
         self.__occupation = occupation
         self.__knowledgeOfMember = knowledgeOfMember
         self.__relationshipWithMember = relationshipWithMember
-        self.__photo = photo
+        self.__image = image
         
     @property
     def dob(self): return self.__dob
     @property
     def maritalStatus(self): return self.__maritalStatus
     @property
-    def photo(self): return self.__photo
+    def image(self): return self.__image
     @property
     def phone(self): return self.__phone
     @property
@@ -432,12 +442,12 @@ class LoanBondDetails:
         self.__loanBond = loanBond
         self.__proposedLoan = loanBond.proposedLoan
         self.__thirdPartySurety = None
-        self.__photo = None
+        self.__image = None
         
         self.__interest = None
     
     @property
-    def photo(self): return self.__photo
+    def image(self): return self.__image
     @property
     def interest(self): return self.__interest
     @property
