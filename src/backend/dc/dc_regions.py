@@ -37,7 +37,8 @@ class Client(DCRegion):
         self.__cardDues = CardDues(self, cardDue)
 
     def __str__(self): return f"{self.manager} | {self.className}({self.name})"
-    
+    @property
+    def spacedID(self): return f'{self.sup.spacedID} | C{self.number}'
     @property
     def area(self): return self.manager.area
     @property
@@ -83,7 +84,11 @@ class Area(DCRegion):
         
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     @property
+    def spacedID(self): return f'{self.sup.spacedID} | A{self.number}'
+    @property
     def otherName(self): return self.__otherName
+    @property
+    def clients(self): return self.clientsManager.clients
     @property
     def clientsManager(self): return self.subRegionsManager
     @property

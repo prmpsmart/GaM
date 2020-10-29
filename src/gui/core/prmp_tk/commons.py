@@ -1,6 +1,6 @@
 
 import time
-from .core import PTp, L, PTh
+from .core import PTp, L, PTh, Tk, F
 
 class ToolTip:
     def __init__(self, wdgt, msg=None, font=None, delay=1, follow=True, tipGeo=(100, 40), **kwargs):
@@ -68,3 +68,36 @@ class ToolTip:
             # self.top.withdraw()
             self.top.destroy()
         # self.parent.state('normal')
+
+class SolidScreen(Tk):
+    def __init__(self, side='top-center', bd=12, geo=(500, 500),**kwargs):
+        super().__init__(be=1, tm=1, geo=geo, gaw=1, side=side, atb=1, asb=1, **kwargs)
+        
+        self.frame = F(self, relief='solid')
+        self.frame['bd'] = 12
+        y, h = self.y_h
+        self.frame.place(x=0, y=y, relw=1, h=h)
+        
+        self.paint()
+        # self.mainloop()
+    
+    def addWidget(self, widget, config={}, place={}, grid={}, pack={}):
+        trues = [bool(pos) for pos in [place, pack, grid]].count(True)
+        
+        if not trues or (trues > 1): raise ValueError('only one is required between [place, pack, grid]')
+        else:
+            wid = widget(self.frame, **config)
+            if place: wid.place(**place)
+            elif pack: wid.pack(**pack)
+            elif grid: wid.grid(**grid)
+            wid.paint()
+            return wid
+        
+        
+        
+        
+        
+        
+
+SS = SolidScreen
+

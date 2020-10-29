@@ -24,6 +24,9 @@ class AGAM(Region):
     def officesManager(self): return self.subRegionsManager
     @property
     def managersManager(self): return self.detailsManager
+    
+    @property
+    def spacedID(self): return self.name
 
 
 

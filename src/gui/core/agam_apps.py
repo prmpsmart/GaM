@@ -1,4 +1,5 @@
 from .agam_dialogs import *
+from .prmp_tk.usefuls import bound_to_mousewheel
 
 class RegionRadioCombo(RC):
     
@@ -71,9 +72,85 @@ class RegionRadioCombo(RC):
         keys = list(self.subRegionDict.keys())
         keys.sort()
         return keys
-
-
 RRC = RegionRadioCombo
+
+
+
+class Hierachy(PRMP_Frame):
+    __shows = ['tree', 'headings']
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master=master, **kwargs)
+        
+        self.t = self.tree = self.treeview = PRMP_Treeview(self)
+        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=self.treeview.xview)
+        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        
+        xscrollbar.pack(side="bottom", fill="x")
+        self.treeview.pack(side='left', fill='both', expand=1)
+        yscrollbar.pack(side="right", fill="y")
+        bound_to_mousewheel(0, self)
+        
+        self.ivd = self.itemsValuesDict = {}
+        
+        
+    
+    def setHeadings(self, headings=[]):
+        for head in headings:
+            self.heading(head.name, head.name)
+    
+    def insert(self, item, position='end', **kwargs): return self.treeview.insert(item, position, **kwargs)
+    
+    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
+    
+    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
+    
+    def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
+    
+    tvc = Config = treeviewConfig
+    
+    def test1(self, region=None, parent=''):
+        rm = region.regionsManagers
+        regs = len(rm)
+        first = rm[0]
+        if first != None:
+            if regs == 1: sub = first
+            else:
+                sub = []
+                for manager in rm: sub += manager[:]
+            for region in sub:
+                item = self.insert(parent, text=region.name)
+                self.ivd[item] = region
+        else: self.ivd[parent] = region
+    
+    def test(self, region=None, parent=''):
+        rm = region.regionsManagers
+        regs = len(rm)
+        first = rm[0]
+        if first != None:
+            if regs == 1:
+                parent = self.insert(parent, text=region.name)
+                for rg in rm[0]:
+                    item = self.insert(parent, text=rg.name)
+                    self.ivd[item] = rg
+            else:
+                for manager in rm:
+                    item = self.insert(parent, text=manager.name)
+                    self.ivd[item] = region
+        else:
+            item = self.insert(parent, text=region.name)
+            
+            self.ivd[item] = region
+    
+    
+    
+    
+    
+    
+H = Hierachy
+
+
+
 
 class RegionDetails(PRMP_Tk, FillWindow):
     
@@ -190,8 +267,6 @@ class RegionDetails(PRMP_Tk, FillWindow):
         self.subRegions.place_forget()
         self.accounts.place(relx=0, y=220, h=350, relw=1)
         self.expand()
-        
-        
 
 
 

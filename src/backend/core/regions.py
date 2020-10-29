@@ -1,6 +1,7 @@
 from .accounts import AccountsManager, DateTime, Mixins, Errors
 from .records import Salary, SalariesManager
 import os
+from hashlib import sha224
 
 class Region(Mixins):
     AccountsManager = AccountsManager
@@ -9,6 +10,7 @@ class Region(Mixins):
     PersonsManager = None
     Person = None
     MultiSubRegionsManager = False
+    
     
     def __init__(self, manager=None, number=None, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, **kwargs):
         if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
@@ -23,6 +25,8 @@ class Region(Mixins):
         self.__location = location
         self.__date = date
         
+        self.__uniqueID = sha224(self.id.encode()).hexdigest()
+        
         self.__accountsManager = self.AccountsManager(self, **kwargs)
         
         
@@ -35,7 +39,7 @@ class Region(Mixins):
             self.__subRegionsManager = None
             self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
             self.__personsManager = None
-    
+            
     def __getitem__(self, num): return self.accountsManager[num]
     def __len__(self): return len(self.accountsManager)
     
@@ -59,6 +63,20 @@ class Region(Mixins):
     
     @property
     def level(self): return len(self.hierachy)
+    
+    @property
+    def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
+    
+    @property
+    def spacedID(self):
+        'override in subclass'
+        return 'id | region'
+    
+    @property
+    def uniqueID(self): return self.__uniqueID
+    
+    @property
+    def link(self): return self.__link
     
     @property
     def hierachy(self): return self.sups + [self]

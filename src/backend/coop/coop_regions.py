@@ -88,7 +88,8 @@ class Member(CoopRegion, Person):
         assert gender.lower() in ['f', 'm', 'male', 'female'], "Name can not be empty and must be among ['f', 'm', 'male', 'female']."
         
         super().__init__(manager=manager, name=name, gender=gender, phone=phone, photo=photo, email=email, date=date, **kwargs)
-    
+    @property
+    def spacedID(self): return f'{self.sup.spacedID} | M{self.number}'
     @property
     def unit(self): return self.manager.unit
     @property
@@ -129,7 +130,10 @@ class Unit(CoopRegion):
     
     def __init__(self, **kwargs):
         super().__init__(nameFromNumber=True, **kwargs)
-        pass
+        
+    @property
+    def spacedID(self): return f'{self.sup.spacedID} | U{self.number}'
+    
     @property
     def office(self): return self.manager.office
     

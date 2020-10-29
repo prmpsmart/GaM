@@ -71,28 +71,34 @@ class ScrollableFrame(PRMP_Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         
-        self.canvas = canvas = PRMP_Canvas(self)
-        canvas.place(relx=0, rely=0, relh=.95, relw=.95)
+        self.canvas = canvas = PRMP_Canvas(self, bg='blue')
+        canvas.place(x=0, rely=0, relh=.96, relw=.99)
+        
+        # self.canvas.grid_rowconfigure(0, weight=1)
         
         xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=canvas.xview)
         yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=canvas.yview)
-        
-        self.scrollable_frame = PRMP_Frame(canvas)
-
-        self.scrollable_frame.bind("<Configure>", self.changeFrameBox)
-
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor="n")
-
         canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
-
         xscrollbar.pack(side="bottom", fill="x")
 
         yscrollbar.pack(side="right", fill="y")
         
         bound_to_mousewheel(0, self)
         
+        self.scrollable_frame = PRMP_Frame(canvas)
+        self.scrollable_frame.pack(side='left', fill='both', expand=1)
+
+        self.scrollable_frame.bind("<Configure>", self.changeFrameBox)
+
+        canvas.create_window((0, 0), window=self.scrollable_frame, anchor='nw')
+
+
         
-    def changeFrameBox(self, e=0): self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        
+    def changeFrameBox(self, e=0):
+        p = self.canvas.bbox("all")
+        self.canvas.configure(scrollregion=p)
+        
     
     def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
 

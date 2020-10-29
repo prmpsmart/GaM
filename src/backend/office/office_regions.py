@@ -35,18 +35,23 @@ class Office(Region):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.__dcOfficesManager = DCOfficesManager(self)
-        self.__coopOfficesManager = CoopOfficesManager(self)
+        self.__dcOffice = DCOffice(self)
+        self.__coopOffice = CoopOffice(self)
         
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
-    def dcOfficesManager(self): return self.__dcOfficesManager
+    def dcOffice(self): return self.__dcOffice
     @property
-    def coopOfficesManager(self): return self.__coopOfficesManager
+    def coopOffice(self): return self.__coopOffice
     @property
-    def regionsManagers(self): return [self.dcOfficesManager, self.coopOfficesManager]
-    def setMoneySign(self, sign=0): Mixins._moneySign = sign
+    def regions(self): return [self.dcOffice, self.coopOffice]
+    
+    def setMoneySign(self, sign='$'): Mixins._moneySign = sign
+    
+    @property
+    def spacedID(self): return f'{self.sup.spacedID} | {self.name}'
+
 
 class OfficesManager(RegionsManager):
     regionClass = Office
@@ -60,23 +65,36 @@ class OfficesManager(RegionsManager):
         else: del kwargs['name']
         return self.createRegion(date=date, auto=auto, name=name, **kwargs)
 
-class DCOffice(Office):
+class SubOffice(Region):
+    DEPARTMENT = 'SO'
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        
+    @property
+    def office(self): return self.manager
+    @property
+    def spacedID(self): return f'{self.sup.spacedID} | {self.DEPARTMENT} '
+
+class DCOffice(SubOffice):
     AccountsManager = DCOfficeAccountsManager
     Manager = 'DCOfficesManager'
-    MultiSubRegionsManager = False
     SubRegionsManager = AreasManager
     PersonsManager = DCManagerDetailsManager
-    @property
-    def regionsManagers(self): return [self.subRegionsManager]
+    DEPARTMENT = 'DC'
+    
     @property
     def areasManager(self): return self.subRegionsManager
-
-class DCOfficesManager(OfficesManager):
-    regionClass = DCOffice
     
-    def createDCOffice(self, **kwargs):
-        name = f'{self.master.name} DC Office'
-        return self.createOffice(name=name, **kwargs)
+    
+
+
+# class DCOfficesManager(OfficesManager):
+#     regionClass = DCOffice
+    
+#     def createDCOffice(self, **kwargs):
+#         name = f'{self.master.name} DC Office'
+#         return self.createOffice(name=name, **kwargs)
 
 class CoopOffice(Office):
     AccountsManager = CoopOfficeAccountsManager
@@ -84,20 +102,19 @@ class CoopOffice(Office):
     SubRegionsManager = UnitsManager
     MultiSubRegionsManager = False
     PersonsManager = CoopManagerDetailsManager
+    DEPARTMENT = 'COOP'
     
-    def addUnit(cls, unit):
+    def addUnit(self, unit):
         pass
-    @property
-    def regionsManagers(self): return [self.subRegionsManager]
     @property
     def unitsManager(self): return self.subRegionsManager
 
-class CoopOfficesManager(OfficesManager):
-    regionClass = CoopOffice
+# class CoopOfficesManager(OfficesManager):
+#     regionClass = CoopOffice
     
-    def createCoopOffice(self, **kwargs):
-        name = f'{self.master.name} COOP Office'
-        office = self.createOffice(name=name, **kwargs)
-        return office
+#     def createCoopOffice(self, **kwargs):
+#         name = f'{self.master.name} COOP Office'
+#         office = self.createOffice(name=name, **kwargs)
+#         return office
 
 

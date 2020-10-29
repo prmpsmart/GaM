@@ -391,7 +391,7 @@ class PRMP_Theme:
             
             self.configure(**_dict)
 
-        elif wt in ['Combobox', 'Progressbar', 'Scrollbar']:
+        elif wt in ['Combobox', 'Progressbar', 'Scrollbar', 'Treeview']:
             if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
             if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
             style = ttk.Style()
@@ -415,6 +415,9 @@ class PRMP_Theme:
                 if self.orient == 'h': style_name = "Horizontal.TProgressbar"
                 else: style_name = "Vertical.TProgressbar"
                 style.configure(style_name, background=a, troughcolor=b, troughrelief='groove', borderwidth=2, thickness=1)
+            elif wt == 'Scrollbar': pass
+            
+            elif wt == 'Treeview': return
 
         else: self.configure(background=background)
         
@@ -850,29 +853,6 @@ class PRMP_Style(ttk.Style):
         super().theme_use(theme)
 PS = PRMP_Style
 
-class PRMP_Font:
-    fancy = ""
-    font11b = "-family {Times New Roman} -size 11 -weight bold"
-    font8b = "-family {Times New Roman} -size 8 -weight bold"
-    font8 = "-family {Times New Roman} -size 8 "
-    font9 = "-family {Times New Roman} -size 9 "
-    font9b = "-family {Times New Roman} -size 9 -weight bold"
-    font10 = "-family {Courier New} -size 10"
-    font10b = "-family {Times New Roman} -size 10 -weight bold"
-    font22b = "-family {Times New Roman} -size 13 -weight bold"
-    font12b = "-family {Times New Roman} -size 12 -weight bold"
-    font22b = "-family {Times New Roman} -size 13 -weight bold"
-    font14b = "-family {Times New Roman} -size 14 -weight bold"
-    font15b = "-family {Times New Roman} -size 15 -weight bold"
-    font17b = "-family {Times New Roman} -size 16 -weight bold"
-    font17b = "-family {Times New Roman} -size 17 -weight bold"
-    font9 =  "-family {Times New Roman} -size 9 -weight bold -slant roman -underline 0 -overstrike 0"
-
-    font11u = "-family {Times New Roman} -size 11 -weight bold -slant roman -underline 0 -overstrike 0"
-    font22 = "-family {Times New Roman} -size 22 -weight bold -slant roman -underline 0 -overstrike 0"
-    font14 = "-family {Times New Roman} -size 14 -weight bold -slant roman -underline 0 -overstrike 0"
-PF = PRMP_Font
-
 class PRMP_Widget(PRMP_Theme):
     _top = 'top'
     _left = 'left'
@@ -964,10 +944,9 @@ class PRMP_Widget(PRMP_Theme):
         for one in group: one.addToggleGroup(group)
     
     @property
-    def remainFromTitleBar(self):
+    def y_h(self):
         y = self.kwargs.get('geo')[1]
-        h = (y - 25) / y
-        return h
+        return (25, y-50)
     
     def useFont(self, font=None):
         if font: self.font = Font(**font)
@@ -989,8 +968,10 @@ class PRMP_Widget(PRMP_Theme):
     
     def addTitleBar(self, title=''):
         if self.titleBar:
-            self.titleBar.set(title)
+            self.titleBar.set(title or self.titleText)
+            self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
             return
+        
         fr = F(self)
         self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
         self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
@@ -1010,7 +991,9 @@ class PRMP_Widget(PRMP_Theme):
     def editStatus(self, text): self.statusBar.set(text)
     
     def addStatusBar(self):
-        if self.statusBar: return
+        if self.statusBar:
+            self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
+            return
         fr = F(self)
         self.statusBar = L(fr, text='Status' or self.statusText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_STATUS_FONT)
         self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
@@ -1020,8 +1003,6 @@ class PRMP_Widget(PRMP_Theme):
         down = B(fr, text=self.downArrow, command=self.nextTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         down.place(relx=.96, rely=0, relh=1, relw=.04)
         
-        # y = self.kwargs.get('geo')[1]
-        # fr.place(x=0, y=y - 25, h=25, relw=1)
         self.placeStatusBar()
         
     
@@ -1034,7 +1015,9 @@ class PRMP_Widget(PRMP_Theme):
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
         
 
-    def bindExit(self): self.bind_all('<Control-/>', exit)
+    def bindExit(self):
+        def ex(e=0): os.sys.exit()
+        self.bind_all('<Control-/>', ex)
     
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
@@ -1050,7 +1033,7 @@ class PRMP_Widget(PRMP_Theme):
     
     PRMP_ELEMENT = PRMP_WIDGET    
     
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, asb=0, **kwargs):
+    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, asb=0, be=1, **kwargs):
         
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
@@ -1070,6 +1053,7 @@ class PRMP_Widget(PRMP_Theme):
             
         if asb: self.addStatusBar()
             
+        if be: self.bindExit()
         
         self.side = side
         
@@ -1130,7 +1114,6 @@ class PRMP_Widget(PRMP_Theme):
             if geometry: self.setGeometry(self._geometry)
         
         self.setGeometry(self.lastPoints)
-    
     
     def addTip(self, tip='Tip', tipGeo=(100, 20), font=PTh.DEFAULT_FONT, delay=0, follow=True):
         from .commons import ToolTip
@@ -1468,7 +1451,7 @@ class PRMP_Scrollbar(ttk.Scrollbar, PRMP_Widget):
         ttk.Scrollbar.__init__(self, master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
         
-        PS = PRMP_Scrollbar
+PS = PRMP_Scrollbar
 
 class PRMP_Text(tk.Text, PRMP_Widget):
     
@@ -1479,6 +1462,15 @@ class PRMP_Text(tk.Text, PRMP_Widget):
     def set(self, values): self.insert(0.0, values)
     
 PTx = PRMP_Text
+
+
+class PRMP_Treeview(ttk.Treeview, PRMP_Widget):
+    
+    def __init__(self, master=None, **kwargs):
+        ttk.Treeview.__init__(self, master, **kwargs)
+        PRMP_Widget.__init__(self, **kwargs)
+        
+PTv = PRMP_Treeview
 
 
 class ImageWidget:
