@@ -47,7 +47,6 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
             x, y = geo[:2]
             xbtn = B(self, text='Submit', command=command)
             xbtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
-            self.childWidgets.append(xbtn)
     
     def addEditButton(self, command=None):
         geo = self.kwargs.get('geo')
@@ -55,7 +54,6 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
             x, y = geo[:2]
             self.editBtn = xbtn = Cb(self, text='Edit', command=self.editInput)
             xbtn.place(x=10 , y=y-40, h=30, w=60)
-            self.childWidgets.append(xbtn)
     
     def processInput(self):
         result = {}
@@ -78,6 +76,7 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
             for widgetName in self.resultsWidgets:
                 wid = self.__dict__.get(widgetName)
                 if wid: wid.disabled()
+            # self.unlight()
 
 class CalendarDialog(PRMP_Dialog):
     _both = '◄►'
@@ -226,7 +225,6 @@ class CalendarDialog(PRMP_Dialog):
             x = col * w
             d = L(fr, text=dayAbbr, relief='groove', background=self.header_bg, foreground=self.header_fg)
             d.place(relx=x, rely=.1, relw=w, relh=.15)
-            self.childWidgets.append(d)
             col += 1
         
         h = .75 / 6
@@ -239,8 +237,6 @@ class CalendarDialog(PRMP_Dialog):
             btn.place(relx=x, rely=y, relw=w, relh=h)
             self.daysButtons.append(btn)
             
-        self.childWidgets += self.daysButtons
-        self.childWidgets += [fr]
         
         self.reset = self.daysButtons[-4]
         self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', notPart=1)
@@ -307,7 +303,8 @@ class PRMP_MsgBox(PRMP_Toplevel):
         self.addTitleBar()
         
         self.label = L(self, text=message, bitmap='')
-        self.label.place(relx=0, rely=.15, relh=.6, relw=1)
+        x, w = self.x_w
+        self.label.place(x=x, y=30, relh=.6, w=w)
         self.bitmap = L(self.label, bitmap=self.getType(_type), relief='flat')
         self.bitmap.place(relx=.84, rely=.2, relh=.6, relw=.15)
 
@@ -321,8 +318,10 @@ class PRMP_MsgBox(PRMP_Toplevel):
         self.no = B(self, text='No', command=self.noCom)
         self.no.place(relx=.77, rely=.8, relh=.15, relw=.17)
         
-        
+        self.paint()
         self._isDialog()
+        
+        
     def getType(self, _type):
         if _type in self._bitmaps: return _type
         elif _type in self._xbms: return f'@{self._xbms[_type]}'

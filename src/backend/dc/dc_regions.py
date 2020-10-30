@@ -36,7 +36,8 @@ class Client(DCRegion):
         self.__detail = ClientDetail(self, **kwargs)
         self.__cardDues = CardDues(self, cardDue)
 
-    def __str__(self): return f"{self.manager} | {self.className}({self.name})"
+    # def __str__(self): return f"{self.manager} | {self.className}({self.name})"
+    def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     @property
     def spacedID(self): return f'{self.sup.spacedID} | C{self.number}'
     @property
@@ -82,7 +83,8 @@ class Area(DCRegion):
         super().__init__(manager, number=number, date=date, nameFromNumber=True, **kwargs)
         self.__otherName = f'DC {self.number}'
         
-    def __str__(self): return f'{self.manager} | {self.className}({self.name})'
+    def __str__(self): return f'{self.manager.master} | {self.name}'
+    
     @property
     def spacedID(self): return f'{self.sup.spacedID} | A{self.number}'
     @property

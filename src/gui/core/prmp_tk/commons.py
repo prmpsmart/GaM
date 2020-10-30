@@ -70,8 +70,8 @@ class ToolTip:
         # self.parent.state('normal')
 
 class SolidScreen(Tk):
-    def __init__(self, side='top-center', bd=12, geo=(500, 500),**kwargs):
-        super().__init__(be=1, tm=1, geo=geo, gaw=1, side=side, atb=1, asb=1, **kwargs)
+    def __init__(self, side='top-center', bd=12, geo=(),**kwargs):
+        super().__init__(tm=1, gaw=1, geo=geo or (500, 500), side=side, atb=1, asb=1, **kwargs)
         
         self.frame = F(self, relief='solid')
         self.frame['bd'] = 12

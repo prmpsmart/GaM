@@ -3,13 +3,80 @@ from .records import Salary, SalariesManager
 import os
 from hashlib import sha224
 
+class Person(Mixins):
+    Manager = 'PersonsManager'
+    
+    __male = 'male', 'm'
+    __female = 'female', 'f'
+    
+    def __init__(self, manager=None, gender='n', phone='', image=None, email='', address='', date=None, name='', **kwargs):
+        
+        if isinstance(manager, str): pass
+        elif isinstance(manager, Region): self.__date = manager.date
+        else: assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}'
+        gender = gender.lower()
+        
+        if gender in self.__male:  self.__gender = self.__male[0].title()
+        elif gender in self.__female:  self.__gender = self.__female[0].title()
+        
+        else: self.__gender = 'Neutral'
+        
+        self.__name = name
+        self.__phone = phone
+        if image:
+            from ...gui.core.prmp_tk.pics import ImageFile
+            assert os.path.isfile(image) and os.path.splitext(image)[1] in ['.png', 'jpeg', '.jpg', '.gif', '.xbm'], f'{image} file given is not a valid picture file.'
+            self.__image = ImageFile(image)
+        else: self.__image = None
+        self.__email = email
+        self.__address = address
+        self.__manager = manager
+    
+    def __str__(self): return f'{self.manager} | {self.className}({self.name})'
+    
+    @property
+    def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
+    
+    @property
+    def name(self): 
+        if not self.__name: return self.manager.name
+        return self.__name
+    @property
+    def manager(self): return self.__manager
+    @property
+    def gender(self): return self.__gender
+    @property
+    def address(self): return self.__address
+    @address.setter
+    def address(self, addr):
+        assert addr, 'Address must be str and not empty.'
+        self.__address = addr
+    @property
+    def image(self): return self.__image
+    @property
+    def email(self): return self.__email
+    @email.setter
+    def email(self, em): 
+        # confirm if email is valid
+        self.__email = em
+    @property
+    def phone(self): return self.__phone
+    @phone.setter
+    def phone(self, number):
+        assert number, 'Number must be valid.'
+        # confirm if number is valid
+        self.__phone = number
+    
+    def show(self):
+        pass
+
+
 class Region(Mixins):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
     PersonsManager = None
     Person = None
-    MultiSubRegionsManager = False
     
     
     def __init__(self, manager=None, number=None, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, **kwargs):
@@ -21,6 +88,10 @@ class Region(Mixins):
         self.__manager = manager
         self.__number = number
         self.__sup = sup
+        self.__person = None
+        self.__personsManager = None
+        self.__subRegionsManager = None
+        
         self.__name = name if not nameFromNumber else f'{self.className} {number}'
         self.__location = location
         self.__date = date
@@ -30,17 +101,16 @@ class Region(Mixins):
         self.__accountsManager = self.AccountsManager(self, **kwargs)
         
         
-        if self.SubRegionsManager or self.MultiSubRegionsManager:
-            if self.MultiSubRegionsManager: self.__subRegionsManager = None
-            else: self.__subRegionsManager = self.SubRegionsManager(self)
-            self.__person = None
-            self.__personsManager = self.PersonsManager(self)
+        if self.SubRegionsManager:
+            self.__subRegionsManager = self.SubRegionsManager(self)
+            
+            if self.PersonsManager: self.__personsManager = self.PersonsManager(self)
+            
         else:
-            self.__subRegionsManager = None
-            self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
-            self.__personsManager = None
+            if self.Person: self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
             
     def __getitem__(self, num): return self.accountsManager[num]
+    
     def __len__(self): return len(self.accountsManager)
     
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
@@ -82,6 +152,9 @@ class Region(Mixins):
     def hierachy(self): return self.sups + [self]
     
     @property
+    def hie(self): return self.hierachy
+    
+    @property
     def hierachyNames(self): return [d.name for d in self.hierachy]
     
     @property
@@ -113,7 +186,10 @@ class Region(Mixins):
     @property
     def region(self): return self.manager.region
     @property
-    def person(self): return self.__person
+    def person(self):
+        if self.personsManager: return self.personsManager.lastPerson
+        return self.__person
+        
     @property
     def personsManager(self): return self.__personsManager
     @property
@@ -125,13 +201,18 @@ class Region(Mixins):
     @property
     def subRegionsManager(self): return self.__subRegionsManager
     @property
-    def regionsManagers(self): return [self.subRegionsManager]
+    def subRegions(self):
+        if self.subRegionsManager: return self.subRegionsManager[:]
+    @property
+    def subRegionsCount(self):
+        if self.subRegions: return len(self.subRegions)
     @property
     def manager(self): return self.__manager
     @property
     def date(self): return self.__date
     @property
     def lastAccount(self): return self.accountsManager.lastAccount
+    
     @property
     def accountsManager(self): return self.__accountsManager
     
@@ -209,7 +290,6 @@ class RegionsManager(Mixins):
     def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
     
     @property
-    
     def master(self): return self.__master
     @property
     def region(self): return self.master
@@ -237,6 +317,7 @@ class RegionsManager(Mixins):
     
     def createRegion(self, date=None, auto=None, **kwargs):
         if (DateTime.checkDateTime(date, dontRaise=True) == False) and (auto == True): date = DateTime.createDateTime(auto=auto)
+        
         region = self.regionClass(manager=self, date=date, number=len(self)+1, sup=self.region, **kwargs)
         
         self.addRegion(region)
@@ -326,72 +407,8 @@ class RegionsManager(Mixins):
     def sortRegionsAccountsIntoYears(self):
         pass
 
-class Person(Mixins):
-    Manager = 'PersonsManager'
-    
-    __male = 'male', 'm'
-    __female = 'female', 'f'
-    
-    def __init__(self, manager=None, gender='n', phone='', image=None, email='', address='', date=None, name=None, **kwargs):
-        
-        if isinstance(manager, str): pass
-        elif isinstance(manager, Region): self.__date = manager.date
-        else: assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}'
-        gender = gender.lower()
-        
-        if gender in self.__male:  self.__gender = self.__male[0].title()
-        elif gender in self.__female:  self.__gender = self.__female[0].title()
-        
-        else: self.__gender = 'Neutral'
-        
-        self.__name = name
-        self.__phone = phone
-        if image:
-            from ...gui.core.prmp_tk.pics import ImageFile
-            assert os.path.isfile(image) and os.path.splitext(image)[1] in ['.png', 'jpeg', '.jpg', '.gif', '.xbm'], f'{image} file given is not a valid picture file.'
-            self.__image = ImageFile(image)
-        else: self.__image = None
-        self.__email = email
-        self.__address = address
-        self.__manager = manager
-    
-    def __str__(self): return f'{self.manager} | {self.className}({self.name})'
-    
-    @property
-    def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
-    
-    @property
-    def name(self): 
-        if not self.__name: return self.manager.name
-        return self.__name
-    @property
-    def manager(self): return self.__manager
-    @property
-    def gender(self): return self.__gender
-    @property
-    def address(self): return self.__address
-    @address.setter
-    def address(self, addr):
-        assert addr, 'Address must be str and not empty.'
-        self.__address = addr
-    @property
-    def image(self): return self.__image
-    @property
-    def email(self): return self.__email
-    @email.setter
-    def email(self, em): 
-        # confirm if email is valid
-        self.__email = em
-    @property
-    def phone(self): return self.__phone
-    @phone.setter
-    def phone(self, number):
-        assert number, 'Number must be valid.'
-        # confirm if number is valid
-        self.__phone = number
-    
-    def show(self):
-        pass
+
+
 
 class PersonsManager(RegionsManager):
     regionClass = Person

@@ -23,7 +23,6 @@ class ThirdPartySuretyDialog(PersonDialog):
         self.relationshipWithMember = LE(other, text='Relationship with Member', orient='h', longent=.6, relx=.01, rely=.73, relh=.1, relw=.7)
         self.knowledgeOfMember = LE(other, text='Knowledge Of Member', orient='h', longent=.6, relx=.01, rely=.84, relh=.1, relw=.7)
         
-        self.childWidgets += [other]
         self.resultsWidgets += ['dob', 'officeAddress', 'religion', 'homeTown', 'stateOfOrigin', 'occupation', 'knowledgeOfMember', 'relationshipWithMember', 'maritalStatus']
 
 

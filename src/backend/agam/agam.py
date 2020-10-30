@@ -21,6 +21,8 @@ class AGAM(Region):
         
     def __str__(self): return f'{self.name}'
     @property
+    def master(self): return 4
+    @property
     def officesManager(self): return self.subRegionsManager
     @property
     def managersManager(self): return self.detailsManager

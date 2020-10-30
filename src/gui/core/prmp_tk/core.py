@@ -12,10 +12,26 @@ from PIL.ImageTk import Image, PhotoImage, BitmapImage
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
+class GUIMixins:
+    
+    def AlphabetsSwitch(self):
+        d = {}
+        for n in range(65, 91):
+            d[chr(n)] = chr(n+32)
+            d[chr(n+32)] = chr(n)
+        return d
+    
+    def propertize(self, name):
+        if name:
+            name = str(name)
+            nm = name.replace(' ', '')
+            fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
+            return fin
 
+GM = GUIMixins
 
 # Excerpt from PRMPSMART theme implementation of his theme.
-class PRMP_Theme:
+class PRMP_Theme(GUIMixins):
     # exerpt from PRMPSMART theming engine
     
     BLUES = ("#082567", "#0A37A3", "#00345B")
@@ -908,16 +924,19 @@ class PRMP_Widget(PRMP_Theme):
     
     def light(self): self.configure(bg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, fg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
     
-    def unlight(self): self.paint()
+    def unlight(self): self.configure(bg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, fg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
     
     def switchOne(self, e=0):
         val = self.var.get()
         if self.onFg == False:
             self.light()
+            self.var.set('0')
             self.onFg = True
         elif self.PRMP_ELEMENT == 'Radiobutton' and val == self.value: self.light()
-        elif val not in ['1', self.value]: self.light()
-        else: self.unlight()
+        elif val != self.value: self.unlight()
+        else:
+            self.unlight()
+            self.onFg = False
     
     def checked(self, e=0):
         if self.variable:
@@ -946,7 +965,11 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def y_h(self):
         y = self.kwargs.get('geo')[1]
-        return (25, y-50)
+        return (30, y-60)
+    @property
+    def x_w(self):
+        x = self.kwargs.get('geo')[0]
+        return (2, (x-4)/x)
     
     def useFont(self, font=None):
         if font: self.font = Font(**font)
@@ -978,7 +1001,10 @@ class PRMP_Widget(PRMP_Theme):
         
         xbtn = B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
-        fr.place(x=0, y=0, h=25, relw=1)
+        
+        x, w = self.x_w
+        y, h = self.y_h
+        fr.place(x=0, y=0, h=y, relw=1)
     
     def prevTheme(self):
         theme, index = self._prevTheme()
@@ -1009,7 +1035,7 @@ class PRMP_Widget(PRMP_Theme):
     def placeStatusBar(self):
         if self.statusBar:
             y = self.kwargs.get('geo')[1]
-            self.statusBar.master.place(x=0, y=y - 25, h=25, relw=1)
+            self.statusBar.master.place(x=0, y=y - 30, h=30, relw=1)
     
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
@@ -1034,7 +1060,7 @@ class PRMP_Widget(PRMP_Theme):
     PRMP_ELEMENT = PRMP_WIDGET    
     
     def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, asb=0, be=1, **kwargs):
-        
+
         if geo: geometry = geo
         if gaw: grabAnyWhere = gaw
         if ntb: noTitleBar = ntb
@@ -1410,9 +1436,10 @@ E = PE = Entry = PRMP_Entry
 
 class PRMP_Frame(tk.Frame, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
-        tk.Frame.__init__(self, master=master, **kwargs)
+    def __init__(self, master=None, bd=2, **kwargs):
+        tk.Frame.__init__(self, master=master, bd=bd, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
+        
 F = PF = Frame = PRMP_Frame
 
 class PRMP_Label(tk.Label, PRMP_Widget):
@@ -1425,9 +1452,10 @@ L = PL = Label = PRMP_Label
 
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, **kwargs):
-        tk.LabelFrame.__init__(self, master=master, **kwargs)
+    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, **kwargs):
+        tk.LabelFrame.__init__(self, master=master, bd=bd, **kwargs)
         PRMP_Widget.__init__(self, font=font)
+        
 LF = LabelFrame = PRMP_LabelFrame
 
 class PRMP_Message(tk.Message, PRMP_Widget):
@@ -1574,7 +1602,9 @@ class FillWindow:
             for key, value in values.items():
                 if key in self.resultsWidgets:
                     wid = self.__dict__.get(key)
-                    if wid: wid.set(value)
+                    if wid:
+                        try: wid.set(value)
+                        except Exception as er: print(f'ERROR {er}.')
             self.values = values
             return True
         else:
