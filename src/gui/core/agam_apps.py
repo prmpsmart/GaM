@@ -212,6 +212,7 @@ class Hierachy(PRMP_Frame):
         rm = region.subRegions
         name, *columns = self.getColumns(region)
         tag = 'prmp'
+        # the fourth value of this [text, attr, width, value] can be used in sorting, it wont insert the region and its columns both into self.tree and self.ivd if not equal to value
         item = self.insert(parent, text=name, values=columns, tag=tag, open=True)
         self.tag_config(tag)
 
