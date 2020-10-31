@@ -1,3 +1,6 @@
+from .errors import Errors
+
+
 class Mixins:
     naira = chr(8358)
     dollar = chr(36)
@@ -67,6 +70,100 @@ class Mixins:
     @property
     def week(self): return self.date.week
 
+
+class RA_Mixins:
+    
+    def __init__(self, master=None, number=None, previous=None, date=None):
+        from .date_time import DateTime
+        if date == None: date = DateTime.now()
+        DateTime.checkDateTime(date)
+        self.__date = date
+        self.__master = master
+        self.__number = number
+        self.__previous = previous
+        self.__next = None
+        
+    @property
+    def master(self): return self.__master
+    @property
+    def number(self): return self.__number
+    @property
+    def date(self): return self.__date
+    @property
+    def previous(self): return self.__previous
+    @property
+    def next(self): return self.__next
+    @next.setter
+    def next(self, next_):
+        if self.__next == None: self.__next = next_
+        else: raise Errors('A next is already set.')
+
+
+class RAM_Mixins:
+    subClass = RA_Mixins
+    
+    def __init__(self, master=None):
+        assert master != None
+        self.__master = master
+        self.__subs = []
+    
+    def __getitem__(self, num): return self.subs[num]
+    def __len__(self): return len(self.subs)
+    
+    @property
+    def master(self): return self.__master
+    @property
+    def subs(self): return self.__subs
+    
+    @property
+    def last(self):
+        pass
+    
+    @property
+    def first(self):
+        if len(self):
+            self.subs.sort()
+            first_ = self[-1]
+            assert first_.previous == None, f'{self} is not the first.'
+            return first_
+        
+    @property
+    def last(self):
+        if len(self):
+            self.subs.sort()
+            last_ = self[-1]
+            assert last_.next == None, f'{self} is not the last.'
+            return last_
+    
+    
+    def addSub(self, sub): self.__subs.append(sub)
+    
+    def getSub(self, attrs_vals={}):
+        if len(self):
+            for sub in self:
+                count = []
+                for attr, val in attrs_vals.item():
+                    if val == None: v = True
+                    
+                    elif 'date' in attr:
+                        w = attr.split('-')[1]
+                        if w == d: v = sub.date.isSameDay(val)
+                        elif w == m: v = sub.date.isSameMonth(val)
+                        elif w == y: v = sub.date.isSameYear(val)
+                        elif w == t: v = sub.date.isSameDate(val)
+                        
+                    else: v = getattr(sub, attr) == val
+                        
+                    count.append(v)
+
+                if count.count(True) == len(count): return sub
+    
+    def createSub(self, date=None, **kwargs):
+        last = self.last
+        sub = self.subClass(self, date=date, previous=last, number=len(self)+1, **kwargs)
+        if last: last.next = sub
+        
+        self.add(sub)
 
 
 

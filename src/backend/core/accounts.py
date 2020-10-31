@@ -1,4 +1,5 @@
-from .date_time import DateTime, CompareByDate, Mixins
+from .date_time import DateTime, CompareByDate
+from .mixins import Mixins, RA_Mixins, RAM_Mixins
 from .errors import Errors
 
 # Account is the list of Records recieved for a month.
@@ -15,6 +16,7 @@ from .errors import Errors
 class DailyAccounts(Mixins):
     # 
     pass
+
 
 class WeeklyAccounts(Mixins):
     
@@ -51,18 +53,12 @@ class MonthlyAccounts(Mixins):
 class YearlyAccounts(Mixins):
     pass
 
-class Account(CompareByDate):
+class Account(RA_Mixins, CompareByDate):
     
-    def __init__(self, manager=None, date=None, previous=None, number=0, **kwargs):
+    def __init__(self, manager, date=None, previous=None, number=0, **kwargs):
         assert manager != None, 'No manager passed.'
-        self.__manager = manager
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
-        self.__date = date
-        self.__nextAccount = None
-        self.__previousAccount = previous
-        self.__number = number
-        
+        RA_Mixins.__init__(self, master, number=number, previous=previous, date=date)
+    
     def __eq__(self, account):
         if account == None: return False
         return ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
@@ -73,23 +69,10 @@ class Account(CompareByDate):
     @property
     def region(self): return self.manager.region
     @property
-    def number(self): return self.__number
-    @property
     def recordsManagers(self): self.notImp()
-    @property
-    def date(self): return self.__date
-    @property
-    def nextAccount(self): return self.__nextAccount
-    @nextAccount.setter
-    def nextAccount(self, account):
-        if self.__nextAccount == None: self.__nextAccount = account
-        else: raise Errors.AccountError('A next account is already set.')
     
     @property
-    def previousAccount(self): return self.__previousAccount
-    
-    @property
-    def manager(self): return self.__manager
+    def manager(self): return self.master
     
     @property
     def recordsManagersAsList(self): return [int(recordsManager) for recordsManager in self]
@@ -147,44 +130,31 @@ class Account(CompareByDate):
         pass
 
 
-class AccountsManager(Mixins):
+class AccountsManager(RAM_Mixins, Mixins):
     accountClass = Account
     
     def __init__(self, region, autoAccount=True, **kwargs):
-        self.__region = region
-        self.__accounts = []
-        
+        RAM_Mixins.__init__(region)
         if autoAccount == True: self.createAccount(auto=True, **kwargs)
+        
     def __eq__(self, manager):
         if manager == None: return False
         return self.region == manager.region
-    
-    def __getitem__(self, num): return self.accounts[num]
-    def __len__(self): return len(self.accounts)
+   
     def __str__(self):
         if self.region != None: return f'{self.region} | {self.className}'
         return f'{self.className}'
     
     @property
-    def accounts(self): return self.__accounts
+    def accounts(self): return self.subs
     @property
-    def region(self): return self.__region
+    def region(self): return self.master
    
     @property
-    def firstAccount(self):
-        if len(self):
-            self.accounts.sort()
-            firstAccount_ = self[-1]
-            assert firstAccount_.previousAccount == None, f'This account {self} is not the first account'
-            return firstAccount_
+    def firstAccount(self): return self.first
         
     @property
-    def lastAccount(self):
-        if len(self):
-            self.accounts.sort()
-            lastAccount_ = self[-1]
-            assert lastAccount_.nextAccount == None, f'This account {self} is not the last account'
-            return lastAccount_
+    def lastAccount(self): return self.last
     
     @property
     def overAllAccounts(self):
@@ -204,22 +174,11 @@ class AccountsManager(Mixins):
                 
             return listOfTuple
 
-    def addAccount(self, account):
-        self.__accounts.append(account)
-        self.__lastAccount = account
+    def addAccount(self, account): return self.addSub(account)
         
-    def createAccount(self, date=None, auto=True, **kwargs):
-        if (DateTime.checkDateTime(date, dontRaise=True) == False) and (auto == True): date = DateTime.createDateTime(auto=auto)
-        lastAccount = self.lastAccount
-        account = self.accountClass(manager=self, date=date, previous=lastAccount, number=len(self), **kwargs)
-        if lastAccount: lastAccount.nextAccount = account
-        self.addAccount(account)
-        return account
+    def createAccount(self, **kwargs): return self.createSub( **kwargs)
     
-    def getAccount(self, month):
-        if len(self):
-            for account in self:
-                if account.date.isSameMonth(month): return account
+    def getAccount(self, month): return self.getSub({'date-m': month})
     
     def balanceAccount(self, month=None):
         if month:

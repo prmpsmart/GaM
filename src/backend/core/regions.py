@@ -1,9 +1,9 @@
-from .accounts import AccountsManager, DateTime, Mixins, Errors
+from .accounts import AccountsManager, DateTime, Mixins, Errors, RA_Mixins, RAM_Mixins
 from .records import Salary, SalariesManager
 import os
 from hashlib import sha224
 
-class Person(Mixins):
+class Person(Mixins, RA_Mixins):
     Manager = 'PersonsManager'
     
     __male = 'male', 'm'
@@ -71,7 +71,7 @@ class Person(Mixins):
         pass
 
 
-class Region(Mixins):
+class Region(RA_Mixins, Mixins):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
@@ -79,22 +79,18 @@ class Region(Mixins):
     Person = None
     
     
-    def __init__(self, manager=None, number=None, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, **kwargs):
+    def __init__(self, manager, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, **kwargs):
+        
         if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
+        RA_Mixins.__init__(self, master, number=number, previous=previous, date=date)
         
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
-        
-        self.__manager = manager
-        self.__number = number
         self.__sup = sup
         self.__person = None
         self.__personsManager = None
         self.__subRegionsManager = None
         
-        self.__name = name if not nameFromNumber else f'{self.className} {number}'
+        self.__name = name if not nameFromNumber else f'{self.className} {self.number}'
         self.__location = location
-        self.__date = date
         
         self.__uniqueID = sha224(self.id.encode()).hexdigest()
         
@@ -108,7 +104,7 @@ class Region(Mixins):
             
         else:
             if self.Person: self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
-            
+    
     def __getitem__(self, num): return self.accountsManager[num]
     
     def __len__(self): return len(self.accountsManager)
@@ -165,26 +161,32 @@ class Region(Mixins):
     def gender(self):
         if self.person: return self.person.gender
         else: return str(self)
+    
     @property
     def phone(self):
         if self.person: return self.person.phone
         else: return str(self)
+    
     @property
     def email(self):
         if self.person: return self.person.email
         else: return str(self)
+    
     @property
     def address(self):
         if self.person: return self.person.address
         else: return str(self)
+    
     @property
     def image(self):
         if self.person: return self.person.image
         else: return str(self)
     
-    def getRegion(self, **kwargs): return self.subRegionsManager.getRegion(**kwargs)
+    def getRegion(self, **kwargs): return self.getSubReg(**kwargs)
+    
     @property
     def region(self): return self.manager.region
+    
     @property
     def person(self):
         if self.personsManager: return self.personsManager.lastPerson
@@ -204,12 +206,11 @@ class Region(Mixins):
     def subRegions(self):
         if self.subRegionsManager: return self.subRegionsManager[:]
     @property
-    def subRegionsCount(self):
-        if self.subRegions: return len(self.subRegions)
+    def subRegionsCount(self): return len(self.subRegions)
+        
     @property
-    def manager(self): return self.__manager
-    @property
-    def date(self): return self.__date
+    def manager(self): return self.master
+    
     @property
     def lastAccount(self): return self.accountsManager.lastAccount
     
@@ -222,10 +223,12 @@ class Region(Mixins):
     
     def subRegionsActiveByMonth(self, month):
         subRegions = []
-        for subRegion in self.subRegionsManager:
+        for subRegion in self:
+        # for subRegion in self.subRegionsManager:
             monthAccount = subRegion.accountsManager.getAccount(month)
             if monthAccount != None: subRegions.append(subRegion)
         return subRegions
+    
     def sortAccountsByMonth(self, month): return self.accountsManager.sortAccountsByMonth(month)
 
 
@@ -276,13 +279,12 @@ class Region(Mixins):
     def sortSubRegionsAccountsByYear(self): return self.subRegionsManager.sortRegionsAccountsByYear(date)
     def sortSubRegionsAccountsIntoYears(self): return self.subRegionsManager.sortRegionsAccountsIntoYears(date)
 
-class RegionsManager(Mixins):
-    regionClass = Region
+class RegionsManager(RAM_Mixins, Mixins):
+    subClass = Region
     
-    def __init__(self, master=None):
-        assert master != None
+    def __init__(self, master):
+        RAM_Mixins.__init__(self, master)
         self.__master = master
-        self.__regions = []
     
     def __getitem__(self, num): return self.regions[num]
     def __len__(self): return len(self.regions)
@@ -290,38 +292,35 @@ class RegionsManager(Mixins):
     def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
     
     @property
-    def master(self): return self.__master
-    @property
     def region(self): return self.master
     
     @property
-    def date(self): return self.__master.date
+    def date(self): return self.master.date
     
     @property
-    def regions(self): return self.__regions
+    def regions(self): return self.subs
     
-    def addRegion(self, region): self.__regions.append(region)
+    def addRegion(self, region): self.addSub(region)
     
     def getRegion(self, number=None, name=None, phone=None, email=None, image=None):
         ## provide mechanism to scan pictures.
-        for region in self.regions:
-            if number == region.number: return region
-            elif name == region.name: return region
-            elif phone == region.phone: return region
-            elif email == region.email: return region
+        self.getSub(dict(number=number, name=name, phone=phone, email=email, image=image))
+        # for region in self.regions:
+        #     if number == region.number: return region
+        #     elif name == region.name: return region
+        #     elif phone == region.phone: return region
+        #     elif email == region.email: return region
+    @property
+    def lastRegion(self): return self.last
+    @property
+    def firstRegion(self): return self.first
             
     @classmethod
     def getFromAllRegions(cls, number):
         for region in cls.allRegions():
             if region.number == number: return region
     
-    def createRegion(self, date=None, auto=None, **kwargs):
-        if (DateTime.checkDateTime(date, dontRaise=True) == False) and (auto == True): date = DateTime.createDateTime(auto=auto)
-        
-        region = self.regionClass(manager=self, date=date, number=len(self)+1, sup=self.region, **kwargs)
-        
-        self.addRegion(region)
-        return region
+    def createRegion(self, **kwargs): return self.createSub(sup=self.region, **kwargs)
     
     def regionExists(self, **kwargs):
         if self.getRegion(**kwargs): return True
@@ -412,7 +411,8 @@ class RegionsManager(Mixins):
 
 class PersonsManager(RegionsManager):
     regionClass = Person
-    
+    @property
+    def lastPerson(self): return self.lastRegion
     def createPerson(self, **kwargs): return self.createRegion(**kwargs)
 
 class Staff(Region):

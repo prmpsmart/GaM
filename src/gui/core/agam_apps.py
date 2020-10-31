@@ -82,10 +82,151 @@ class RegionRadioCombo(RC):
         return keys
 RRC = RegionRadioCombo
 
+class Hierachy(PRMP_Frame):
+    __shows = ['tree', 'headings']
+    __slots__ = ['tree']
+    
+    def __init__(self, master=None, columns=[], **kwargs):
+        super().__init__(master=master, **kwargs)
+        
+        self.t = self.tree = self.treeview = PRMP_Treeview(self)
+        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=self.treeview.xview)
+        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        
+        xscrollbar.pack(side="bottom", fill="x")
+        self.treeview.pack(side='left', fill='both', expand=1)
+        yscrollbar.pack(side="right", fill="y")
+        bound_to_mousewheel(0, self)
+        
+        self.ivd = self.itemsValuesDict = {}
+        self.firstItem = None
+        self.current = None
+        self.attributes = []
+        
+        self.setColumns(columns)
+        
+        self.bindings()
+    
+    def splitColumns(self, columns):
+        cols = []
+        for col in columns:
+            if isinstance(col, (list, tuple)):
+                if len(col) == 1: cols.append([col[0], '', 20])
+                elif len(col) == 2: cols.append([col[0], col[1], 20])
+                elif len(col) > 2: cols.append([col[0], col[1], col[2]])
+            else: cols.append([col, '', 20])
+        
+        return cols
+    
+    def getColumns(self, region):
+        if region:
+            cols = []
+            for col in self.columns:
+                if col[1]: _attr = col[1]
+                else: _attr = self.propertize(col[0])
+                
+                attr = getattr(region, _attr)
+                
+                cols.append(attr)
+                
+            self.subNone(cols)
+            
+            return cols
+    
+    def zippable(self, columns):
+        le = len(columns[0])
+        innerCols = [[] for _ in range(le)]
+        
+        for col in columns:
+            for c in col:
+                ind = col.index(c)
+                innerCols[ind].append(c)
+        
+        return innerCols
+        
+        
+    def setColumns(self, columns=[]):
+        if columns:
+            cols = [f'#{num}' for num in range(len(columns))]
+            splitedColumns = self.splitColumns(columns)
+            zippable = self.zippable(splitedColumns)
+
+            col_col = zip_longest(cols, *zippable)
+            
+            self.columns = [col[0:] for col in splitedColumns]
+            
+            if len(cols) > 1: self.tvc(columns=cols[1:])
+
+            for c, t, a, w  in col_col:
+                self.tree.heading(c, text=t, anchor='center')
+                self.tree.column(c, width=w, minwidth=10, stretch=1,  anchor="w")
+
+    def bindings(self):
+        self.tree.bind('<<TreeviewSelect>>', self.setSelected)
+        self.tree.bind('<Control-v>', self.viewRegion)
+        self.tree.bind('<Control-V>', self.viewRegion)
+
+    def setSelected(self, e=0):
+        item = self.tree.focus()
+        self.current = self.ivd.get(item)
+        # self.tag_config('prmp', background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
+        return self.current
+
+    def viewRegion(self, e=0):
+        current = self.setSelected()
+        if current:
+            if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
+            else: RegionDetails(self, region=current)
+    
+    def setHeadings(self, headings=[]):
+        for head in headings:
+            self.heading(head.name, head.name)
+    
+    def insert(self, item, position='end',  **kwargs): return self.treeview.insert(item, position, **kwargs)
+    
+    def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
+        font = Font(**font)
+        return self.tree.tag_configure(tagName, font=font, **kwargs)
+    
+    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
+    
+    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
+    
+    def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
+    
+    tvc = Config = treeviewConfig
+    
+    def subNone(self, list_):
+        for li in list_:
+            ind = list_.index(li)
+            if not li: list_[ind] = ''
+    
+    def set(self, region=None, parent=''):
+        
+        rm = region.subRegions
+        columns = self.getColumns(region)
+        tag = 'prmp'
+        item = self.insert(parent, text=region.name, values=columns, tag=tag)
+        self.tag_config(tag)
+
+        self.ivd[item] = region
+        
+        if self.firstItem == None:
+            self.firstItem = item
+            self.treeview.focus(self.firstItem)
+        if rm:
+            for rg in rm: self.set(rg, item)
+
+H = Hierachy
+
+PRMP_Toplevel = PRMP_Tk
+
 class RegionDetails(PRMP_Toplevel, FillWindow):
     
     def __init__(self, master=None, title='Region Details', geo=(600, 250), values={}, region=None, **kwargs):
-        PRMP_Toplevel.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
+        
+        PRMP_Toplevel.__init__(self, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         FillWindow.__init__(self, values=values)
         
         self.region = region
@@ -218,107 +359,3 @@ class RegionDetails(PRMP_Toplevel, FillWindow):
         self.expand()
 
 
-class Hierachy(PRMP_Frame):
-    __shows = ['tree', 'headings']
-    __slots__ = ['tree']
-    def __init__(self, master=None, columns=[], colsWidths=[], **kwargs):
-        super().__init__(master=master, **kwargs)
-        
-        self.t = self.tree = self.treeview = PRMP_Treeview(self)
-        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=self.treeview.xview)
-        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=self.treeview.yview)
-        self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
-        
-        xscrollbar.pack(side="bottom", fill="x")
-        self.treeview.pack(side='left', fill='both', expand=1)
-        yscrollbar.pack(side="right", fill="y")
-        bound_to_mousewheel(0, self)
-        
-        self.ivd = self.itemsValuesDict = {}
-        self.firstItem = None
-        self.current = None
-        self.attributes = []
-        
-        self.setColumns(columns, colsWidths)
-        
-        self.bindings()
-        
-    def setColumns(self, columns=[], colsWidths=[]):
-        if columns:
-            cols = [f'#{num}' for num in range(len(columns))]
-            col_col = zip_longest(cols, columns, colsWidths)
-            self.columns = columns[1:]
-            
-            if len(cols) > 1: self.tvc(columns=self.columns)
-            
-            for c, v, w in col_col:
-                self.tree.heading(c, text=v, anchor='nw')
-                
-                self.tree.column(c, width=w or 20, minwidth=10, stretch=1,  anchor="w")
-        
-    def bindings(self):
-        self.tree.bind('<<TreeviewSelect>>', self.setSelected)
-        self.tree.bind('<Control-v>', self.viewRegion)
-        self.tree.bind('<Control-V>', self.viewRegion)
-
-    def setSelected(self, e=0):
-        item = self.tree.focus()
-        self.current = self.ivd.get(item)
-        # self.tag_config('prmp', background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
-        return self.current
-
-    def viewRegion(self, e=0):
-        current = self.setSelected()
-        if current:
-            if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
-            else: RegionDetails(self, region=current)
-    
-    def setHeadings(self, headings=[]):
-        for head in headings:
-            self.heading(head.name, head.name)
-    
-    def insert(self, item, position='end',  **kwargs): return self.treeview.insert(item, position, **kwargs)
-    
-    def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
-        font = Font(**font)
-        return self.tree.tag_configure(tagName, font=font, **kwargs)
-    
-    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
-    
-    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
-    
-    def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
-    
-    tvc = Config = treeviewConfig
-    
-    def getColumns(self, region):
-        if region:
-            cols = []
-            for col in self.columns:
-                attr = getattr(region, self.propertize(col))
-                cols.append(attr)
-            self.subNone(cols)
-            return cols
-    
-    def subNone(self, list_):
-        for li in list_:
-            ind = list_.index(li)
-            if not li: list_[ind] = ''
-    
-    def test(self, region=None, parent=''):
-        
-        rm = region.subRegions
-        columns = self.getColumns(region)
-        tag = 'prmp'
-        item = self.insert(parent, text=region.name, values=columns, tag=tag)
-        # self.tag_config(tag)
-
-        self.ivd[item] = region
-        
-        if self.firstItem == None:
-            self.firstItem = item
-            self.treeview.focus(self.firstItem)
-        if rm:
-            for rg in rm: self.test(rg, item)
-    
-H = Hierachy

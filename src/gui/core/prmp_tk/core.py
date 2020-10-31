@@ -1294,12 +1294,29 @@ class PRMP_Widget(PRMP_Theme):
         self.resizable(0, 0)
         # self.grab_set()
         self.wait_window()
-PRMP_Window = PRMP_Widget
+
+
+
+
+class PRMP_Window(PRMP_Widget):
+    
+    def __init__(self, master=None, **kwargs):
+        if master:
+            self = tk.Toplevel(master, **kwargs)
+            # 
+        else:
+            self = tk.Tk()
+            # tk.Tk.__init__(self)
+            
+        PRMP_Widget.__init__(self, window=True, **kwargs)
+        
+PW = PRMP_Window
 
 class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Widget.__init__(self, window=True, **kwargs)
+        
 Tk = PTk = PRMP_Tk
 
 
@@ -1307,6 +1324,7 @@ class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         tk.Toplevel.__init__(self, master)
         PRMP_Widget.__init__(self, window=True, **kwargs)
+        
 Top = Toplevel = PTp = PRMP_Toplevel
 
 

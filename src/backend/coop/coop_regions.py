@@ -77,7 +77,7 @@ class CoopRegionsManager(RegionsManager):
     regionClass = CoopRegion
     # def __str__(self): return f'{self.master} {self.className}'
 
-class Member(CoopRegion, Person):
+class Member(CoopRegion):
     AccountsManager = MemberAccount
     Manager = 'MembersManager'
     Person = MemberDetail

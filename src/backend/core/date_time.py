@@ -149,6 +149,16 @@ class DateTime(datetime, Mixins):
     
     def __str__(self): return self.strftime(self.date_fmt)
     
+    @property
+    def isLeap(self): return self.year % 4 == 0 and (self.year % 100 != 0 or self.year % 400 == 0)
+    
+    @property
+    def totalDays(self):
+        lis = [1, 3, 5, 7, 8, 10, 12]
+        if self.month == 2: return 28 + self.isLeap
+        elif self.month in lis: return 31
+        else: return 30
+    
     @classmethod
     def getDayNum(cls, day):
         error = cls.Error(f'day must be among {cls.daysAbbrs} or {cls.daysNames}')
@@ -221,8 +231,10 @@ class DateTime(datetime, Mixins):
         else: dayNum = day
         
         year, month, day = int(year), int(monthNum), int(dayNum)
-
-        return cls(year, month, day)
+        
+        dummy = cls(year, month, 1).totalDays
+        if dummy < day: return cls(year, month, dummy)
+        else: return cls(year, month, day)
 
     @property
     def dayNum(self): return self.day
