@@ -23,7 +23,7 @@ class TwoWidgets(PRMP_Frame):
         bottom_wid = self.bottom_widgets[bottom]
         
         if top in ['checkbutton', 'radiobutton']:
-            topKwargs = dict(command=command if command else self.checked, **topKwargs, **self.top_defaults)
+            topKwargs = dict(command=command or self.checked, **topKwargs, **self.top_defaults)
             
         self.Top = top_wid(self, **topKwargs)
         
