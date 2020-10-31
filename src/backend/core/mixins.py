@@ -73,18 +73,30 @@ class Mixins:
 
 class RA_Mixins:
     
-    def __init__(self, master=None, number=None, previous=None, date=None):
+    def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False):
         from .date_time import DateTime
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
-        self.__date = date
-        self.__master = master
+        
         self.__number = number
+        
+        self.__name = name if not nameFromNumber else f'{self.className} {self.number}'
+        self.__date = date
+        self.__manager = manager
         self.__previous = previous
         self.__next = None
         
     @property
-    def master(self): return self.__master
+    def name(self): return self.__name
+    
+    @property
+    def manager(self): return self.__manager
+    
+    @property
+    def master(self):
+        if isinstance(self.manager, str): return self.manager
+        return self.manager.master
+    
     @property
     def number(self): return self.__number
     @property
@@ -103,7 +115,8 @@ class RAM_Mixins:
     subClass = RA_Mixins
     
     def __init__(self, master=None):
-        assert master != None
+        assert master != None, 'Master can not be None.'
+        
         self.__master = master
         self.__subs = []
     
@@ -114,10 +127,6 @@ class RAM_Mixins:
     def master(self): return self.__master
     @property
     def subs(self): return self.__subs
-    
-    @property
-    def last(self):
-        pass
     
     @property
     def first(self):
@@ -158,12 +167,15 @@ class RAM_Mixins:
 
                 if count.count(True) == len(count): return sub
     
-    def createSub(self, date=None, **kwargs):
+    def createSub(self, **kwargs):
         last = self.last
-        sub = self.subClass(self, date=date, previous=last, number=len(self)+1, **kwargs)
+        # print(self.className)
+        sub = self.subClass(self, previous=last, number=len(self)+1, **kwargs)
         if last: last.next = sub
         
-        self.add(sub)
+        self.addSub(sub)
+        
+        return sub
 
 
 

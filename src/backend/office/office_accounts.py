@@ -5,16 +5,16 @@ class OfficeAccount(Account):
     pass
 
 class OfficeAccountsManager(AccountsManager):
-    accountClass = OfficeAccount
+    subClass = OfficeAccount
 
 class CoopOfficeAccount(OfficeAccount):
     pass
 
 class CoopOfficeAccountsManager(OfficeAccountsManager):
-    accountClass = CoopOfficeAccount
+    subClass = CoopOfficeAccount
 
 class DCOfficeAccount(OfficeAccount):
     pass
 
 class DCOfficeAccountsManager(OfficeAccountsManager):
-    accountClass = DCOfficeAccount
+    subClass = DCOfficeAccount

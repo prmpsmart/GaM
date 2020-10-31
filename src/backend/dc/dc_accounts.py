@@ -5,14 +5,15 @@ from ..core.accounts import DateTime, Account, AccountsManager
 
 class DCAccount(Account):
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, manager, **kwargs):
+        super().__init__(manager, **kwargs)
         
         self.__broughtForwards = BroughtForwards(self)
         self.__savings = Savings(self)
         self.__debits = Debits(self)
         self.__upfronts = Upfronts(self)
         self.__balances = Balances(self)
+        
     def __int__(self): return int(self.balances)
     @property
     def region(self):
@@ -43,15 +44,16 @@ class DCAccount(Account):
         if self.nextAccount: self.nextAccount.addBroughtForward(int(self.balances))
 
 class DCAccountsManager(AccountsManager):
-    accountClass = DCAccount
+    subClass = DCAccount
     
     def __init__(self, region, **kwargs):
         super().__init__(region, **kwargs)
+        
 
 class ClientAccount(DCAccount):
     
-    def __init__(self, ledgerNumber=0, rate=0, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, manager, ledgerNumber=0, rate=0, **kwargs):
+        super().__init__(manager, **kwargs)
         
         self.__ledgerNumber = ledgerNumber
         self.__contributions = Contributions(self)
@@ -87,8 +89,8 @@ class ClientAccount(DCAccount):
 
 class AreaAccount(DCAccount):
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, manager, **kwargs):
+        super().__init__(manager, **kwargs)
         self.__commissions = Commissions(self)
         self.__broughtToOffices = BroughtToOffices(self)#
         self.__excesses = Excesses(self)
@@ -119,20 +121,25 @@ class AreaAccount(DCAccount):
 
 
 class ClientAccountsManager(DCAccountsManager):
-    accountClass = ClientAccount
+    subClass = ClientAccount
     
     def __init__(self, region, **kwargs):
-        self.__startRate = kwargs['rate']
+        self.__startRate = kwargs.get('rate', 0)
         super().__init__(region, **kwargs)
+    
+    @property
+    def areaAccountsManager(self): return self.master.accountsManager
     
     @property
     def startRate(self): return self.__startRate
     
-    def createAccount(self, date=None, rate=0, auto=False, **kwargs):
+    def createAccount(self, rate=0, **kwargs):
+        # prmp needs proper thinking
+        # get total accounts for current month from the area account manager
         lastAccount = self.lastAccount
         lastLedgerNumber = lastAccount.ledgerNumber if lastAccount else 0
         ledgerNumber = lastLedgerNumber + 1
-        return super().createAccount(date=date, rate=rate, auto=auto, ledgerNumber=ledgerNumber, **kwargs)
+        return super().createAccount(rate=rate, ledgerNumber=ledgerNumber, **kwargs)
 
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
@@ -151,12 +158,10 @@ class ClientAccountsManager(DCAccountsManager):
         pass
 
 class AreaAccountsManager(DCAccountsManager):
-    accountClass = AreaAccount
+    subClass = AreaAccount
     
     @property
     def clientsManager(self): return self.region.clientsManager
-    
-    def createAccount(self, date=None, auto=True, **kwargs): return super().createAccount(date=date, auto=auto, **kwargs)
     
     def sortClientsAccountsByMonth(self, month): return self.sortSubRegionsAccountsByMonth(month)
 

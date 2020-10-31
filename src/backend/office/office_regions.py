@@ -32,14 +32,14 @@ class Office(Region):
     Manager = 'OfficesManager'
     PersonsManager = OfficeManagerDetailsManager
     
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
         self.__coopOffice = CoopOffice(manager=self, sup=self, number=1)
         self.__dcOffice = DCOffice(manager=self, sup=self, number=2)
         
-    def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
-    @property
-    def master(self): return self
+    # def __str__(self): return f' {self.className}({self.name})'
+    # def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
+    
     @property
     def dcOffice(self): return self.__dcOffice
     @property
@@ -52,25 +52,23 @@ class Office(Region):
 
 
 class OfficesManager(RegionsManager):
-    regionClass = Office
+    subClass = Office
+    
+    def __init__(self, manager, **kwargs):
+        super().__init__(manager, **kwargs)
+        self.createOffice = self.createRegion
     
     @property
     def name(self): return self.master.name
     
-    def createOffice(self, date=None, auto=None, **kwargs):
-        name = kwargs.get('name')
-        if name == None: name = self.name
-        else: del kwargs['name']
-        
-        return self.createRegion(date=date, auto=auto, name=name, **kwargs)
+    # def createOffice(self, name=None, **kwargs):
+    #     if name == None: name = self.name 
+    #     return self.createRegion(name=name, **kwargs)
 
 
 class SubOffice(Region):
     DEPARTMENT = 'SO'
     Manager = 'Office'
-    
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
     def __str__(self): return f'{self.manager.master} | {self.name} '
     @property
     def name(self): return f'{self.office.name} {self.DEPARTMENT}'

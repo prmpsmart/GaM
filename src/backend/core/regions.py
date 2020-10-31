@@ -1,4 +1,4 @@
-from .accounts import AccountsManager, DateTime, Mixins, Errors, RA_Mixins, RAM_Mixins
+from .accounts import AccountsManager, DateTime, Mixins, Errors, RA_Mixins, RAM_Mixins, CompareByDate
 from .records import Salary, SalariesManager
 import os
 from hashlib import sha224
@@ -30,7 +30,6 @@ class Person(Mixins, RA_Mixins):
         else: self.__image = None
         self.__email = email
         self.__address = address
-        self.__manager = manager
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     
@@ -41,8 +40,7 @@ class Person(Mixins, RA_Mixins):
     def name(self): 
         if not self.__name: return self.manager.name
         return self.__name
-    @property
-    def manager(self): return self.__manager
+    
     @property
     def gender(self): return self.__gender
     @property
@@ -71,7 +69,7 @@ class Person(Mixins, RA_Mixins):
         pass
 
 
-class Region(RA_Mixins, Mixins):
+class Region(RA_Mixins, CompareByDate):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
@@ -79,17 +77,16 @@ class Region(RA_Mixins, Mixins):
     Person = None
     
     
-    def __init__(self, manager, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, **kwargs):
+    def __init__(self, manager, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, previous=None, number=None, **kwargs):
         
         if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
-        RA_Mixins.__init__(self, master, number=number, previous=previous, date=date)
+        RA_Mixins.__init__(self, manager, number=number, previous=previous, date=date, name=name, nameFromNumber=nameFromNumber)
         
         self.__sup = sup
         self.__person = None
         self.__personsManager = None
         self.__subRegionsManager = None
         
-        self.__name = name if not nameFromNumber else f'{self.className} {self.number}'
         self.__location = location
         
         self.__uniqueID = sha224(self.id.encode()).hexdigest()
@@ -126,6 +123,11 @@ class Region(RA_Mixins, Mixins):
             xx = ss[:-1]
             zz = list(reversed(xx))
             return zz
+    
+    @property
+    def nextRegion(self): return self.next
+    @property
+    def previousRegion(self): return self.previous
     
     @property
     def level(self): return len(self.hierachy)
@@ -197,10 +199,6 @@ class Region(RA_Mixins, Mixins):
     @property
     def location(self): return self.__location
     @property
-    def name(self): return self.__name
-    @property
-    def number(self): return self.__number
-    @property
     def subRegionsManager(self): return self.__subRegionsManager
     @property
     def subRegions(self):
@@ -208,9 +206,6 @@ class Region(RA_Mixins, Mixins):
     @property
     def subRegionsCount(self): return len(self.subRegions)
         
-    @property
-    def manager(self): return self.master
-    
     @property
     def lastAccount(self): return self.accountsManager.lastAccount
     
@@ -285,11 +280,19 @@ class RegionsManager(RAM_Mixins, Mixins):
     def __init__(self, master):
         RAM_Mixins.__init__(self, master)
         self.__master = master
+        self.addRegion = self.addSub
+        
+    
     
     def __getitem__(self, num): return self.regions[num]
     def __len__(self): return len(self.regions)
     def __repr__(self): return f'<{self}>'
     def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
+    
+    @property
+    def firstRegion(self): return self.first
+    @property
+    def lastRegion(self): return self.last
     
     @property
     def region(self): return self.master
@@ -300,8 +303,6 @@ class RegionsManager(RAM_Mixins, Mixins):
     @property
     def regions(self): return self.subs
     
-    def addRegion(self, region): self.addSub(region)
-    
     def getRegion(self, number=None, name=None, phone=None, email=None, image=None):
         ## provide mechanism to scan pictures.
         self.getSub(dict(number=number, name=name, phone=phone, email=email, image=image))
@@ -310,21 +311,17 @@ class RegionsManager(RAM_Mixins, Mixins):
         #     elif name == region.name: return region
         #     elif phone == region.phone: return region
         #     elif email == region.email: return region
-    @property
-    def lastRegion(self): return self.last
-    @property
-    def firstRegion(self): return self.first
             
     @classmethod
     def getFromAllRegions(cls, number):
         for region in cls.allRegions():
             if region.number == number: return region
     
-    def createRegion(self, **kwargs): return self.createSub(sup=self.region, **kwargs)
-    
     def regionExists(self, **kwargs):
         if self.getRegion(**kwargs): return True
         return False
+    
+    def createRegion(self, **kwargs): return self.createSub(sup=self.master, **kwargs)
     
 
  ########## Sorting
@@ -410,7 +407,7 @@ class RegionsManager(RAM_Mixins, Mixins):
 
 
 class PersonsManager(RegionsManager):
-    regionClass = Person
+    subClass = Person
     @property
     def lastPerson(self): return self.lastRegion
     def createPerson(self, **kwargs): return self.createRegion(**kwargs)

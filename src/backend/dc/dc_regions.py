@@ -10,7 +10,7 @@ class DC_CO(Person):
     'Daily Contribution Cash Officer.'
 
 class DC_COsManager(PersonsManager):
-    regionClass = DC_CO
+    subClass = DC_CO
     
     
     def createDC_CO(self, **kwargs): return self.createPerson(**kwargs)
@@ -31,7 +31,7 @@ class Client(DCRegion):
     SubRegionsManager = None
     Person = ClientDetail
     
-    def __init__(self, manager, name, date, rate=None, cardDue=False, **kwargs):
+    def __init__(self, manager, name, date=None, rate=None, cardDue=False, **kwargs):
         super().__init__(manager=manager, name=name, date=date, rate=rate, **kwargs)
         self.__detail = ClientDetail(self, **kwargs)
         self.__cardDues = CardDues(self, cardDue)
@@ -62,7 +62,7 @@ class Client(DCRegion):
         pass
 
 class ClientsManager(DCRegionsManager):
-    regionClass = Client
+    subClass = Client
     
     @property
     def area(self): return self.master
@@ -99,7 +99,7 @@ class Area(DCRegion):
     def createClient(self, name, rate, cardDue=False, **kwargs): return self.clientsManager.createClient(name=name, rate=rate, cardDue=cardDue, **kwargs)
 
 class AreasManager(DCRegionsManager):
-    regionClass = Area
+    subClass = Area
     
     @property
     def areas(self): return self.regions

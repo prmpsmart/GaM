@@ -57,7 +57,7 @@ class Account(RA_Mixins, CompareByDate):
     
     def __init__(self, manager, date=None, previous=None, number=0, **kwargs):
         assert manager != None, 'No manager passed.'
-        RA_Mixins.__init__(self, master, number=number, previous=previous, date=date)
+        RA_Mixins.__init__(self, manager, number=number, previous=previous, date=date)
     
     def __eq__(self, account):
         if account == None: return False
@@ -72,7 +72,9 @@ class Account(RA_Mixins, CompareByDate):
     def recordsManagers(self): self.notImp()
     
     @property
-    def manager(self): return self.master
+    def nextAccount(self): return self.next
+    @property
+    def previousAccount(self): return self.previous
     
     @property
     def recordsManagersAsList(self): return [int(recordsManager) for recordsManager in self]
@@ -131,11 +133,15 @@ class Account(RA_Mixins, CompareByDate):
 
 
 class AccountsManager(RAM_Mixins, Mixins):
-    accountClass = Account
+    subClass = Account
     
     def __init__(self, region, autoAccount=True, **kwargs):
-        RAM_Mixins.__init__(region)
-        if autoAccount == True: self.createAccount(auto=True, **kwargs)
+        
+        RAM_Mixins.__init__(self, region)
+        self.addAccount = self.addSub
+        self.createAccount = self.createSub
+        
+        if autoAccount == True: self.createAccount(**kwargs)
         
     def __eq__(self, manager):
         if manager == None: return False
@@ -146,16 +152,15 @@ class AccountsManager(RAM_Mixins, Mixins):
         return f'{self.className}'
     
     @property
+    def firstAccount(self): return self.first
+    @property
+    def lastAccount(self): return self.last
+    
+    @property
     def accounts(self): return self.subs
     @property
     def region(self): return self.master
    
-    @property
-    def firstAccount(self): return self.first
-        
-    @property
-    def lastAccount(self): return self.last
-    
     @property
     def overAllAccounts(self):
         listOfTuple = []
@@ -173,11 +178,7 @@ class AccountsManager(RAM_Mixins, Mixins):
                 gone = True
                 
             return listOfTuple
-
-    def addAccount(self, account): return self.addSub(account)
         
-    def createAccount(self, **kwargs): return self.createSub( **kwargs)
-    
     def getAccount(self, month): return self.getSub({'date-m': month})
     
     def balanceAccount(self, month=None):

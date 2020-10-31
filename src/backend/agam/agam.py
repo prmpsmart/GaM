@@ -6,7 +6,7 @@ class CEO(Person):
     pass
 
 class CEOsManager(PersonsManager):
-    regionClass = CEO
+    subClass = CEO
 
     def createCEO(self, **kwargs): return self.createPerson(**kwargs)
     
@@ -17,9 +17,10 @@ class AGAM(Region):
     PersonsManager = CEOsManager
     
     def __init__(self, manager='AGAM',  name='AGAM'):
-        super().__init__(manager=manager, name=name)
+        super().__init__(manager, name=name)
         
     def __str__(self): return f'{self.name}'
+    
     @property
     def master(self): return 4
     @property

@@ -11,7 +11,7 @@ class CoopCO(Person):
     'Cooperative Cash Officer.'
 
 class CoopCOsManager(PersonsManager):
-    regionClass = CoopCO
+    subClass = CoopCO
     def createCoopCo(self, **kwargs): return self.createDetail(**kwargs)
 
 class CoopThirdPartySurety(ThirdPartySurety):
@@ -69,12 +69,14 @@ class CoopLoanBondDetails(LoanBondDetails):
         self.__thirdSurety = self.unit.getMember(number=members[2])
 
 class CoopRegion(Region):
+    
     Errors = CoopErrors
     AccountsManager = CoopAccount
     Manager = 'CoopRegionsManager'
+    
 
 class CoopRegionsManager(RegionsManager):
-    regionClass = CoopRegion
+    subClass = CoopRegion
     # def __str__(self): return f'{self.master} {self.className}'
 
 class Member(CoopRegion):
@@ -110,7 +112,7 @@ class Member(CoopRegion):
     def balanceAccount(self): return self.accountsManager.balanceAccount()
 
 class MembersManager(CoopRegionsManager):
-    regionClass = Member
+    subClass = Member
    
     @property
     def unit(self): return self.master
@@ -128,8 +130,8 @@ class Unit(CoopRegion):
     SubRegionsManager = MembersManager
     PersonsManager = CoopCOsManager
     
-    def __init__(self, **kwargs):
-        super().__init__(nameFromNumber=True, **kwargs)
+    def __init__(self, manager, **kwargs):
+        super().__init__(manager, nameFromNumber=True, **kwargs)
         
     @property
     def spacedID(self): return f'{self.sup.spacedID} | U{self.number}'
@@ -147,7 +149,7 @@ class Unit(CoopRegion):
     def getMember(self, **kwargs): return self.getRegion(**kwargs)
 
 class UnitsManager(CoopRegionsManager):
-    regionClass = Unit
+    subClass = Unit
     
     @property
     def office(self): return self.master
