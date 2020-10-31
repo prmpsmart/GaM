@@ -81,23 +81,6 @@ class SolidScreen(Tk):
         self.paint()
         # self.mainloop()
     
-    def addWidget(self, widget, config={}, place={}, grid={}, pack={}):
-        trues = [bool(pos) for pos in [place, pack, grid]].count(True)
-        
-        if not trues or (trues > 1): raise ValueError('only one is required between [place, pack, grid]')
-        else:
-            wid = widget(self.frame, **config)
-            if place: wid.place(**place)
-            elif pack: wid.pack(**pack)
-            elif grid: wid.grid(**grid)
-            wid.paint()
-            return wid
-        
-        
-        
-        
-        
-        
 
 SS = SolidScreen
 

@@ -128,6 +128,7 @@ class RAM_Mixins:
     
     @property
     def master(self): return self.__master
+    
     @property
     def subs(self): return self.__subs
     

@@ -14,6 +14,9 @@ TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnati
 
 class GUIMixins:
     
+    @property
+    def className(self): return f'{self.__class__.__name__}'
+    
     def AlphabetsSwitch(self):
         d = {}
         for n in range(65, 91):
@@ -888,7 +891,7 @@ class PRMP_Widget(PRMP_Theme):
     
     def __init__(self, window=False, tip=None, tipGeo=(300, 40), **kwargs):
         self.kwargs = kwargs
-        
+        self.container = None
         self.__resultsWidgets = []
         
         self.font = None
@@ -925,6 +928,20 @@ class PRMP_Widget(PRMP_Theme):
     def light(self): self.configure(bg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, fg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
     
     def unlight(self): self.configure(bg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, fg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
+    
+    
+    def addWidget(self, widget, config={}, place={}, grid={}, pack={}, container=None):
+        trues = [bool(pos) for pos in [place, pack, grid]].count(True)
+        container = container if container else self.container
+        
+        if not trues or (trues > 1): raise ValueError('only one is required between [place, pack, grid]')
+        else:
+            wid = widget(container, **config)
+            if place: wid.place(**place)
+            elif pack: wid.pack(**pack)
+            elif grid: wid.grid(**grid)
+            wid.paint()
+            return wid
     
     def switchOne(self, e=0):
         val = self.var.get()
@@ -1049,6 +1066,7 @@ class PRMP_Widget(PRMP_Theme):
         self.kwargs.update(kwargs)
         self.configure(**kwargs)
         # self.paint()
+    
     @property
     def className(self): return self.__class__.__name__
     
@@ -1182,7 +1200,6 @@ class PRMP_Widget(PRMP_Theme):
             self.unbind_all('<Shift-Button-4>')
             self.unbind_all('<Shift-Button-5>')
 
-
     def _move(self, event):
         try: self.x, self.y = event.x, event.y
         except: pass
@@ -1191,10 +1208,12 @@ class PRMP_Widget(PRMP_Theme):
         self.bind("<ButtonPress-1>", self._move)
         self.bind("<ButtonRelease-1>", self._move)
         self.bind("<B1-Motion>", self._onMotion)
+    
     def _grab_anywhere_off(self):
         self.unbind("<ButtonPress-1>")
         self.unbind("<ButtonRelease-1>")
         self.unbind("<B1-Motion>")
+    
     def _onMotion(self, event):
         try:
             deltax = event.x - self.x
@@ -1204,9 +1223,13 @@ class PRMP_Widget(PRMP_Theme):
             self.geometry("+%s+%s" % (x, y))
         except Exception as e:
             print('on motion error', e)
+    
     def screenwidth(self): return self.winfo_screenwidth() - 70
+    
     def screenheight(self): return self.winfo_screenheight() - 70
+    
     def getWhichSide(self): return randint(1, 15) % 3
+    
     @property
     def getXY(self):
         if self._geometry: return self._geometry[:3]
@@ -1295,22 +1318,7 @@ class PRMP_Widget(PRMP_Theme):
         # self.grab_set()
         self.wait_window()
 
-
-
-
-class PRMP_Window(PRMP_Widget):
-    
-    def __init__(self, master=None, **kwargs):
-        if master:
-            self = tk.Toplevel(master, **kwargs)
-            # 
-        else:
-            self = tk.Tk()
-            # tk.Tk.__init__(self)
-            
-        PRMP_Widget.__init__(self, window=True, **kwargs)
-        
-PW = PRMP_Window
+PWd = PRMP_Widget
 
 class PRMP_Tk(tk.Tk, PRMP_Widget):
     def __init__(self, **kwargs):
@@ -1319,13 +1327,39 @@ class PRMP_Tk(tk.Tk, PRMP_Widget):
         
 Tk = PTk = PRMP_Tk
 
-
 class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
     def __init__(self, master=None, **kwargs):
         tk.Toplevel.__init__(self, master)
         PRMP_Widget.__init__(self, window=True, **kwargs)
         
 Top = Toplevel = PTp = PRMP_Toplevel
+
+
+class PRMP_Window(PRMP_Widget):
+    
+    def __init__(self, master=None, **kwargs):
+        from .usefuls import copyClassMethods
+        if master: self.root = PRMP_Toplevel(master, **kwargs)
+        else: self.root = PRMP_Tk(**kwargs)
+        
+        mro = list(reversed(self.root.__class__.__mro__))
+        for cl in mro:
+            if cl == PRMP_Widget: continue
+            copyClassMethods(self, cl, self.root)
+        
+        self.__dict__.update(self.root.__dict__)
+        self._w = self.root._w
+        
+        self.container = self.root
+        
+        
+    def __repr__(self): return self.root
+    
+    def __str__(self): return self.root
+    
+    def __getitem__(self, num): return self.root
+
+PWn = PRMP_Window
 
 
 class PRMP_Button(tk.Button, PRMP_Widget):
@@ -1563,7 +1597,8 @@ class ImageWidget:
         else: image.thumbnail(self.thumb)
         
         self.image =  PhotoImage(image=image)
-        self['image'] = self.image
+        # self['image'] = self.image
+        self.configure(image=self.image)
     
     def set(self, imageFile): self.loadImage(imageFile=imageFile, start=1)
     

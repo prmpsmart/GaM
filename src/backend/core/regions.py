@@ -110,6 +110,10 @@ class Region(RA_Mixins, CompareByDate):
     def sup(self): return self.__sup
     
     @property
+    def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
+    @property
+    def totalSubs(self): return len(self.subs)
+    @property
     def sups(self):
         ss = []
         sup = self.sup
@@ -197,7 +201,7 @@ class Region(RA_Mixins, CompareByDate):
     @property
     def subRegionsManager(self): return self.__subRegionsManager
     @property
-    def subRegions(self): return self.subRegionsManager[:] if self.subRegionsManager else []
+    def subRegions(self): return self.subs
     @property
     def subRegionsCount(self): return len(self.subRegions)
         

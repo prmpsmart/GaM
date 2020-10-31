@@ -4,8 +4,6 @@ from .core import *
 from .pics import Xbms
 
 
-# PRMP_Toplevel = PRMP_Tk
-
 class PRMP_Dialog(PRMP_Toplevel, FillWindow):
     
     def __init__(self, master=None, _return=True, values={}, **kwargs):

@@ -1,8 +1,8 @@
 
 # Extentions widgets
 import tkinter as tk, tkinter.ttk as ttk, platform, time
-from .usefuls import create_container, bound_to_mousewheel
-from .core import PRMP_Frame, PRMP_Scrollbar, PRMP_Canvas
+from .usefuls import create_container, bound_to_mousewheel, Columns
+from .core import PRMP_Frame, PRMP_Scrollbar, PRMP_Canvas, PRMP_Treeview, Font, PRMP_Theme
 
 
 class AutoScroll:
@@ -64,8 +64,6 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
-
-
 class ScrollableFrame(PRMP_Frame):
     
     def __init__(self, master, **kwargs):
@@ -99,11 +97,88 @@ class ScrollableFrame(PRMP_Frame):
         p = self.canvas.bbox("all")
         self.canvas.configure(scrollregion=p)
         
-    
-    def addWidget(self, widget, **kwargs): return widget(self.scrollable_frame, **kwargs)
 
 SF = ScrollableFrame
 
+
+class PRMP_TreeView(PRMP_Frame):
+    __shows = ['tree', 'headings']
+    __slots__ = ['tree']
+    
+    def __init__(self, master=None, columns=[], **kwargs):
+        super().__init__(master=master, **kwargs)
+        
+        self.t = self.tree = self.treeview = PRMP_Treeview(self)
+        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=self.treeview.xview)
+        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=self.treeview.yview)
+        self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        
+        xscrollbar.pack(side="bottom", fill="x")
+        self.treeview.pack(side='left', fill='both', expand=1)
+        yscrollbar.pack(side="right", fill="y")
+        bound_to_mousewheel(0, self)
+        
+        self.ivd = self.itemsValuesDict = {}
+        self.firstItem = None
+        self.current = None
+        self.attributes = []
+        
+        self.columns = Columns(columns)
+        self.setColumns()
+        self.bindings()
+    
+    def bindings(self):
+        self.tree.bind('<<TreeviewSelect>>', self.selected)
+
+    def selected(self, e=0):
+        item = self.tree.focus()
+        self.current = self.ivd.get(item)
+        return self.current
+
+    def insert(self, item, position='end',  **kwargs): return self.treeview.insert(item, position, **kwargs)
+    
+    def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
+        font = Font(**font)
+        return self.tree.tag_configure(tagName, font=font, **kwargs)
+    
+    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
+    
+    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
+    
+    def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
+    
+    tvc = Config = treeviewConfig
+
+    def setColumns(self, columns=[]):
+        if columns: self.columns.process(columns)
+            
+        if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
+
+        for column in self.columns:
+            self.heading(column.index, text=column.text, anchor='center')
+            self.column(column.index, width=column.width, minwidth=10, stretch=1,  anchor="w")
+    
+    def set(self, obj=None, parent='', op=False):
+
+        cols = self.columns.get(obj)
+        
+        name, *columns = self.columns.get(obj)
+        tag = 'prmp'
+        
+        # the fourth value of this [text, attr, width, value] can be used in sorting, it wont insert the region and its columns both into self.tree and self.ivd if not equal to value
+        
+        item = self.insert(parent, text=name, values=columns, tag=tag, open=op)
+        self.tag_config(tag)
+
+        self.ivd[item] = obj
+        
+        if self.firstItem == None:
+            self.firstItem = item
+            self.treeview.focus(self.firstItem)
+        
+        subs = obj.subs
+        if subs:
+            for sub in subs: self.set(sub, item, op)
 
 
 
