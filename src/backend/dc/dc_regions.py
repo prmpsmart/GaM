@@ -2,9 +2,10 @@ from ..core.regions import Region, RegionsManager, Person, PersonsManager
 from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, DateTime, CardDues, DCErrors, Rates
 
 class ClientDetail(Person):
-    
+    Manager = 'Client'
     @property
     def client(self): return self.manager
+    
 
 class DC_CO(Person):
     'Daily Contribution Cash Officer.'

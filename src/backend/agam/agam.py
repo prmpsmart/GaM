@@ -15,6 +15,7 @@ class AGAM(Region):
     SubRegionsManager = OfficesManager
     AccountsManager = AGAMAccountsManager
     PersonsManager = CEOsManager
+    # Manager = 'AGAMAccountsManager.'
     
     def __init__(self, manager='AGAM',  name='AGAM'):
         super().__init__(manager, name=name)

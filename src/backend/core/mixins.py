@@ -72,11 +72,14 @@ class Mixins:
 
 
 class RA_Mixins:
+    Manager = 'RAM_Mixins'
     
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False):
         from .date_time import DateTime
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
+        
+        if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
         
         self.__number = number
         

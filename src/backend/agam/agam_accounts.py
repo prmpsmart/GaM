@@ -1,9 +1,10 @@
 from ..core.accounts import Account, AccountsManager
 
 class AGAMAccount(Account):
-    pass
+    Manager = 'AGAMAccountsManager'
 
 class AGAMAccountsManager(AccountsManager):
-    pass
+    subClass = AGAMAccount
+    
 
 

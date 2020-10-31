@@ -2,19 +2,19 @@ from ..core.accounts import Account, AccountsManager
 
 
 class OfficeAccount(Account):
-    pass
+    Manager = 'OfficeAccountsManager'
 
 class OfficeAccountsManager(AccountsManager):
     subClass = OfficeAccount
 
 class CoopOfficeAccount(OfficeAccount):
-    pass
+    Manager = 'CoopOfficeAccountsManager'
 
 class CoopOfficeAccountsManager(OfficeAccountsManager):
     subClass = CoopOfficeAccount
 
 class DCOfficeAccount(OfficeAccount):
-    pass
+    Manager = 'DCOfficeAccountsManager'
 
 class DCOfficeAccountsManager(OfficeAccountsManager):
     subClass = DCOfficeAccount

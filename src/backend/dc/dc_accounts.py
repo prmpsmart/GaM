@@ -51,7 +51,7 @@ class DCAccountsManager(AccountsManager):
         
 
 class ClientAccount(DCAccount):
-    
+    Manager = 'ClientAccountsManager'
     def __init__(self, manager, ledgerNumber=0, rate=0, **kwargs):
         super().__init__(manager, **kwargs)
         
@@ -88,6 +88,7 @@ class ClientAccount(DCAccount):
         pass
 
 class AreaAccount(DCAccount):
+    Manager = 'AreaAccountsManager'
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)

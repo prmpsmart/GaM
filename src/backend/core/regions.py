@@ -3,7 +3,7 @@ from .records import Salary, SalariesManager
 import os
 from hashlib import sha224
 
-class Person(Mixins, RA_Mixins):
+class Person(RA_Mixins, Mixins):
     Manager = 'PersonsManager'
     
     __male = 'male', 'm'
@@ -11,9 +11,10 @@ class Person(Mixins, RA_Mixins):
     
     def __init__(self, manager=None, gender='n', phone='', image=None, email='', address='', date=None, name='', **kwargs):
         
-        if isinstance(manager, str): pass
-        elif isinstance(manager, Region): self.__date = manager.date
-        else: assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}'
+        if isinstance(manager, Region): date = manager.date
+        
+        RA_Mixins.__init__(self, manager, date=date, name=name)
+
         gender = gender.lower()
         
         if gender in self.__male:  self.__gender = self.__male[0].title()
@@ -21,13 +22,15 @@ class Person(Mixins, RA_Mixins):
         
         else: self.__gender = 'Neutral'
         
-        self.__name = name
         self.__phone = phone
+        
         if image:
             from ...gui.core.prmp_tk.pics import ImageFile
             assert os.path.isfile(image) and os.path.splitext(image)[1] in ['.png', 'jpeg', '.jpg', '.gif', '.xbm'], f'{image} file given is not a valid picture file.'
             self.__image = ImageFile(image)
+            
         else: self.__image = None
+        
         self.__email = email
         self.__address = address
     
@@ -36,10 +39,6 @@ class Person(Mixins, RA_Mixins):
     @property
     def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
     
-    @property
-    def name(self): 
-        if not self.__name: return self.manager.name
-        return self.__name
     
     @property
     def gender(self): return self.__gender
@@ -79,7 +78,6 @@ class Region(RA_Mixins, CompareByDate):
     
     def __init__(self, manager, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, previous=None, number=None, **kwargs):
         
-        if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
         RA_Mixins.__init__(self, manager, number=number, previous=previous, date=date, name=name, nameFromNumber=nameFromNumber)
         
         self.__sup = sup
@@ -187,7 +185,10 @@ class Region(RA_Mixins, CompareByDate):
     def getRegion(self, **kwargs): return self.getSubReg(**kwargs)
     
     @property
-    def region(self): return self.manager.region
+    def region(self):
+        manager = self.manager
+        if isinstance(manager, str): return manager
+        return manager.region
     
     @property
     def person(self):
@@ -201,8 +202,7 @@ class Region(RA_Mixins, CompareByDate):
     @property
     def subRegionsManager(self): return self.__subRegionsManager
     @property
-    def subRegions(self):
-        if self.subRegionsManager: return self.subRegionsManager[:]
+    def subRegions(self): return self.subRegionsManager[:] if self.subRegionsManager else []
     @property
     def subRegionsCount(self): return len(self.subRegions)
         

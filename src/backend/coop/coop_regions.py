@@ -3,7 +3,7 @@ from .coop_accounts import CoopErrors, CoopAccount, MemberAccount, UnitAccount
 from .coop_errors import CoopErrors
 
 class MemberDetail(Person):
-    
+    Manager = 'Member'
     @property
     def member(self): return self.manager
 

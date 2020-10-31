@@ -127,7 +127,7 @@ class Hierachy(PRMP_Frame):
                 else: _attr = self.propertize(col[0])
                 
                 attr = getattr(region, _attr)
-                
+                print(attr)
                 cols.append(attr)
                 
             self.subNone(cols)
@@ -149,13 +149,11 @@ class Hierachy(PRMP_Frame):
     def setColumns(self, columns=[]):
         if columns:
             cols = [f'#{num}' for num in range(len(columns))]
-            splitedColumns = self.splitColumns(columns)
-            zippable = self.zippable(splitedColumns)
+            self.columns = self.splitColumns(columns)
+            zippable = self.zippable(self.columns)
 
             col_col = zip_longest(cols, *zippable)
-            
-            self.columns = [col[0:] for col in splitedColumns]
-            
+                        
             if len(cols) > 1: self.tvc(columns=cols[1:])
 
             for c, t, a, w  in col_col:
@@ -198,14 +196,15 @@ class Hierachy(PRMP_Frame):
     tvc = Config = treeviewConfig
     
     def subNone(self, list_):
+        c = 0
         for li in list_:
-            ind = list_.index(li)
-            if not li: list_[ind] = ''
+            if not li: list_[c] = ''
+            c += 1
     
     def set(self, region=None, parent=''):
         
         rm = region.subRegions
-        columns = self.getColumns(region)
+        columns = self.getColumns(region)[1:]
         tag = 'prmp'
         item = self.insert(parent, text=region.name, values=columns, tag=tag)
         self.tag_config(tag)
