@@ -108,58 +108,6 @@ class Hierachy(PRMP_Frame):
         
         self.bindings()
     
-    def splitColumns(self, columns):
-        cols = []
-        for col in columns:
-            if isinstance(col, (list, tuple)):
-                if len(col) == 1: cols.append([col[0], '', 20])
-                elif len(col) == 2: cols.append([col[0], col[1], 20])
-                elif len(col) > 2: cols.append([col[0], col[1], col[2]])
-            else: cols.append([col, '', 20])
-        
-        return cols
-    
-    def getColumns(self, region):
-        if region:
-            cols = []
-            for col in self.columns:
-                if col[1]: _attr = col[1]
-                else: _attr = self.propertize(col[0])
-                
-                attr = getattr(region, _attr)
-                print(attr)
-                cols.append(attr)
-                
-            self.subNone(cols)
-            
-            return cols
-    
-    def zippable(self, columns):
-        le = len(columns[0])
-        innerCols = [[] for _ in range(le)]
-        
-        for col in columns:
-            for c in col:
-                ind = col.index(c)
-                innerCols[ind].append(c)
-        
-        return innerCols
-        
-        
-    def setColumns(self, columns=[]):
-        if columns:
-            cols = [f'#{num}' for num in range(len(columns))]
-            self.columns = self.splitColumns(columns)
-            zippable = self.zippable(self.columns)
-
-            col_col = zip_longest(cols, *zippable)
-                        
-            if len(cols) > 1: self.tvc(columns=cols[1:])
-
-            for c, t, a, w  in col_col:
-                self.tree.heading(c, text=t, anchor='center')
-                self.tree.column(c, width=w, minwidth=10, stretch=1,  anchor="w")
-
     def bindings(self):
         self.tree.bind('<<TreeviewSelect>>', self.setSelected)
         self.tree.bind('<Control-v>', self.viewRegion)
@@ -201,12 +149,70 @@ class Hierachy(PRMP_Frame):
             if not li: list_[c] = ''
             c += 1
     
+    def getColumns(self, region):
+        if region:
+            cols = []
+            for col in self.columns:
+                if col[1]: _attr = col[1]
+                else: _attr = self.propertize(col[0])
+                
+                attr = getattr(region, _attr, '')
+                cols.append(attr)
+                
+            self.subNone(cols)
+            
+            return cols
+        
+    def reformatColumns(self, columns):
+        cols = []
+        defaut_width = 20
+        for col in columns:
+            if isinstance(col, (list, tuple)):
+                if len(col) == 1: cols.append([col[0], '', defaut_width])
+                elif len(col) == 2: cols.append([col[0], col[1], defaut_width])
+                elif len(col) > 2: cols.append([col[0], col[1], col[2]])
+            elif isinstance(col, dict):
+                text = col.get('text', '')
+                attr = col.get('attr', '')
+                width = col.get('width', defaut_width)
+                cols.append([text, attr, width])
+            else: cols.append([col, '', defaut_width])
+        
+        return cols
+    
+    def zippable(self, columns):
+        le = len(columns[0])
+        innerCols = [[] for _ in range(le)]
+        
+        for col in columns:
+            for c in col:
+                ind = col.index(c)
+                innerCols[ind].append(c)
+        
+        return innerCols
+        
+        
+    def setColumns(self, columns=[]):
+        if columns:
+            cols = [f'#{num}' for num in range(len(columns))]
+            self.columns = self.reformatColumns(columns)
+            zippable = self.zippable(self.columns)
+
+            col_col = zip_longest(cols, *zippable)
+        
+            if len(cols) > 1: self.tvc(columns=cols[1:])
+
+            for c, t, _, w  in col_col:
+                self.tree.heading(c, text=t, anchor='center')
+                self.tree.column(c, width=w, minwidth=10, stretch=1,  anchor="w")
+
+    
     def set(self, region=None, parent=''):
         
         rm = region.subRegions
-        columns = self.getColumns(region)[1:]
+        name, *columns = self.getColumns(region)
         tag = 'prmp'
-        item = self.insert(parent, text=region.name, values=columns, tag=tag)
+        item = self.insert(parent, text=name, values=columns, tag=tag, open=True)
         self.tag_config(tag)
 
         self.ivd[item] = region

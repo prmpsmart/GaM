@@ -160,27 +160,22 @@ class Region(RA_Mixins, CompareByDate):
     @property
     def gender(self):
         if self.person: return self.person.gender
-        else: return str(self)
     
     @property
     def phone(self):
         if self.person: return self.person.phone
-        else: return str(self)
     
     @property
     def email(self):
         if self.person: return self.person.email
-        else: return str(self)
     
     @property
     def address(self):
         if self.person: return self.person.address
-        else: return str(self)
     
     @property
     def image(self):
         if self.person: return self.person.image
-        else: return str(self)
     
     def getRegion(self, **kwargs): return self.getSubReg(**kwargs)
     
