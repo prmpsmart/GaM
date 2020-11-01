@@ -2,13 +2,12 @@ __author__ = 'PRMPSmart@gmail.com'
 
 from datetime import datetime, timedelta, date
 from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
-from .mixins import Mixins
 from .errors import Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
 
 
-class CompareByDate(Mixins):
+class CompareByDate:
     def __lt__(self, other):
         if other == None: return False
         return self.date < other.date
@@ -28,7 +27,7 @@ class CompareByDate(Mixins):
         if other == None: return True
         return self.date >= other.date
 
-class CompareByWeek(Mixins):
+class CompareByWeek:
     def __lt__(self, other):
         if other == None: return False
         return self.date.weekMonthYearTuple < other.date.weekMonthYearTuple
@@ -48,7 +47,7 @@ class CompareByWeek(Mixins):
         if other == None: return True
         return self.date.weekMonthYearTuple >= other.date.weekMonthYearTuple
 
-class CompareByMonth(Mixins):
+class CompareByMonth:
     def __lt__(self, other):
         if other == None: return False
         return self.date.monthYearTuple < other.date.monthYearTuple
@@ -68,7 +67,7 @@ class CompareByMonth(Mixins):
         if other == None: return True
         return self.date.monthYearTuple >= other.date.monthYearTuple
 
-class CompareByYear(Mixins):
+class CompareByYear:
     def __lt__(self, other):
         if other == None: return False
         return self.date.year < other.date.year
@@ -88,7 +87,7 @@ class CompareByYear(Mixins):
         if other == None: return True
         return self.date.year >= other.date.year
 
-class DateTime(datetime, Mixins):
+class DateTime(datetime):
     date_fmt = "%d/%m/%Y"
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
     Error = Errors.DateTimeError

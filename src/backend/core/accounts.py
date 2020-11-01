@@ -1,5 +1,5 @@
 from .date_time import DateTime, CompareByDate
-from .mixins import Mixins, RA_Mixins, RAM_Mixins
+from .bases import Mixins, Object, ObjectsManager
 from .errors import Errors
 
 # Account is the list of Records recieved for a month.
@@ -53,11 +53,11 @@ class MonthlyAccounts(Mixins):
 class YearlyAccounts(Mixins):
     pass
 
-class Account(RA_Mixins, CompareByDate):
+class Account(Object, CompareByDate):
     
-    def __init__(self, manager, date=None, previous=None, number=0, **kwargs):
+    def __init__(self, manager, **kwargs):
         assert manager != None, 'No manager passed.'
-        RA_Mixins.__init__(self, manager, number=number, previous=previous, date=date)
+        Object.__init__(self, manager, **kwargs)
     
     def __eq__(self, account):
         if account == None: return False
@@ -66,8 +66,10 @@ class Account(RA_Mixins, CompareByDate):
     def __getitem__(self, num): return self.recordsManagers[num]
     def __str__(self): return f'{self.manager} | {self.className}({self.date.dayMonthYear})'
     def __len__(self): return len(self.recordsManagers)
+    
     @property
     def region(self): return self.manager.region
+    
     @property
     def recordsManagers(self): self.notImp()
     
@@ -132,16 +134,16 @@ class Account(RA_Mixins, CompareByDate):
         pass
 
 
-class AccountsManager(RAM_Mixins, Mixins):
-    subClass = Account
+class AccountsManager(ObjectsManager, Mixins):
+    ObjectType = Account
     
     def __init__(self, region, autoAccount=True, **kwargs):
         
-        RAM_Mixins.__init__(self, region)
+        ObjectsManager.__init__(self, region)
         self.addAccount = self.addSub
         self.createAccount = self.createSub
         
-        if autoAccount == True: self.createAccount(**kwargs)
+        if autoAccount == True: self.createAccount()
         
     def __eq__(self, manager):
         if manager == None: return False

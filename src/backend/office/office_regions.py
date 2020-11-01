@@ -1,11 +1,11 @@
 from ..core.accounts import AccountsManager, Mixins
-from ..core.regions import RegionsManager, Region, Person, PersonsManager
+from ..core.regions_managers import RegionsManager, Region, Person, PersonsManager
 
 from ..dc.dc_regions import AreasManager
 
 from ..coop.coop_regions import UnitsManager
 
-from .office_accounts import CoopOfficeAccount, DCOfficeAccount, CoopOfficeAccountsManager, DCOfficeAccountsManager, OfficeAccountsManager, OfficeAccount
+from .office_accounts import *
 
 class DCManagerDetail(Person):
     pass
@@ -36,9 +36,6 @@ class Office(Region):
         super().__init__(master, **kwargs)
         self.__coopOffice = CoopOffice(manager=self, sup=self, number=1)
         self.__dcOffice = DCOffice(manager=self, sup=self, number=2)
-        
-    # def __str__(self): return f' {self.className}({self.name})'
-    # def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
     def dcOffice(self): return self.__dcOffice
@@ -52,18 +49,19 @@ class Office(Region):
 
 
 class OfficesManager(RegionsManager):
-    subClass = Office
+    ObjectType = Office
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
-        self.createOffice = self.createRegion
     
     @property
     def name(self): return self.master.name
     
-    # def createOffice(self, name=None, **kwargs):
-    #     if name == None: name = self.name 
-    #     return self.createRegion(name=name, **kwargs)
+    def createOffice(self, name=None, **kwargs):
+        if name == None: name = self.name 
+        
+        # exit()
+        return self.createRegion(name=name, **kwargs)
 
 
 class SubOffice(Region):
@@ -91,7 +89,7 @@ class CoopOffice(SubOffice):
     AccountsManager = CoopOfficeAccountsManager
     SubRegionsManager = UnitsManager
     PersonsManager = CoopManagerDetailsManager
-    DEPARTMENT = 'COOP'
+    DEPARTMENT = 'Coop'
     
     def addUnit(self, unit):
         pass

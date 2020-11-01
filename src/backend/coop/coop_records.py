@@ -1,15 +1,24 @@
-from ..core.records import RecordsManager, DateTime, Repayment, RepaymentsManager, Loan, LoanBonds, LoanInterests, LoanBond
+from ..core.records_managers import RecordsManager, DateTime, Repayment, RepaymentsManager, Loan, LoanBonds, LoanInterests, LoanBond, Record
 
 from .coop_errors import CoopErrors
 
+class CoopRecord(Record):
+    Managers = ('Savings', )
+
 class CoopRecordsManager(RecordsManager):
     Errors = CoopErrors
-    'Able to list records in a particular season, able to total it too.'
+    Managers = ('UnitAccount', 'MemberAccount')
+    ObjectType = CoopRecord
+    
     
     def getMonthRecords(self, month): return self.sortRecordsIntoDaysInMonth(month)
     def getYearRecords(self, year): return self.sortRecordsByYear(year)
 
+class CoopRepayment(Repayment):
+    Managers = ('UnitAccount', 'MemberAccount')
+
 class CoopRepaymentsManager(RepaymentsManager):
+    Managers = ('UnitAccount', 'MemberAccount')
     
     @property
     def region(self): return self.account
@@ -17,7 +26,7 @@ class CoopRepaymentsManager(RepaymentsManager):
 class Expenses(CoopRecordsManager):
     pass
 
-class Levies(Repayment):
+class Levies(CoopRepayment):
     duing = False
     rate = 200
     
@@ -49,9 +58,9 @@ class Levies(Repayment):
     
     def addLevy(self, repay, **kwargs):
         if self.outstanding == 0: raise CoopErrors.LeviesError('No outstanding levy.')
-        return self.repaymentsManager.addRecord(repay, **kwargs)
+        return self.repaymentsManager.createRecord(repay, **kwargs)
 
-class LoanInterest(Repayment):
+class LoanInterest(CoopRepayment):
     duing = False
     
     def __init__(self, manager, interest, date, interestRate=None):
@@ -62,10 +71,10 @@ class LoanInterest(Repayment):
     @property
     def interestRate(self): return self.__interestRate
 
-    def repayInterest(self, interest, **kwargs): return self.addRecord(interest, **kwargs)
+    def repayInterest(self, interest, **kwargs): return self.createRecord(interest, **kwargs)
 
 class LoanInterests(CoopRepaymentsManager):
-    recordClass = LoanInterest
+    ObjectType = LoanInterest
     
     def __init__(self, manager):
         super().__init__(manager)
@@ -74,7 +83,7 @@ class LoanInterests(CoopRepaymentsManager):
     def addLoanInterest(self, **kwargs):
         interestRate = self.loan.interestRate
         interest = self.loan.outstanding * interestRate
-        self.addRecord(interest, interestRate=interestRate, **kwargs)
+        self.createRecord(interest, interestRate=interestRate, **kwargs)
         
     @property
     def loan(self): return self.account
@@ -93,25 +102,25 @@ class CoopLoan(Loan):
 
 class CoopLoanBond(LoanBond):
     duing = False
-    
+    LoanType = CoopLoan
     
     @property
     def unit(self): return self.manager.member.unit
 
 
 class CoopLoanBonds(LoanBonds):
-    recordClass = CoopLoanBond
+    ObjectType = CoopLoanBond
     
     @property
     def region(self): return self.manager
 
 
-class Materials(Repayment):
+class Materials(CoopRepayment):
     duing = False
 
 class Savings(CoopRecordsManager):
     
-    def addSaving(self, savings, **kwargs): self.addRecord(savings, **kwargs)
+    def addSaving(self, savings, **kwargs): self.createRecord(savings, **kwargs)
 
 class Shares(CoopRecordsManager):
     pass

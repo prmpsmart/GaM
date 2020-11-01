@@ -1,4 +1,4 @@
-from ..core.regions import Region, RegionsManager, Person, PersonsManager, ThirdPartySurety, LoanBondDetails
+from ..core.regions_managers import Region, RegionsManager, Person, PersonsManager, ThirdPartySurety, LoanBondDetails
 from .coop_accounts import CoopErrors, CoopAccount, MemberAccount, UnitAccount
 from .coop_errors import CoopErrors
 
@@ -11,7 +11,7 @@ class CoopCO(Person):
     'Cooperative Cash Officer.'
 
 class CoopCOsManager(PersonsManager):
-    subClass = CoopCO
+    ObjectType = CoopCO
     def createCoopCo(self, **kwargs): return self.createDetail(**kwargs)
 
 class CoopThirdPartySurety(ThirdPartySurety):
@@ -76,7 +76,7 @@ class CoopRegion(Region):
     
 
 class CoopRegionsManager(RegionsManager):
-    subClass = CoopRegion
+    ObjectType = CoopRegion
     # def __str__(self): return f'{self.master} {self.className}'
 
 class Member(CoopRegion):
@@ -84,12 +84,13 @@ class Member(CoopRegion):
     Manager = 'MembersManager'
     Person = MemberDetail
     
-    def __init__(self, manager, name, gender, phone, photo=None, email=None, date=None, **kwargs):
+    def __init__(self, manager, name='', gender='', **kwargs):
         assert name != None, 'Name can not be empty.'
         assert gender, 'Gender is not provided.'
         assert gender.lower() in ['f', 'm', 'male', 'female'], "Name can not be empty and must be among ['f', 'm', 'male', 'female']."
         
-        super().__init__(manager=manager, name=name, gender=gender, phone=phone, photo=photo, email=email, date=date, **kwargs)
+        super().__init__(manager=manager, name=name, **kwargs)
+        
     @property
     def spacedID(self): return f'{self.sup.spacedID} | M{self.number}'
     @property
@@ -112,7 +113,7 @@ class Member(CoopRegion):
     def balanceAccount(self): return self.accountsManager.balanceAccount()
 
 class MembersManager(CoopRegionsManager):
-    subClass = Member
+    ObjectType = Member
    
     @property
     def unit(self): return self.master
@@ -149,7 +150,7 @@ class Unit(CoopRegion):
     def getMember(self, **kwargs): return self.getRegion(**kwargs)
 
 class UnitsManager(CoopRegionsManager):
-    subClass = Unit
+    ObjectType = Unit
     
     @property
     def office(self): return self.master

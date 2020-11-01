@@ -932,7 +932,7 @@ class PRMP_Widget(PRMP_Theme):
     
     def addWidget(self, widget, config={}, place={}, grid={}, pack={}, container=None):
         trues = [bool(pos) for pos in [place, pack, grid]].count(True)
-        container = container if container else self.container
+        container = container or self.container or self
         
         if not trues or (trues > 1): raise ValueError('only one is required between [place, pack, grid]')
         else:

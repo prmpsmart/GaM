@@ -4,3 +4,9 @@
 #   for coop:
 #       recordmanagers, once clicked shows the records (scrollabe Frame with LabelLabel children, with tip = record.details) on the right
 #       
+
+Record should be a sub of Object
+
+ability of ObjectsManager to list records in a particular season, able to total it too.
+
+restructured everything into proper inheritance of each other

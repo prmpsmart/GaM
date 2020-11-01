@@ -73,10 +73,10 @@ class SolidScreen(Tk):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
         super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, atb=1, asb=1, **kwargs)
         
-        self.frame = F(self, relief='solid')
-        self.frame['bd'] = 12
+        self.container = F(self, relief='solid')
+        self.container['bd'] = 12
         y, h = self.y_h
-        self.frame.place(x=0, y=y, relw=1, h=h)
+        self.container.place(x=0, y=y, relw=1, h=h)
         
         self.paint()
         # self.mainloop()

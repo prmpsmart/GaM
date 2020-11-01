@@ -1,12 +1,12 @@
 from ..office.office_regions import OfficesManager, Region
 from .agam_accounts import AGAMAccountsManager
-from ..core.regions import Person, PersonsManager
+from ..core.regions_managers import Person, PersonsManager
 
 class CEO(Person):
     pass
 
 class CEOsManager(PersonsManager):
-    subClass = CEO
+    ObjectType = CEO
 
     def createCEO(self, **kwargs): return self.createPerson(**kwargs)
     
@@ -15,7 +15,6 @@ class AGAM(Region):
     SubRegionsManager = OfficesManager
     AccountsManager = AGAMAccountsManager
     PersonsManager = CEOsManager
-    # Manager = 'AGAMAccountsManager.'
     
     def __init__(self, manager='AGAM',  name='AGAM'):
         super().__init__(manager, name=name)
@@ -23,7 +22,8 @@ class AGAM(Region):
     def __str__(self): return f'{self.name}'
     
     @property
-    def master(self): return 4
+    def master(self): return self
+    
     @property
     def officesManager(self): return self.subRegionsManager
     @property

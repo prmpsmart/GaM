@@ -34,6 +34,7 @@ class CoopAccount(Account):
 
 class MemberAccount(CoopAccount):
     Manager = 'Member'
+    
     def newLoanBond(self, money, proposedLoan, **kwargs): return self.loanBonds.newLoanBond(money, proposedLoan, **kwargs)
     
     def balanceAccount(self):
@@ -49,6 +50,7 @@ class MemberAccount(CoopAccount):
 
 class UnitAccount(CoopAccount):
     Manager = 'Unit'
+    
     def __init__(self, manager, date=None,  **kwargs):
         super().__init__(manager, date=date,  **kwargs)
         

@@ -5,16 +5,16 @@ class OfficeAccount(Account):
     Manager = 'OfficeAccountsManager'
 
 class OfficeAccountsManager(AccountsManager):
-    subClass = OfficeAccount
+    ObjectType = OfficeAccount
 
 class CoopOfficeAccount(OfficeAccount):
     Manager = 'CoopOfficeAccountsManager'
 
 class CoopOfficeAccountsManager(OfficeAccountsManager):
-    subClass = CoopOfficeAccount
+    ObjectType = CoopOfficeAccount
 
 class DCOfficeAccount(OfficeAccount):
     Manager = 'DCOfficeAccountsManager'
 
 class DCOfficeAccountsManager(OfficeAccountsManager):
-    subClass = DCOfficeAccount
+    ObjectType = DCOfficeAccount

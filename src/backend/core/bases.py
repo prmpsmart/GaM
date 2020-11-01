@@ -1,17 +1,39 @@
 from .errors import Errors
+from .date_time import CompareByDate
+from hashlib import sha224
 
-
-class Mixins:
+class Mixins(CompareByDate):
     naira = chr(8358)
     dollar = chr(36)
     euro = chr(163)
     yen = chr(165)
     _moneySign = naira + chr(32)
+    Error = Errors
     
     def __len__(self):
         try: return len(self[:])
         except: return 1
     
+    def numWithCommas(self, num=None):
+        if num == None: num = int(self)
+        
+        div = 3
+        str_num = str(num)
+        num_list = list(str_num)
+        num_len = len(str_num)
+        num_rem = num_len % div
+        num_div = num_len // div
+        if not num_rem: num_div -= 1
+        co, to = -3, 0
+        for _ in range(num_div):
+            num_list.insert(co - to, ",")
+            co -= 3
+            to += 1
+        return "".join(num_list)
+    
+    @property
+    def withCommas(self): return self.numWithCommas(self.money)
+
     @classmethod
     def setMoneySign(cls, sign): Mixins._moneySign = sign
     
@@ -71,23 +93,44 @@ class Mixins:
     def week(self): return self.date.week
 
 
-class RA_Mixins:
-    Manager = 'RAM_Mixins'
+
+
+class Object(Mixins):
+    Manager = 'ObjectsManager'
+    Managers = ()
     
-    def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False):
+    def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
         from .date_time import DateTime
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         
-        if not isinstance(manager, str): assert manager.className == self.Manager, f'Manager should be {self.Manager} not {manager.className}.'
+        if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
         self.__number = number
+        self.__sup = sup
         
         self.__name = name if not nameFromNumber else f'{self.className} {self.number}'
         self.__date = date
         self.__manager = manager
         self.__previous = previous
         self.__next = None
+        
+        self.__uniqueID = sha224(self.id.encode()).hexdigest()
+    
+    
+    @property
+    def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
+    
+    @property
+    def sup(self): return self.__sup
+    
+    @property
+    def spacedID(self):
+        'override in subclass'
+        return 'id | object'
+    
+    @property
+    def uniqueID(self): return self.__uniqueID
         
     @property
     def name(self): return self.__name
@@ -102,20 +145,25 @@ class RA_Mixins:
     
     @property
     def number(self): return self.__number
+    
     @property
     def date(self): return self.__date
+    
     @property
     def previous(self): return self.__previous
+    
     @property
     def next(self): return self.__next
+    
     @next.setter
     def next(self, next_):
         if self.__next == None: self.__next = next_
-        else: raise Errors('A next is already set.')
+        else: raise self.Error('A next is already set.')
 
 
-class RAM_Mixins:
-    subClass = RA_Mixins
+
+class ObjectsManager(Mixins):
+    ObjectType = Object
     
     def __init__(self, master=None):
         assert master != None, 'Master can not be None.'
@@ -124,6 +172,7 @@ class RAM_Mixins:
         self.__subs = []
     
     def __getitem__(self, num): return self.subs[num]
+    
     def __len__(self): return len(self.subs)
     
     @property
@@ -160,10 +209,10 @@ class RAM_Mixins:
                     
                     elif 'date' in attr:
                         w = attr.split('-')[1]
-                        if w == d: v = sub.date.isSameDay(val)
-                        elif w == m: v = sub.date.isSameMonth(val)
-                        elif w == y: v = sub.date.isSameYear(val)
-                        elif w == t: v = sub.date.isSameDate(val)
+                        if w == 'd': v = sub.date.isSameDay(val)
+                        elif w == 'm': v = sub.date.isSameMonth(val)
+                        elif w == 'y': v = sub.date.isSameYear(val)
+                        elif w == 't': v = sub.date.isSameDate(val)
                         
                     else: v = getattr(sub, attr) == val
                         
@@ -171,17 +220,17 @@ class RAM_Mixins:
 
                 if count.count(True) == len(count): return sub
     
-    def createSub(self, **kwargs):
+    def createSub(self, *args, **kwargs):
         last = self.last
-        # print(self.className)
-        sub = self.subClass(self, previous=last, number=len(self)+1, **kwargs)
+        print(kwargs, self.className)
+        # if self.className == 'OfficeAccountsManager': exit()
+        
+        sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, **kwargs)
         if last: last.next = sub
         
         self.addSub(sub)
         
         return sub
-
-
 
 
 

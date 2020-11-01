@@ -1,9 +1,9 @@
-from .accounts import AccountsManager, DateTime, Mixins, Errors, RA_Mixins, RAM_Mixins, CompareByDate
-from .records import Salary, SalariesManager
+from .accounts import AccountsManager, DateTime, Mixins, Errors, Object, ObjectsManager, CompareByDate
+from .records_managers import *
 import os
-from hashlib import sha224
 
-class Person(RA_Mixins, Mixins):
+
+class Person(Object):
     Manager = 'PersonsManager'
     
     __male = 'male', 'm'
@@ -13,7 +13,7 @@ class Person(RA_Mixins, Mixins):
         
         if isinstance(manager, Region): date = manager.date
         
-        RA_Mixins.__init__(self, manager, date=date, name=name)
+        Object.__init__(self, manager, date=date, name=name)
 
         gender = gender.lower()
         
@@ -68,7 +68,7 @@ class Person(RA_Mixins, Mixins):
         pass
 
 
-class Region(RA_Mixins, CompareByDate):
+class Region(Object):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
@@ -76,27 +76,25 @@ class Region(RA_Mixins, CompareByDate):
     Person = None
     
     
-    def __init__(self, manager, name=None, date=None, nameFromNumber=False, location=None, phone=None, sup=None, previous=None, number=None, **kwargs):
+    def __init__(self, manager, name=None, date=None, location=None, phone=None, **kwargs):
         
-        RA_Mixins.__init__(self, manager, number=number, previous=previous, date=date, name=name, nameFromNumber=nameFromNumber)
+        Object.__init__(self, manager, date=date, name=name, **kwargs)
         
-        self.__sup = sup
+        
         self.__person = None
         self.__personsManager = None
         self.__subRegionsManager = None
         
         self.__location = location
         
-        self.__uniqueID = sha224(self.id.encode()).hexdigest()
         
         self.__accountsManager = self.AccountsManager(self, **kwargs)
-        
         
         if self.SubRegionsManager:
             self.__subRegionsManager = self.SubRegionsManager(self)
             
             if self.PersonsManager: self.__personsManager = self.PersonsManager(self)
-            
+
         else:
             if self.Person: self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
     
@@ -105,9 +103,6 @@ class Region(RA_Mixins, CompareByDate):
     def __len__(self): return len(self.accountsManager)
     
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
-    
-    @property
-    def sup(self): return self.__sup
     
     @property
     def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
@@ -134,16 +129,6 @@ class Region(RA_Mixins, CompareByDate):
     @property
     def level(self): return len(self.hierachy)
     
-    @property
-    def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
-    
-    @property
-    def spacedID(self):
-        'override in subclass'
-        return 'id | region'
-    
-    @property
-    def uniqueID(self): return self.__uniqueID
     
     @property
     def link(self): return self.__link
@@ -162,24 +147,19 @@ class Region(RA_Mixins, CompareByDate):
     @property
     def reignMonthsYears(self): return divmod(self.reignMonths, 12)
     @property
-    def gender(self):
-        if self.person: return self.person.gender
+    def gender(self): return self.person.gender if self.person else ''
     
     @property
-    def phone(self):
-        if self.person: return self.person.phone
+    def phone(self): return self.person.phone if self.person else ''
     
     @property
-    def email(self):
-        if self.person: return self.person.email
+    def email(self): return self.person.email if self.person else ''
     
     @property
-    def address(self):
-        if self.person: return self.person.address
+    def address(self): return self.person.address if self.person else ''
     
     @property
-    def image(self):
-        if self.person: return self.person.image
+    def image(self): return self.person.image if self.person else ''
     
     def getRegion(self, **kwargs): return self.getSubReg(**kwargs)
     
@@ -273,143 +253,6 @@ class Region(RA_Mixins, CompareByDate):
     def sortSubRegionsAccountsByYear(self): return self.subRegionsManager.sortRegionsAccountsByYear(date)
     def sortSubRegionsAccountsIntoYears(self): return self.subRegionsManager.sortRegionsAccountsIntoYears(date)
 
-class RegionsManager(RAM_Mixins, Mixins):
-    subClass = Region
-    
-    def __init__(self, master):
-        RAM_Mixins.__init__(self, master)
-        self.__master = master
-        self.addRegion = self.addSub
-        
-    
-    
-    def __getitem__(self, num): return self.regions[num]
-    def __len__(self): return len(self.regions)
-    def __repr__(self): return f'<{self}>'
-    def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
-    
-    @property
-    def firstRegion(self): return self.first
-    @property
-    def lastRegion(self): return self.last
-    
-    @property
-    def region(self): return self.master
-    
-    @property
-    def date(self): return self.master.date
-    
-    @property
-    def regions(self): return self.subs
-    
-    def getRegion(self, number=None, name=None, phone=None, email=None, image=None):
-        ## provide mechanism to scan pictures.
-        self.getSub(dict(number=number, name=name, phone=phone, email=email, image=image))
-        # for region in self.regions:
-        #     if number == region.number: return region
-        #     elif name == region.name: return region
-        #     elif phone == region.phone: return region
-        #     elif email == region.email: return region
-            
-    @classmethod
-    def getFromAllRegions(cls, number):
-        for region in cls.allRegions():
-            if region.number == number: return region
-    
-    def regionExists(self, **kwargs):
-        if self.getRegion(**kwargs): return True
-        return False
-    
-    def createRegion(self, **kwargs): return self.createSub(sup=self.master, **kwargs)
-    
-
- ########## Sorting
-  # SubRegions
-   #Date Sorting
-    def sortRegionsByDate(self, date):
-        DateTime.checkDateTime(date)
-        clientsByDate = [client for client in self.clients if client.regDate == date]
-        return clientsByDate
-   #Day Sorting
-    def sortRegionsByDay(self):
-        pass
-    def sortRegionsIntoDaysInWeek(self):
-        pass
-    def sortRegionsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortRegionsByWeek(self):
-        pass
-    def sortRegionsIntoWeeksInMonth(self):
-        pass
-    def sortRegionsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortRegionsByMonth(self, month):
-        pass
-    def sortRegionsIntoMonthsInYear(self):
-        pass
-    def sortRegionsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortRegionsByYear(self):
-        pass
-    def sortRegionsIntoYears(self):
-        pass
-
-  # Regions Accounts
-   #Date Sorting
-    def sortRegionsAccountsByDate(self):
-        pass
-
-   #Day Sorting
-    def sortRegionsAccountsByDay(self):
-        pass
-    def sortRegionsAccountsIntoDaysInWeek(self):
-        pass
-    def sortRegionsAccountsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortRegionsAccountsByWeek(self):
-        pass
-    def sortRegionsAccountsIntoWeeksInMonth(self):
-        pass
-    def sortRegionsAccountsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortRegionsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
-        clients = [client for client in self.clients if client.lastAccount.date.isSameMonth(month)]
-        accounts = []
-        for client in clients:
-            clientAccounts = client.accountsManager.sortAccountsByMonth(month)
-            accounts.extend(clientAccounts)
-        return accounts
-        
-    def sortRegionsAccountsIntoMonthsInYear(self):
-        pass
-    def sortRegionsAccountsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortRegionsAccountsByYear(self):
-        pass
-    def sortRegionsAccountsIntoYears(self):
-        pass
-
-
-
-
-class PersonsManager(RegionsManager):
-    subClass = Person
-    @property
-    def lastPerson(self): return self.lastRegion
-    def createPerson(self, **kwargs): return self.createRegion(**kwargs)
 
 class Staff(Region):
     AccountsManager = SalariesManager

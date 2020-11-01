@@ -4,7 +4,7 @@ class AGAMAccount(Account):
     Manager = 'AGAMAccountsManager'
 
 class AGAMAccountsManager(AccountsManager):
-    subClass = AGAMAccount
+    ObjectType = AGAMAccount
     
 
 
