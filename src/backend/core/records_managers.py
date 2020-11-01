@@ -230,7 +230,7 @@ class RecordsManager(ObjectsManager):
     def date(self): return self.account.date
     
     @property
-    def account(self): return self.__account
+    def account(self): return self.master
     
     @property
     def region(self): return self.account.region
@@ -283,9 +283,9 @@ class RecordsManager(ObjectsManager):
                     if notAdd: record.set(money)
                     else: record.add(money)
             else: new = True
-        print(kwargs, 'llonh')
+            
         if new:
-            record = self.createSub(self, money, date=date, **kwargs)
+            record = self.createSub(money, date=date, **kwargs)
             self.records.sort()
         
         return record

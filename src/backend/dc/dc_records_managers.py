@@ -18,6 +18,7 @@ class Rates(DCRecordsManager):
     def __init__(self, accounts, rate):
         super().__init__(accounts, True)
         self.setRate(rate)
+        
     def __int__(self): return int(self[-1])
     
     def payUpBal(self, rate):
@@ -29,7 +30,7 @@ class Rates(DCRecordsManager):
     
     @classmethod
     def checkRate(cls, rate):
-        if rate < cls.lowest: raise DCErrors.RatesError(f'Rate must not be less than {cls.lowest}')
+        if rate < cls.lowest: raise DCErrors.RatesError(f'Rate ({rate}) must not be less than {cls.lowest}')
         return True
     
     def setRate(self, rate):

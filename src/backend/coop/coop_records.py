@@ -98,10 +98,12 @@ class CoopLoan(Loan):
     dueSeason = 'year'
     dueTime = 11
     rate = 2
+    # Manager = ''
     
 
 class CoopLoanBond(LoanBond):
     duing = False
+    Manager = 'CoopLoanBonds'
     LoanType = CoopLoan
     
     @property

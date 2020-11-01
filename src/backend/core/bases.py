@@ -1,5 +1,5 @@
 from .errors import Errors
-from .date_time import CompareByDate
+from .date_time import CompareByDate, DateTime
 from hashlib import sha224
 
 class Mixins(CompareByDate):
@@ -30,6 +30,11 @@ class Mixins(CompareByDate):
             co -= 3
             to += 1
         return "".join(num_list)
+    
+    def testPrint(self, *args):
+        print()
+        for a in args: print(a, end='=')
+        print()
     
     @property
     def withCommas(self): return self.numWithCommas(self.money)
@@ -104,7 +109,7 @@ class Object(Mixins):
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         
-        if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager should be {self.Manager} or in {self.Managers} not {manager.className}.'
+        if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
         self.__number = number
         self.__sup = sup
@@ -222,8 +227,6 @@ class ObjectsManager(Mixins):
     
     def createSub(self, *args, **kwargs):
         last = self.last
-        print(kwargs, self.className)
-        # if self.className == 'OfficeAccountsManager': exit()
         
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, **kwargs)
         if last: last.next = sub

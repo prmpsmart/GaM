@@ -99,8 +99,6 @@ class Hierachy(PRMP_TreeView):
         if current:
             if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
             else: RegionDetails(self, region=current)
-
-
 H = Hierachy
 
 
@@ -129,12 +127,15 @@ class RegionDetails(PRMP_Window, FillWindow):
         if not region: return
         text = ''
         hie = region.hierachy
+        
         for reg in hie[1:]:
-            if len(hie) > 2 and reg == hie[2]: name = reg.name.split(hie[1].name)[1]
+            if len(hie) > 2 and reg is hie[2]: name = reg.DEPARTMENT
             else: name = reg.name
             text += name + ' | '
+
         te = text.split('|')[:-1]
         text = ' | '.join(te)
+        
         self.region = region
         self.titleBar.set(text)
         
@@ -192,11 +193,12 @@ class RegionDetails(PRMP_Window, FillWindow):
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
         
-    def showPersons(self):
+    def showPersons(self, e=0):
         if self.personDialog: self.personDialog.destroy()
         if self.region:
             if self.region.level == 5:
                 self.personDialog = PersonDialog(values=self.region.person.values, side='center')
+            else: print('Level not upto')
     
     def switch(self):
         # to switch between subregions and accounts
@@ -238,5 +240,5 @@ class RegionDetails(PRMP_Window, FillWindow):
         self.subRegions.place_forget()
         self.accounts.place(x=2, y=220, h=350, relw=self.w)
         self.expand()
-
+RD = RegionDetails
 

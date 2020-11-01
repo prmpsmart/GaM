@@ -4,6 +4,7 @@ from ..core.accounts import DateTime, Account, AccountsManager
 
 
 class DCAccount(Account):
+    Manager = 'DCAccountsManager'
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
@@ -52,12 +53,14 @@ class DCAccountsManager(AccountsManager):
 
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
+    
     def __init__(self, manager, ledgerNumber=0, rate=0, **kwargs):
         super().__init__(manager, **kwargs)
         
         self.__ledgerNumber = ledgerNumber
         self.__contributions = Contributions(self)
         self.__rates = Rates(self, rate)
+        
         
     @property
     def recordsManagers(self):
@@ -117,6 +120,12 @@ class AreaAccount(DCAccount):
         self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
         self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
         self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
+        
+        ###############
+        
+        self.balances
+        self.excesses
+        self.deficits
 
 
 class ClientAccountsManager(DCAccountsManager):

@@ -76,9 +76,9 @@ class Region(Object):
     Person = None
     
     
-    def __init__(self, manager, name=None, date=None, location=None, phone=None, **kwargs):
+    def __init__(self, manager, name=None, date=None, location=None, phone=None, previous=None, number=None, **kwargs):
         
-        Object.__init__(self, manager, date=date, name=name, **kwargs)
+        Object.__init__(self, manager, previous=previous, date=date, name=name, number=number, **kwargs)
         
         
         self.__person = None

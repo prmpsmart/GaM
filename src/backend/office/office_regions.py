@@ -59,8 +59,6 @@ class OfficesManager(RegionsManager):
     
     def createOffice(self, name=None, **kwargs):
         if name == None: name = self.name 
-        
-        # exit()
         return self.createRegion(name=name, **kwargs)
 
 

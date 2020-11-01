@@ -133,8 +133,8 @@ class RegionsManager(ObjectsManager, Mixins):
 class PersonsManager(ObjectsManager):
     ObjectType = Person
     @property
-    def lastPerson(self): return self.lastRegion
-    def createPerson(self, **kwargs): return self.createRegion(**kwargs)
+    def lastPerson(self): return self.last
+    def createPerson(self, **kwargs): return self.createSub(**kwargs)
 
 
 

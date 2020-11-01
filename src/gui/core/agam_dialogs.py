@@ -7,6 +7,7 @@ class PersonDialog(PRMP_Dialog):
     def __init__(self, master=None, title='Person Dialog', person=None, geo=(550, 320), **kwargs):
         super().__init__(master=master, title=title, geo=geo,  **kwargs)
         self.person = person
+        
     
     def _setupDialog(self):
         self.addTitleBar(self.titleText)

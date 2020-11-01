@@ -1,9 +1,10 @@
-from .bases import Object
+from .bases import Object, DateTime
 
 # Record is the {money, date} recieved daily a.k.a DayRecord
 
 
 class Record(Object):
+    Manager = 'RecordsManager'
     
     def __init__(self, manager, money, date=None, note='', **kwargs):
         Object.__init__(self, manager, **kwargs)
@@ -12,7 +13,7 @@ class Record(Object):
     
     def __int__(self): return self.money
     
-    def __str__(self): return f' {self.manager} | {self.className}({self.date} , {self.moneyWithSign} , {self.note})'
+    def __str__(self): return f' {self.manager} | {self.className}({self.date} , {self.moneyWithSign} , {self.note or "Note"})'
 
     @property
     def region(self): return self.manager.region
@@ -39,9 +40,10 @@ class Repayment(Record):
     dueSeason = ''
     dueTime = 0
     duing =  True
+    Manager = 'RepaymentsManager'
     
-    def __init__(self, manager, money, date=None):
-        super().__init__(manager, money, date)
+    def __init__(self, manager, money, date=None, **kwargs):
+        super().__init__(manager, money, date, **kwargs)
         
         if self.duing: assert self.dueSeason and self.dueTime, 'Due Season and Time must be set.'
         
@@ -92,11 +94,13 @@ class Loan(Repayment):
     dueSeason = 'year'
     dueTime = 11
     rate = 2
+    Manager = 'LoanBond'
     
-    def __init__(self, loanBond, date, interestRate=.1, dueTime=None):
+    def __init__(self, loanBond, interestRate=.1, dueTime=None, **kwargs):
         if dueTime: self.dueTime = dueTime
+        from .records_managers import LoanInterests
         
-        super().__init__(loanBond, loanBond.proposedLoan, date)
+        super().__init__(loanBond, loanBond.proposedLoan, **kwargs)
         
         self.__interestRate = interestRate
         self.__loanInterests = LoanInterests(self)
@@ -130,9 +134,10 @@ class Loan(Repayment):
 class LoanBond(Repayment):
     duing = False
     LoanType = Loan
+    Manager = 'LoanBonds'
     
-    def __init__(self, manager, money, proposedLoan, date=None):
-        super().__init__(manager, money, date)
+    def __init__(self, manager, money, proposedLoan, **kwargs):
+        super().__init__(manager, money, **kwargs)
         
         validLoan = manager.validLoan
         assert validLoan >= proposedLoan, f'Loan {proposedLoan} exceed maximum valid loan of {validLoan}.'
@@ -179,18 +184,16 @@ class LoanBond(Repayment):
     def fillLoanBond(self, ):
         pass
     
-    def grant(self, interestRate=.1, dueTime=None, date=None):
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
-        self.__loan = self.LoanType(self, date, interestRate=interestRate, dueTime=dueTime)
+    def grant(self, interestRate=.1, dueTime=None, date=None): self.__loan = self.LoanType(self, date=date, interestRate=interestRate, dueTime=dueTime)
 
 class LoanInterest(Repayment):
     duing = False
+    Manager = 'LoanInterests'
     
-    def __init__(self, manager, interest, date, interestRate=None):
+    def __init__(self, manager, interest, interestRate=None, **kwargs):
         if interestRate: self.__interestRate = interestRate
         
-        super().__init__(manager, interest, date)
+        super().__init__(manager, interest, **kwargs)
     
     @property
     def interestRate(self): return self.__interestRate

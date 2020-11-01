@@ -2,19 +2,21 @@ from src.backend.core.records_managers import Repayment, DateTime, RecordsManage
 from .dc_errors import DCErrors
 
 class DCRecord(Record):
-    pass
+    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', '', '', '')
 
 class DCRepayment(Repayment):
-    pass
+    Managers = ('Upfronts', )
 
 class Contribution(DCRecord):
     
     def __init__(self, manager, contrib, **kwargs):
-        rate = manager.manager.rate 
+        rate = manager.master.rate
         money = rate * contrib
         self.__contrib = contrib
 
         super().__init__(manager, money, **kwargs)
+    
+    def __int__(self): return self.contributed
     
     @property
     def contributed(self): return self.__contrib
@@ -23,6 +25,7 @@ class Contribution(DCRecord):
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1
+    Manager = 'Upfronts'
 
 
 

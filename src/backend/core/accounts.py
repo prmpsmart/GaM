@@ -140,10 +140,11 @@ class AccountsManager(ObjectsManager, Mixins):
     def __init__(self, region, autoAccount=True, **kwargs):
         
         ObjectsManager.__init__(self, region)
+        
         self.addAccount = self.addSub
         self.createAccount = self.createSub
         
-        if autoAccount == True: self.createAccount()
+        if autoAccount == True: self.createAccount(**kwargs)
         
     def __eq__(self, manager):
         if manager == None: return False
