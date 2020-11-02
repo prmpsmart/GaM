@@ -225,9 +225,8 @@ class RegionDetails(PRMP_Window, FillWindow):
     
     def placeSubs(self, sub):
         x, y = self.expandGeo
-        h = y - 183 - 60 - 30
-        print(h)
-        w = x - 4
+        h = y - 183 - 60 - 6
+        w = x - 12
         sub.place(x=2, y=183, h=h or 350, w=w or 788)
         
     def showAccountsContainer(self):
