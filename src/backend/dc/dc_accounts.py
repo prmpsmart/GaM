@@ -1,5 +1,5 @@
 
-from .dc_records_managers import BroughtForwards, Rates, Contributions, Savings, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits
+from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings
 from ..core.accounts import DateTime, Account, AccountsManager
 
 
@@ -43,6 +43,7 @@ class DCAccount(Account):
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
         if self.nextAccount: self.nextAccount.addBroughtForward(int(self.balances))
+        
 
 class DCAccountsManager(AccountsManager):
     ObjectType = DCAccount
@@ -71,36 +72,58 @@ class ClientAccount(DCAccount):
     
     @property
     def rate(self): return int(self.rates)
+    
     @property
     def rates(self): return self.__rates
+    
     @property
     def contributions(self): return self.__contributions
+    
     @property
     def ledgerNumber(self): return self.__ledgerNumber
+    
     def _balanceAccount(self, date=None):
         rate = int(self.rates)
-        bal = int(self.broughtForwards) + int(self.savings) - self.upfronts.outstanding - int(self.debits) - self.rate
-        self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
+        bal = int(self.broughtForwards) + int(self.savings) - int(self.upfronts.outstanding) - int(self.debits) - rate
+        
+        if bal: self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 
     def addContribution(self, contribution): self.contributions.addContribution(contribution)
     
-    def addDebit(self, debit): self.debits.addDebit(debit)
+    def addDebit(self, debit, up=0):
+        if up: self._balanceAccount()
+        self.debits.addDebit(debit)
     
     def addUpfront(self, upfront):
         # assert DateTime.now().isSameMonth(month)
         pass
 
+    # @property
+    # def savings(self): return self.contributions.savings
+    
+    
+    
 class AreaAccount(DCAccount):
     Manager = 'AreaAccountsManager'
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
+        
+        self.__savings = Savings(self)
+        self.__commissions = Commissions(self)
         self.__broughtToOffices = BroughtToOffices(self)#
         self.__excesses = Excesses(self)
         self.__deficits = Deficits(self)
     
+    # @property
+    # def savings(self): return self.contributions
+    
     @property
     def commissions(self): return self.__commissions
+    
+    @property
+    def savings(self): return self.__savings
+    
     @property
     def recordsManagers(self):
         recordsManagers =  super().recordsManagers + [self.broughtToOffices, self.excesses, self.deficits]
@@ -108,24 +131,39 @@ class AreaAccount(DCAccount):
     
     @property
     def broughtToOffices(self): return self.__broughtToOffices
+    
+    @property
+    def btos(self): return self.broughtToOffices
+    
+    @property
+    def commissions(self): return self.__commissions
+    
     @property
     def excesses(self): return self.__excesses
+    
     @property
     def deficits(self): return self.__deficits
+    
     def _balanceAccount(self):
         clientsAccounts = self.manager.sortClientsAccountsByMonth(self.date)
-        self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
-        self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
-        self.commissions.updateWithOtherManagers([account.rates for account in clientsAccounts])
-        self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
-        self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
-        self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
+        if clientsAccounts:
+            self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
+            
+            self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
+            
+            self.commissions.updateWithOtherManagers([account.rates for account in clientsAccounts])
+            
+            self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
+            
+            self.savings.updateWithOtherManagers([account.contributions for account in clientsAccounts])
+            
+            self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
         
-        ###############
-        
-        self.balances
-        self.excesses
-        self.deficits
+            ###############
+            
+            self.btos
+            self.excesses
+            self.deficits
 
 
 class ClientAccountsManager(DCAccountsManager):

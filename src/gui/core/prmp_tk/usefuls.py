@@ -66,7 +66,6 @@ def confirm(title=None, msg=None, num=None):
     if num == 4: return msgbox.askretrycancel(title, msg)
     if num == 5: return msgbox.askyesnocancel(title, msg)
 
-
 def copyClassMethods(obj, copyClass, *args):
     
     for key, val in copyClass.__dict__.items():

@@ -95,6 +95,7 @@ class Hierachy(PRMP_TreeView):
         self.tree.bind('<Control-Return>', self.viewRegion)
 
     def viewRegion(self, e=0):
+        print(e.__dict__)
         current = self.selected()
         if current:
             if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
@@ -104,7 +105,8 @@ H = Hierachy
 
 class RegionDetails(PRMP_Window, FillWindow):
     
-    def __init__(self, master=None, title='Region Details', geo=(600, 250), values={}, region=None, **kwargs):
+    def __init__(self, master=None, title='Region Details', geo=(600, 250), expandGeo=(800, 600), values={}, region=None, **kwargs):
+        
         
         PRMP_Window.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         FillWindow.__init__(self, values=values)
@@ -112,8 +114,9 @@ class RegionDetails(PRMP_Window, FillWindow):
         self.region = region
         self.personDialog = None
         self.switchState = None
-        self.setupApp()
-        
+        self._setupApp()
+        self.geo_ = geo
+        self.expandGeo = expandGeo
         self.fill()
         self.paint()
         
@@ -125,36 +128,17 @@ class RegionDetails(PRMP_Window, FillWindow):
     def regionChanged(self, region):
         region = region[1]
         if not region: return
-        text = ''
-        hie = region.hierachy
-        
-        for reg in hie[1:]:
-            if len(hie) > 2 and reg is hie[2]: name = reg.DEPARTMENT
-            else: name = reg.name
-            text += name + ' | '
-
-        te = text.split('|')[:-1]
-        text = ' | '.join(te)
-        
+    
         self.region = region
-        self.titleBar.set(text)
+        self.titleBar.set(region.idText)
         
         person = region.person
         if person: self.fill(person.values)
     
-    def setupApp(self):
-        # self.addTitleBar()
-        # self.addStatusBar()
-        
-        self.frame = F(self, relief='groove')
-        y, h = self.y_h
-        x, w = self.x_w
-        self.frame.place(x=2, y=y, relw=w, h=h)
-        self.w = w
-        
+    def _setupApp(self):
        # hierachy
-        self.hierachy = LF(self.frame, text='Hierachy')
-        self.hierachy.place(relx=0, y=0, h=150, w=335)
+        self.hierachy = LF(self.container, text='Hierachy')
+        self.hierachy.place(x=2, y=0, h=150, relw=.6)
         
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
@@ -171,33 +155,36 @@ class RegionDetails(PRMP_Window, FillWindow):
         self.sup.addReceiver(self.sub.receiver)
         
         # workers in the region or the individual 
-        persons = B(self.frame, text='Persons', command=self.showPersons)
-        persons.place(x=0, y=155, h=24, w=90)
+        persons = B(self.container, text='Persons', command=self.showPersons)
+        persons.place(x=2, y=155, h=24, w=80)
         
-        switch = B(self.frame, text='Switch?', command=self.switch)
-        switch.place(x=110, y=155, h=24, w=90)
+        switch = B(self.container, text='Switch?', command=self.switch)
+        switch.place(x=100, y=155, h=24, w=90)
         
-        new = PCb(self.frame, text='New Dialog ?')
-        new.place(x=215, y=155, h=24, w=120)
+        new = PCb(self.container, text='New Dialog ?')
+        new.place(x=208, y=155, h=24, w=120)
        
         
         self.image = IL(self)
-        self.image.place(x=360, y=40, h=170, w=230)
+        self.image.place(relx=.606, y=40, h=170, relw=.382)
     
        # accounts
-        self.accounts = LF(self, text='Accounts')
+        self.accounts = LF(self.container, text='Accounts')
        # subregions
-        self.subRegions = LF(self, text='Sub Regions')
+        self.subRegions = LF(self.container, text='Sub Regions')
+        
         
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
         
+        # self.switch()
+        
     def showPersons(self, e=0):
         if self.personDialog: self.personDialog.destroy()
         if self.region:
             if self.region.level == 5:
-                self.personDialog = PersonDialog(values=self.region.person.values, side='center')
+                self.personDialog = PersonDialog(self,  values=self.region.person.values, side='center')
             else: print('Level not upto')
     
     def switch(self):
@@ -224,21 +211,29 @@ class RegionDetails(PRMP_Window, FillWindow):
             self.titleBar.config(text=f'{self.region} Details Dialog')
         
     def unExpand(self):
-        self.changeGeometry((600, 250))
         self.accounts.place_forget()
+        self.changeGeometry(self.geo_)
         self.placeStatusBar()
         
     def expand(self):
-        self.changeGeometry((800, 600))
+        self.changeGeometry(self.expandGeo)
         self.placeStatusBar()
         
     def showSubRegionsContainer(self):
-        self.subRegions.place(x=2, y=220, h=350, relw=self.w)
+        self.placeSubs(self.subRegions)
         self.expand()
+    
+    def placeSubs(self, sub):
+        x, y = self.expandGeo
+        h = y - 183 - 60 - 30
+        print(h)
+        w = x - 4
+        sub.place(x=2, y=183, h=h or 350, w=w or 788)
         
     def showAccountsContainer(self):
         self.subRegions.place_forget()
-        self.accounts.place(x=2, y=220, h=350, relw=self.w)
+        self.placeSubs(self.accounts)
         self.expand()
+        
 RD = RegionDetails
 

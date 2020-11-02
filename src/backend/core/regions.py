@@ -67,7 +67,6 @@ class Person(Object):
     def show(self):
         pass
 
-
 class Region(Object):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
@@ -131,7 +130,18 @@ class Region(Object):
     
     
     @property
-    def link(self): return self.__link
+    def idText(self):
+        text = ''
+        hie = self.hierachy
+        
+        for reg in hie[1:]:
+            if len(hie) > 2 and reg is hie[2]: name = reg.DEPARTMENT
+            else: name = reg.name
+            text += name + ' | '
+
+        te = text.split('|')[:-1]
+        text = ' | '.join(te)
+        return text
     
     @property
     def hierachy(self): return self.sups + [self]

@@ -104,6 +104,10 @@ class Object(Mixins):
     Manager = 'ObjectsManager'
     Managers = ()
     
+    def __eq__(self, other):
+        if other == None: return False
+        return self is other
+    
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
         from .date_time import DateTime
         if date == None: date = DateTime.now()
@@ -234,6 +238,10 @@ class ObjectsManager(Mixins):
         self.addSub(sub)
         
         return sub
+
+    def deleteSubs(self):
+        del self.__subs
+        self._subs = []
 
 
 

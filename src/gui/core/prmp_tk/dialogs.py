@@ -4,15 +4,18 @@ from .core import *
 from .pics import Xbms
 
 
-class PRMP_Dialog(PRMP_Toplevel, FillWindow):
+class PRMP_Dialog(PRMP_Window, FillWindow):
     
     def __init__(self, master=None, _return=True, values={}, **kwargs):
-        PRMP_Toplevel.__init__(self, master, ntb=9, nrz=0, tm=1, gaw=1, **kwargs)
+        PRMP_Window.__init__(self, master, ntb=9, nrz=0, tm=1, gaw=1, **kwargs)
         FillWindow.__init__(self, values=values)
         
         self.__result = None
         
         self._return = _return
+        
+        self.submitBtn = None
+        self.editBtn = None
         
         self._setupDialog()
         self.fill()
@@ -40,18 +43,23 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
     def _setResult(self, result): self.__result = result
     
     def addSubmitButton(self, command=None):
-        geo = self.kwargs.get('geo')
-        if geo:
-            x, y = geo[:2]
-            xbtn = B(self, text='Submit', command=command)
-            xbtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
+        self.submitBtn = B(self.container, text='Submit', command=command or self.processInput)
+        # self.placeSubmitBtn(1)
+            
     
-    def addEditButton(self, command=None):
-        geo = self.kwargs.get('geo')
-        if geo:
-            x, y = geo[:2]
-            self.editBtn = xbtn = Cb(self, text='Edit', command=self.editInput)
-            xbtn.place(x=10 , y=y-40, h=30, w=60)
+    def placeSubmitBtn(self, wh=0):
+        if wh:
+            self.container.paint()
+            geo = self.kwargs.get('geo')
+            x, y = self.containerGeo
+            self.submitBtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
+        else: self.submitBtn.place_forget()
+    
+    def addEditButton(self, command=None, submitCommand=None):
+        if self.submitBtn == None: self.addSubmitButton(submitCommand)
+        x, y = self.containerGeo
+        self.editBtn = xbtn = Cb(self.container, text='Edit', command=self.editInput)
+        xbtn.place(x=10 , y=y-40, h=30, w=60)
     
     def processInput(self):
         result = {}
@@ -67,10 +75,12 @@ class PRMP_Dialog(PRMP_Toplevel, FillWindow):
         
     def editInput(self):
         if self.editBtn.var.get() == '1':
+            self.placeSubmitBtn(1)
             for widgetName in self.resultsWidgets:
                 wid = self.__dict__.get(widgetName)
                 if wid: wid.normal()
-        else: 
+        else:
+            self.placeSubmitBtn()
             for widgetName in self.resultsWidgets:
                 wid = self.__dict__.get(widgetName)
                 if wid: wid.disabled()
@@ -300,11 +310,12 @@ class PRMP_MsgBox(PRMP_Toplevel):
         self.__result = None
         self.addTitleBar()
         
-        self.label = L(self, text=message, bitmap='')
-        x, w = self.x_w
-        self.label.place(x=x, y=30, relh=.6, w=w)
-        self.bitmap = L(self.label, bitmap=self.getType(_type), relief='flat')
-        self.bitmap.place(relx=.84, rely=.2, relh=.6, relw=.15)
+        self.label = L(self, text=message, bitmap='', wraplength=250)
+        
+        self.label.place(relx=.007, y=30, relh=.6, relw=.833)
+        
+        self.bitmap = L(self, bitmap=self.getType(_type))
+        self.bitmap.place(relx=.84, y=30, relh=.6, relw=.15)
 
         self.yes = PRMP_Button(self, text='Yes', command=self.yesCom)
         self.yes.place(relx=.06, rely=.8, relh=.15, relw=.17)

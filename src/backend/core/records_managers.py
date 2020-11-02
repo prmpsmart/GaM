@@ -269,7 +269,9 @@ class RecordsManager(ObjectsManager):
         new = False
         record = None
         
-        assert money != 0, 'Money must not be zero.'
+        # if money == 0: newRecord, notAdd = False, True
+        
+        # assert money != 0, 'Money must not be zero.'
         
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
@@ -291,6 +293,7 @@ class RecordsManager(ObjectsManager):
         return record
         
     def updateWithOtherManagers(self, managers):
+        self.deleteSubs()
         total = sum([int(manager) for manager in managers])
         self.createRecord(total, newRecord=False, notAdd=True)
     
@@ -322,9 +325,9 @@ class RecordsManager(ObjectsManager):
     @property
     def recordsAsTupleFull(self): return [(record, int(record)) for record in self]
     @property
-    def recordsAsTupleShort(self): return [(str(record.date), int(record)) for record in self]
+    def recordsAsTupleShort(self): return [(self.className, str(record.date), int(record)) for record in self]
     @property
-    def recordsAsTuple(self): return [(str(str(record.date)), int(record)) for record in self]
+    def recordsAsTuple(self): return [(str(record.date), int(record)) for record in self]
     @property
     def recordsAsDict(self): return [{str(record.date): int(record)} for record in self]
     @property

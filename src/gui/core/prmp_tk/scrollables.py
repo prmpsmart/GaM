@@ -181,7 +181,7 @@ class PRMP_TreeView(PRMP_Frame):
             for sub in subs: self.set(sub, item, op)
 
 
-
+PTr = PRMP_TreeView
 
 
 

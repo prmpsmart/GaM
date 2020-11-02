@@ -11,6 +11,8 @@ class DCRecordsManager(RecordsManager):
     def __int__(self):
         if self._lastRecord: return self.lastMoney
         else: return super().__int__()
+    
+    def balance(self): return self.account.balanceAccount()
 
 class Rates(DCRecordsManager):
     lowest = 50
@@ -41,17 +43,13 @@ class Balances(DCRecordsManager):
     def __init__(self, account):
         super().__init__(account, True)
     
-    @property
-    def balance(self): return self.recordAccount
 
 class BroughtForwards(DCRecordsManager):
     def __init__(self, account):
         super().__init__(account, True)
 
-class BroughtToOffices(DCRecordsManager):
+class BroughtToOffices(DCRecordsManager): pass
     
-    @property
-    def broughtToOffice(self): return self.recordAccount
 
 class CardDues(DCRecordsManager):
     def __init__(self, account, cardDue=True):
@@ -61,26 +59,73 @@ class CardDues(DCRecordsManager):
     @property
     def cardDues(self): return self.totalMonies
 
+class Commissions(DCRecordsManager): pass
+
 class Contributions(DCRecordsManager):
     ObjectType = Contribution
+    
+    def __init__(self, account):
+        super().__init__(account)
+        
+        self.__savings = 0
     
     def payUp(self, rate, payup):
         payUpBal = self.account.rates.payUpBal(rate)
         if payUpBal != -1:
             if payup == payUpBal: self.account.rates.changeRate(rate)
 
-    def addContribution(self, contribution, **kwargs):
-        if (int(self) + contribution) < 32:
-            sav = contribution * self.account.rate
+    def addContribution(self, contribution, note=None, **kwargs):
+        newContributions = int(self) + contribution
+        if newContributions < 32:
+            self.savings.addSaving(contribution * self.account.rate, **kwargs)
             self.createRecord(contribution, **kwargs)
-            if self.account.upfronts.paid: self.account.savings.addSaving(sav, **kwargs)
-            else:
-                out = self.account.upfronts.outstanding
-                if out > sav: self.account.upfronts.repayUpfront(sav)
-                else:
-                    self.account.upfronts.repayUpfront(out)
-                    self.account.savings.addSaving(sav - out, **kwargs)
-        else: raise DCErrors.ContributionsError(f'Contributions will be {int(self) + contribution} which is more than 31')
+            
+            if not self.upfronts.paid:
+                
+                out = self.upfronts.outstanding
+                
+                sav = int(self.savings)
+                
+                money = sav if out > sav else out
+                repay, remain = money, 0 - money
+                
+                self.upfronts.repayUpfront(repay, note=note, **kwargs)
+                self.savings.addSaving(remain, note=f'Repay of Upfront Loan. {note}', **kwargs)
+                
+            # self.balance()
+        else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
+    
+    # def addContribution(self, contribution, **kwargs):
+    #     newContributions = int(self) + contribution
+    #     assert contribution != 0, 'Contributions can not be zero.'
+    #     if newContributions < 32:
+            
+    #         self.__savings += contribution * self.account.rate
+            
+    #         self.createRecord(contribution, **kwargs)
+            
+            
+    #         if not self.upfronts.paid:
+    #             out = self.upfronts.outstanding
+                
+    #             if out > self.__savings:
+    #                 self.upfronts.repayUpfront(self.__savings, **kwargs)
+    #                 self.__savings = 0
+                
+    #             else:
+    #                 self.upfronts.repayUpfront(out, **kwargs)
+    #                 self.__savings = self.__savings - out
+                    
+    #     else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
+    
+    # @property
+    # def savings(self): return sum([rec.savings for rec in self])
+    
+    @property
+    def upfronts(self): return self.account.upfronts
+    
+    @property
+    def savings(self): return self.account.savings
 
 
 class Debits(DCRecordsManager):
@@ -93,22 +138,18 @@ class Debits(DCRecordsManager):
             else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
 
 
-class Deficits(DCRecordsManager):
+class Deficits(DCRecordsManager): pass
     
-    @property
-    def deficit(self): return self.recordAccount
 
 
-class Excesses(DCRecordsManager):
+class Excesses(DCRecordsManager): pass
     
-    @property
-    def excess(self): return self.recordAccount
 
 
 class Savings(DCRecordsManager):
     
     def __init__(self, account):
-        super().__init__(account, True)
+        super().__init__(account)
     
     def addSaving(self, saving, **kwargs): self.createRecord(saving, **kwargs)
 
@@ -123,6 +164,7 @@ class Upfronts(RepaymentsManager):
     
     def addUpfront(self, upfront):
         rate = self.account.rate
+        savings = self.account.savings
         maxDebit = rate * 30
         
         if (int(self.account.debits) + int(self) + upfront) > maxDebit: raise DCErrors.UpfrontsError(f'Client\'s debit can\'t be more than {maxDebit}')

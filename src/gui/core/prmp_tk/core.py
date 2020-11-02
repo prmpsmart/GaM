@@ -889,12 +889,14 @@ class PRMP_Widget(PRMP_Theme):
     x_btn1 = chr(10060)
     x_btn2 = chr(10062)
     
-    def __init__(self, window=False, tip=None, tipGeo=(300, 40), **kwargs):
+    
+    def __init__(self, window=False, tip=None, tipGeo=(300, 40), container=False, containerConfig={}, **kwargs):
         self.kwargs = kwargs
-        self.container = None
+        
         self.__resultsWidgets = []
         
         self.font = None
+        self.container = None
         
         
         self.toggleGroup = []
@@ -902,7 +904,16 @@ class PRMP_Widget(PRMP_Theme):
         self.val = self.value = kwargs.get('value', '1')
         self.var = self.variable = kwargs.get('variable')
         
-        if window: self.setupOfWidget(**kwargs)
+        if window:
+            self.setupOfWidget(**kwargs)
+            if container:
+                
+                self.container = PRMP_Frame(self, relief='groove', **containerConfig)
+                
+                self.placeContainer()
+                self.bind('<Configure>', self.placeContainer)
+                
+        
         try:
             font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
             self.useFont(font)
@@ -919,6 +930,10 @@ class PRMP_Widget(PRMP_Theme):
                 for ch in child: self.addResultsWidgets(ch)
             else: self.__resultsWidgets.append(child)
     
+    def getWid_H_W(self, wid):
+        wid.update()
+        return (wid.winfo_width(), wid.winfo_height())
+    
     @property
     def resultsWidgets(self): return self.__resultsWidgets
     
@@ -932,7 +947,7 @@ class PRMP_Widget(PRMP_Theme):
     
     def addWidget(self, widget, config={}, place={}, grid={}, pack={}, container=None):
         trues = [bool(pos) for pos in [place, pack, grid]].count(True)
-        container = container or self.container or self
+        container = container or self.container
         
         if not trues or (trues > 1): raise ValueError('only one is required between [place, pack, grid]')
         else:
@@ -978,15 +993,58 @@ class PRMP_Widget(PRMP_Theme):
             
     def setRadioGroups(self, group):
         for one in group: one.addToggleGroup(group)
+        
+    @property
+    def geo(self): return self.kwargs.get('geo')
     
     @property
-    def y_h(self):
-        y = self.kwargs.get('geo')[1]
-        return (30, y-60)
+    def containerGeo(self): return (self.x_w[1], self.y_h[1])
+    
     @property
-    def x_w(self):
-        x = self.kwargs.get('geo')[0]
-        return (2, (x-4)/x)
+    def y_h(self): return (30, self.geo[1]-60)
+    
+    @property
+    def rel_y_h(self):
+        x, y = self.geo[:2]
+        _y, h = self.y_h
+        return (_y, h/y)
+    
+    def YH(self, geo=()):
+        if not geo: return self.y_h
+        x, y = geo[:2]
+        return (30, y-60)
+    
+    def XW(self, geo=()):
+        if not geo: return self.x_w
+        x, y = geo[:2]
+        return (2, x-4)
+    
+    def relYH(self, geo=()):
+        if not geo: return self.rel_y_h
+        _y, h = self.y_h
+        x, y = geo[:2]
+        return (_y, h/y)
+    
+    def relXW(self, geo=()):
+        if not geo: return self.rel_x_w
+        _x, w = self.x_w
+        x, y = geo[:2]
+        return (_x, w/x)
+    
+    @property
+    def rel_x_w(self):
+        x, y = self.geo[:2]
+        _x, w = self.x_w
+        return (_x, w/x)
+    
+    def placeContainer(self, e=0):
+        y, relh = self.rel_y_h
+        y, h = self.y_h
+        x, relw = self.rel_x_w
+        self.container.place(x=2, y=y, relw=relw, h=h)
+    
+    @property
+    def x_w(self): return (2, self.geo[0]-4)
     
     def useFont(self, font=None):
         if font: self.font = Font(**font)
@@ -1009,7 +1067,7 @@ class PRMP_Widget(PRMP_Theme):
     def addTitleBar(self, title=''):
         if self.titleBar:
             self.titleBar.set(title or self.titleText)
-            self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
+            # self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
             return
         
         fr = F(self)
@@ -1019,8 +1077,7 @@ class PRMP_Widget(PRMP_Theme):
         xbtn = B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
         xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
         
-        x, w = self.x_w
-        y, h = self.y_h
+        y = self.y_h[0]
         fr.place(x=0, y=0, h=y, relw=1)
     
     def prevTheme(self):
@@ -1235,7 +1292,7 @@ class PRMP_Widget(PRMP_Theme):
         if self._geometry: return self._geometry[:3]
         return (400, 300)
     
-    def _pointsToCenterOfScreen(self, x, y):
+    def _pointsToCenterOfScreen(self, x, y, *a):
         screen_x, screen_y = self.screenwidth(), self.screenheight()
         show_x = (screen_x - x) // 2
         show_y = (screen_y - y) // 2
@@ -1337,10 +1394,11 @@ Top = Toplevel = PTp = PRMP_Toplevel
 
 class PRMP_Window(PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, atb=1, asb=1, **kwargs):
+        
         from .usefuls import copyClassMethods
-        if master: self.root = PRMP_Toplevel(master, **kwargs)
-        else: self.root = PRMP_Tk(**kwargs)
+        if master: self.root = PRMP_Toplevel(master, atb=atb, asb=asb, container=True, **kwargs)
+        else: self.root = PRMP_Tk(atb=atb, asb=asb, container=True, **kwargs)
         
         mro = list(reversed(self.root.__class__.__mro__))
         for cl in mro:
@@ -1350,7 +1408,7 @@ class PRMP_Window(PRMP_Widget):
         self.__dict__.update(self.root.__dict__)
         self._w = self.root._w
         
-        self.container = self.root
+        # self.container = self.root.container
         
         
     def __repr__(self): return self.root
@@ -1567,7 +1625,7 @@ class ImageWidget:
         self.default_dp = Pngs.get('profile_pix')
         
         self.bindMenu()
-        self.loadImage(imageFile=imageFile, start=1)
+        self.loadImage(imageFile=imageFile or self.default_dp)
         self.bindEntryHighlight()
         
         self.set = partial(ImageWidget.set, self)
@@ -1581,30 +1639,34 @@ class ImageWidget:
         self.bindMenu()
         super().normal()
     
-    def loadImage(self, e=0, imageFile=None, start=0):
-        if not imageFile:
-            if start: pass
-            elif not self.PMB('Profile Picture Removal', 'Are you sure you wanna remove the picture from this profile? ').result: return
-            imageFile = self.default_dp
-        image = Image.open(imageFile)
-        
-        if isinstance(imageFile, str): imageFile = self.IF(imageFile)
-        elif not isinstance(imageFile, self.IF): raise ValueError(f' imageFile must be [ImageFile, str] not {imageFile}.')
-        
-        self.__image = imageFile
-        
-        if imageFile.ext == '.xbm': image = image.resize(self.resize)
-        else: image.thumbnail(self.thumb)
-        
-        self.image =  PhotoImage(image=image)
-        # self['image'] = self.image
-        self.configure(image=self.image)
+    def loadImage(self, imageFile=None):
+        if imageFile:
+            image = Image.open(imageFile)
+            
+            if isinstance(imageFile, str): imageFile = self.IF(imageFile)
+            
+            elif not isinstance(imageFile, self.IF): raise ValueError(f' imageFile must be [ImageFile, str] not {imageFile}.')
+            
+            self.__image = imageFile
+            
+            if imageFile.ext == '.xbm': image = image.resize(self.resize)
+            else: image.thumbnail(self.thumb)
+            
+            self.image =  PhotoImage(image=image)
+            # self['image'] = self.image
+            self.configure(image=self.image)
     
-    def set(self, imageFile): self.loadImage(imageFile=imageFile, start=1)
+    def removeImage(self):
+        if self.rt: self.rt.destroy()
+        if not self.PMB(title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
+        else: self.loadImage(imageFile=self.default_dp)
+    
+    def set(self, imageFile):
+        if imageFile: self.loadImage(imageFile=imageFile)
     
     def changeImage(self, e=0):
         file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
-        self.loadImage(imageFile=file)
+        if file: self.loadImage(imageFile=file)
     
     def bindMenu(self):
         self.bind('<1>', self.delMenu, '+')
@@ -1633,7 +1695,7 @@ class ImageWidget:
         btn1 = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
         btn1.place(relx=0, rely=0, relh=.5, relw=1)
         
-        btn2 = B(rt, text='Remove', command=self.loadImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
+        btn2 = B(rt, text='Remove', command=self.removeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
         btn2.place(relx=0, rely=.5, relh=.5, relw=1)
         rt.attributes('-topmost', 1)
         # rt.geometry(f'50x50+{x}+{y}')
