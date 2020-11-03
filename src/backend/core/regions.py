@@ -97,7 +97,11 @@ class Region(Object):
         else:
             if self.Person: self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
     
-    def __getitem__(self, num): return self.accountsManager[num]
+    # def __getitem__(self, num):
+    #     print(num)
+    #     if isinstance(num, int):
+    #         acc = self.accountsManager
+    #         if num <= len(acc): return acc[num]
     
     def __len__(self): return len(self.accountsManager)
     
@@ -105,6 +109,7 @@ class Region(Object):
     
     @property
     def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
+    
     @property
     def totalSubs(self): return len(self.subs)
     @property

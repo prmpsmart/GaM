@@ -80,6 +80,7 @@ class RegionRadioCombo(RC):
         keys.sort()
         
         return keys
+
 RRC = RegionRadioCombo
 
 class Hierachy(PRMP_TreeView):
@@ -103,12 +104,12 @@ class Hierachy(PRMP_TreeView):
 H = Hierachy
 
 
-class RegionDetails(PRMP_Window, FillWindow):
+class RegionDetails(PRMP_MainWindow, FillWindow):
     
     def __init__(self, master=None, title='Region Details', geo=(600, 250), expandGeo=(800, 600), values={}, region=None, **kwargs):
         
+        PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         
-        PRMP_Window.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         FillWindow.__init__(self, values=values)
         
         self.region = region
@@ -119,7 +120,6 @@ class RegionDetails(PRMP_Window, FillWindow):
         self.expandGeo = expandGeo
         self.fill()
         self.paint()
-        
         
         if self.region:
             for wid in [self.office, self.department, self.sub, self.sup]:
@@ -165,8 +165,8 @@ class RegionDetails(PRMP_Window, FillWindow):
         new.place(x=208, y=155, h=24, w=120)
        
         
-        self.image = IL(self)
-        self.image.place(relx=.606, y=40, h=170, relw=.382)
+        self.image = IL(self.container)
+        self.image.place(relx=.61, y=10, h=170, relw=.382)
     
        # accounts
         self.accounts = LF(self.container, text='Accounts')
@@ -213,26 +213,29 @@ class RegionDetails(PRMP_Window, FillWindow):
     def unExpand(self):
         self.accounts.place_forget()
         self.changeGeometry(self.geo_)
-        self.placeStatusBar()
         
     def expand(self):
         self.changeGeometry(self.expandGeo)
-        self.placeStatusBar()
+        self.update()
         
     def showSubRegionsContainer(self):
-        self.placeSubs(self.subRegions)
         self.expand()
+        self.placeSubs(self.subRegions)
     
     def placeSubs(self, sub):
-        x, y = self.expandGeo
-        h = y - 183 - 60 - 6
-        w = x - 12
-        sub.place(x=2, y=183, h=h or 350, w=w or 788)
+        w, h = sub.master.tupled_winfo_geometry[:2]
+        
+        h -= 189
+        
+        print(w, h)
+        sub.place(x=2, y=183, h=h, w=w-8)
+        # sub.place(x=2, y=183, h=h or 350, w=w or 788)
         
     def showAccountsContainer(self):
         self.subRegions.place_forget()
-        self.placeSubs(self.accounts)
         self.expand()
-        
+        self.placeSubs(self.accounts)
+
+
 RD = RegionDetails
 

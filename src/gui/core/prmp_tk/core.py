@@ -15,7 +15,7 @@ TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnati
 class GUIMixins:
     
     @property
-    def className(self): return f'{self.__class__.__name__}'
+    def className(self): return self.__class__.__name__
     
     def AlphabetsSwitch(self):
         d = {}
@@ -346,7 +346,7 @@ class PRMP_Theme(GUIMixins):
         highlightthickness = kwargs.pop('highlightthickness', 1)
         
         relief = kwargs.pop('relief',  PRMP_Theme.DEFAULT_RELIEF)
-        wt = widgetType = self.PRMP_ELEMENT
+        wt = widgetType = self.PRMP_WIDGET
         
         asLabel = kwargs.get('asLabel')
         if asLabel != None:
@@ -872,6 +872,7 @@ class PRMP_Style(ttk.Style):
         super().theme_use(theme)
 PS = PRMP_Style
 
+
 class PRMP_Widget(PRMP_Theme):
     _top = 'top'
     _left = 'left'
@@ -880,40 +881,26 @@ class PRMP_Widget(PRMP_Theme):
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
     
-    upArrow = '<'
-    downArrow = '>'
-    x_btn1 = 'X'
-    x_btn2 = '#'
     upArrow = chr(11014)
     downArrow = chr(11015)
     x_btn1 = chr(10060)
     x_btn2 = chr(10062)
     
+    max_ = chr(9645)
+    min_ = chr(10134)
     
-    def __init__(self, window=False, tip=None, tipGeo=(300, 40), container=False, containerConfig={}, **kwargs):
+    
+    def __init__(self, tip=None, tipGeo=(300, 40), **kwargs):
         self.kwargs = kwargs
         
-        self.__resultsWidgets = []
         
         self.font = None
-        self.container = None
-        
         
         self.toggleGroup = []
         
         self.val = self.value = kwargs.get('value', '1')
         self.var = self.variable = kwargs.get('variable')
-        
-        if window:
-            self.setupOfWidget(**kwargs)
-            if container:
                 
-                self.container = PRMP_Frame(self, relief='groove', **containerConfig)
-                
-                self.placeContainer()
-                self.bind('<Configure>', self.placeContainer)
-                
-        
         try:
             font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
             self.useFont(font)
@@ -922,21 +909,30 @@ class PRMP_Widget(PRMP_Theme):
         if tip: self.addTip(tip, tipGeo=tipGeo)
         
         self.config = partial(PRMP_Widget.config, self)
-        # self.paint()
     
-    def addResultsWidgets(self, child):
-        if child not in self.__resultsWidgets:
-            if isinstance(child, (list, tuple)):
-                for ch in child: self.addResultsWidgets(ch)
-            else: self.__resultsWidgets.append(child)
     
     def getWid_H_W(self, wid):
         wid.update()
         return (wid.winfo_width(), wid.winfo_height())
     
     @property
-    def resultsWidgets(self): return self.__resultsWidgets
+    def winfos(self):
+        geo_infos = [self.winfo_geometry, self.winfo_height, self.winfo_pointerx, self.winfo_pointerxy, self.winfo_pointery, self.winfo_rootx, self.winfo_rooty, self.winfo_screendepth, self.winfo_screenheight, self.winfo_width, self.winfo_x, self.winfo_y]
+        
+        unnecessaries = [self.winfo_reqheight, self.winfo_reqwidth, self.winfo_depth, self.winfo_screenmmheight, self.winfo_screenmmwidth, self.winfo_vrootheight, self.winfo_vrootwidth, self.winfo_vrootx, self.winfo_vrooty, ]
+        
+        # print(len(geo_infos))
+        # for gi in geo_infos: print((gi.__name__, gi()), end=' <> ')
+        return [(a.__name__, a()) for a in geo_infos]
     
+    @property
+    def tupled_winfo_geometry(self):
+        geo = self.winfo_geometry()
+        first = geo.split('x')
+        second = first[1].split('+')
+        ret = [int(n) for n in (first[0], *second)]
+        
+        return ret
     
     def set(self, values): self.config(text=values)
     
@@ -993,58 +989,6 @@ class PRMP_Widget(PRMP_Theme):
             
     def setRadioGroups(self, group):
         for one in group: one.addToggleGroup(group)
-        
-    @property
-    def geo(self): return self.kwargs.get('geo')
-    
-    @property
-    def containerGeo(self): return (self.x_w[1], self.y_h[1])
-    
-    @property
-    def y_h(self): return (30, self.geo[1]-60)
-    
-    @property
-    def rel_y_h(self):
-        x, y = self.geo[:2]
-        _y, h = self.y_h
-        return (_y, h/y)
-    
-    def YH(self, geo=()):
-        if not geo: return self.y_h
-        x, y = geo[:2]
-        return (30, y-60)
-    
-    def XW(self, geo=()):
-        if not geo: return self.x_w
-        x, y = geo[:2]
-        return (2, x-4)
-    
-    def relYH(self, geo=()):
-        if not geo: return self.rel_y_h
-        _y, h = self.y_h
-        x, y = geo[:2]
-        return (_y, h/y)
-    
-    def relXW(self, geo=()):
-        if not geo: return self.rel_x_w
-        _x, w = self.x_w
-        x, y = geo[:2]
-        return (_x, w/x)
-    
-    @property
-    def rel_x_w(self):
-        x, y = self.geo[:2]
-        _x, w = self.x_w
-        return (_x, w/x)
-    
-    def placeContainer(self, e=0):
-        y, relh = self.rel_y_h
-        y, h = self.y_h
-        x, relw = self.rel_x_w
-        self.container.place(x=2, y=y, relw=relw, h=h)
-    
-    @property
-    def x_w(self): return (2, self.geo[0]-4)
     
     def useFont(self, font=None):
         if font: self.font = Font(**font)
@@ -1060,162 +1004,22 @@ class PRMP_Widget(PRMP_Theme):
         wid.bind('<Enter>', setRelief)
         wid.bind('<Leave>', resetRelief)
     
-    def disabled(self): self['state'] = 'disabled'
+    def disabled(self): self.state('disabled')
     
-    def normal(self): self['state'] = 'normal'
+    def normal(self): self.state('normal')
     
-    def addTitleBar(self, title=''):
-        if self.titleBar:
-            self.titleBar.set(title or self.titleText)
-            # self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
-            return
-        
-        fr = F(self)
-        self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
-        self.titleBar.place(relx=0, rely=0, relh=1, relw=.95)
-        
-        xbtn = B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
-        xbtn.place(relx=.95, rely=0, relh=1, relw=.05)
-        
-        y = self.y_h[0]
-        fr.place(x=0, y=0, h=y, relw=1)
-    
-    def prevTheme(self):
-        theme, index = self._prevTheme()
-        self.editStatus(f'Theme({theme}) | Index({index}) ')
-        
-    def nextTheme(self):
-        theme, index = self._nextTheme()
-        self.editStatus(f'Theme({theme}) | Index({index})')
-    
-    def editStatus(self, text): self.statusBar.set(text)
-    
-    def addStatusBar(self):
-        if self.statusBar:
-            self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
-            return
-        fr = F(self)
-        self.statusBar = L(fr, text='Status' or self.statusText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_STATUS_FONT)
-        self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
-        
-        up = B(fr, text=self.upArrow, command=self.prevTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
-        up.place(relx=.92, rely=0, relh=1, relw=.04)
-        down = B(fr, text=self.downArrow, command=self.nextTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
-        down.place(relx=.96, rely=0, relh=1, relw=.04)
-        
-        self.placeStatusBar()
-        
-    
-    def placeStatusBar(self):
-        if self.statusBar:
-            y = self.kwargs.get('geo')[1]
-            self.statusBar.master.place(x=0, y=y - 30, h=30, relw=1)
-    
+    def state(self, s): self['state'] = s
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
-        
 
-    def bindExit(self):
-        def ex(e=0): os.sys.exit()
-        self.bind_all('<Control-/>', ex)
-    
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
         self.configure(**kwargs)
         # self.paint()
     
     @property
-    def className(self): return self.__class__.__name__
-    
-    @property
-    def PRMP_WIDGET(self):
-        a = self.className.replace('PRMP_', '')
-        return a
-    
-    PRMP_ELEMENT = PRMP_WIDGET    
-    
-    def setupOfWidget(self, gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=0, asb=0, be=1, **kwargs):
-
-        if geo: geometry = geo
-        if gaw: grabAnyWhere = gaw
-        if ntb: noTitleBar = ntb
-        if tm: topMost = tm
-        if nrz: notResizable = nrz
-        if alp: alpha = alp
-        if tw: toolWindow = tw
-        
-        self.titleText = title
-        self.title(title)
-        
-        self.titleBar = None
-        self.statusBar = None
-        
-        if atb: self.addTitleBar(); noTitleBar = 1
-            
-        if asb: self.addStatusBar()
-            
-        if be: self.bindExit()
-        
-        self.side = side
-        
-        if notResizable: self.resizable(0, 0)
-        
-        if bind_exit: self.bind_exit()
-        
-        self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
-        
-        if grabAnyWhere: self._grab_anywhere_on()
-        else: self._grab_anywhere_off()
-        
-        if noTitleBar:
-            self.state('withdrawn')
-            self.overrideredirect(1)
-            self.state('normal')
-        
-        self.placeOnScreen(side, geometry)
-
-        
-    setupOfWindow = setupOfWidget
-        
-    def placeOnScreen(self, side='', geometry=(400, 300)):
-        error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
-        if len(geometry) == 4:
-            self.lastPoints = geometry
-            side = None
-            
-        else: self.lastPoints = [0, 0, 0, 0]
-        
-        self._geometry = geometry
-        
-        if side:
-            if '-' in side:
-                one, two = side.split('-')
-                sides = one, two
-                assert (one in self._sides) and (two in self._sides), error_string
-                assert one != two, error_string
-                assert not ((self._top in sides) and (self._bottom in sides)), 'both "top" and "bottom" can not be combined'
-                assert not ((self._left in sides) and (self._right in sides)), 'both "left" and "right" can not be combined'
-                
-                if self._center in sides:
-                    main_side = one if one != self._center else two
-                    funcs = {self._top: self.centerOfTopOfScreen, self._left: self.centerOfLeftOfScreen, self._right: self.centerOfRightOfScreen, self._bottom: self.centerOfBottomOfScreen}
-                elif self._top in sides:
-                    main_side = one if one != self._top else two
-                    funcs = {self._right: self.topRightOfScreen, self._left: self.topLeftOfScreen}
-                elif self._bottom in sides:
-                    main_side = one if one != self._bottom else two
-                    funcs = {self._right: self.bottomRightOfScreen, self._left: self.bottomLeftOfScreen}
-                
-            else:
-                assert side in self._sides, error_string
-                main_side = side
-                funcs = {self._top: self.topOfScreen, self._left: self.leftOfScreen, self._right: self.rightOfScreen, self._bottom: self.bottomOfScreen, self._center: self.centerOfScreen}
-            funcs[main_side]()
-        else:
-            if geometry: self.setGeometry(self._geometry)
-        
-        self.setGeometry(self.lastPoints)
-    
+    def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
+       
     def addTip(self, tip='Tip', tipGeo=(100, 20), font=PTh.DEFAULT_FONT, delay=0, follow=True):
         from .commons import ToolTip
         ToolTip(self, msg=tip, tipGeo=tipGeo, font=font, delay=delay, follow=follow, bg=PTh.DEFAULT_BACKGROUND_COLOR)
@@ -1281,10 +1085,151 @@ class PRMP_Widget(PRMP_Theme):
         except Exception as e:
             print('on motion error', e)
     
-    def screenwidth(self): return self.winfo_screenwidth() - 70
+PWd = PRMP_Widget
+
+
+class PRMP_Window(PRMP_Widget):
     
-    def screenheight(self): return self.winfo_screenheight() - 70
+    def __init__(self, container=True, containerConfig={},  gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=1, asb=1, be=1, resize=(1, 1), **kwargs):
+        
+        PRMP_Widget.__init__(self, geo=geo, **kwargs)
+        
+        self.container = None
+        self.zoomed = False
+        self.iconed = False
+        self.titleBar = None
+        self.statusBar = None
+        self.side = side
+        self.titleText = title
+
+        if container:
+            self.container = PRMP_Frame(self, relief='groove', **containerConfig)
+        
+        if geo: geometry = geo
+        if gaw: grabAnyWhere = gaw
+        if ntb: noTitleBar = ntb
+        if tm: topMost = tm
+        if nrz: notResizable = nrz
+        if alp: alpha = alp
+        if tw: toolWindow = tw
+        
+        self.title(title)
+        self.co = 0
+        
+        if atb: self.addTitleBar(); noTitleBar = 1
+        if asb: self.addStatusBar()
+        if be: self.bindExit()
+        
+        if notResizable: self.resizable(0, 0)
+        if bind_exit: self.bind_exit()
+
+        self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
+        
+        if grabAnyWhere: self._grab_anywhere_on()
+        else: self._grab_anywhere_off()
+        
+        if noTitleBar:
+            self.withdraw()
+            self.overrideredirect(True)
+            self.normal()
+        
+        self.bind('<Configure>', self.placeContainer)
+        self.bind('<FocusIn>', self.placeContainer)
+        self.bind('<FocusIn>', self.deiconed)
+        
+        self.placeOnScreen(side, geometry)
+ 
+    def placeOnScreen(self, side='', geometry=(400, 300)):
+        error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
+        if len(geometry) == 4:
+            self.lastPoints = geometry
+            side = None
+            
+        else: self.lastPoints = [0, 0, 0, 0]
+        
+        self._geometry = geometry
+        
+        if side:
+            if '-' in side:
+                one, two = side.split('-')
+                sides = one, two
+                assert (one in self._sides) and (two in self._sides), error_string
+                assert one != two, error_string
+                assert not ((self._top in sides) and (self._bottom in sides)), 'both "top" and "bottom" can not be combined'
+                assert not ((self._left in sides) and (self._right in sides)), 'both "left" and "right" can not be combined'
+                
+                if self._center in sides:
+                    main_side = one if one != self._center else two
+                    funcs = {self._top: self.centerOfTopOfScreen, self._left: self.centerOfLeftOfScreen, self._right: self.centerOfRightOfScreen, self._bottom: self.centerOfBottomOfScreen}
+                elif self._top in sides:
+                    main_side = one if one != self._top else two
+                    funcs = {self._right: self.topRightOfScreen, self._left: self.topLeftOfScreen}
+                elif self._bottom in sides:
+                    main_side = one if one != self._bottom else two
+                    funcs = {self._right: self.bottomRightOfScreen, self._left: self.bottomLeftOfScreen}
+                
+            else:
+                assert side in self._sides, error_string
+                main_side = side
+                funcs = {self._top: self.topOfScreen, self._left: self.leftOfScreen, self._right: self.rightOfScreen, self._bottom: self.bottomOfScreen, self._center: self.centerOfScreen}
+            funcs[main_side]()
+        else:
+            if geometry: self.setGeometry(self._geometry)
+        
+        self.setGeometry(self.lastPoints)
     
+    @property
+    def screenwidth(self): return self.winfo_screenwidth()
+    @property
+    def screenheight(self): return self.winfo_screenheight()
+    @property
+    def screen_xy(self): return (self.screenwidth, self.screenheight)
+    @property
+    def paddedScreen_xy(self): return (self.screenwidth-70, self.screenheight-70)
+    
+    @property
+    def geo(self): return self.kwargs.get('geo')
+    
+    @property
+    def containerGeo(self): return (self.x_w[1], self.y_h[1])
+    
+    @property
+    def y_h(self): return (30, self.geo[1]-60)
+    
+    @property
+    def rel_y_h(self):
+        x, y = self.geo[:2]
+        _y, h = self.y_h
+        return (_y, h/y)
+    
+    def YH(self, geo=()):
+        if not geo: return self.y_h
+        x, y = geo[:2]
+        return (30, y-60)
+    
+    def XW(self, geo=()):
+        if not geo: return self.x_w
+        x, y = geo[:2]
+        return (2, x-4)
+    
+    def relYH(self, geo=()):
+        if not geo: return self.rel_y_h
+        _y, h = self.y_h
+        x, y = geo[:2]
+        return (_y, h/y)
+    
+    def relXW(self, geo=()):
+        if not geo: return self.rel_x_w
+        _x, w = self.x_w
+        x, y = geo[:2]
+        return (_x, w/x)
+    
+    @property
+    def rel_x_w(self):
+        x, y = self.geo[:2]
+        _x, w = self.x_w
+        return (_x, w/x)
+        
     def getWhichSide(self): return randint(1, 15) % 3
     
     @property
@@ -1293,7 +1238,7 @@ class PRMP_Widget(PRMP_Theme):
         return (400, 300)
     
     def _pointsToCenterOfScreen(self, x, y, *a):
-        screen_x, screen_y = self.screenwidth(), self.screenheight()
+        screen_x, screen_y = self.screen_xy
         show_x = (screen_x - x) // 2
         show_y = (screen_y - y) // 2
         return [x, y, show_x, show_y]
@@ -1321,7 +1266,7 @@ class PRMP_Widget(PRMP_Theme):
         self.setGeometry(points)
     
     def changeGeometry(self, geo=(400, 300)):
-        self.kwargs.update({'geo': geo, 'geometry': geo})
+        # self.kwargs.update({'geo': geo, 'geometry': geo})
         self.placeOnScreen(side=self.side, geometry=geo)
         
     def centerOfScreen(self): self.setGeometry(self.pointsToCenterOfScreen)
@@ -1368,57 +1313,177 @@ class PRMP_Widget(PRMP_Theme):
     def bottomOfScreen(self): [self.bottomLeftOfScreen, self.bottomRightOfScreen, self.centerOfBotomOfScreen][self.getWhichSide()]()
     def rightOfScreen(self): [self.bottomRightOfScreen, self.topRightOfScreen, self.centerOfRightOfScreen][self.getWhichSide()]()
     def leftOfScreen(self): [self.bottomLeftOfScreen, self.topLeftOfScreen, self.centerOfLeftOfScreen][self.getWhichSide()]()
-    
+
     def _isDialog(self):
         self.attributes('-toolwindow', 1)
         self.resizable(0, 0)
         # self.grab_set()
         self.wait_window()
+    
+    
+    def placeContainer(self, e=0):
+        self.container.place(x=2, y=30, w=self.winfo_width()-4, h=self.winfo_height()-60)
+        self.placeStatusBar()
+    
+    @property
+    def x_w(self): return (2, self.geo[0]-4)
+    
+    def minimize(self, e=0):
+        
+        self.iconed = True
+        # self.withdraw()
+        self.overrideredirect(False)
+        self.iconify()
+        # self.placeStatusBar()
+    
+    def deiconed(self, e=0):
+        if self.iconed:
+            self.iconed = False
+            self.overrideredirect(True)
+            # self.normal()
+            
+        
+    def maximize(self, e=0):
+        if self.zoomed:
+            self.zoomed = False
+            self.state('normal')
+        else:
+            self.zoomed = True
+            self.state('zoomed')
+    
+    
+    def addTitleBar(self, title=''):
+        if self.titleBar:
+            self.titleBar.set(title or self.titleText)
+            return
+        
+        fr = F(self)
+        self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
+        self.titleBar.place(relx=0, rely=0, relh=1, relw=.85)
+        
+        B(fr, text=self.min_, command=self.minimize, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.85, rely=0, relh=1, relw=.05)
+        
+        B(fr, text=self.max_, command=self.maximize, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.9, rely=0, relh=1, relw=.05)
+        
+        B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.95, rely=0, relh=1, relw=.05)
+        
+        y = self.y_h[0]
+        fr.place(x=0, y=0, h=y, relw=1)
+    
+    def editStatus(self, text): self.statusBar.set(text)
+    
+    def addStatusBar(self):
+        if self.statusBar:
+            self.placeStatusBar()
+            return
+        
+        fr = F(self)
+        self.statusBar = L(fr, text='Status' or self.statusText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_STATUS_FONT)
+        self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
+        
+        up = B(fr, text=self.upArrow, command=self.prevTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
+        up.place(relx=.92, rely=0, relh=1, relw=.04)
+        down = B(fr, text=self.downArrow, command=self.nextTheme, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n')
+        down.place(relx=.96, rely=0, relh=1, relw=.04)
+        
+        self.placeStatusBar()
+        
+    def placeStatusBar(self, e=0):
+        if self.statusBar: self.statusBar.master.place(x=0, y=self.winfo_height() - 30, h=30, relw=1)
+    
+    def prevTheme(self):
+        theme, index = self._prevTheme()
+        self.editStatus(f'Theme({theme}) | Index({index}) ')
+        
+    def nextTheme(self):
+        theme, index = self._nextTheme()
+        self.editStatus(f'Theme({theme}) | Index({index})')
+    
+    def bindExit(self):
+        def ex(e=0): os.sys.exit()
+        self.bind_all('<Control-/>', ex)
 
-PWd = PRMP_Widget
+PWn = PRMP_Window
 
-class PRMP_Tk(tk.Tk, PRMP_Widget):
+
+class PRMP_Tk(tk.Tk, PRMP_Window):
     def __init__(self, **kwargs):
         tk.Tk.__init__(self)
-        PRMP_Widget.__init__(self, window=True, **kwargs)
-        
+        PRMP_Window.__init__(self, **kwargs)
+    
 Tk = PTk = PRMP_Tk
 
-class PRMP_Toplevel(tk.Toplevel, PRMP_Widget):
+class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
     def __init__(self, master=None, **kwargs):
         tk.Toplevel.__init__(self, master)
-        PRMP_Widget.__init__(self, window=True, **kwargs)
-        
+        PRMP_Window.__init__(self, **kwargs)
+    
 Top = Toplevel = PTp = PRMP_Toplevel
 
 
-class PRMP_Window(PRMP_Widget):
+class PRMP_MainWindow(PRMP_Window):
     
     def __init__(self, master=None, atb=1, asb=1, **kwargs):
-        
         from .usefuls import copyClassMethods
         if master: self.root = PRMP_Toplevel(master, atb=atb, asb=asb, container=True, **kwargs)
         else: self.root = PRMP_Tk(atb=atb, asb=asb, container=True, **kwargs)
         
-        mro = list(reversed(self.root.__class__.__mro__))
-        for cl in mro:
-            if cl == PRMP_Widget: continue
-            copyClassMethods(self, cl, self.root)
-        
         self.__dict__.update(self.root.__dict__)
+        self.tk = self.root.tk
         self._w = self.root._w
+
+        # self.root.tk_focusFollowsMouse()
         
-        # self.container = self.root.container
+        mro = list(reversed(self.root.__class__.__mro__))
         
+        for cl in mro:
+            if cl == PRMP_Window: continue
+            copyClassMethods(self, cl, self.root)
         
     def __repr__(self): return self.root
     
     def __str__(self): return self.root
     
     def __getitem__(self, num): return self.root
+    
+    # def title(self, t): self.root.title(t)
 
-PWn = PRMP_Window
+PMW = PRMP_MainWindow
 
+
+class FillWindow:
+    
+    def __init__(self, values={}):
+        
+        self.__resultsWidgets = []
+        self.values = values
+        
+    
+    def addResultsWidgets(self, child):
+        if child not in self.__resultsWidgets:
+            if isinstance(child, (list, tuple)):
+                for ch in child: self.addResultsWidgets(ch)
+            else: self.__resultsWidgets.append(child)
+    
+    @property
+    def resultsWidgets(self): return self.__resultsWidgets
+    
+    
+    def fill(self, values={}):
+        if values:
+            for key, value in values.items():
+                if key in self.resultsWidgets:
+                    wid = self.__dict__.get(key)
+                    if wid:
+                        try: wid.set(value)
+                        except Exception as er: print(f'ERROR {er}.')
+            self.values = values
+            return True
+        else:
+            if self.values: return self.fill(self.values)
+    
+
+FW = FillWindow
 
 class PRMP_Button(tk.Button, PRMP_Widget):
     
@@ -1574,13 +1639,13 @@ class PRMP_Message(tk.Message, PRMP_Widget):
         tk.Message.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, **kwargs)
 
+
 class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
     
     def __init__(self, master=None, asLabel=False, **kwargs):
         tk.Radiobutton.__init__(self, master=master, **kwargs)
         PRMP_Widget.__init__(self, asLabel=asLabel, **kwargs)
-        
-        
+
 Rb = PRb = Radiobutton = PRMP_Radiobutton
 
 class PRMP_Scrollbar(ttk.Scrollbar, PRMP_Widget):
@@ -1701,6 +1766,7 @@ class ImageWidget:
         # rt.geometry(f'50x50+{x}+{y}')
         rt.paint()
 
+
 class ImageLabel(PRMP_Label, ImageWidget):
     def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
         PRMP_Label.__init__(self, master, **kwargs)
@@ -1708,25 +1774,6 @@ class ImageLabel(PRMP_Label, ImageWidget):
     
 IL = ImageLabel
 
-class FillWindow:
-    
-    def __init__(self, values={}): self.values = values
-    
-    def fill(self, values={}):
-        if values:
-            for key, value in values.items():
-                if key in self.resultsWidgets:
-                    wid = self.__dict__.get(key)
-                    if wid:
-                        try: wid.set(value)
-                        except Exception as er: print(f'ERROR {er}.')
-            self.values = values
-            return True
-        else:
-            if self.values: return self.fill(self.values)
-    
-
-FW = FillWindow
 
 
 

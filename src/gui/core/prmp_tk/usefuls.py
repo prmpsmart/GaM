@@ -1,6 +1,7 @@
 import platform
 import tkinter.messagebox as msgbox
 from .core import PRMP_Frame, partial
+from ....backend.core.bases import Mixins
 
 
 def on_mousewheel(event, widget):
@@ -74,10 +75,7 @@ def copyClassMethods(obj, copyClass, *args):
             func = partial(val, *args)
             setattr(obj, key, func)
 
-class Col_Mixins:
-    
-    @property
-    def className(self): return f'{self.__class__.__name__}'
+class Col_Mixins(Mixins):
     
     def __str__(self): return f'{self.className}({str(self.columns)})'
     
@@ -85,19 +83,6 @@ class Col_Mixins:
     
     def __len__(self): return len(self.columns)
     
-    def AlphabetsSwitch(self):
-        d = {}
-        for n in range(65, 91):
-            d[chr(n)] = chr(n+32)
-            d[chr(n+32)] = chr(n)
-        return d
-    
-    def propertize(self, name):
-        if name:
-            name = str(name)
-            nm = name.replace(' ', '')
-            fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
-            return fin
 
 class Column(Col_Mixins):
     

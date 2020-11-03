@@ -96,6 +96,46 @@ class Mixins(CompareByDate):
    
     @property
     def week(self): return self.date.week
+    
+    def containerToDict(self, cont):
+        lcont = len(cont)
+        assert lcont % 2 == 0, f'Length of container items must be divisible by 2 not {lcont} .'
+    
+    
+    def AlphabetsSwitch(self):
+        d = {}
+        for n in range(65, 91):
+            d[chr(n)] = chr(n+32)
+            d[chr(n+32)] = chr(n)
+        return d
+    
+    def propertize(self, name):
+        if name:
+            name = str(name)
+            nm = name.replace(' ', '')
+            fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
+            return fin
+    
+    
+    def __getattr__(self, attr): return None
+    
+    def __setitem__(self, key, value): pass
+    
+    def __getitem__(self, item):
+        
+        if isinstance(item, slice):
+            subs = self.subs
+            if subs: return subs[item]
+            print(item, 'num')
+        elif isinstance(item, (list, tuple, set)):
+            dicts = self.containerToDict(item)
+            print('container')
+        if isinstance(item, slice):
+            pass
+        if isinstance(item, slice):
+            pass
+        if isinstance(item, slice):
+            pass
 
 
 
@@ -139,6 +179,9 @@ class Object(Mixins):
         return 'id | object'
     
     @property
+    def subs(self): return []
+    
+    @property
     def uniqueID(self): return self.__uniqueID
         
     @property
@@ -168,6 +211,7 @@ class Object(Mixins):
     def next(self, next_):
         if self.__next == None: self.__next = next_
         else: raise self.Error('A next is already set.')
+    
 
 
 
