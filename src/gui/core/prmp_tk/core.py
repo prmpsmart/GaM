@@ -890,9 +890,10 @@ class PRMP_Widget(PRMP_Theme):
     min_ = chr(10134)
     
     
-    def __init__(self, tip=None, tipGeo=(300, 40), **kwargs):
+    def __init__(self, tip=None, tipGeo=(300, 40), status='', bs=1, **kwargs):
         self.kwargs = kwargs
         
+        self.status = status
         
         self.font = None
         
@@ -909,7 +910,18 @@ class PRMP_Widget(PRMP_Theme):
         if tip: self.addTip(tip, tipGeo=tipGeo)
         
         self.config = partial(PRMP_Widget.config, self)
+        
+        if bs: self.bindStatus()
+        
+    def bindStatus(self): self.bind('<Enter>', self.statusShow)
     
+    def statusShow(self, e=0):
+        root = self.winfo_toplevel()
+        try:
+            text = self.status or self['text']
+            if root and root.statusBar: root.statusBar.set(text)
+            
+        except Exception as er: print(er)
     
     def getWid_H_W(self, wid):
         wid.update()
@@ -960,7 +972,7 @@ class PRMP_Widget(PRMP_Theme):
             self.light()
             self.var.set('0')
             self.onFg = True
-        elif self.PRMP_ELEMENT == 'Radiobutton' and val == self.value: self.light()
+        elif self.PRMP_WIDGET == 'Radiobutton' and val == self.value: self.light()
         elif val != self.value: self.unlight()
         else:
             self.unlight()
@@ -1085,14 +1097,17 @@ class PRMP_Widget(PRMP_Theme):
         except Exception as e:
             print('on motion error', e)
     
+    def bindToWidget(self, *args):
+        for arg in args: self.bind(arg[0], arg[1])
+    
 PWd = PRMP_Widget
 
 
 class PRMP_Window(PRMP_Widget):
     
-    def __init__(self, container=True, containerConfig={},  gaw=False, ntb=False, tm=False, tw=False, alp=1, grabAnyWhere=False, geo=(), geometry=(), noTitleBar=False, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bind_exit=False, nrz=False, notResizable=False, atb=1, asb=1, be=1, resize=(1, 1), **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, alp=1, grabAnyWhere=True, geo=(), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, **kwargs):
         
-        PRMP_Widget.__init__(self, geo=geo, **kwargs)
+        PRMP_Widget.__init__(self, geo=geo, bs=0, **kwargs)
         
         self.container = None
         self.zoomed = False
@@ -1101,29 +1116,30 @@ class PRMP_Window(PRMP_Widget):
         self.statusBar = None
         self.side = side
         self.titleText = title
+        
+        self.title(title)
+        self.co = 0
 
         if container:
             self.container = PRMP_Frame(self, relief='groove', **containerConfig)
         
-        if geo: geometry = geo
-        if gaw: grabAnyWhere = gaw
-        if ntb: noTitleBar = ntb
-        if tm: topMost = tm
-        if nrz: notResizable = nrz
-        if alp: alpha = alp
-        if tw: toolWindow = tw
+        if geo != None: geometry = geo
+        if gaw != None: grabAnyWhere = gaw
+        if ntb != None: noTitleBar = ntb
+        if tm != None: topMost = tm
+        if nrz != None: notResizable = nrz
+        if alp != None: alpha = alp
+        if tw != None: toolWindow = tw
+        if be != None: bindExit = be
+        if atb != None: addTitleBar = atb
+        if asb != None: addStatusBar = asb
         
-        self.title(title)
-        self.co = 0
         
-        if atb: self.addTitleBar(); noTitleBar = 1
-        if asb: self.addStatusBar()
-        if be: self.bindExit()
+        if notResizable: resize = (0, 0)
         
-        if notResizable: self.resizable(0, 0)
-        if bind_exit: self.bind_exit()
+        if bindExit: self.bindExit()
 
-        self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
+        self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, resize=resize, addTitleBar=addTitleBar, addStatusBar=addStatusBar)
         
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
@@ -1133,11 +1149,29 @@ class PRMP_Window(PRMP_Widget):
             self.overrideredirect(True)
             self.normal()
         
-        self.bind('<Configure>', self.placeContainer)
-        self.bind('<FocusIn>', self.placeContainer)
-        self.bind('<FocusIn>', self.deiconed)
+        self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
         
         self.placeOnScreen(side, geometry)
+
+    
+    def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1, resize=(1,1), addTitleBar=1, addStatusBar=1):
+        
+        self.resizable(*resize)
+        
+        self.noTitleBar = noTitleBar
+        if noTitleBar:
+            self.overrideredirect(True)
+            addTitleBar = 1
+        
+        if addTitleBar:
+            if toolWindow: w = 1
+            elif not (resize[0] and resize[1]): w = 2
+            else: w = 0
+            self.addTitleBar(w=w)
+            
+        if addStatusBar: self.addStatusBar()
+        
+        self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
  
     def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
@@ -1321,8 +1355,8 @@ class PRMP_Window(PRMP_Widget):
         self.wait_window()
     
     
-    def placeContainer(self, e=0):
-        self.container.place(x=2, y=30, w=self.winfo_width()-4, h=self.winfo_height()-60)
+    def placeContainer(self, e=0, h=0):
+        self.container.place(x=2, y=30, w=self.winfo_width()-4, h=h or self.winfo_height()-60)
         self.placeStatusBar()
     
     @property
@@ -1330,17 +1364,22 @@ class PRMP_Window(PRMP_Widget):
     
     def minimize(self, e=0):
         
-        self.iconed = True
-        # self.withdraw()
+        self.withdraw()
         self.overrideredirect(False)
         self.iconify()
+        self.iconed = True
         # self.placeStatusBar()
     
     def deiconed(self, e=0):
         if self.iconed:
+            self.co += 1
             self.iconed = False
-            self.overrideredirect(True)
             # self.normal()
+            v = self.winfo_viewable()
+            if v:
+                if self.noTitleBar: self.overrideredirect(True)
+                self.normal()
+                self.iconed = False
             
         
     def maximize(self, e=0):
@@ -1352,22 +1391,23 @@ class PRMP_Window(PRMP_Widget):
             self.state('zoomed')
     
     
-    def addTitleBar(self, title=''):
+    def addTitleBar(self, title='', w=0):
         if self.titleBar:
             self.titleBar.set(title or self.titleText)
             return
         
         fr = F(self)
         self.titleBar = L(fr, text=title or self.titleText, relief='groove', anchor='center', font=PRMP_Theme.DEFAULT_TITLE_FONT)
-        self.titleBar.place(relx=0, rely=0, relh=1, relw=.85)
+        self.titleBar.place(relx=0, rely=0, relh=1, relw=.85 if w != 1 else .95)
+        if w != 1:
+            B(fr, text=self.min_, command=self.minimize, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.85, rely=0, relh=1, relw=.05)
         
-        B(fr, text=self.min_, command=self.minimize, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.85, rely=0, relh=1, relw=.05)
-        
-        B(fr, text=self.max_, command=self.maximize, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.9, rely=0, relh=1, relw=.05)
+            B(fr, text=self.max_, command=self.maximize, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n', state='normal' if w != 2 else 'disabled').place(relx=.9, rely=0, relh=1, relw=.05)
         
         B(fr, text=self.x_btn2, command=self.destroy, font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, anchor='n').place(relx=.95, rely=0, relh=1, relw=.05)
         
         y = self.y_h[0]
+        
         fr.place(x=0, y=0, h=y, relw=1)
     
     def editStatus(self, text): self.statusBar.set(text)
@@ -1481,15 +1521,14 @@ class FillWindow:
             return True
         else:
             if self.values: return self.fill(self.values)
-    
 
 FW = FillWindow
 
 class PRMP_Button(tk.Button, PRMP_Widget):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, **kwargs):
-        tk.Button.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **kwargs)
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
+        tk.Button.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
 B = Button = PB = PRMP_Button
 
 
@@ -1540,138 +1579,73 @@ PRB = PRMP_RegionButton
 
 class PRMP_Canvas(tk.Canvas, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
-        tk.Canvas.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Canvas.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
     
 Ca = PCa = Canvas = PRMP_Canvas
 
 class PRMP_Checkbutton(tk.Checkbutton, PRMP_Widget):
     
-    def __init__(self, master=None, asLabel=False, **kwargs):
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         self.var = tk.StringVar()
-        
-        tk.Checkbutton.__init__(self, master=master, variable=self.var, **kwargs)
-        PRMP_Widget.__init__(self, variable=self.var, asLabel=asLabel, **kwargs)
+        tk.Checkbutton.__init__(self, master=master, variable=self.var, **config)
+        PRMP_Widget.__init__(self, variable=self.var, asLabel=asLabel, **config, **kwargs)
         
         self.var.set('0')
         self.toggleSwitch()
 
 Cb = PCb = Checkbutton = PRMP_Checkbutton
 
-class PRMP_Combobox(ttk.Combobox, PRMP_Widget):
-    
-    def __init__(self, master=None, **kwargs):
-        
-        ttk.Combobox.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
-    
-    def changeValues(self, values): self['values'] = values
-    
-    def set(self, value):
-        self.delete(0, '')
-        self.insert(0, value)
-    
-
-Cx = PCx = Combobox = PRMP_Combobox
-
-class PRMP_Entry(tk.Entry, PRMP_Widget):
-    
-    def __init__(self, master=None, placeholder='', field_color='', placeholder_color='', **kwargs):
-        tk.Entry.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
-        self.bindEntryHighlight()
-        
-        if placeholder:
-            self.placeholder = placeholder
-            self.field_color = field_color or 'yellow'
-            self.placeholder_color = placeholder_color or 'blue'
-            self.insert("0", self.placeholder)
-            self.bind("<FocusIn>", self._clear_placeholder)
-            self.bind("<FocusOut>", self._add_placeholder)
-    
-    
-    def _clear_placeholder(self, e):
-        if self.get() == self.placeholder:
-            self.delete("0", "end")
-            self["bg"] = 'white'
-            self["fg"] = 'black'
-            
-
-    def _add_placeholder(self, e):
-        if not self.get():
-            self.insert("0", self.placeholder)
-            self["bg"] = self.field_color
-            self["fg"] = self.placeholder_color
-    
-    def set(self, values): self.insert(0, values)
-
-E = PE = Entry = PRMP_Entry
-
 
 class PRMP_Frame(tk.Frame, PRMP_Widget):
     
-    def __init__(self, master=None, bd=2, **kwargs):
-        tk.Frame.__init__(self, master=master, bd=bd, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+    def __init__(self, master=None, bd=2, bs=0, config={}, **kwargs):
+        tk.Frame.__init__(self, master=master, bd=bd, **config)
+        PRMP_Widget.__init__(self, bs=bs, **config, **kwargs)
         
 F = PF = Frame = PRMP_Frame
 
 class PRMP_Label(tk.Label, PRMP_Widget):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, **kwargs):
-        tk.Label.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **kwargs)
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
+        tk.Label.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
         
 L = PL = Label = PRMP_Label
 
 class PRMP_LabelFrame(tk.LabelFrame, PRMP_Widget):
     
-    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, **kwargs):
-        tk.LabelFrame.__init__(self, master=master, bd=bd, **kwargs)
-        PRMP_Widget.__init__(self, font=font)
+    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
+        tk.LabelFrame.__init__(self, master=master, bd=bd, **config)
+        PRMP_Widget.__init__(self, font=font, **config, **kwargs)
         
 LF = LabelFrame = PRMP_LabelFrame
 
-class PRMP_Message(tk.Message, PRMP_Widget):
-    
-    def __init__(self, master=None, **kwargs):
-        tk.Message.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
 
 
 class PRMP_Radiobutton(tk.Radiobutton, PRMP_Widget):
     
-    def __init__(self, master=None, asLabel=False, **kwargs):
-        tk.Radiobutton.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, asLabel=asLabel, **kwargs)
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        tk.Radiobutton.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, asLabel=asLabel, **config, **kwargs)
 
 Rb = PRb = Radiobutton = PRMP_Radiobutton
 
 class PRMP_Scrollbar(ttk.Scrollbar, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
-        ttk.Scrollbar.__init__(self, master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Scrollbar.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
         
 PS = PRMP_Scrollbar
-
-class PRMP_Text(tk.Text, PRMP_Widget):
-    
-    def __init__(self, master=None, **kwargs):
-        tk.Text.__init__(self, master=master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
-    
-    def set(self, values): self.insert(0.0, values)
-    
-PTx = PRMP_Text
 
 
 class PRMP_Treeview(ttk.Treeview, PRMP_Widget):
     
-    def __init__(self, master=None, **kwargs):
-        ttk.Treeview.__init__(self, master, **kwargs)
-        PRMP_Widget.__init__(self, **kwargs)
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Treeview.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
         
 PTv = PRMP_Treeview
 
@@ -1774,6 +1748,72 @@ class ImageLabel(PRMP_Label, ImageWidget):
     
 IL = ImageLabel
 
+
+
+class PRMP_Input(PRMP_Widget):
+    
+    def __init__(self, placeholder='', config={}, **kwargs):
+        PRMP_Widget.__init__(self, **config, **kwargs)
+
+        if placeholder:
+            self.placeholder = placeholder
+            self.set(self.placeholder)
+            self.bind("<FocusIn>", self._clear_placeholder)
+            self.bind("<FocusOut>", self._add_placeholder)
+    
+    def set(self, values): self.clear(); self.insert(0, values)
+    
+    def _clear_placeholder(self, e):
+        if self.get() == self.placeholder: self.clear()
+
+    def _add_placeholder(self, e):
+        if self.get() == '': self.set(self.placeholder)
+    
+    def clear(self): self.delete('0', 'end')
+
+
+class PRMP_Combobox(ttk.Combobox, PRMP_Input):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Combobox.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+    
+    def changeValues(self, values): self['values'] = values
+    
+    def clear(self): self.delete(0, '')
+    
+    def set(self, value): self.clear(); self.insert(0, value)
+
+Cx = PCx = Combobox = PRMP_Combobox
+
+class PRMP_Entry(tk.Entry, PRMP_Input):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Entry.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+    
+
+E = PE = Entry = PRMP_Entry
+
+class PRMP_Message(tk.Message, PRMP_Input):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Message.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+
+class PRMP_Text(tk.Text, PRMP_Input):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Text.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+    
+    def get(self): return super().get('1.0', 'end').strip('\n')
+    
+    def set(self, values): self.clear(); self.insert('0.0', values)
+    
+    def clear(self): self.delete('0.0', 'end')
+    
+PTx = PRMP_Text
 
 
 

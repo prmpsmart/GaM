@@ -9,7 +9,7 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}):
+    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}, placeholder=''):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
@@ -22,14 +22,25 @@ class TwoWidgets(PRMP_Frame):
         top_wid = self.top_widgets[top]
         bottom_wid = self.bottom_widgets[bottom]
         
+        top_defaults = self.top_defaults.copy()
+        
         if top in ['checkbutton', 'radiobutton']:
-            topKwargs = dict(command=command or self.checked, **topKwargs, **self.top_defaults)
+            topKwargs['command']= command or self.checked
+            topKwargs.update(top_defaults)
             
         self.Top = top_wid(self, **topKwargs)
         
+        bottom_defaults = self.bottom_defaults.copy()
         
-        bottomKwargs.update(self.bottom_defaults.copy() if bottom in ['label', 'datebutton'] else {})
-        self.Bottom = bottom_wid(self, **bottomKwargs)
+        if bottom in ['label', 'datebutton']: bottomKwargs.update(bottom_defaults)
+        
+        placeholder = placeholder or f'Enter {topKwargs.get("text")}.'
+        
+        if bottomKwargs.get('placeholder'): del bottomKwargs['placeholder']
+        
+        self.Bottom = bottom_wid(self, placeholder=placeholder, **bottomKwargs)
+        
+        del topKwargs, bottomKwargs
         
         events = self.events.get(bottom)
         if events:
@@ -103,7 +114,6 @@ class TwoWidgets(PRMP_Frame):
             self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
         return self
     
-    
 TW = TwoWidgets
 
 class RadioCombo(TwoWidgets):
@@ -132,7 +142,7 @@ class LabelText(TwoWidgets):
     def __init__(self, master, **kwargs):
         super().__init__(master, top='label', bottom='text', **kwargs)
     
-    def get(self): return self.B.get('1.0', 'end').strip('\n')
+    
 LT = LabelText
 
 class LabelCombo(TwoWidgets):

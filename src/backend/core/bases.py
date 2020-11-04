@@ -123,7 +123,7 @@ class Mixins(CompareByDate):
     
     def __getitem__(self, item):
         
-        if isinstance(item, slice):
+        if isinstance(item, (int, slice)):
             subs = self.subs
             if subs: return subs[item]
             print(item, 'num')

@@ -6,8 +6,8 @@ from .pics import Xbms
 
 class PRMP_Dialog(PRMP_MainWindow, FillWindow):
     
-    def __init__(self, master=None, _return=True, values={}, **kwargs):
-        PRMP_MainWindow.__init__(self, master, ntb=9, nrz=0, tm=1, gaw=1, **kwargs)
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, **kwargs):
+        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, **kwargs)
         FillWindow.__init__(self, values=values)
         
         self.__result = None
@@ -304,28 +304,31 @@ class CalendarDialog(PRMP_Dialog):
 
 class PRMP_MsgBox(PRMP_Toplevel):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, **kwargs):
-        super().__init__(title=title, geo=geo, ntb=1, tm=1, **kwargs)
+    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, askText='', **kwargs):
+        super().__init__(title=title, geo=geo, ntb=1, tm=1, asb=0, tw=1, **kwargs)
         
         self.__result = None
         self.addTitleBar()
+        self.placeContainer(h=geo[1]-50)
+        self.label = L(self.container, text=message, bitmap='', wraplength=250, relief='flat')
         
-        self.label = L(self, text=message, bitmap='', wraplength=250)
+        self.label.place(x=0, y=0, relh=1, relw=.85)
         
-        self.label.place(relx=.007, y=30, relh=.6, relw=.833)
-        
-        self.bitmap = L(self, bitmap=self.getType(_type))
-        self.bitmap.place(relx=.84, y=30, relh=.6, relw=.15)
+        self.bitmap = L(self.container, bitmap=self.getType(_type), relief='flat')
+        self.bitmap.place(relx=.85, y=0, relh=1, relw=.15)
 
-        self.yes = PRMP_Button(self, text='Yes', command=self.yesCom)
-        self.yes.place(relx=.06, rely=.8, relh=.15, relw=.17)
+        self.yes = PRMP_Button(self, text='Yes' if ask else askText or 'Ok', command=self.yesCom)
+        
+        if not ask: self.yes.place(relx=.425, rely=.83, relh=.15, relw=.17)
+        else:
+            self.yes.place(relx=.06, rely=.8, relh=.15, relw=.17)
+            self.no = B(self, text='No', command=self.noCom)
+            self.no.place(relx=.77, rely=.83, relh=.15, relw=.17)
 
         if cancel:
             self.cancel = B(self, text='Cancel', command=self.cancelCom)
             self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
 
-        self.no = B(self, text='No', command=self.noCom)
-        self.no.place(relx=.77, rely=.8, relh=.15, relw=.17)
         
         self.paint()
         self._isDialog()

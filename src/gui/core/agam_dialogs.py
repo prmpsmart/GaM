@@ -19,7 +19,7 @@ class PersonDialog(PRMP_Dialog):
         
         contact = self.addWidget(LF, config=dict(text='Contact Details'), place=dict(relx=0, rely=0, h=200, relw=.55))
         
-        self.name = LE(contact,  topKwargs={'text': 'Name'}, orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
+        self.name = LE(contact,  topKwargs={'text': 'Name'}, bottomKwargs=dict(placeholder='Love'), orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
         
         self.phone = LE(contact,  topKwargs={'text': 'Phone Number'}, relx=.02, rely=.14, relh=.15, relw=.96, longent=.5, orient='h')
         

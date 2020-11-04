@@ -165,7 +165,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         new.place(x=208, y=155, h=24, w=120)
        
         
-        self.image = IL(self.container)
+        self.image = IL(self.container, status='Profile Picture', bs=1)
         self.image.place(relx=.61, y=10, h=170, relw=.382)
     
        # accounts
@@ -184,13 +184,17 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         if self.personDialog: self.personDialog.destroy()
         if self.region:
             if self.region.level == 5:
-                self.personDialog = PersonDialog(self,  values=self.region.person.values, side='center')
+                self.personDialog = PersonDialog(self,  values=self.region.person.values, side=self.side)
             else: print('Level not upto')
     
     def switch(self):
         # to switch between subregions and accounts
+        val = self.hierachyVar.get()
+        if val == '0':
+            PRMP_MsgBox(self, title='Choose First!', message='Choose a region first.', side=self.side)
+            return
         if self.switchState == None:
-            if self.hierachyVar.get() != self.sub.val:
+            if val != self.sub.val:
                 self.showSubRegionsContainer()
                 self.switchState = True
             else:
@@ -224,10 +228,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
     
     def placeSubs(self, sub):
         w, h = sub.master.tupled_winfo_geometry[:2]
-        
         h -= 189
-        
-        print(w, h)
         sub.place(x=2, y=183, h=h, w=w-8)
         # sub.place(x=2, y=183, h=h or 350, w=w or 788)
         
