@@ -1,5 +1,5 @@
 from .date_time import DateTime, CompareByDate
-from .bases import Mixins, Object, ObjectsManager
+from .bases import ObjectsObjectsMixins, Object, ObjectsManager
 from .errors import Errors
 
 # Account is the list of Records recieved for a month.
@@ -13,12 +13,12 @@ from .errors import Errors
 
 
 
-class DailyAccounts(Mixins):
+class DailyAccounts(ObjectsMixins):
     # 
     pass
 
 
-class WeeklyAccounts(Mixins):
+class WeeklyAccounts(ObjectsMixins):
     
     def __init__(self, week, days_accounts, oneWeek=False):
         self.week = week
@@ -37,7 +37,7 @@ class WeeklyAccounts(Mixins):
                 if oneWeek: self.__dict__[day] = self.__dict__[day][0]
                 else: self.__dict__[day] = sum(self.__dict__[day])
 
-class MonthlyAccounts(Mixins):
+class MonthlyAccounts(ObjectsMixins):
     def __init__(self, monthName, accounts, day=False):
         self.monthName = monthName
         if day == False:
@@ -50,7 +50,7 @@ class MonthlyAccounts(Mixins):
         else:
             self.days = accounts.sort()
 
-class YearlyAccounts(Mixins):
+class YearlyAccounts(ObjectsMixins):
     pass
 
 class Account(Object, CompareByDate):
@@ -134,7 +134,7 @@ class Account(Object, CompareByDate):
         pass
 
 
-class AccountsManager(ObjectsManager, Mixins):
+class AccountsManager(ObjectsManager, ObjectsMixins):
     ObjectType = Account
     
     def __init__(self, region, autoAccount=True, **kwargs):

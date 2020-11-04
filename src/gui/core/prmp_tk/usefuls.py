@@ -1,7 +1,6 @@
 import platform
 import tkinter.messagebox as msgbox
-from .core import PRMP_Frame, partial
-from ....backend.core.bases import Mixins
+from .core import PRMP_Frame, partial,  Mixins
 
 
 def on_mousewheel(event, widget):

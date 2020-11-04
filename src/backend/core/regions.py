@@ -30,8 +30,9 @@ class Person(Object):
             self.__image = ImageFile(image)
             
         else: self.__image = None
+        self.__email = None
+        if self.checkEmail(email): self.__email = email
         
-        self.__email = email
         self.__address = address
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
@@ -268,7 +269,6 @@ class Region(Object):
     def sortSubRegionsAccountsByYear(self): return self.subRegionsManager.sortRegionsAccountsByYear(date)
     def sortSubRegionsAccountsIntoYears(self): return self.subRegionsManager.sortRegionsAccountsIntoYears(date)
 
-
 class Staff(Region):
     AccountsManager = SalariesManager
     Manager = 'StaffsManager'
@@ -277,9 +277,9 @@ class Staff(Region):
     def paySalary(self, salary, date=None): self.salariesManager.addSalary(salary, date=date)
 
 
-class ThirdPartySurety:
+class ThirdPartySurety(Mixins):
     
-    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', relationshipWithMember='', image='', date=None):
+    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
     
         self.__loanBondDetails = loanBondDetails
         self.__name = None
@@ -296,6 +296,9 @@ class ThirdPartySurety:
         self.__knowledgeOfMember = knowledgeOfMember
         self.__relationshipWithMember = relationshipWithMember
         self.__image = image
+        
+        self.__email = None
+        if self.checkEmail(email): self.__email = email
         
     @property
     def dob(self): return self.__dob
@@ -345,4 +348,5 @@ class LoanBondDetails:
     
     def setThirdPartySurety(self, **kwargs): 
         self.__thirdPartySurety = self.thirdPartySurety(self, **kwargs)
+
 

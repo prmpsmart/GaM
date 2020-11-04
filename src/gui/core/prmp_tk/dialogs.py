@@ -43,9 +43,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWindow):
     def _setResult(self, result): self.__result = result
     
     def addSubmitButton(self, command=None):
-        self.submitBtn = B(self.container, text='Submit', command=command or self.processInput)
-        # self.placeSubmitBtn(1)
-            
+        self.submitBtn = B(self.container, text='Submit', command=command or self.processInput)            
     
     def placeSubmitBtn(self, wh=0):
         if wh:
@@ -84,7 +82,6 @@ class PRMP_Dialog(PRMP_MainWindow, FillWindow):
             for widgetName in self.resultsWidgets:
                 wid = self.__dict__.get(widgetName)
                 if wid: wid.disabled()
-            # self.unlight()
 
 class CalendarDialog(PRMP_Dialog):
     _both = '◄►'

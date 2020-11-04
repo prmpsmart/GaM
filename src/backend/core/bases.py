@@ -1,36 +1,21 @@
 from .errors import Errors
 from .date_time import CompareByDate, DateTime
 from hashlib import sha224
+import re
 
-class Mixins(CompareByDate):
+class Mixins:
     naira = chr(8358)
     dollar = chr(36)
     euro = chr(163)
     yen = chr(165)
     _moneySign = naira + chr(32)
     Error = Errors
+    email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
-    def __len__(self):
-        try: return len(self[:])
-        except: return 1
     
-    def numWithCommas(self, num=None):
-        if num == None: num = int(self)
-        
-        div = 3
-        str_num = str(num)
-        num_list = list(str_num)
-        num_len = len(str_num)
-        num_rem = num_len % div
-        num_div = num_len // div
-        if not num_rem: num_div -= 1
-        co, to = -3, 0
-        for _ in range(num_div):
-            num_list.insert(co - to, ",")
-            co -= 3
-            to += 1
-        return "".join(num_list)
     
+    def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
+
     def testPrint(self, *args):
         print()
         for a in args: print(a, end='=')
@@ -51,8 +36,58 @@ class Mixins(CompareByDate):
     
     @property
     def shortName(self): return self._shortName
+    
+    
+    def containerToDict(self, cont):
+        lcont = len(cont)
+        assert lcont % 2 == 0, f'Length of container items must be divisible by 2 not {lcont} .'
+    
+    
+    def AlphabetsSwitch(self):
+        d = {}
+        for n in range(65, 91):
+            d[chr(n)] = chr(n+32)
+            d[chr(n+32)] = chr(n)
+        return d
+    
+    def propertize(self, name):
+        if name:
+            name = str(name)
+            nm = name.replace(' ', '')
+            fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
+            return fin
+    
+
+
+class ObjectsMixins(Mixins, CompareByDate):
+    
+    
+    def __len__(self):
+        try: return len(self[:])
+        except: return 1
+    
+    
     @property
     def moneyWithSign(self, hashtag=0): return f'{self._moneySign}{int(self)}'
+    
+    def numWithCommas(self, num=None):
+        if num == None: num = int(self)
+        
+        div = 3
+        str_num = str(num)
+        num_list = list(str_num)
+        num_len = len(str_num)
+        num_rem = num_len % div
+        num_div = num_len // div
+        if not num_rem: num_div -= 1
+        co, to = -3, 0
+        for _ in range(num_div):
+            num_list.insert(co - to, ",")
+            co -= 3
+            to += 1
+        return "".join(num_list)
+    
+    
     
     def __bool__(self): return True
     
@@ -97,24 +132,6 @@ class Mixins(CompareByDate):
     @property
     def week(self): return self.date.week
     
-    def containerToDict(self, cont):
-        lcont = len(cont)
-        assert lcont % 2 == 0, f'Length of container items must be divisible by 2 not {lcont} .'
-    
-    
-    def AlphabetsSwitch(self):
-        d = {}
-        for n in range(65, 91):
-            d[chr(n)] = chr(n+32)
-            d[chr(n+32)] = chr(n)
-        return d
-    
-    def propertize(self, name):
-        if name:
-            name = str(name)
-            nm = name.replace(' ', '')
-            fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
-            return fin
     
     
     def __getattr__(self, attr): return None
@@ -136,11 +153,9 @@ class Mixins(CompareByDate):
             pass
         if isinstance(item, slice):
             pass
+    
 
-
-
-
-class Object(Mixins):
+class Object(ObjectsMixins):
     Manager = 'ObjectsManager'
     Managers = ()
     
@@ -211,11 +226,10 @@ class Object(Mixins):
     def next(self, next_):
         if self.__next == None: self.__next = next_
         else: raise self.Error('A next is already set.')
-    
 
 
 
-class ObjectsManager(Mixins):
+class ObjectsManager(ObjectsMixins):
     ObjectType = Object
     
     def __init__(self, master=None):

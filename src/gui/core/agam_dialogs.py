@@ -15,19 +15,19 @@ class PersonDialog(PRMP_Dialog):
         name = self.values.get('name')
         if name: self.addTitleBar(name)
         
-        self.addEditButton(self.editInput)
+        self.addEditButton()
         
         contact = self.addWidget(LF, config=dict(text='Contact Details'), place=dict(relx=0, rely=0, h=200, relw=.55))
         
-        self.name = LE(contact,  topKwargs={'text': 'Name'}, bottomKwargs=dict(placeholder='Love'), orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
+        self.name = LE(contact,  topKwargs=dict(text='Name'), bottomKwargs=dict(placeholder='Love'), orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
         
-        self.phone = LE(contact,  topKwargs={'text': 'Phone Number'}, relx=.02, rely=.14, relh=.15, relw=.96, longent=.5, orient='h')
+        self.phone = LE(contact,  topKwargs=dict(text='Phone Number'), relx=.02, rely=.14, relh=.15, relw=.96, longent=.5, orient='h')
         
-        self.email = LE(contact,  topKwargs={'text': 'Email'}, relx=.02, rely=.28, relh=.15, relw=.96, longent=.25, orient='h')
+        self.email = LE(contact,  topKwargs=dict(text='Email'), bottomKwargs=dict(type_='email'), relx=.02, rely=.28, relh=.15, relw=.96, longent=.25, orient='h')
         
-        self.gender = LC(contact,  topKwargs={'text': 'Gender'}, bottomKwargs={'values': ['Male', 'Female']}, relx=.02, rely=.42, relh=.15, relw=.96, longent=.25, orient='h')
+        self.gender = LC(contact,  topKwargs=dict(text='Gender'), bottomKwargs=dict(type_='gender'), relx=.02, rely=.42, relh=.15, relw=.96, longent=.25, orient='h')
         
-        self.address = LT(contact,  topKwargs={'text': 'Address'}, relx=.02, rely=.56, relh=.44, relw=.96, longent=.3, orient='h')
+        self.address = LT(contact,  topKwargs=dict(text='Address'), relx=.02, rely=.56, relh=.44, relw=.96, longent=.3, orient='h')
         
         self.image = IL(self.container)
         self.image.place(relx=.58, y=10, h=190, relw=.41)
