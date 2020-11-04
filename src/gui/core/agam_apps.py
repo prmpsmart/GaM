@@ -174,10 +174,6 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         self.accounts = LF(self.container, text='Accounts')
         self.accountsHie = Hierachy(self.accounts)
         
-        # hx, hy = self.accounts.tupled_winfo_geometry[:2]
-        
-        # self.accountsHie.place(x=2, y=10, w=hx-4, h=hy-4)
-        
        # subregions
         self.subRegions = LF(self.container, text='Sub Regions')
         
@@ -196,8 +192,6 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
             else: print('Level not upto')
     
     def switch(self):
-        # self.placeContainer()
-        # return
         # to switch between subregions and accounts
         val = self.hierachyVar.get()
         if val == '0':
@@ -246,6 +240,10 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         self.subRegions.place_forget()
         self.expand()
         self.placeSubs(self.accounts)
+        
+        hx, hy = self.accounts.tupled_winfo_geometry[:2]
+        print(hx, hy)
+        self.accountsHie.place(x=2, y=10, w=hx-4, h=hy-4)
 
 
 RD = RegionDetails
