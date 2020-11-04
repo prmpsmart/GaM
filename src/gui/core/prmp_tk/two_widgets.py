@@ -9,7 +9,7 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}, placeholder=''):
+    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}, placeholder='', disableOnTogle=True, dot=None):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
@@ -19,6 +19,11 @@ class TwoWidgets(PRMP_Frame):
         self.bottom = bottom.lower()
         self.orient = orient
         self.longent = longent
+        
+        if dot != None: disableOnTogle = dot
+        self.disableOnTogle = disableOnTogle
+        
+        
         top_wid = self.top_widgets[top]
         bottom_wid = self.bottom_widgets[bottom]
         
@@ -57,6 +62,7 @@ class TwoWidgets(PRMP_Frame):
         
         if self.value and self.variable: self.checked()
         
+        
         self.place_widgs()
         
     def clicked(self, e=0): return self.B.get()
@@ -75,6 +81,8 @@ class TwoWidgets(PRMP_Frame):
         if self.toggleGroup: self.T.bind('<1>', self.switchGroup)
         
     def disabled(self, wh=''):
+        if not self.disableOnTogle: return
+        
         if wh == 't': self.Top.config(state='disabled')
         elif wh == 'b': self.Bottom.config(state='disabled')
         else:
@@ -94,6 +102,7 @@ class TwoWidgets(PRMP_Frame):
         else:
             self.Top.config(state='normal')
             self.Bottom.config(state='normal')
+        
     
     def set(self, values): self.Bottom.set(values)
     

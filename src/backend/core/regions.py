@@ -1,4 +1,4 @@
-from .accounts import AccountsManager, DateTime, Mixins, Errors, Object, ObjectsManager, CompareByDate
+from .accounts import AccountsManager, DateTime, ObjectsMixins, Errors, Object, ObjectsManager, CompareByDate
 from .records_managers import *
 import os
 
@@ -277,7 +277,7 @@ class Staff(Region):
     def paySalary(self, salary, date=None): self.salariesManager.addSalary(salary, date=date)
 
 
-class ThirdPartySurety(Mixins):
+class ThirdPartySurety(ObjectsMixins):
     
     def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
     

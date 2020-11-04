@@ -143,15 +143,15 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
         
-        self.office = RRC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'off', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged])
+        self.office = RRC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'off', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
         
-        self.department = RRC(self.hierachy,  topKwargs={'text': 'Department', 'value': 'dep', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged])
+        self.department = RRC(self.hierachy,  topKwargs={'text': 'Department', 'value': 'dep', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
         self.office.addReceiver(self.department.receiver)
         
-        self.sup = RRC(self.hierachy,  topKwargs={'text': 'Superscript', 'value': 'sup', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged])
+        self.sup = RRC(self.hierachy,  topKwargs={'text': 'Superscript', 'value': 'sup', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
         self.department.addReceiver(self.sup.receiver)
         
-        self.sub = RRC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged])
+        self.sub = RRC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
         self.sup.addReceiver(self.sub.receiver)
         
         # workers in the region or the individual 
@@ -167,9 +167,17 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         
         self.image = IL(self.container, status='Profile Picture', bs=1)
         self.image.place(relx=.61, y=10, h=170, relw=.382)
+        
+        
     
        # accounts
         self.accounts = LF(self.container, text='Accounts')
+        self.accountsHie = Hierachy(self.accounts)
+        
+        # hx, hy = self.accounts.tupled_winfo_geometry[:2]
+        
+        # self.accountsHie.place(x=2, y=10, w=hx-4, h=hy-4)
+        
        # subregions
         self.subRegions = LF(self.container, text='Sub Regions')
         
@@ -188,6 +196,8 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
             else: print('Level not upto')
     
     def switch(self):
+        # self.placeContainer()
+        # return
         # to switch between subregions and accounts
         val = self.hierachyVar.get()
         if val == '0':

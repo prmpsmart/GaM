@@ -1102,7 +1102,7 @@ class PRMP_Window(PRMP_Widget):
         self.co = 0
 
         if container:
-            self.container = PRMP_Frame(self, relief='groove', **containerConfig)
+            self.container = PRMP_Frame(self, config=dict(relief='groove', **containerConfig))
         
         if geo != None: geometry = geo
         if gaw != None: grabAnyWhere = gaw

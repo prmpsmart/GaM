@@ -1,6 +1,6 @@
 
 import time
-from .core import PTp, L, PTh, Tk, F, PRMP_Window
+from .core import PTp, L, PTh, Tk, F, PRMP_MainWindow
 
 class ToolTip:
     def __init__(self, wdgt, msg=None, font=None, delay=1, follow=True, tipGeo=(100, 40), **kwargs):
@@ -70,9 +70,9 @@ class ToolTip:
         # self.parent.state('normal')
 
 
-class SolidScreen(PRMP_Window):
+class SolidScreen(PRMP_MainWindow):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
-        super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, containerConfig=dict(relief='solid'), **kwargs)
+        super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, **kwargs)
         
         self.container['bd'] = 12
         
