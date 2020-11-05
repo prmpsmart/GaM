@@ -1331,10 +1331,11 @@ class PRMP_Window(PRMP_Widget):
     def rightOfScreen(self): [self.bottomRightOfScreen, self.topRightOfScreen, self.centerOfRightOfScreen][self.getWhichSide()]()
     def leftOfScreen(self): [self.bottomLeftOfScreen, self.topLeftOfScreen, self.centerOfLeftOfScreen][self.getWhichSide()]()
 
-    def _isDialog(self):
+    def _isDialog(self, g=1):
         self.attributes('-toolwindow', 1)
         self.resizable(0, 0)
-        # self.grab_set()
+        if g: self.grab_set()
+        self.focus()
         self.wait_window()
     
     

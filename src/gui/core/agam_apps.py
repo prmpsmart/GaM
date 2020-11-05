@@ -176,6 +176,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         
        # subregions
         self.subRegions = LF(self.container, config=dict(text='Sub Regions'))
+        self.subRegionsHie = Hierachy(self.subRegions)
         
         
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
@@ -195,7 +196,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         # to switch between subregions and accounts
         val = self.hierachyVar.get()
         if val == '0':
-            PRMP_MsgBox(self, title='Choose First!', message='Choose a region first.', side=self.side)
+            PRMP_MsgBox(self, title='Choose First!', message='Choose a region first.', side=self.side, ask=0)
             return
         if self.switchState == None:
             if val != self.sub.val:
@@ -246,7 +247,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         self.accounts.update()
         hx, hy = self.accounts.tupled_winfo_geometry[:2]
         print(hx, hy)
-        self.accountsHie.place(x=2, y=10, w=hx-4, h=hy-4)
+        self.accountsHie.place(x=2, y=0, w=hx-8, h=hy-24)
         
     def placeSubRegions(self):
         self.placeSubs(self.subRegions)
@@ -254,7 +255,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
         print(hx, hy)
-        self.subRegionsHie.place(x=2, y=10, w=hx-4, h=hy-4)
+        self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
     
 
 

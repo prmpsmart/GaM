@@ -316,7 +316,9 @@ class PRMP_MsgBox(PRMP_Toplevel):
 
         self.yes = PRMP_Button(self, config=dict(text='Yes' if ask else okText or 'Ok', command=self.yesCom))
         
-        if not ask: self.yes.place(relx=.425, rely=.83, relh=.15, relw=.17)
+        if not ask:
+            self.yes.place(relx=.425, rely=.83, relh=.15, relw=.17)
+            self.bind('<Return>', lambda e: self.yes.invoke())
         else:
             self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)
             self.no = B(self, config=dict(text='No', command=self.noCom))
@@ -326,8 +328,8 @@ class PRMP_MsgBox(PRMP_Toplevel):
             self.cancel = B(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
 
-        
         self.paint()
+        
         self._isDialog()
         
         
