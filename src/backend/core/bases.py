@@ -12,7 +12,9 @@ class Mixins:
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
+    def getFromSelf(self, name): return self.__dict__.get(name)
     
+    def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
 

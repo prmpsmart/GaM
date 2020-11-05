@@ -13,9 +13,9 @@ from ....backend.core.bases import Mixins
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
-# Excerpt from PRMPSMART theme implementation of his theme.
+# Excerpt from PySimpleGUI theme implementation of his theme.
 class PRMP_Theme(Mixins):
-    # exerpt from PRMPSMART theming engine
+    # exerpt from PySimpleGUI theming engine
     
     BLUES = ("#082567", "#0A37A3", "#00345B")
     PURPLES = ("#480656", "#4F2398", "#380474")
@@ -874,7 +874,7 @@ class PRMP_Widget(PRMP_Theme):
     def __init__(self, tip=None, tipGeo=(300, 40), status='', bs=1, **kwargs):
         self.kwargs = kwargs
         
-        self.status = status
+        self._status = status
         
         self.font = None
         
@@ -898,12 +898,9 @@ class PRMP_Widget(PRMP_Theme):
     
     def statusShow(self, e=0):
         root = self.winfo_toplevel()
-        try:
-            text = self.status or self['text']
-            if root and root.statusBar: root.statusBar.set(text)
-            
-        except Exception as er: print(er)
-    
+        
+        if root and root.statusBar: root.statusBar.set(self.status)
+        
     def getWid_H_W(self, wid):
         wid.update()
         return (wid.winfo_width(), wid.winfo_height())
@@ -927,9 +924,19 @@ class PRMP_Widget(PRMP_Theme):
         
         return ret
     
+    def getText(self):
+        try: return self['text']
+        except Exception as er: self.printError('get', er)
+    
+    @property
+    def status(self):
+        if self._status: return self._status
+        try: return self['text']
+        except: pass
+        
     def set(self, values):
         try: self.config(text=values)
-        except Exception as er: print('Error: ', er, self)
+        except Exception as er: self.printError('set', er)
     
     def light(self): self.configure(bg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, fg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
     
@@ -1000,6 +1007,8 @@ class PRMP_Widget(PRMP_Theme):
         wid.bind('<Leave>', resetRelief)
     
     def disabled(self): self.state('disabled')
+    
+    def active(self): self.state('active')
     
     def normal(self): self.state('normal')
     
@@ -1461,7 +1470,7 @@ class PRMP_MainWindow(PRMP_Window):
         mro = list(reversed(self.root.__class__.__mro__))
         
         for cl in mro:
-            if cl == PRMP_Window: continue
+            if cl in (PRMP_Window, Mixins): continue
             copyClassMethods(self, cl, self.root)
         
     def __repr__(self): return self.root
@@ -1474,7 +1483,7 @@ class PRMP_MainWindow(PRMP_Window):
 
 PMW = PRMP_MainWindow
 
-class FillWindow:
+class FillWidgets:
     
     def __init__(self, values={}):
         
@@ -1494,18 +1503,18 @@ class FillWindow:
     
     def fill(self, values={}):
         if values:
-            for key, value in values.items():
-                if key in self.resultsWidgets:
-                    wid = self.__dict__.get(key)
-                    if wid:
-                        try: wid.set(value)
-                        except Exception as er: print(f'ERROR {er}.')
+            for widgetName in self.resultsWidgets:
+                widget = self.getFromSelf(widgetName)
+                if widget:
+                    try: widget.set(values.get(widgetName, ''))
+                    except Exception as er: print(f'ERROR {er}.')
+                else: print(widgetName, widget)
             self.values = values
             return True
         else:
             if self.values: return self.fill(self.values)
 
-FW = FillWindow
+FW = FillWidgets
 
 class PRMP_Button(PRMP_Widget, tk.Button):
     
@@ -1742,6 +1751,7 @@ class PRMP_Input(PRMP_Widget):
     
     def __init__(self, placeholder='', **kwargs):
         PRMP_Widget.__init__(self, **kwargs)
+        self.verification = None
         
         if placeholder:
             self.placeholder = placeholder
@@ -1757,6 +1767,7 @@ class PRMP_Input(PRMP_Widget):
         except: return
         def setRelief(e=0):
             self._clear_placeholder()
+            self.statusShow()
             self.configure(relief='solid')
         def resetRelief(e=0):
             self.focus()
@@ -1766,21 +1777,48 @@ class PRMP_Input(PRMP_Widget):
         self.bind('<Enter>', setRelief)
         self.bind('<Leave>', resetRelief)
     
+    
+    def checkingEmail(self, e=0):
+        email = self.get()
+        if email:
+            if self.checkEmail(email): self.configure(background='white', foreground='green')
+            else: self.configure(background='white', foreground='red')
+        else: self.paint()
+        
+    def verify(self):
+        if self.verification: return self.verification()
+    
+    def normal(self):
+        super().normal()
+        self.verify()
+        
+    def disabled(self):
+        self._add_placeholder()
+        super().disabled()
+        self.verify()
+        
+    def paint(self):
+        super().paint()
+        self.verify()
 
-    def set(self, values): self.clear(); self.insert(0, values)
+    def set(self, values):
+        self.clear()
+        self.insert(0, values)
+        self.verify()
+        
     
     def _clear_placeholder(self, e=0):
+        print(e, self.placeholder, self._get() or 'nop')
         if self._get() == self.placeholder: self.clear()
+        else: print('No')
 
     def _add_placeholder(self, e=0):
         if self._get() == '': self.set(self.placeholder)
+        pass
     
     def clear(self): self.delete('0', 'end')
     
-    
     def _get(self): return super().get()
-    
-    def set(self, value): self.clear(); self.insert(0, value)
     
     def get(self):
         get = self._get()
@@ -1788,14 +1826,20 @@ class PRMP_Input(PRMP_Widget):
         return get
 
 
+
 class PRMP_Combobox(PRMP_Input, ttk.Combobox):
     
     def __init__(self, master=None, type_='', config={}, **kwargs):
         ttk.Combobox.__init__(self, master=master, **config)
         PRMP_Input.__init__(self, **config, **kwargs)
+        self.values = []
         if type_.lower() == 'gender': self.changeValues(['Male', 'Female'])
     
-    def changeValues(self, values): self['values'] = values
+    def changeValues(self, values):
+        self.values = values
+        self['values'] = values
+    
+    def getValues(self): return self['values']
     
 
 Cx = PCx = Combobox = PRMP_Combobox
@@ -1808,13 +1852,9 @@ class PRMP_Entry(PRMP_Input, tk.Entry):
         
         if type_.lower() == 'email':
             self.bind('<KeyRelease>', self.checkingEmail)
+            self.verification = self.checkingEmail
     
-    def checkingEmail(self, e=0):
-        email = self.get()
-        if email:
-            if self.checkEmail(email): self.configure(background='white', foreground='green')
-            else: self.configure(background='white', foreground='red')
-        else: self.paint()
+    
 
 E = PE = Entry = PRMP_Entry
 

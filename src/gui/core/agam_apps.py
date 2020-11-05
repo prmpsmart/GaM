@@ -104,13 +104,13 @@ class Hierachy(PRMP_TreeView):
 H = Hierachy
 
 
-class RegionDetails(PRMP_MainWindow, FillWindow):
+class RegionDetails(PRMP_MainWindow, FillWidgets):
     
     def __init__(self, master=None, title='Region Details', geo=(600, 250), expandGeo=(800, 600), values={}, region=None, **kwargs):
         
         PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         
-        FillWindow.__init__(self, values=values)
+        FillWidgets.__init__(self, values=values)
         
         self.region = region
         self.personDialog = None
@@ -118,6 +118,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         self._setupApp()
         self.geo_ = geo
         self.expandGeo = expandGeo
+        
         self.fill()
         self.paint()
         

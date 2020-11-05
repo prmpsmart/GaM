@@ -1,14 +1,9 @@
- 
-# accounts, 
-# on top there should be sort and search LabelFrames
-#   for coop:
-#       recordmanagers, once clicked shows the records (scrollabe Frame with LabelLabel children, with tip = record.details) on the right
-#       
+on top there should be sort and search LabelFrames
 
-Record should be a sub of Object
+parallelize PRMP_Theme and PRMP_Style
 
-ability of ObjectsManager to list records in a particular season, able to total it too.
 
-restructured everything into proper inheritance of each other
 
-geo_infos = [self.winfo_depth, self.winfo_geometry, self.winfo_height, self.winfo_pointerx, self.winfo_pointerxy, self.winfo_pointery, self.winfo_reqheight, self.winfo_reqwidth, self.winfo_rootx, self.winfo_rooty, self.winfo_screendepth, self.winfo_screenheight, self.winfo_screenmmheight, self.winfo_screenmmwidth, self.winfo_vrootheight, self.winfo_vrootwidth, self.winfo_vrootx, self.winfo_vrooty, self.winfo_width, self.winfo_x, self.winfo_y]
+
+
+

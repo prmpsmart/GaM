@@ -39,11 +39,11 @@ class TwoWidgets(PRMP_Frame):
         
         if bottom in ['label', 'datebutton']: bottomKwargs.update(bottom_defaults)
         
-        placeholder = placeholder or f'Enter {topKwargs.get("text")}.'
+        placeholder = placeholder or bottomKwargs.get('placeholder') or f'Enter {topKwargs.get("text")}.'
         
         if bottomKwargs.get('placeholder'): del bottomKwargs['placeholder']
         
-        self.Bottom = bottom_wid(self, placeholder=placeholder, **bottomKwargs)
+        self.Bottom = bottom_wid(self, placeholder=placeholder, status=placeholder, **bottomKwargs)
         
         del topKwargs, bottomKwargs
         
@@ -81,25 +81,25 @@ class TwoWidgets(PRMP_Frame):
     def disabled(self, wh=''):
         if not self.disableOnTogle: return
         
-        if wh == 't': self.Top.config(state='disabled')
-        elif wh == 'b': self.Bottom.config(state='disabled')
+        if wh == 't': self.Top.disabled()
+        elif wh == 'b': self.Bottom.disabled()
         else:
-            self.Top.config(state='disabled')
-            self.Bottom.config(state='disabled')
+            self.Top.disabled()
+            self.Bottom.disabled()
     
     def active(self, wh=''):
-        if wh == 't': self.Top.config(state='active')
-        elif wh == 'b': self.Bottom.config(state='active')
+        if wh == 't': self.Top.active()
+        elif wh == 'b': self.Bottom.active()
         else:
-            self.Top.config(state='active')
-            self.Bottom.config(state='active')
+            self.Top.active()
+            self.Bottom.active()
     
     def normal(self, wh=''):
-        if wh == 't': self.Top.config(state='normal')
-        elif wh == 'b': self.Bottom.config(state='normal')
+        if wh == 't': self.Top.normal()
+        elif wh == 'b': self.Bottom.normal()
         else:
-            self.Top.config(state='normal')
-            self.Bottom.config(state='normal')
+            self.Top.normal()
+            self.Bottom.normal()
         
     
     def set(self, values): self.Bottom.set(values)

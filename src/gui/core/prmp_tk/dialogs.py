@@ -4,11 +4,11 @@ from .core import *
 from .pics import Xbms
 
 
-class PRMP_Dialog(PRMP_MainWindow, FillWindow):
+class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, **kwargs):
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, **kwargs)
-        FillWindow.__init__(self, values=values)
+        FillWidgets.__init__(self, values=values)
         
         self.__result = None
         
