@@ -10,7 +10,7 @@ class ThirdPartySuretyDialog(PersonDialog):
     def _setupDialog(self):
         super()._setupDialog()
         
-        other = LF(self, text='Other Details')
+        other = LF(self, config=dict(text='Other Details'))
         other.place(relx=.02, y=230, h=290, relw=.96)
         
         self.dob = LDB(other, text='Date of Birth', orient='h', longent=.5, relx=.01, rely=0, relh=.1, relw=.5)

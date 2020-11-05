@@ -69,13 +69,13 @@ class ScrollableFrame(PRMP_Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         
-        self.canvas = canvas = PRMP_Canvas(self, bg='blue')
+        self.canvas = canvas = PRMP_Canvas(self, config=dict(bg='blue'))
         canvas.place(x=0, rely=0, relh=.96, relw=.99)
         
         # self.canvas.grid_rowconfigure(0, weight=1)
         
-        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=canvas.xview)
-        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=canvas.yview)
+        xscrollbar = PRMP_Scrollbar(self, config=dct(orient="horizontal", command=canvas.xview))
+        yscrollbar = PRMP_Scrollbar(self, config=dct(orient="vertical", command=canvas.yview))
         canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
         xscrollbar.pack(side="bottom", fill="x")
 
@@ -109,8 +109,8 @@ class PRMP_TreeView(PRMP_Frame):
         super().__init__(master=master, **kwargs)
         
         self.t = self.tree = self.treeview = PRMP_Treeview(self)
-        xscrollbar = PRMP_Scrollbar(self, orient="horizontal", command=self.treeview.xview)
-        yscrollbar = PRMP_Scrollbar(self, orient="vertical", command=self.treeview.yview)
+        xscrollbar = PRMP_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
+        yscrollbar = PRMP_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
         self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
         
         xscrollbar.pack(side="bottom", fill="x")

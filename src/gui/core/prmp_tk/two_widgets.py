@@ -57,8 +57,6 @@ class TwoWidgets(PRMP_Frame):
         self.val, self.var = self.value, self.variable = self.T.val, self.T.var
 
         self.rt = None
-        try: self.bindOverrelief(self.B, 'solid')
-        except: pass
         
         if self.value and self.variable: self.checked()
         

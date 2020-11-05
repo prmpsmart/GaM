@@ -43,7 +43,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWindow):
     def _setResult(self, result): self.__result = result
     
     def addSubmitButton(self, command=None):
-        self.submitBtn = B(self.container, text='Submit', command=command or self.processInput)            
+        self.submitBtn = B(self.container, config=dict(text='Submit', command=command or self.processInput))            
     
     def placeSubmitBtn(self, wh=0):
         if wh:
@@ -301,29 +301,29 @@ class CalendarDialog(PRMP_Dialog):
 
 class PRMP_MsgBox(PRMP_Toplevel):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, askText='', **kwargs):
+    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', **kwargs):
         super().__init__(title=title, geo=geo, ntb=1, tm=1, asb=0, tw=1, **kwargs)
         
         self.__result = None
         self.addTitleBar()
         self.placeContainer(h=geo[1]-50)
-        self.label = L(self.container, text=message, bitmap='', wraplength=250, relief='flat')
+        self.label = L(self.container, config=dict(text=message, bitmap='', wraplength=250, relief='flat'))
         
         self.label.place(x=0, y=0, relh=1, relw=.85)
         
-        self.bitmap = L(self.container, bitmap=self.getType(_type), relief='flat')
+        self.bitmap = L(self.container, config=dict(bitmap=self.getType(_type)), relief='flat')
         self.bitmap.place(relx=.85, y=0, relh=1, relw=.15)
 
-        self.yes = PRMP_Button(self, text='Yes' if ask else askText or 'Ok', command=self.yesCom)
+        self.yes = PRMP_Button(self, config=dict(text='Yes' if ask else okText or 'Ok', command=self.yesCom))
         
         if not ask: self.yes.place(relx=.425, rely=.83, relh=.15, relw=.17)
         else:
-            self.yes.place(relx=.06, rely=.8, relh=.15, relw=.17)
-            self.no = B(self, text='No', command=self.noCom)
+            self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)
+            self.no = B(self, config=dict(text='No', command=self.noCom))
             self.no.place(relx=.77, rely=.83, relh=.15, relw=.17)
 
         if cancel:
-            self.cancel = B(self, text='Cancel', command=self.cancelCom)
+            self.cancel = B(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
 
         

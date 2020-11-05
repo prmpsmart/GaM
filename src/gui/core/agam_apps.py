@@ -137,7 +137,7 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
     
     def _setupApp(self):
        # hierachy
-        self.hierachy = LF(self.container, text='Hierachy')
+        self.hierachy = LF(self.container, config=dict(text='Hierachy'))
         self.hierachy.place(x=2, y=0, h=150, relw=.6)
         
         self.hierachyVar = tk.StringVar()
@@ -155,13 +155,13 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         self.sup.addReceiver(self.sub.receiver)
         
         # workers in the region or the individual 
-        persons = B(self.container, text='Persons', command=self.showPersons)
+        persons = B(self.container, config=dict(text='Persons', command=self.showPersons))
         persons.place(x=2, y=155, h=24, w=80)
         
-        switch = B(self.container, text='Switch?', command=self.switch)
+        switch = B(self.container, config=dict(text='Switch?', command=self.switch))
         switch.place(x=100, y=155, h=24, w=90)
         
-        new = PCb(self.container, text='New Dialog ?')
+        new = PCb(self.container, config=dict(text='New Dialog ?'))
         new.place(x=208, y=155, h=24, w=120)
        
         
@@ -171,11 +171,11 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         
     
        # accounts
-        self.accounts = LF(self.container, text='Accounts')
+        self.accounts = LF(self.container, config=dict(text='Accounts'))
         self.accountsHie = Hierachy(self.accounts)
         
        # subregions
-        self.subRegions = LF(self.container, text='Sub Regions')
+        self.subRegions = LF(self.container, config=dict(text='Sub Regions'))
         
         
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
@@ -225,10 +225,6 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
     def expand(self):
         self.changeGeometry(self.expandGeo)
         self.update()
-        
-    def showSubRegionsContainer(self):
-        self.expand()
-        self.placeSubs(self.subRegions)
     
     def placeSubs(self, sub):
         w, h = sub.master.tupled_winfo_geometry[:2]
@@ -236,14 +232,30 @@ class RegionDetails(PRMP_MainWindow, FillWindow):
         sub.place(x=2, y=183, h=h, w=w-8)
         # sub.place(x=2, y=183, h=h or 350, w=w or 788)
         
+    def showSubRegionsContainer(self):
+        self.expand()
+        self.placeSubRegions()
+        
     def showAccountsContainer(self):
         self.subRegions.place_forget()
         self.expand()
-        self.placeSubs(self.accounts)
+        self.placeAccounts()
         
+    def placeAccounts(self):
+        self.placeSubs(self.accounts)
+        self.accounts.update()
         hx, hy = self.accounts.tupled_winfo_geometry[:2]
         print(hx, hy)
         self.accountsHie.place(x=2, y=10, w=hx-4, h=hy-4)
+        
+    def placeSubRegions(self):
+        self.placeSubs(self.subRegions)
+        self.subRegions.update()
+        
+        hx, hy = self.subRegions.tupled_winfo_geometry[:2]
+        print(hx, hy)
+        self.subRegionsHie.place(x=2, y=10, w=hx-4, h=hy-4)
+    
 
 
 RD = RegionDetails
