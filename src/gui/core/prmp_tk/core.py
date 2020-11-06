@@ -458,10 +458,13 @@ class PRMP_Style(ttk.Style):
             base, ext = os.path.splitext(pix)
             nameKeys.append(base)
         return nameKeys
+    
+    def getThemePicsPath(self, theme):
+        pass
 
     def styleImages(self, name):
         script = '''
-        set imgdir [file join [file dirname [info script]] %s]
+        set imgdir [file join  [file dirname [info script]]  %s]
 
         proc LoadImages {imgdir} {
             variable I
@@ -472,6 +475,23 @@ class PRMP_Style(ttk.Style):
         }
         
         array set I [LoadImages $imgdir]''' % name
+        
+        script = '''
+        set imgdir [file join pics styles %s]
+        puts $imgdir
+        puts [pwd]
+        proc LoadImages {imgdir} {
+            variable I
+            foreach file [glob -directory $imgdir *.gif] {
+                set img [file tail [file rootname $file]]
+                set I($img) [image create photo -file $file -format gif89]
+            }
+        }
+        
+        array set I [LoadImages $imgdir]''' % name
+
+        print(script)
+
         self.tk.eval(script)
         
         nameKeys = self.getImageKeys(name)
