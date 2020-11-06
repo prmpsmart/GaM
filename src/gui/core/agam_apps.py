@@ -144,15 +144,15 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
         
-        self.office = RRC(self.hierachy,  topKwargs={'text': 'Office', 'value': 'off', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
+        self.office = RRC(self.hierachy,  topKwargs=dict(text= 'Office', value= 'off', variable= self.hierachyVar), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
         
-        self.department = RRC(self.hierachy,  topKwargs={'text': 'Department', 'value': 'dep', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
+        self.department = RRC(self.hierachy,  topKwargs=dict(text= 'Department', value= 'dep', variable= self.hierachyVar), orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
         self.office.addReceiver(self.department.receiver)
         
-        self.sup = RRC(self.hierachy,  topKwargs={'text': 'Superscript', 'value': 'sup', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
+        self.sup = RRC(self.hierachy,  topKwargs=dict(text= 'Superscript', value= 'sup', variable= self.hierachyVar), orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
         self.department.addReceiver(self.sup.receiver)
         
-        self.sub = RRC(self.hierachy,  topKwargs={'text': 'Subscript', 'value': 'sub', 'variable': self.hierachyVar}, orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
+        self.sub = RRC(self.hierachy,  topKwargs=dict(text= 'Subscript', value= 'sub', variable= self.hierachyVar), orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
         self.sup.addReceiver(self.sub.receiver)
         
         # workers in the region or the individual 
@@ -166,18 +166,18 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         new.place(x=208, y=155, h=24, w=120)
        
         
-        self.image = IL(self.container, status='Profile Picture', bs=1)
+        self.image = IL(self.container, status='Profile Picture')
         self.image.place(relx=.61, y=10, h=170, relw=.382)
         
         
     
        # accounts
         self.accounts = LF(self.container, config=dict(text='Accounts'))
-        self.accountsHie = Hierachy(self.accounts)
+        self.accountsHie = Hierachy(self.accounts, status='Accounts Details')
         
        # subregions
         self.subRegions = LF(self.container, config=dict(text='Sub Regions'))
-        self.subRegionsHie = Hierachy(self.subRegions)
+        self.subRegionsHie = Hierachy(self.subRegions, status='Sub Regions Details')
         
         
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
@@ -225,6 +225,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.changeGeometry(self.geo_)
         
     def expand(self):
+        self.resize = (1, 1)
         self.changeGeometry(self.expandGeo)
         self.update()
     
@@ -247,7 +248,6 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.placeSubs(self.accounts)
         self.accounts.update()
         hx, hy = self.accounts.tupled_winfo_geometry[:2]
-        print(hx, hy)
         self.accountsHie.place(x=2, y=0, w=hx-8, h=hy-24)
         
     def placeSubRegions(self):
@@ -255,8 +255,8 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.subRegions.update()
         
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
-        print(hx, hy)
         self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
+    
     
 
 

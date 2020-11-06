@@ -63,7 +63,6 @@ class Mixins:
 
 class ObjectsMixins(Mixins, CompareByDate):
     
-    
     def __len__(self):
         try: return len(self[:])
         except: return 1

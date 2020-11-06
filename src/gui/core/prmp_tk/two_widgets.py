@@ -1,6 +1,7 @@
 from .core import *
 from ....backend.core.date_time import DateTime
 
+#  These widgets doesn't need or can't be used with PRMP_Widget.addWidget()
 
 class TwoWidgets(PRMP_Frame):
     top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
@@ -9,7 +10,7 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs={}, bottomKwargs={}, placeholder='', disableOnTogle=True, dot=None):
+    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs=dict(), bottomKwargs=dict(), placeholder='', disableOnTogle=True, dot=None):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
@@ -27,23 +28,24 @@ class TwoWidgets(PRMP_Frame):
         top_wid = self.top_widgets[top]
         bottom_wid = self.bottom_widgets[bottom]
         
-        top_defaults = self.top_defaults.copy()
+        top_defaults = {k:v for k, v in self.top_defaults.items()}
         
-        if top in ['checkbutton', 'radiobutton']:
-            topKwargs['command']= command or self.checked
-            topKwargs.update(top_defaults)
+        if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
+        else: topKw = dict(**topKwargs)
             
         self.Top = top_wid(self, **topKwargs)
         
-        bottom_defaults = self.bottom_defaults.copy()
-        
-        if bottom in ['label', 'datebutton']: bottomKwargs.update(bottom_defaults)
-        
+        bottom_def = {k:v for k, v in self.bottom_defaults.items()}
         placeholder = placeholder or bottomKwargs.get('placeholder') or f'Enter {topKwargs.get("text")}.'
         
-        if bottomKwargs.get('placeholder'): del bottomKwargs['placeholder']
+        print(bottomKwargs, 7)
         
-        self.Bottom = bottom_wid(self, placeholder=placeholder, status=placeholder, **bottomKwargs)
+        if bottom in ['label', 'datebutton']: bottomKw = dict(**bottom_def, **bottomKwargs)
+        else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
+        
+        print(bottomKwargs, self)
+        
+        self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
         
         del topKwargs, bottomKwargs
         
