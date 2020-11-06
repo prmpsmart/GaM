@@ -113,6 +113,7 @@ class Region(Object):
     
     @property
     def totalSubs(self): return len(self.subs)
+    
     @property
     def sups(self):
         ss = []
@@ -196,8 +197,13 @@ class Region(Object):
     def location(self): return self.__location
     @property
     def subRegionsManager(self): return self.__subRegionsManager
+    
     @property
-    def subRegions(self): return self.subs
+    def subs(self): return self.accountsManager if self.accountsManager else []
+    
+    @property
+    def subRegions(self): return self.subRegionsManager if self.subRegionsManager else []
+    
     @property
     def subRegionsCount(self): return len(self.subRegions)
         

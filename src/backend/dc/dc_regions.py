@@ -24,6 +24,9 @@ class DCRegion(Region):
     AccountsManager = DCAccountsManager
     Manager = 'DCRegionsManager'
     SubRegionsManager = DCRegionsManager
+    
+    @property
+    def subs(self): return self.accountsManager[:] if self.accountsManager else []
 
 class Client(DCRegion):
     

@@ -4,6 +4,8 @@ from hashlib import sha224
 import re
 
 class Mixins:
+    
+    containers = list, set, tuple
     naira = chr(8358)
     dollar = chr(36)
     euro = chr(163)
@@ -12,7 +14,7 @@ class Mixins:
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
-    def getFromSelf(self, name): return self.__dict__.get(name)
+    def getFromSelf(self, name): return getattr(self, name, None)
     
     def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
     
@@ -39,12 +41,6 @@ class Mixins:
     @property
     def shortName(self): return self._shortName
     
-    
-    def containerToDict(self, cont):
-        lcont = len(cont)
-        assert lcont % 2 == 0, f'Length of container items must be divisible by 2 not {lcont} .'
-    
-    
     def AlphabetsSwitch(self):
         d = {}
         for n in range(65, 91):
@@ -62,6 +58,7 @@ class Mixins:
 
 
 class ObjectsMixins(Mixins, CompareByDate):
+    
     
     def __len__(self):
         try: return len(self[:])
@@ -88,8 +85,7 @@ class ObjectsMixins(Mixins, CompareByDate):
             to += 1
         return "".join(num_list)
     
-    
-    
+
     def __bool__(self): return True
     
     def addMoneySign(self, money): return f'{self._moneySign}{money}'
@@ -133,28 +129,20 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def week(self): return self.date.week
     
-    
-    
     def __getattr__(self, attr): return None
     
     def __setitem__(self, key, value): pass
     
     def __getitem__(self, item):
         
-        if isinstance(item, (int, slice)):
-            subs = self.subs
-            if subs: return subs[item]
-            print(item, 'num')
-        elif isinstance(item, (list, tuple, set)):
-            dicts = self.containerToDict(item)
-            print('container')
-        if isinstance(item, slice):
-            pass
-        if isinstance(item, slice):
-            pass
-        if isinstance(item, slice):
-            pass
-    
+        if isinstance(item, int): return self.subs[item] if self.subs else None
+        
+        elif isinstance(item, slice): return self.subs[item] if self.subs else []
+
+        elif isinstance(item, self.containers): return [self.getFromSelf(attr) for attr in item]
+            
+        elif isinstance(item, str): return self.getFromSelf(item)
+
 
 class Object(ObjectsMixins):
     Manager = 'ObjectsManager'

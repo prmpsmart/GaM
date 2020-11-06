@@ -337,10 +337,7 @@ class PRMP_Theme(Mixins):
         if asEntry != None:
             asEntry = kwargs.pop('asEntry')
             wt = 'Entry' if asEntry else wt
-            # print(kwargs, self)
-            self.configure(activebackground=activebackground)
-            self.configure(activeforeground=activeforeground)
-            self.configure(highlightbackground=background)
+            self.configure(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background)
         
         oneColor = True
         col = PRMP_Theme.DEFAULT_BUTTON_COLOR
@@ -445,9 +442,7 @@ class PRMP_Style(ttk.Style):
     def __init__(self, master=None):
         super().__init__(master=master)
         
-        # for theme in self.ttkthemes:
-        #     method = getattr(self, 'create' + theme.title())
-            # method()
+        self.loadedThemes = []
         
     
     def getPixs(self, name):
@@ -498,6 +493,8 @@ class PRMP_Style(ttk.Style):
     def createArc(self):
         pass
     def createBlack(self):
+        self.loadedThemes.append('black')
+
         disabledfg = "DarkGrey"
         frame = "#424242"
         dark = "#222222"
@@ -611,7 +608,8 @@ class PRMP_Style(ttk.Style):
         return self
 
     def createBlue(self):
-        
+        self.loadedThemes.append('blue')
+
         frame = "#6699cc"
         lighter = "#bcd2e8"
         window = "#e6f3ff"
@@ -851,9 +849,10 @@ class PRMP_Style(ttk.Style):
         pass
     
     def theme_use(self, theme):
-        if theme in self.ttkthemes: getattr(self, 'create' + theme.title())()
+        if theme in self.ttkthemes:
+            if theme not in self.loadedThemes: getattr(self, 'create' + theme.title())()
         super().theme_use(theme)
-PS = PRMP_Style
+PSt = PRMP_Style
 
 
 class PRMP_Widget(PRMP_Theme):
@@ -1390,6 +1389,7 @@ class PRMP_Window(PRMP_Widget):
             
         
     def maximize(self, e=0):
+        # print(e)
         if not (self.resize[0] and self.resize[1]): return
         
         if self.zoomed:
@@ -1408,6 +1408,8 @@ class PRMP_Window(PRMP_Widget):
         fr = F(self)
         self.titleBar = L(fr, config=dict( text=title or self.titleText, anchor='center'), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
         self.titleBar.place(relx=0, rely=0, relh=1, relw=.85 if w != 1 else .95)
+        self.titleBar.bind('<Double-1>', self.maximize)
+        
         if not w:
             B(fr, config=dict(command=self.minimize, text=self.min_, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT).place(relx=.85, rely=0, relh=1, relw=.05)
         
@@ -1793,7 +1795,7 @@ class PRMP_Input(PRMP_Widget):
         if email:
             if self.checkEmail(email): self.configure(background='white', foreground='green')
             else: self.configure(background='white', foreground='red')
-        else: self.paint()
+        # else: self.paint()
         
     def verify(self):
         if self.verification: return self.verification()

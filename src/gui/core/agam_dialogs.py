@@ -38,20 +38,20 @@ PD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Record Dialog', region=None, geo=(300, 280), **kwargs):
+    def __init__(self, master=None, title='Record Dialog', region=None, geo=(300, 300), **kwargs):
         
         if region: title = f'{region.className} {title}'
         self.region = region
 
-        super().__init__(master=master, title=title, geo=geo, tw=1, **kwargs)
+        super().__init__(master=master, title=title, geo=geo, tw=1,  **kwargs)
     
     def _setupDialog(self):
+        self.addEditButton()
         
-        # self.money = LE(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(text='Money'), orient='h')
-        self.date = LDB(self.container, topKwargs=dict(text='Date'), relx=.02, rely=.17, relh=.15, relw=.96, longent=.35, orient='h')
-        self.note = LT(self.container, topKwargs=dict(text='Note'), relx=.02, rely=.33, relh=.15, relw=.96, longent=.35, orient='h')
+        self.money = LE(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(text='Money'), orient='h')
+        self.date = LDB(self.container, topKwargs=dict(text='Date'), relx=.02, rely=.16, relh=.15, relw=.96, longent=.35, orient='h')
+        self.note = LT(self.container, topKwargs=dict(text='Note'), relx=.02, rely=.32, relh=.5, relw=.96, longent=.35, orient='h')
         
-        pass
  
 
 

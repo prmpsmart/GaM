@@ -7,7 +7,7 @@ from .pics import Xbms
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, **kwargs):
-        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, **kwargs)
+        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=1, **kwargs)
         FillWidgets.__init__(self, values=values)
         
         self.__result = None
@@ -23,14 +23,11 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         self.default()
         
         
-        try:
-            if values: self.editBtn.var.set('0')
-            else: self.editBtn.var.set('1')
-            self.editInput()
-        except: pass
+        if values: self.editInput(0)
+        else: self.editInput(1)
         
-        # self._isDialog()
-        self.mainloop()
+        self._isDialog()
+        # self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
@@ -71,7 +68,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         self.destroy()
         print(self.result)
         
-    def editInput(self):
+    def editInput(self, e=0):
+        if e: self.editBtn.var.set('1')
         if self.editBtn.var.get() == '1':
             self.placeSubmitBtn(1)
             for widgetName in self.resultsWidgets:

@@ -53,7 +53,7 @@ class MonthlyAccounts(ObjectsMixins):
 class YearlyAccounts(ObjectsMixins):
     pass
 
-class Account(Object, CompareByDate):
+class Account(Object):
     
     def __init__(self, manager, **kwargs):
         assert manager != None, 'No manager passed.'
@@ -63,12 +63,14 @@ class Account(Object, CompareByDate):
         if account == None: return False
         return ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
     
-    def __getitem__(self, num): return self.recordsManagers[num]
     def __str__(self): return f'{self.manager} | {self.className}({self.date.dayMonthYear})'
     def __len__(self): return len(self.recordsManagers)
     
     @property
     def region(self): return self.manager.region
+    
+    @property
+    def subs(self): return self.recordsManagers
     
     @property
     def recordsManagers(self): self.notImp()
@@ -134,7 +136,7 @@ class Account(Object, CompareByDate):
         pass
 
 
-class AccountsManager(ObjectsManager, ObjectsMixins):
+class AccountsManager(ObjectsManager):
     ObjectType = Account
     
     def __init__(self, region, autoAccount=True, **kwargs):

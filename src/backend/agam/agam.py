@@ -26,6 +26,7 @@ class AGAM(Region):
     
     @property
     def officesManager(self): return self.subRegionsManager
+    
     @property
     def managersManager(self): return self.detailsManager
     

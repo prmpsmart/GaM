@@ -14,23 +14,33 @@ class CoopAccount(Account):
         self.__materials = Materials(self, self.materialCost, self.date)
         self.__savings = Savings(self)
         self.__shares = Shares(self)
+    
     @property
     def region(self): return self.manager
+    
     @property
     def levies(self): return self.__levies
+    
     @property
     def loanBonds(self): return self.__loanBonds
+    
     @property
     def loans(self): return [lb.loan for lb in self.loanBonds if lb.loan]
+    
     @property
     def materials(self): return self.__materials
+    
     @property
     def savings(self): return self.__savings
+    
     @property
     def shares(self): return self.__shares
     
     def balanceAccount(self):
         pass
+    
+    @property
+    def recordsManagers(self): return [self.__levies, self.__loanBonds, self.__materials, self.__savings, self.__shares]
 
 class MemberAccount(CoopAccount):
     Manager = 'Member'
@@ -59,3 +69,9 @@ class UnitAccount(CoopAccount):
     
     @property
     def expenses(self): return self.__expenses
+    
+    @property
+    def recordsManagers(self): 
+        rms = [a for a in super().recordsManagers]
+        rms += [self.__expenses]
+        return rms

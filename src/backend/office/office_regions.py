@@ -41,8 +41,10 @@ class Office(Region):
     def dcOffice(self): return self.__dcOffice
     @property
     def coopOffice(self): return self.__coopOffice
+    
     @property
-    def subs(self): return [self.coopOffice, self.dcOffice]
+    def subRegions(self): return [self.coopOffice, self.dcOffice]
+    
     def setMoneySign(self, sign='$'): Mixins._moneySign = sign
     @property
     def spacedID(self): return f'{self.sup.spacedID} | {self.name}'

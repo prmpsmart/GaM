@@ -38,12 +38,14 @@ class TwoWidgets(PRMP_Frame):
         bottom_def = {k:v for k, v in self.bottom_defaults.items()}
         placeholder = placeholder or bottomKwargs.get('placeholder') or f'Enter {topKwargs.get("text")}.'
         
-        print(bottomKwargs, 7)
+        bottomKwargs['placeholder'] = placeholder
         
-        if bottom in ['label', 'datebutton']: bottomKw = dict(**bottom_def, **bottomKwargs)
-        else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
+        if bottom in ['label', 'datebutton']:
+            del bottomKwargs['placeholder']
+            bottomKw = dict(**bottom_def, **bottomKwargs)
+        else: bottomKw = dict(**bottomKwargs)
         
-        print(bottomKwargs, self)
+        if bottom == 'datebutton': placeholder = 'Choose Date'
         
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
         

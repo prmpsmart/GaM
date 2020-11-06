@@ -1,6 +1,6 @@
 
 import time
-from .core import PTp, L, PTh, Tk, F, PRMP_MainWindow
+from .core import PTp, L, PTh, Tk, F, PRMP_MainWindow, PSt
 
 class ToolTip:
     def __init__(self, wdgt, msg=None, font=None, delay=1, follow=True, tipGeo=(100, 40), **kwargs):

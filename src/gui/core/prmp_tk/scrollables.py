@@ -158,8 +158,8 @@ class PRMP_TreeView(PRMP_Frame):
             self.heading(column.index, text=column.text, anchor='center')
             self.column(column.index, width=column.width, minwidth=10, stretch=1,  anchor="w")
     
-    def set(self, obj=None, parent='', op=False):
-
+    def _set(self, obj=None, parent='', op=False):
+        
         cols = self.columns.get(obj)
         
         name, *columns = self.columns.get(obj)
@@ -176,9 +176,16 @@ class PRMP_TreeView(PRMP_Frame):
             self.firstItem = item
             self.treeview.focus(self.firstItem)
         
-        subs = obj.subs
+        subs = obj.subRegions
         if subs:
-            for sub in subs: self.set(sub, item, op)
+            for sub in subs: self._set(sub, item, op)
+    
+    def set(self, obj, op=1):
+        if obj:
+            self.obj = obj
+            self._set(obj, op=op)
+    
+    def reload(self): self.set(self.obj)
 
 
 PTr = PRMP_TreeView
