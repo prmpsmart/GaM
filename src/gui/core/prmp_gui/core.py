@@ -11,6 +11,9 @@ from .usefuls import Mixins, partial, copyClassMethods
 
 
 
+#   from tk widgets --> PRMP_
+
+
 class PRMP_Theme(Mixins):
     # exerpt from PySimpleGUI theming engine
     
@@ -699,6 +702,758 @@ class PRMP_Widget(PRMP_Theme):
 PWd = PRMP_Widget
 
 
+class FillWidgets:
+    
+    def __init__(self, values={}):
+        
+        self.__resultsWidgets = []
+        self.values = values
+        
+    
+    def addResultsWidgets(self, child):
+        if child not in self.__resultsWidgets:
+            if isinstance(child, (list, tuple)):
+                for ch in child: self.addResultsWidgets(ch)
+            else: self.__resultsWidgets.append(child)
+    
+    @property
+    def resultsWidgets(self): return self.__resultsWidgets
+    
+    
+    def fill(self, values={}):
+        if values:
+            for widgetName in self.resultsWidgets:
+                widget = self.getFromSelf(widgetName)
+                if widget:
+                    try: widget.set(values.get(widgetName, ''))
+                    except Exception as er: print(f'ERROR {er}.')
+                else: print(widgetName, widget)
+            self.values = values
+            return True
+        else:
+            if self.values: return self.fill(self.values)
+
+FW = FillWidgets
+
+
+class ImageWidget:
+    def __init__(self, imageFile=None, thumb=None, resize=None):
+        self.rt = None
+        self.__image = None
+        self.thumb = thumb or (200, 170)
+        self.resize = resize or (100, 100)
+        from .dialogs import PMB
+        self.PMB = PMB
+        
+        self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb)
+        
+        self.bindMenu()
+        self.loadImage(imageFile=imageFile or self.default_dp)
+        self.bindEntryHighlight()
+        
+        self.set = partial(ImageWidget.set, self)
+    
+    
+    def disabled(self):
+        self.unBindMenu()
+        super().disabled()
+    
+    def normal(self):
+        self.bindMenu()
+        super().normal()
+    
+    def loadImage(self, imageFile=None):
+        if imageFile:
+            if isinstance(imageFile, PRMP_Image): pass
+            else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)
+            
+            self.image = self.__image = imageFile
+
+            if imageFile.ext == 'xbm': self.image = imageFile.resizeTk(self.resize)
+            # else: self.image = imageFile.thumbnailTk(self.thumb)
+            
+            self.configure(image=self.image)
+    
+    def removeImage(self):
+        if self.rt: self.rt.destroy()
+        if not self.PMB(title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
+        else: self.loadImage(imageFile=self.default_dp)
+    
+    def set(self, imageFile):
+        if imageFile: self.loadImage(imageFile=imageFile)
+    
+    def changeImage(self, e=0):
+        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
+        if file: self.loadImage(imageFile=file)
+    
+    def bindMenu(self):
+        self.bind('<1>', self.delMenu, '+')
+        self.bind('<3>', self.showMenu, '+')
+        # self.bind('<Double-1>', self.showMenu)
+    
+    def unBindMenu(self):
+        self.unbind('<1>')
+        self.unbind('<3>')
+        # self.unbind('<Double-1>')
+    
+    def get(self): return self.__image
+    
+    def delMenu(self, e=0):
+        if self.rt:
+            self.rt.destroy()
+            del self.rt
+            self.rt = None
+    
+    def showMenu(self, e=0):
+        self.delMenu()
+        x, y = e.x, e.y
+        x, y = e.x_root, e.y_root
+        self.rt = rt = PTp(self, geo=(50, 50, x, y))
+        rt.overrideredirect(1)
+        btn1 = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
+        btn1.place(relx=0, rely=0, relh=.5, relw=1)
+        
+        btn2 = B(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT)
+        btn2.place(relx=0, rely=.5, relh=.5, relw=1)
+        rt.attributes('-topmost', 1)
+        rt.paint()
+
+
+class PRMP_Input(PRMP_Widget):
+    
+    def __init__(self, placeholder='', **kwargs):
+        PRMP_Widget.__init__(self, **kwargs)
+        self.verification = None
+        
+        if placeholder:
+            self.placeholder = placeholder
+            self.set(self.placeholder)
+            
+            self.bind("<FocusIn>", self._clear_placeholder)
+            self.bind("<FocusOut>", self._add_placeholder)
+        
+        
+    def entered(self, e=0):
+        super().entered()
+        self._clear_placeholder()
+        
+    def left(self, e=0):
+        super().left()
+        self.focus()
+        self._add_placeholder()
+    
+    
+    def checkingEmail(self, e=0):
+        email = self.get()
+        if email:
+            if self.checkEmail(email): self.configure(background='white', foreground='green')
+            else: self.configure(background='white', foreground='red')
+        # else: self.paint()
+        
+    def verify(self):
+        if self.verification: return self.verification()
+    
+    def normal(self):
+        super().normal()
+        self.verify()
+        
+    def disabled(self):
+        self._add_placeholder()
+        super().disabled()
+        self.verify()
+        
+    def paint(self):
+        super().paint()
+        self.verify()
+
+    def set(self, values):
+        self.clear()
+        self.insert(0, values)
+        self.verify()
+        
+    
+    def _clear_placeholder(self, e=0):
+        if self._get() == self.placeholder: self.clear()
+
+    def _add_placeholder(self, e=0):
+        if self._get() == '': self.set(self.placeholder)
+        pass
+    
+    def clear(self): self.delete('0', 'end')
+    
+    def _get(self): return super().get()
+    
+    def get(self):
+        get = self._get()
+        if get == self.placeholder: get = ''
+        return get
+
+
+class PRMP_Button(PRMP_Widget, tk.Button):
+    
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
+        tk.Button.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+B = Button = PB = PRMP_Button
+
+
+class PRMP_DateButton(B):
+    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, **kwargs):
+        self.date = None
+        from .dialogs import CalendarDialog, DateTime
+        self.CD = CalendarDialog
+        self.DT = DateTime
+        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
+    
+    def action(self):
+        self.date = self.CD.generate(geo=(300, 200)).result
+        self.set(str(self.date))
+    
+    def get(self): return self.date
+    
+    def set(self, date):
+        if '-' in date: d, m, y = date.split('-')
+        elif '/' in date: d, m, y = date.split('/')
+        else: return
+        self.date = self.DT.createDateTime(int(y), int(m), int(d))
+        self['text'] = self.date
+PDB = PRMP_DateButton
+
+
+class PRMP_RegionButton(B):
+    
+    def __init__(self, master=None, region=None, **kwargs):
+        super().__init__(master, command=self.openDetails, **kwargs)
+        self.region = region
+        self.set(region)
+        self.bindEntryHighlight()
+    
+    def openDetails(self):
+        
+        # open RegionDetailsDialog
+        pass
+    
+    def get(self): return self.region
+    
+    def set(self, region=None):
+        if region:
+            self.region = region
+            self['text'] = region.name
+
+PRB = PRMP_RegionButton
+
+class PRMP_Canvas(PRMP_Widget, tk.Canvas):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Canvas.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+    
+Ca = PCa = Canvas = PRMP_Canvas
+
+class PRMP_Checkbutton(PRMP_Widget, tk.Checkbutton):
+    
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        self.var = tk.StringVar()
+        tk.Checkbutton.__init__(self, master=master, variable=self.var, **config)
+        PRMP_Widget.__init__(self, variable=self.var, asLabel=asLabel, **config, **kwargs)
+        
+        self.var.set('0')
+        self.toggleSwitch()
+
+Cb = PCb = Checkbutton = PRMP_Checkbutton
+
+
+class PRMP_Frame(PRMP_Widget, tk.Frame):
+    
+    def __init__(self, master=None, bd=2, relief='flat', config={}, **kwargs):
+        tk.Frame.__init__(self, master=master, relief=relief, bd=bd, **config)
+        PRMP_Widget.__init__(self, relief=relief, **config, **kwargs)
+        
+F = PF = Frame = PRMP_Frame
+
+class PRMP_Label(PRMP_Widget, tk.Label):
+    
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
+        tk.Label.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+        
+L = PL = Label = PRMP_Label
+
+class PRMP_LabelFrame(PRMP_Widget, tk.LabelFrame):
+    
+    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
+        tk.LabelFrame.__init__(self, master=master, bd=bd, **config)
+        PRMP_Widget.__init__(self, font=font, **config, **kwargs)
+        
+LF = LabelFrame = PRMP_LabelFrame
+
+
+class PRMP_Radiobutton(PRMP_Widget, tk.Radiobutton):
+    
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        tk.Radiobutton.__init__(self, master=master, **config)
+        PRMP_Widget.__init__(self, asLabel=asLabel, **config, **kwargs)
+
+Rb = PRb = Radiobutton = PRMP_Radiobutton
+
+class PRMP_Scrollbar(PRMP_Widget, tk.Scrollbar):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Scrollbar.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+    
+    def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
+        
+PS = PRMP_Scrollbar
+
+
+class PRMP_Treeview(PRMP_Widget, ttk.Treeview):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Treeview.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+    
+    def set(self, *args):
+        print(args)
+        
+PTv = PRMP_Treeview
+
+
+class ImageLabel(PRMP_Label, ImageWidget):
+    def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
+        PRMP_Label.__init__(self, master, **kwargs)
+        ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
+    
+IL = ImageLabel
+
+
+class PRMP_Combobox(PRMP_Input, ttk.Combobox):
+    
+    def __init__(self, master=None, type_='', config={}, **kwargs):
+        ttk.Combobox.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+        self.values = []
+        if type_.lower() == 'gender': self.changeValues(['Male', 'Female'])
+    
+    def changeValues(self, values):
+        self.values = values
+        self['values'] = values
+    
+    def getValues(self): return self['values']
+    
+
+Cx = PCx = Combobox = PRMP_Combobox
+
+class PRMP_Entry(PRMP_Input, tk.Entry):
+    
+    def __init__(self, master=None, type_='text', config={}, **kwargs):
+        tk.Entry.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+        
+        if type_.lower() == 'email':
+            self.bind('<KeyRelease>', self.checkingEmail)
+            self.verification = self.checkingEmail
+    
+    
+
+E = PE = Entry = PRMP_Entry
+
+class PRMP_Message(PRMP_Input, tk.Message):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Message.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+
+PMs = PRMP_Message
+
+class PRMP_Text(PRMP_Input, tk.Text):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Text.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, **config, **kwargs)
+        
+    def _get(self): return tk.Text.get(self, '1.0', 'end').strip('\n')
+    
+    def set(self, values): self.clear(); self.insert('0.0', values)
+    
+    def clear(self): self.delete('0.0', 'end')
+    
+PTx = PRMP_Text
+
+
+
+
+#   from ttk widgets --> PRMP_Style_
+
+
+class PRMP_Style(ttk.Style):
+    loaded = False
+    ttkthemes = ("black", "blue", 'prmp')
+    ttkstyles = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
+
+    def __init__(self, master=None):
+        super().__init__(master=master)
+        if not PRMP_Style.loaded: self.createPrmp()
+    
+    def tupledFont(self, fontDict):
+        options = []
+        for k, v in fontDict.items():
+            options.append("-"+k)
+            options.append(str(v))
+        return tuple(options)
+    
+    def theme_use(self, theme):
+        if theme in self.ttkthemes:
+            if theme not in self.loadedThemes: getattr(self, 'create' + theme.title())()
+            pass
+
+        PRMP_Style.CURRENTSTYLE = theme
+        super().theme_use(theme)
+    
+    def getPixs(self, name):
+        name_dict = {}
+        for pix in os.listdir(name):
+            base, ext = os.path.splitext(pix)
+            name_dict[base] = os.path.join(name, pix)
+        return name_dict
+    
+    def getImageKeys(self, name):
+        nameKeys = []
+        for pix in os.listdir(self.getThemePicsPath(name)):
+            base, ext = os.path.splitext(pix)
+            nameKeys.append(base)
+        return nameKeys
+    
+    def getThemePicsPath(self, theme):
+        cwd = os.path.dirname(__file__)
+        dirs = ['pics', 'styles', theme]
+        for d in dirs: cwd = os.path.join(cwd, d)
+        cwd = cwd.replace('\\', '/')
+        return cwd
+
+    def styleImages(self, name):
+        script = '''
+        set imgdir %s
+
+        proc LoadImages {imgdir} {
+            variable I
+            foreach file [glob -directory $imgdir *.gif] {
+                set img [file tail [file rootname $file]]
+                set I($img) [image create photo -file $file -format gif89]
+            }
+        }
+        
+        array set I [LoadImages $imgdir]''' % self.getThemePicsPath(name)
+
+        self.tk.eval(script)
+        nameKeys = self.getImageKeys(name)
+        imageKeys = {}
+        for key in nameKeys:
+            tkImageName = self.tk.eval(f'return $I({key})')
+            imageKeys[key] = tkImageName
+        return imageKeys
+    
+    def createBlue(self):
+        PRMP_Style.loadedThemes.append('blue')
+        
+        frame = "#6699cc"
+        lighter = "#bcd2e8"
+        window = "#e6f3ff"
+        # window = "red"
+        selectbg = "#2d2d66"
+        # selectbg = "blue"
+        selectfg = "#ffffff"
+        selectfg = "yellow"
+        disabledfg = "#666666"
+
+        imagesDict = self.styleImages('blue')
+        
+        # return
+        settings = {
+            '.': {
+                'configure': {
+                    'borderwidth': 1,
+                    'background': frame,
+                    'fieldbackground': window,
+                    'troughcolor': lighter,
+                    'selectbackground': selectbg,
+                    'selectforeground': selectfg
+                },
+                'map': {
+                    'foreground': [
+                        ('disabled', disabledfg)
+                    ]
+                }
+            },
+            'TButton': {
+                'configure': {
+                    'padding': (10, 0),
+                },
+                'layout': [
+                    ('Button.button', {'children': [
+                        ('Button.focus', {'children': [
+                            ('Button.padding', {'children': [
+                                ('Button.label', None)
+                            ]})
+                        ]})
+                    ]})
+                ],
+            },
+            'button': {
+                'element create': ['image', imagesDict['button-n'], ('pressed', imagesDict['button-p']), ('active', imagesDict['button-h']), {'border': 4, 'sticky': 'ew'}]
+            },
+            'Checkbutton.indicator': {
+                'element create': ['image', imagesDict['check-nu'], 
+                    (('active', '!disabled', 'selected'), imagesDict['check-hc']), 
+                    (('active', '!disabled'), imagesDict['check-hu']), 
+                    (('selected', '!disabled'), imagesDict['check-nc']), {'width': 24, 'sticky': 'w'}]
+            },
+            'Radiobutton.indicator': {
+                'element create': ['image', imagesDict['radio-nu'], 
+                    (('active', '!disabled', 'selected'), imagesDict['radio-hc']), 
+                    (('active', '!disabled'), imagesDict['radio-hu']), 
+                    ('selected', imagesDict['radio-nc']), {'width': 24, 'sticky': 'w'}]
+            },
+            'TMenubutton': {
+                'configure': {
+                    'relief': 'raised',
+                    'padding': (10, 2)
+                },
+            },
+            'Toolbar': {
+                'configure': {
+                    'width': 0,
+                    'relief': 'flat',
+                    'borderwidth': 2,
+                    'padding': 4,
+                    'background': frame,
+                    'foreground': '#000000'
+                },
+                'map': {
+                    'background': [
+                        ('active', selectbg)
+                    ],
+                    'foreground': [
+                        ('active', selectfg)
+                    ],
+                    'relief': [
+                        ('disabled', 'flat'), 
+                        ('selected', 'sunken'), 
+                        ('pressed', 'sunken'), 
+                        ('active', 'raised')
+                    ]
+                }
+            },
+            'TEntry': {
+                'configure': {
+                    'selectborderwidth': 1,
+                    'padding': 2,
+                    'insertwidth': 2,
+                    'font': 'TkTextFont'
+                }
+            },
+            'TCombobox': {
+                'configure': {
+                    'selectborderwidth': 1,
+                    'padding': 2,
+                    'insertwidth': 2,
+                    'font': 'TkTextFont'
+                }
+            },
+            'TNotebook.Tab': {
+                'configure': {
+                    'padding': (4, 2, 4, 2)
+                },
+                'map': {
+                    'background': [
+                        ('selected', frame),
+                        ('active', lighter)
+                    ],
+                    'padding': [
+                        ('selected', (4, 4, 4, 2))
+                    ]
+                }
+            },
+            'TLabel': {
+                'configure': {
+                    'relief': 'solid',
+                    'anchor': 'center',
+                    'font': "-family {Times New Roman} -size 11 -weight bold"
+                },
+                'map': {
+                    'relief': [('!active', 'solid'), ('disabled', 'ridge')],
+                    'foreground': [('!disabled', 'black')],
+                    # 'padding':
+                }
+            },
+            'TLabelframe': {
+                'configure': {
+                    'borderwidth': 2,
+                    'relief': 'groove'
+                }
+            },
+            'Vertical.TScrollbar': {
+                'layout': [
+                    ('Scrollbar.trough', {'children': [
+                        ('Scrollbar.uparrow', {'side': 'top'}),
+                        ('Scrollbar.downarrow', {'side': 'bottom'}),
+                        ('Scrollbar.uparrow', {'side': 'bottom'}),
+                        ('Vertical.Scrollbar.thumb', {'side': 'left', 'expand': 'true', 'sticky': 'ns'})
+                    ]})
+                ]
+            },
+            'Horizontal.TScrollbar': {
+                'layout': [
+                    ('Scrollbar.trough', {'children': [
+                        ('Scrollbar.leftarrow', {'side': 'left'}),
+                        ('Scrollbar.rightarrow', {'side': 'right'}),
+                        ('Scrollbar.leftarrow', {'side': 'right'}),
+                        ('Horizontal.Scrollbar.thumb', {'side': 'left', 'expand': 'true', 'sticky': 'we'})
+                    ]})
+                ]
+            },
+            'Horizontal.Scrollbar.thumb': {
+                'element create': ['image', imagesDict['sb-thumb'], (('pressed', '!disabled'), imagesDict['sb-thumb-p']), {'border': 3}]
+            },
+            'Vertical.Scrollbar.thumb': {
+                'element create': ['image', imagesDict['sb-vthumb'], (('pressed', '!disabled'), imagesDict['sb-vthumb-p']), {'border': 3}]
+            },
+            # element create 133
+            # last for loop
+            # element create 138
+            'Scale.slider': {
+                'element create': ['image', imagesDict['slider'], (('pressed', '!disabled'), imagesDict['slider-p'])]
+            },
+            'Vertical.Scale.slider': {
+                'element create': ['image', imagesDict['vslider'], (('pressed', '!disabled'), imagesDict['vslider-p'])]
+            },
+            'Horizontal.Progress.bar': {
+                'element create': ['image', imagesDict['sb-thumb'], {'border': 2}]
+            },
+            
+            'Vertical.Progress.bar': {
+                'element create': ['image', imagesDict['sb-vthumb'], {'border': 2}]
+            },
+            'Treeview': {
+                'map': {
+                    'background': [
+                        ('selected', selectbg)
+                    ],
+                    'foreground': [
+                        ('selected', selectfg)
+                    ]
+                }
+            }
+        }
+        
+        for sd in ['up', 'down', 'left', 'right']:
+            settings.update({f'{sd}arrow': {
+                'element create': ['image', imagesDict[f'arrow{sd}'], ('disabled', imagesDict[f'arrow{sd}']), ('pressed', imagesDict[f'arrow{sd}-p']), ('active', imagesDict[f'arrow{sd}-h']), {'border': 1, 'sticky': ()}]}})
+        
+        # s = sfs(settings)
+        
+        self.theme_create('blue', settings=settings)
+        return self
+
+    def createPrmp(self):
+        if PRMP_Style.loaded: return
+        self.theme_create('prmp', settings=self.settings)
+        PRMP_Style.loaded = True
+    
+    @property
+    def settings(self):
+
+        button_color =   PRMP_Theme.DEFAULT_BUTTON_COLOR
+        prmpsmart_botton_color = PRMP_Theme.OFFICIAL_PRMPSMART_BUTTON_COLOR
+        error_button_color = PRMP_Theme.DEFAULT_ERROR_BUTTON_COLOR
+        foreground = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
+        background = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+        text_background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
+        text_foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
+        scrollbar_color = PRMP_Theme.DEFAULT_SCROLLBAR_COLOR
+        progressbar_color = PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR
+        relief = PRMP_Theme.DEFAULT_RELIEF
+
+        default_font = self.tupledFont(PRMP_Theme.DEFAULT_FONT)
+        big_font = self.tupledFont(PRMP_Theme.BIG_FONT)
+        menu_font = self.tupledFont(PRMP_Theme.DEFAULT_MENU_FONT)
+        button_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTON_FONT)
+        small_button_font = self.tupledFont(PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        title_font = self.tupledFont(PRMP_Theme.DEFAULT_TITLE_FONT)
+        status_font = self.tupledFont(PRMP_Theme.DEFAULT_STATUS_FONT)
+        label_font = self.tupledFont(PRMP_Theme.DEFAULT_LABEL_FONT)
+        labelframe_font = self.tupledFont(PRMP_Theme.DEFAULT_LABELFRAME_FONT)
+
+        oneColor = True
+
+        if isinstance(button_color, tuple): button_foreground, button_background = button_color
+        else:
+            background, foreground = 'white', 'black'
+            button_foreground, button_background = foreground, background
+        
+        _settings = {
+            '.': {
+                'map': {
+                    'anchor': [('hover', 'nw')]
+                }
+
+            },
+
+            'TButton': {
+                'configure': {
+                    'relief': 'raised',
+                    'anchor': 'center',
+                    'font': button_font,
+                    'foreground': button_foreground,
+                    'background': button_background
+                },
+               'map': {
+                    'relief': [('pressed', 'solid'), ('hover', 'ridge'), ('focus', 'solid')],
+                    'foreground': [('disabled', 'black')],
+                },
+            },
+            
+            'TLabel': {
+                'configure': {
+                    'relief': 'groove',
+                    'anchor': 'center',
+                    'font': label_font,
+                    'foreground': foreground,
+                    'background': background,
+                },
+                'map': {
+                    'relief': [('active', 'groove'), ('disabled', 'ridge'), ('hover', 'ridge'),],
+                }
+            },
+            'entry.TLabel': {
+                'configure': {
+                    'relief': 'sunken',
+                    'background': text_background,
+                    'foreground': text_foreground,
+                    'overrelief': 'solid',
+                    'font': default_font
+                },
+                'map': {
+                    'relief': [('hover', 'solid')],
+                }
+            },
+        }
+
+        return _settings
+
+    def update(self, e=0):
+        if not PRMP_Style.loaded: self.createPrmp()
+        self.theme_settings('prmp', self.settings)
+    theme_use = update
+
+PSt = PRMP_Style
+
+
+
+
+#  windows
+
+
 class PRMP_Window(PRMP_Widget):
     
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, alp=1, grabAnyWhere=True, geo=(), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, **kwargs):
@@ -718,6 +1473,8 @@ class PRMP_Window(PRMP_Widget):
         self.co = 0
 
         if container:
+            if self._ttk_: Frame = PRMP_Style_Frame
+            else: Frame = PRMP_Frame
             self.container = PRMP_Frame(self, relief='groove', config=dict(**containerConfig))
         
         if geo != None: geometry = geo
@@ -993,8 +1750,8 @@ class PRMP_Window(PRMP_Widget):
         if self.titleBar:
             self.titleBar.set(title or self.titleText)
             return
-        if self._ttk_: from .prmp_ttk import F, L, B
-        else: from .prmp_tk import F, L, B
+        if self._ttk_: F, L, B = PRMP_Style_Frame, PRMP_Style_Label, PRMP_Style_Button
+        else: F, L, B = PRMP_Frame, PRMP_Label, PRMP_Button
 
         fr = F(self)
         self.titleBar = L(fr, config=dict( text=title or self.titleText, anchor='center'), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
@@ -1023,9 +1780,9 @@ class PRMP_Window(PRMP_Widget):
             self.placeStatusBar()
             return
         
-        if self._ttk_: from .prmp_ttk import F, L, B
-        else: from .prmp_tk import F, L, B
-        
+        if self._ttk_: F, L, B = PRMP_Style_Frame, PRMP_Style_Label, PRMP_Style_Button
+        else: F, L, B = PRMP_Frame, PRMP_Label, PRMP_Button
+
         fr = F(self)
         self.statusBar = L(fr, config=dict(text='Status' or self.statusText, relief='groove', anchor='center'), font=PRMP_Theme.DEFAULT_STATUS_FONT)
         self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
@@ -1098,199 +1855,5 @@ class PRMP_MainWindow(PRMP_Window):
     # def title(self, t): self.root.title(t)
 
 PMW = PRMP_MainWindow
-
-
-class FillWidgets:
-    
-    def __init__(self, values={}):
-        
-        self.__resultsWidgets = []
-        self.values = values
-        
-    
-    def addResultsWidgets(self, child):
-        if child not in self.__resultsWidgets:
-            if isinstance(child, (list, tuple)):
-                for ch in child: self.addResultsWidgets(ch)
-            else: self.__resultsWidgets.append(child)
-    
-    @property
-    def resultsWidgets(self): return self.__resultsWidgets
-    
-    
-    def fill(self, values={}):
-        if values:
-            for widgetName in self.resultsWidgets:
-                widget = self.getFromSelf(widgetName)
-                if widget:
-                    try: widget.set(values.get(widgetName, ''))
-                    except Exception as er: print(f'ERROR {er}.')
-                else: print(widgetName, widget)
-            self.values = values
-            return True
-        else:
-            if self.values: return self.fill(self.values)
-
-FW = FillWidgets
-
-
-
-class ImageWidget:
-    def __init__(self, imageFile=None, thumb=None, resize=None):
-        self.rt = None
-        self.__image = None
-        self.thumb = thumb or (200, 170)
-        self.resize = resize or (100, 100)
-        from .dialogs import PMB
-        self.PMB = PMB
-        
-        self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb)
-        
-        self.bindMenu()
-        self.loadImage(imageFile=imageFile or self.default_dp)
-        self.bindEntryHighlight()
-        
-        self.set = partial(ImageWidget.set, self)
-    
-    
-    def disabled(self):
-        self.unBindMenu()
-        super().disabled()
-    
-    def normal(self):
-        self.bindMenu()
-        super().normal()
-    
-    def loadImage(self, imageFile=None):
-        if imageFile:
-            if isinstance(imageFile, PRMP_Image): pass
-            else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)
-            
-            self.image = self.__image = imageFile
-
-            if imageFile.ext == 'xbm': self.image = imageFile.resizeTk(self.resize)
-            # else: self.image = imageFile.thumbnailTk(self.thumb)
-            
-            self.configure(image=self.image)
-    
-    def removeImage(self):
-        if self.rt: self.rt.destroy()
-        if not self.PMB(title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
-        else: self.loadImage(imageFile=self.default_dp)
-    
-    def set(self, imageFile):
-        if imageFile: self.loadImage(imageFile=imageFile)
-    
-    def changeImage(self, e=0):
-        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
-        if file: self.loadImage(imageFile=file)
-    
-    def bindMenu(self):
-        self.bind('<1>', self.delMenu, '+')
-        self.bind('<3>', self.showMenu, '+')
-        # self.bind('<Double-1>', self.showMenu)
-    
-    def unBindMenu(self):
-        self.unbind('<1>')
-        self.unbind('<3>')
-        # self.unbind('<Double-1>')
-    
-    def get(self): return self.__image
-    
-    def delMenu(self, e=0):
-        if self.rt:
-            self.rt.destroy()
-            del self.rt
-            self.rt = None
-    
-    def showMenu(self, e=0):
-        self.delMenu()
-        x, y = e.x, e.y
-        x, y = e.x_root, e.y_root
-        self.rt = rt = PTp(self, geo=(50, 50, x, y))
-        rt.overrideredirect(1)
-        btn1 = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
-        btn1.place(relx=0, rely=0, relh=.5, relw=1)
-        
-        btn2 = B(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT)
-        btn2.place(relx=0, rely=.5, relh=.5, relw=1)
-        rt.attributes('-topmost', 1)
-        rt.paint()
-
-
-
-class PRMP_Input(PRMP_Widget):
-    
-    def __init__(self, placeholder='', **kwargs):
-        PRMP_Widget.__init__(self, **kwargs)
-        self.verification = None
-        
-        if placeholder:
-            self.placeholder = placeholder
-            self.set(self.placeholder)
-            
-            self.bind("<FocusIn>", self._clear_placeholder)
-            self.bind("<FocusOut>", self._add_placeholder)
-        
-        
-    def entered(self, e=0):
-        super().entered()
-        self._clear_placeholder()
-        
-    def left(self, e=0):
-        super().left()
-        self.focus()
-        self._add_placeholder()
-    
-    
-    def checkingEmail(self, e=0):
-        email = self.get()
-        if email:
-            if self.checkEmail(email): self.configure(background='white', foreground='green')
-            else: self.configure(background='white', foreground='red')
-        # else: self.paint()
-        
-    def verify(self):
-        if self.verification: return self.verification()
-    
-    def normal(self):
-        super().normal()
-        self.verify()
-        
-    def disabled(self):
-        self._add_placeholder()
-        super().disabled()
-        self.verify()
-        
-    def paint(self):
-        super().paint()
-        self.verify()
-
-    def set(self, values):
-        self.clear()
-        self.insert(0, values)
-        self.verify()
-        
-    
-    def _clear_placeholder(self, e=0):
-        if self._get() == self.placeholder: self.clear()
-
-    def _add_placeholder(self, e=0):
-        if self._get() == '': self.set(self.placeholder)
-        pass
-    
-    def clear(self): self.delete('0', 'end')
-    
-    def _get(self): return super().get()
-    
-    def get(self):
-        get = self._get()
-        if get == self.placeholder: get = ''
-        return get
-
-
-
-
-
 
 

@@ -1,6 +1,6 @@
 
-from .prmp_tk.two_widgets import *
-from .prmp_tk.dialogs import *
+from .prmp_gui.two_widgets import *
+from .prmp_gui.dialogs import *
 
 class PersonDialog(PRMP_Dialog):
     

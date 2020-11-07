@@ -1,7 +1,7 @@
 from itertools import zip_longest
 
 from .agam_dialogs import *
-from .prmp_tk.scrollables import bound_to_mousewheel, PRMP_TreeView
+from .prmp_gui.scrollables import bound_to_mousewheel, PRMP_TreeView
 
 
 class RegionRadioCombo(RC):

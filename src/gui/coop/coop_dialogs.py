@@ -1,5 +1,5 @@
 from ..core.agam_dialogs import *
-from ..core.prmp_tk.two_widgets import *
+from ..core.prmp_gui.two_widgets import *
 
 
 class ThirdPartySuretyDialog(PersonDialog):
