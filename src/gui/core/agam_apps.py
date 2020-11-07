@@ -66,9 +66,9 @@ class RegionRadioCombo(RC):
                 self.B.set(keys[0])
         
     def set(self, region):
-        self._subRegionDict = {}
-        self.subRegionDict = {}
         if region:
+            self.subRegionDict = {}
+            self._subRegionDict = {}
             regionLevel = len(region.hierachy)
             
             assert regionLevel  == self.regionLevel, f'Incorrect region of level {regionLevel} given, level must be {self.regionLevel}'
@@ -96,7 +96,6 @@ class Hierachy(PRMP_TreeView):
         self.tree.bind('<Control-Return>', self.viewRegion)
 
     def viewRegion(self, e=0):
-        print(e.__dict__)
         current = self.selected()
         if current:
             if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
@@ -184,7 +183,6 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
         
-        # self.switch()
         
     def showPersons(self, e=0):
         if self.personDialog: self.personDialog.destroy()

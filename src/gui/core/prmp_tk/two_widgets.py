@@ -72,15 +72,20 @@ class TwoWidgets(PRMP_Frame):
     def light(self):
         self.normal('b')
         self.T.light()
-        self.B.focus_set()
+        self.B.focus()
     
     def unlight(self):
+        # self.readonly()
         self.disabled('b')
         self.T.unlight()
     
     def toggleSwitch(self):
         self.onFg = False
         if self.toggleGroup: self.T.bind('<1>', self.switchGroup)
+        
+    def readonly(self):
+        try: self.Bottom.readonly()
+        except Exception as e: self.disabled('b')
         
     def disabled(self, wh=''):
         if not self.disableOnTogle: return
@@ -91,6 +96,7 @@ class TwoWidgets(PRMP_Frame):
             self.Top.disabled()
             self.Bottom.disabled()
     
+
     def active(self, wh=''):
         if wh == 't': self.Top.active()
         elif wh == 'b': self.Bottom.active()

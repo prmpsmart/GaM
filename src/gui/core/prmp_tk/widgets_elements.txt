@@ -1,0 +1,432 @@
+options:
+ for tkinter, but also works for ttk.Widget.configure()
+    Standard Options:
+        activebackground
+        activeforeground
+        anchor
+        background
+        bitmap
+        borderwidth
+        cursor
+        disabledforeground
+        disabledbackground
+        font
+        foreground
+        highlightbackground
+        highlightcolor
+        highlightthickness
+        image
+        justify
+        padx
+        pady
+        relief
+        takefocus
+        text
+        textvariable
+        underline
+        wraplength
+
+    Button:
+        command
+        compound
+        default
+        height
+        overrelief
+        state
+        width
+
+    Checkbutton:
+        command
+        height
+        indicatoron
+        offvalue
+        onvalue
+        selectcolor
+        selectimage
+        state
+        variable
+        width
+    
+    Entry:
+        exportselection
+        insertbackground
+        insertborderwidth
+        insertofftime
+        insertontime
+        insertwidth
+        invalidcommand
+        invcmd
+        selectbackground
+        selectborderwidth
+        selectforeground
+        show
+        state
+        textvariable
+        validate
+        validatecommand
+        vcmd
+        width
+        xscrollcommand
+    
+    Frame:
+        class
+        colormap
+        container
+        height
+        labelanchor
+        visual
+        width
+
+    Label:
+        height
+        state
+        width
+    
+    ListBox:
+        exportselection
+        height
+        selectbackground
+        selectborderwidth
+        selectforeground
+        selectmode
+        setgrid
+        width
+        xscrollcommand
+        yscrollcommand
+        listvariable
+    
+    Menu:
+        postcommand
+        selectcolor
+        tearoff
+        tearoffcommand
+        title
+        type
+    
+    Radiobutton:
+        command
+        height
+        indicatoron
+        justify
+        selectcolor
+        selectimage
+        state
+        value
+        variable
+        width
+        
+    Scale:
+        bigincrement
+        command
+        digits
+        from
+        label
+        length
+        orient
+        repeatdelay
+        repeatinterval
+        resolution
+        showvalue
+        sliderlength
+        sliderrelief
+        tickinterval
+        to
+        troughcolor
+        variable
+        width
+    
+    Scrollbar:
+        activerelief
+        command
+        cursor
+        elementborderwidth
+        jump
+        orient
+        repeatdelay
+        repeatinterval
+        troughcolor
+        width
+
+    Text: 
+        autoseparators
+        height
+        maxundo
+        spacing1
+        spacing2
+        spacing3
+        state
+        tabs
+        undo
+        width
+        wrap
+    
+    Spinbox:
+        exportselection
+        insertbackground
+        insertborderwidth
+        insertofftime
+        insertontime
+        insertwidth
+        repeatdelay
+        repeatinterval
+        selectbackground
+        selectborderwidth
+        selectforeground
+        xscrollcommand
+
+        buttonbackground
+        buttoncursor
+        buttondownrelief
+        buttonuprelief
+        command
+        disabledbackground
+        disabledforeground
+        format
+        from
+        invalidcommand
+        increment
+        readonlybackground
+        state
+        to
+        validate
+        validatecommand values
+        width
+        wrap
+    
+    LabelFrame:
+        background
+        class
+        colormap
+        container
+        height
+        labelanchor
+        labelwidget
+        visual
+        width
+    
+    
+        handlepad
+        handlesize
+        opaqueresize
+        sashcursor
+        sashpad
+        sashrelief
+        sashwidth
+        showhandle
+
+
+states:
+ '!' in front to negate
+    active
+    disabled
+    focus
+    pressed
+    selected
+    background
+    embossed
+    readonly
+    alternate
+    invalid
+    hover
+
+
+configure:
+    options=values
+
+    TButton:
+        shiftrelief
+
+    TEntry:
+        selectborderwidth
+        insertwidth
+        padding
+        font
+
+
+    Combobox:
+        foreground
+        selectbackground
+        fieldbackground
+        selectforeground
+        background
+        arrowcolor
+
+    TLabelframe:
+        labeloutside     [bool]
+        labelmargins     [int, int, int, int]
+    
+    TScale:
+        groovewidth
+        sliderlength
+        troughrelief
+        sliderwidth
+    
+    TSpinbox:
+        arrowsize
+
+
+map:
+    options=[(state, value) for state in states]
+
+
+layout:
+    elements: To use remove the first T, as in TButton -> Button.border
+
+        TButton: 
+            border
+            focus
+            padding
+            label
+            highlight
+            background      Settings: (*button.background is not needed in tile 0.5 or above)
+        
+        TCheckbutton:
+            padding
+            indicator
+            focus
+            label
+            highlight
+        
+        TCombobox:
+            field
+            downarrow
+            padding
+            textarea
+            rightdownarrow
+            background
+            focus
+            border
+        
+        TEntry:
+            field
+            padding
+            textarea
+            highlight
+            background
+
+        TFrame:
+            border
+        
+        TLabel:
+            border
+            padding
+            label
+        
+        TLabelframe:
+            border
+        
+        TMenubutton:
+            border
+            focus
+            indicator
+            padding
+            label
+            dropdown
+            highlight
+            background
+            button
+        
+        TNotebook:
+            client
+            Tab
+        
+        [Vertical, Horizontal].Progressbar:
+            bar
+            trough
+            pbar
+        
+        Panedwindow:
+            hsash
+            vsash
+            background
+
+            configure:
+                Sash options[gripcount, sashthickness]
+        
+        Scale:
+            slider
+            trough
+
+        
+        [Vertical, Horizontal].TScrollbar: Scrollbar. or [Vertical, Horizontal].Scrollbar: TScrollbar.
+            thumb
+            trough
+            grip
+            leftarrow
+            rightarrow
+            uparrow
+            downarrow
+            background
+
+        
+        TRadiobutton:
+            highlight
+            padding
+            indicator
+            focus
+            label
+        
+        TSeparator:
+            separator
+            vseparator
+            hseparator
+
+        TSizegrip:
+            sizegrip
+        
+        TSpinbox:
+            field
+            background
+            padding
+            innerbg
+            textarea
+            uparrow
+            downarrow
+        
+        Treeview:
+            field
+            padding
+            treearea
+            Treeheading.cell
+            
+            maps and configure:
+                Heading
+                Item
+                Row
+                Column
+                Cell
+
+        
+        Toolbutton:
+            border
+            padding
+
+
+
+
+
+    options:
+        side    [left, right, top, bottom]
+        sticky  [nswe]
+        border  [int]
+        expand  [bool]
+        unit
+        children --- takes another layout, just like a loop
+
+    styleName: or widget
+        [(element of styleName), {options: value}]
+
+
+
+alt     $$ +
+blue    $pictures +
+clam    $$
+clearlooks  $border and padding +
+elegance    $pictures +
+keramic     $pictures +
+radiance    $border and padding  +
+
+
+
+
+

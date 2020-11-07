@@ -10,8 +10,8 @@ class Styles(ThemedStyle):
     short_geo = "600x700"
     password = "d3cd7fdbcfec731019d16678a16e6c83e70ba7952f32221ced7765bc"
 
-    themes = all_themes
     themes = ["black", "blue", "kroc", "smog", "ubuntu"]
+    themes = all_themes
 
     style = "blue"
 
