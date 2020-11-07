@@ -1068,15 +1068,25 @@ class PRMP_Widget(PRMP_Theme):
         try: self.x, self.y = event.x, event.y
         except: pass
     
+    def _moveroot(self):
+        root = self.winfo_toplevel()
+        self.bind("<ButtonPress-1>", partial(PRMP_Widget._move, root))
+        self.bind("<ButtonRelease-1>", partial(PRMP_Widget._move, root))
+        self.bind("<B1-Motion>", partial(PRMP_Widget._onMotion, root))
+        
+        self.bind("<ButtonPress-3>", partial(PRMP_Widget._move, root))
+        self.bind("<ButtonRelease-3>", partial(PRMP_Widget._move, root))
+        self.bind("<B3-Motion>", partial(PRMP_Widget._onMotion, root))
+    
     def _grab_anywhere_on(self):
-        self.bind("<ButtonPress-1>", self._move)
-        self.bind("<ButtonRelease-1>", self._move)
-        self.bind("<B1-Motion>", self._onMotion)
+        self.bind("<ButtonPress-3>", self._move)
+        self.bind("<ButtonRelease-3>", self._move)
+        self.bind("<B3-Motion>", self._onMotion)
     
     def _grab_anywhere_off(self):
-        self.unbind("<ButtonPress-1>")
-        self.unbind("<ButtonRelease-1>")
-        self.unbind("<B1-Motion>")
+        self.unbind("<ButtonPress-3>")
+        self.unbind("<ButtonRelease-3>")
+        self.unbind("<B3-Motion>")
     
     def _onMotion(self, event):
         try:
@@ -1394,6 +1404,7 @@ class PRMP_Window(PRMP_Widget):
         self.titleBar = L(fr, config=dict( text=title or self.titleText, anchor='center'), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
         self.titleBar.place(relx=0, rely=0, relh=1, relw=.85 if w != 1 else .95)
         self.titleBar.bind('<Double-1>', self.maximize)
+        self.titleBar._moveroot()
         
         if not w:
             self.imgMin = PRMP_Image('green', resize=(20, 20))
@@ -1419,7 +1430,7 @@ class PRMP_Window(PRMP_Widget):
         fr = F(self)
         self.statusBar = L(fr, config=dict(text='Status' or self.statusText, relief='groove', anchor='center'), font=PRMP_Theme.DEFAULT_STATUS_FONT)
         self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
-        
+        self.statusBar._moveroot()
         up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
         up.place(relx=.92, rely=0, relh=1, relw=.04)
         down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
@@ -1680,8 +1691,6 @@ class ImageWidget:
         super().normal()
     
     def loadImage(self, imageFile=None):
-
-        print(imageFile)
         if imageFile:
             if isinstance(imageFile, PRMP_Image): pass
             else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)

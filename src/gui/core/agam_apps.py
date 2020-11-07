@@ -13,6 +13,7 @@ class RegionRadioCombo(RC):
         self.subRegionDict = {}
         self.set(region)
         self.choosen = None
+        self.region = region
         self._receivers = recievers
         self.regionLevel = regionLevel
     
@@ -127,7 +128,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
     def regionChanged(self, region):
         region = region[1]
-        if not region: return
+        if not region or (region is self.region): return
     
         self.region = region
         self.titleBar.set(region.idText)
