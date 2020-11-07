@@ -2,13 +2,12 @@ import os
 import platform
 import time
 import tkinter as tk
-from functools import partial
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from random import randint
 from tkinter.filedialog import askopenfilename
 from .pics import PRMP_Image
-from ....backend.core.bases import Mixins
+from .usefuls import Mixins, partial, copyClassMethods
 
 TK_WIDGETS = ['Button', 'Canvas', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Listbox', 'Menu', 'Menubutton', 'Message', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'TKCalendar', 'TKOutput', 'Text', 'TkFixedFrame', 'TkScrollableFrame', 'Widget']
 TTK_THEMES = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
@@ -1474,7 +1473,7 @@ Top = Toplevel = PTp = PRMP_Toplevel
 class PRMP_MainWindow(PRMP_Window):
     
     def __init__(self, master=None, atb=1, asb=1, **kwargs):
-        from .usefuls import copyClassMethods
+        
         if master: self.root = PRMP_Toplevel(master, atb=atb, asb=asb, **kwargs)
         else: self.root = PRMP_Tk(atb=atb, asb=asb, **kwargs)
         
