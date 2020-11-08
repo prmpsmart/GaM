@@ -382,7 +382,7 @@ class PRMP_Theme(Mixins):
                         highlightbackground=highlightbackground,
                         highlightcolor=highlightcolor,
                         highlightthickness=highlightthickness,
-                        relief=relief, 
+                        relief='sunken', 
                         font=font,
                         **kwargs)
             # print(self)
@@ -712,12 +712,12 @@ class PRMP_Input:
     def __init__(self, placeholder=''):
         self.verification = None
         
-        if placeholder:
-            self.placeholder = placeholder
-            self.set(self.placeholder)
-            
-            self.bind("<FocusIn>", self._clear_placeholder)
-            self.bind("<FocusOut>", self._add_placeholder)
+        # if placeholder:
+        self.placeholder = placeholder
+        self.set(self.placeholder)
+        
+        self.bind("<FocusIn>", self._clear_placeholder)
+        self.bind("<FocusOut>", self._add_placeholder)
         
     def entered(self, e=0):
         super().entered()
@@ -790,12 +790,12 @@ class PRMP_Message(PRMP_, tk.Message):
         PRMP_Input.__init__(self, **config, **kwargs)
 PM = PRMP_Message
 
-class PRMP_Text(PRMP_, PRMP_Input, tk.Text):
+class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
     
     def __init__(self, master=None, placeholder='', config={}, **kwargs):
         tk.Text.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, placeholder=placeholder)
         PRMP_.__init__(self, **config, **kwargs)
+        PRMP_Input.__init__(self, placeholder=placeholder)
         
     def _get(self): return tk.Text.get(self, '1.0', 'end').strip('\n')
     
@@ -810,8 +810,8 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
     
     def __init__(self, master=None, type_='', placeholder='', config={}, **kwargs):
         ttk.Combobox.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, placeholder=placeholder)
         PRMP_Style_.__init__(self, **config, **kwargs)
+        PRMP_Input.__init__(self, placeholder=placeholder)
 
         self.values = []
         if type_.lower() == 'gender': self.changeValues(['Male', 'Female'])
@@ -1258,12 +1258,12 @@ class PRMP_Checkbutton(PRMP_, tk.Checkbutton):
         self.toggleSwitch()
 PC = PRMP_Checkbutton
 
-class PRMP_Entry(PRMP_, PRMP_Input, tk.Entry):
+class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
     
     def __init__(self, master=None, type_='text', placeholder='', config={}, **kwargs):
         tk.Entry.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, placeholder=placeholder)
         PRMP_.__init__(self, **config, **kwargs)
+        PRMP_Input.__init__(self, placeholder=placeholder)
         
         if type_.lower() == 'email':
             self.bind('<KeyRelease>', self.checkingEmail)
@@ -1362,12 +1362,12 @@ class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton):
         self.toggleSwitch()
 PSC = PRMP_Style_Checkbutton
 
-class PRMP_Style_Entry(PRMP_, PRMP_Input, ttk.Entry):
+class PRMP_Style_Entry(PRMP_Input, PRMP_, ttk.Entry):
     
     def __init__(self, master=None, type_='text', placeholder='', config={}, **kwargs):
         ttk.Entry.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, placeholder=placeholder)
         PRMP_.__init__(self, **config, **kwargs)
+        PRMP_Input.__init__(self, placeholder=placeholder)
         
         if type_.lower() == 'email':
             self.bind('<KeyRelease>', self.checkingEmail)

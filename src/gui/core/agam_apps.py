@@ -2,7 +2,7 @@ from .agam_dialogs import *
 from .prmp_gui.extensions import bound_to_mousewheel, PRMP_TreeView
 
 
-class RegionRadioCombo(RC):
+class RegionRadioCombo(RadioCombo):
     
     def __init__(self, master=None, region=None, regionLevel=5, recievers=[], **kwargs):
         super().__init__(master, **kwargs)
@@ -112,10 +112,11 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.region = region
         self.personDialog = None
         self.switchState = None
-        self._setupApp()
         self.geo_ = geo
         self.expandGeo = expandGeo
         
+        self._setupApp()
+
         self.fill()
         self.paint()
         
@@ -159,7 +160,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         switch = PRMP_Button(self.container, config=dict(text='Switch?', command=self.switch))
         switch.place(x=100, y=155, h=24, w=90)
         
-        new = PCb(self.container, config=dict(text='New Dialog ?'))
+        new = PRMP_Checkbutton(self.container, config=dict(text='New Dialog ?'))
         new.place(x=208, y=155, h=24, w=120)
        
         

@@ -40,7 +40,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     def _setResult(self, result): self.__result = result
     
     def addSubmitButton(self, command=None):
-        self.submitBtn = B(self.container, config=dict(text='Submit', command=command or self.processInput))            
+        self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=command or self.processInput))            
     
     def placeSubmitBtn(self, wh=0):
         if wh:
@@ -53,7 +53,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     def addEditButton(self, command=None, submitCommand=None):
         if self.submitBtn == None: self.addSubmitButton(submitCommand)
         x, y = self.containerGeo
-        self.editBtn = xbtn = Cb(self.container, text='Edit', command=self.editInput)
+        self.editBtn = xbtn = PRMP_Checkbutton(self.container, text='Edit', command=self.editInput)
         xbtn.place(x=10 , y=y-40, h=30, w=60)
     
     def processInput(self):

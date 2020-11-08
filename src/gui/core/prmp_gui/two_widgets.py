@@ -10,7 +10,7 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs=dict(), bottomKwargs=dict(), placeholder='', disableOnTogle=True, dot=None):
+    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs=dict(), bottomKwargs=dict(), disableOnTogle=True, dot=None):
         super().__init__(master)
         
         self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
@@ -35,21 +35,18 @@ class TwoWidgets(PRMP_Frame):
             
         self.Top = top_wid(self, **topKwargs)
         
-        bottom_def = {k:v for k, v in self.bottom_defaults.items()}
-        placeholder = placeholder or bottomKwargs.get('placeholder') or f'Enter {topKwargs.get("text")}.'
+        placeholder = bottomKwargs.get('placeholder', f'Enter {topKwargs.get("text")}.')
         
-        bottomKwargs['placeholder'] = placeholder
-        
-        if bottom in ['label', 'datebutton']:
-            del bottomKwargs['placeholder']
-            bottomKw = dict(**bottom_def, **bottomKwargs)
-        else: bottomKw = dict(**bottomKwargs)
+        if bottom in ['label', 'datebutton']: bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
+        else:
+            if bottomKwargs.get('placeholder'): bottomKw = dict(**bottomKwargs)
+            else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
         
         if bottom == 'datebutton': placeholder = 'Choose Date'
         
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
         
-        del topKwargs, bottomKwargs
+        # del topKwargs, bottomKwargs
         
         events = self.events.get(bottom)
         if events:
