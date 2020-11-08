@@ -309,7 +309,7 @@ class PRMP_Theme(Mixins):
         return [theme, prev]
     
     def paint(self):
-        kwargs = self.kwargs.copy()
+        kwargs = { k: v for k, v in self.kwargs.items()}
         
         # theme = PRMP_Theme.currentThemeDict()
         # print(theme)
@@ -1646,9 +1646,7 @@ class PRMP_Window(PRMP_Widget):
         points[-1] = 50
         self.setGeometry(points)
     
-    def changeGeometry(self, geo=(400, 300)):
-        # self.kwargs.update({'geo': geo, 'geometry': geo})
-        self.placeOnScreen(side=self.side, geometry=geo)
+    def changeGeometry(self, geo=(400, 300)): self.placeOnScreen(side=self.side, geometry=geo)
         
     def centerOfScreen(self): self.setGeometry(self.pointsToCenterOfScreen)
         
