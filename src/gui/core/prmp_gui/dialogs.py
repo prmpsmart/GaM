@@ -91,7 +91,7 @@ class CalendarDialog(PRMP_Dialog):
     choosen = None
     _version_ = '3.3.0' # Alpha by PRMPSmart
     
-    class DayLabel(L):
+    class DayLabel(PRMP_Label):
         highlight_bg = '#2d18e7'
         highlight_fg = 'white'
         now_fg = 'white'

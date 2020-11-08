@@ -1,7 +1,5 @@
-from itertools import zip_longest
-
 from .agam_dialogs import *
-from .prmp_gui.scrollables import bound_to_mousewheel, PRMP_TreeView
+from .prmp_gui.extensions import bound_to_mousewheel, PRMP_TreeView
 
 
 class RegionRadioCombo(RC):
@@ -81,7 +79,6 @@ class RegionRadioCombo(RC):
         keys.sort()
         
         return keys
-
 RRC = RegionRadioCombo
 
 class Hierachy(PRMP_TreeView):
@@ -138,45 +135,45 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
     
     def _setupApp(self):
        # hierachy
-        self.hierachy = LF(self.container, config=dict(text='Hierachy'))
+        self.hierachy = PRMP_LabelFrame(self.container, config=dict(text='Hierachy'))
         self.hierachy.place(x=2, y=0, h=150, relw=.6)
         
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
         
-        self.office = RRC(self.hierachy,  topKwargs=dict(text= 'Office', value= 'off', variable= self.hierachyVar), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
+        self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(text= 'Office', value= 'off', variable= self.hierachyVar), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
         
-        self.department = RRC(self.hierachy,  topKwargs=dict(text= 'Department', value= 'dep', variable= self.hierachyVar), orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
+        self.department = RegionRadioCombo(self.hierachy,  topKwargs=dict(text= 'Department', value= 'dep', variable= self.hierachyVar), orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
         self.office.addReceiver(self.department.receiver)
         
-        self.sup = RRC(self.hierachy,  topKwargs=dict(text= 'Superscript', value= 'sup', variable= self.hierachyVar), orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
+        self.sup = RegionRadioCombo(self.hierachy,  topKwargs=dict(text= 'Superscript', value= 'sup', variable= self.hierachyVar), orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
         self.department.addReceiver(self.sup.receiver)
         
-        self.sub = RRC(self.hierachy,  topKwargs=dict(text= 'Subscript', value= 'sub', variable= self.hierachyVar), orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
+        self.sub = RegionRadioCombo(self.hierachy,  topKwargs=dict(text= 'Subscript', value= 'sub', variable= self.hierachyVar), orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
         self.sup.addReceiver(self.sub.receiver)
         
         # workers in the region or the individual 
-        persons = B(self.container, config=dict(text='Persons', command=self.showPersons))
+        persons = PRMP_Button(self.container, config=dict(text='Persons', command=self.showPersons))
         persons.place(x=2, y=155, h=24, w=80)
         
-        switch = B(self.container, config=dict(text='Switch?', command=self.switch))
+        switch = PRMP_Button(self.container, config=dict(text='Switch?', command=self.switch))
         switch.place(x=100, y=155, h=24, w=90)
         
         new = PCb(self.container, config=dict(text='New Dialog ?'))
         new.place(x=208, y=155, h=24, w=120)
        
         
-        self.image = IL(self.container, status='Profile Picture')
+        self.image = ImageLabel(self.container, status='Profile Picture')
         self.image.place(relx=.61, y=10, h=170, relw=.382)
         
         
     
        # accounts
-        self.accounts = LF(self.container, config=dict(text='Accounts'))
+        self.accounts = PRMP_LabelFrame(self.container, config=dict(text='Accounts'))
         self.accountsHie = Hierachy(self.accounts, status='Accounts Details')
         
        # subregions
-        self.subRegions = LF(self.container, config=dict(text='Sub Regions'))
+        self.subRegions = PRMP_LabelFrame(self.container, config=dict(text='Sub Regions'))
         self.subRegionsHie = Hierachy(self.subRegions, status='Sub Regions Details')
         
         
@@ -255,9 +252,5 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
         self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
-    
-    
-
-
 RD = RegionDetails
 

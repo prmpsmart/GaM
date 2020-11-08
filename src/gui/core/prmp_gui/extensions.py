@@ -1,5 +1,5 @@
 from .core import *
-from .usefuls import create_container, bound_to_mousewheel, Columns
+from .miscs import create_container, bound_to_mousewheel, Columns
 
 # Extensions
 

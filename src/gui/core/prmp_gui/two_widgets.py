@@ -1,5 +1,5 @@
-from .core import *
 from ....backend.core.date_time import DateTime
+from .extensions import *
 
 #  These widgets doesn't need or can't be used with PRMP_Widget.addWidget()
 
