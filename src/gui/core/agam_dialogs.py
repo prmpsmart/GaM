@@ -33,8 +33,7 @@ class PersonDialog(PRMP_Dialog):
         self.image.place(relx=.58, y=10, h=190, relw=.41)
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender'])
-        
-PD = PersonDialog
+PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
@@ -51,7 +50,7 @@ class RecordDialog(PRMP_Dialog):
         self.money = LE(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(text='Money'), orient='h')
         self.date = LDB(self.container, topKwargs=dict(text='Date'), relx=.02, rely=.16, relh=.15, relw=.96, longent=.35, orient='h')
         self.note = LT(self.container, topKwargs=dict(text='Note'), relx=.02, rely=.32, relh=.5, relw=.96, longent=.35, orient='h')
-        
+RecD = RecordDialog
  
 
 

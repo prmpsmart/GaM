@@ -1,6 +1,6 @@
 
 from ....backend.core.date_time import DateTime
-from .core import *
+from .extensions import *
 from .pics import Xbms
 
 
@@ -80,6 +80,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
             for widgetName in self.resultsWidgets:
                 wid = self.__dict__.get(widgetName)
                 if wid: wid.disabled()
+PD = PRMP_Dialog
 
 class CalendarDialog(PRMP_Dialog):
     _both = '◄►'
@@ -296,6 +297,7 @@ class CalendarDialog(PRMP_Dialog):
 
     @classmethod
     def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PTh.DEFAULT_BACKGROUND_COLOR, header_fg=PTh.DEFAULT_BUTTON_COLOR[0], header_bg=PTh.DEFAULT_BUTTON_COLOR[1],  month_fg=PTh.DEFAULT_BUTTON_COLOR[1], month_bg=PTh.DEFAULT_BUTTON_COLOR[0],  year_fg=PTh.DEFAULT_BUTTON_COLOR[1], year_bg=PTh.DEFAULT_BUTTON_COLOR[0],  days_fg=PTh.DEFAULT_BACKGROUND_COLOR, days_bg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_fg=PTh.DEFAULT_FOREGROUND_COLOR, highlight_bg=PTh.DEFAULT_BACKGROUND_COLOR, surf_fg=PTh.DEFAULT_BUTTON_COLOR[0], surf_bg=PTh.DEFAULT_BUTTON_COLOR[1], empty_bg=PTh.DEFAULT_BUTTON_COLOR[0], **kwargs)
+CD = CalendarDialog
 
 class PRMP_MsgBox(PRMP_Toplevel):
     _bitmaps = ['info', 'question', 'error', 'warning']
@@ -350,7 +352,6 @@ class PRMP_MsgBox(PRMP_Toplevel):
     def noCom(self):
         self._setResult(False)
         self.destroy()
-
 PMB = PRMP_MsgBox
 
 

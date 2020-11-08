@@ -7,12 +7,9 @@ import tkinter.ttk as ttk
 from random import randint
 from tkinter.filedialog import askopenfilename
 from .pics import PRMP_Image
-from .usefuls import Mixins, partial, copyClassMethods
+from .miscs import Mixins, partial, copyClassMethods
 
-
-
-#   from tk widgets --> PRMP_
-
+# superclasses
 
 class PRMP_Theme(Mixins):
     # exerpt from PySimpleGUI theming engine
@@ -434,9 +431,6 @@ class PRMP_Theme(Mixins):
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
 
-PTh = PRMP_Theme
-
-
 class PRMP_Widget(PRMP_Theme):
     _top = 'top'
     _left = 'left'
@@ -698,131 +692,20 @@ class PRMP_Widget(PRMP_Theme):
     
     def bindToWidget(self, *args):
         for arg in args: self.bind(arg[0], arg[1])
-    
-PWd = PRMP_Widget
 
+class PRMP_(PRMP_Widget):
 
-class FillWidgets:
-    
-    def __init__(self, values={}):
-        
-        self.__resultsWidgets = []
-        self.values = values
-        
-    
-    def addResultsWidgets(self, child):
-        if child not in self.__resultsWidgets:
-            if isinstance(child, (list, tuple)):
-                for ch in child: self.addResultsWidgets(ch)
-            else: self.__resultsWidgets.append(child)
-    
-    @property
-    def resultsWidgets(self): return self.__resultsWidgets
-    
-    
-    def fill(self, values={}):
-        if values:
-            for widgetName in self.resultsWidgets:
-                widget = self.getFromSelf(widgetName)
-                if widget:
-                    try: widget.set(values.get(widgetName, ''))
-                    except Exception as er: print(f'ERROR {er}.')
-                else: print(widgetName, widget)
-            self.values = values
-            return True
-        else:
-            if self.values: return self.fill(self.values)
+    def __init__(self, **kwargs):
+        super().__init__( _ttk_=False, **kwargs)
 
-FW = FillWidgets
+class PRMP_Style_(PRMP_Widget):
 
+    def __init__(self, **kwargs):
+        super().__init__( _ttk_=True, **kwargs)
 
-class ImageWidget:
-    def __init__(self, imageFile=None, thumb=None, resize=None):
-        self.rt = None
-        self.__image = None
-        self.thumb = thumb or (200, 170)
-        self.resize = resize or (100, 100)
-        from .dialogs import PMB
-        self.PMB = PMB
-        
-        self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb)
-        
-        self.bindMenu()
-        self.loadImage(imageFile=imageFile or self.default_dp)
-        self.bindEntryHighlight()
-        
-        self.set = partial(ImageWidget.set, self)
+class PRMP_Input:
     
-    
-    def disabled(self):
-        self.unBindMenu()
-        super().disabled()
-    
-    def normal(self):
-        self.bindMenu()
-        super().normal()
-    
-    def loadImage(self, imageFile=None):
-        if imageFile:
-            if isinstance(imageFile, PRMP_Image): pass
-            else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)
-            
-            self.image = self.__image = imageFile
-
-            if imageFile.ext == 'xbm': self.image = imageFile.resizeTk(self.resize)
-            # else: self.image = imageFile.thumbnailTk(self.thumb)
-            
-            self.configure(image=self.image)
-    
-    def removeImage(self):
-        if self.rt: self.rt.destroy()
-        if not self.PMB(title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
-        else: self.loadImage(imageFile=self.default_dp)
-    
-    def set(self, imageFile):
-        if imageFile: self.loadImage(imageFile=imageFile)
-    
-    def changeImage(self, e=0):
-        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
-        if file: self.loadImage(imageFile=file)
-    
-    def bindMenu(self):
-        self.bind('<1>', self.delMenu, '+')
-        self.bind('<3>', self.showMenu, '+')
-        # self.bind('<Double-1>', self.showMenu)
-    
-    def unBindMenu(self):
-        self.unbind('<1>')
-        self.unbind('<3>')
-        # self.unbind('<Double-1>')
-    
-    def get(self): return self.__image
-    
-    def delMenu(self, e=0):
-        if self.rt:
-            self.rt.destroy()
-            del self.rt
-            self.rt = None
-    
-    def showMenu(self, e=0):
-        self.delMenu()
-        x, y = e.x, e.y
-        x, y = e.x_root, e.y_root
-        self.rt = rt = PTp(self, geo=(50, 50, x, y))
-        rt.overrideredirect(1)
-        btn1 = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
-        btn1.place(relx=0, rely=0, relh=.5, relw=1)
-        
-        btn2 = B(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT)
-        btn2.place(relx=0, rely=.5, relh=.5, relw=1)
-        rt.attributes('-topmost', 1)
-        rt.paint()
-
-
-class PRMP_Input(PRMP_Widget):
-    
-    def __init__(self, placeholder='', **kwargs):
-        PRMP_Widget.__init__(self, **kwargs)
+    def __init__(self, placeholder=''):
         self.verification = None
         
         if placeholder:
@@ -832,7 +715,6 @@ class PRMP_Input(PRMP_Widget):
             self.bind("<FocusIn>", self._clear_placeholder)
             self.bind("<FocusOut>", self._add_placeholder)
         
-        
     def entered(self, e=0):
         super().entered()
         self._clear_placeholder()
@@ -841,7 +723,6 @@ class PRMP_Input(PRMP_Widget):
         super().left()
         self.focus()
         self._add_placeholder()
-    
     
     def checkingEmail(self, e=0):
         email = self.get()
@@ -870,7 +751,6 @@ class PRMP_Input(PRMP_Widget):
         self.clear()
         self.insert(0, values)
         self.verify()
-        
     
     def _clear_placeholder(self, e=0):
         if self._get() == self.placeholder: self.clear()
@@ -889,149 +769,44 @@ class PRMP_Input(PRMP_Widget):
         return get
 
 
-class PRMP_Button(PRMP_Widget, tk.Button):
-    
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
-        tk.Button.__init__(self, master=master, **config)
-        PRMP_Widget.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
-B = Button = PB = PRMP_Button
+# based on tk only
 
-
-class PRMP_DateButton(B):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, **kwargs):
-        self.date = None
-        from .dialogs import CalendarDialog, DateTime
-        self.CD = CalendarDialog
-        self.DT = DateTime
-        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
-    
-    def action(self):
-        self.date = self.CD.generate(geo=(300, 200)).result
-        self.set(str(self.date))
-    
-    def get(self): return self.date
-    
-    def set(self, date):
-        if '-' in date: d, m, y = date.split('-')
-        elif '/' in date: d, m, y = date.split('/')
-        else: return
-        self.date = self.DT.createDateTime(int(y), int(m), int(d))
-        self['text'] = self.date
-PDB = PRMP_DateButton
-
-
-class PRMP_RegionButton(B):
-    
-    def __init__(self, master=None, region=None, **kwargs):
-        super().__init__(master, command=self.openDetails, **kwargs)
-        self.region = region
-        self.set(region)
-        self.bindEntryHighlight()
-    
-    def openDetails(self):
-        
-        # open RegionDetailsDialog
-        pass
-    
-    def get(self): return self.region
-    
-    def set(self, region=None):
-        if region:
-            self.region = region
-            self['text'] = region.name
-
-PRB = PRMP_RegionButton
-
-class PRMP_Canvas(PRMP_Widget, tk.Canvas):
+class PRMP_Canvas(PRMP_, tk.Canvas):
     
     def __init__(self, master=None, config={}, **kwargs):
         tk.Canvas.__init__(self, master=master, **config)
-        PRMP_Widget.__init__(self, **config, **kwargs)
-    
-Ca = PCa = Canvas = PRMP_Canvas
+        PRMP_.__init__(self, **config, **kwargs)
 
-class PRMP_Checkbutton(PRMP_Widget, tk.Checkbutton):
-    
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        self.var = tk.StringVar()
-        tk.Checkbutton.__init__(self, master=master, variable=self.var, **config)
-        PRMP_Widget.__init__(self, variable=self.var, asLabel=asLabel, **config, **kwargs)
-        
-        self.var.set('0')
-        self.toggleSwitch()
-
-Cb = PCb = Checkbutton = PRMP_Checkbutton
-
-
-class PRMP_Frame(PRMP_Widget, tk.Frame):
-    
-    def __init__(self, master=None, bd=2, relief='flat', config={}, **kwargs):
-        tk.Frame.__init__(self, master=master, relief=relief, bd=bd, **config)
-        PRMP_Widget.__init__(self, relief=relief, **config, **kwargs)
-        
-F = PF = Frame = PRMP_Frame
-
-class PRMP_Label(PRMP_Widget, tk.Label):
-    
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
-        tk.Label.__init__(self, master=master, **config)
-        PRMP_Widget.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
-        
-L = PL = Label = PRMP_Label
-
-class PRMP_LabelFrame(PRMP_Widget, tk.LabelFrame):
-    
-    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
-        tk.LabelFrame.__init__(self, master=master, bd=bd, **config)
-        PRMP_Widget.__init__(self, font=font, **config, **kwargs)
-        
-LF = LabelFrame = PRMP_LabelFrame
-
-
-class PRMP_Radiobutton(PRMP_Widget, tk.Radiobutton):
-    
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        tk.Radiobutton.__init__(self, master=master, **config)
-        PRMP_Widget.__init__(self, asLabel=asLabel, **config, **kwargs)
-
-Rb = PRb = Radiobutton = PRMP_Radiobutton
-
-class PRMP_Scrollbar(PRMP_Widget, tk.Scrollbar):
+class PRMP_Message(PRMP_, tk.Message):
     
     def __init__(self, master=None, config={}, **kwargs):
-        ttk.Scrollbar.__init__(self, master, **config)
-        PRMP_Widget.__init__(self, **config, **kwargs)
-    
-    def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
-        
-PS = PRMP_Scrollbar
-
-
-class PRMP_Treeview(PRMP_Widget, ttk.Treeview):
-    
-    def __init__(self, master=None, config={}, **kwargs):
-        ttk.Treeview.__init__(self, master, **config)
-        PRMP_Widget.__init__(self, **config, **kwargs)
-    
-    def set(self, *args):
-        print(args)
-        
-PTv = PRMP_Treeview
-
-
-class ImageLabel(PRMP_Label, ImageWidget):
-    def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
-        PRMP_Label.__init__(self, master, **kwargs)
-        ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
-    
-IL = ImageLabel
-
-
-class PRMP_Combobox(PRMP_Input, ttk.Combobox):
-    
-    def __init__(self, master=None, type_='', config={}, **kwargs):
-        ttk.Combobox.__init__(self, master=master, **config)
+        tk.Message.__init__(self, master=master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
         PRMP_Input.__init__(self, **config, **kwargs)
+
+class PRMP_Text(PRMP_, PRMP_Input, tk.Text):
+    
+    def __init__(self, master=None, placeholder='', config={}, **kwargs):
+        tk.Text.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_.__init__(self, **config, **kwargs)
+        
+    def _get(self): return tk.Text.get(self, '1.0', 'end').strip('\n')
+    
+    def set(self, values): self.clear(); self.insert('0.0', values)
+    
+    def clear(self): self.delete('0.0', 'end')
+
+
+# based on ttk only
+
+class PRMP_Combobox(PRMP_, PRMP_Input, ttk.Combobox):
+    
+    def __init__(self, master=None, type_='', placeholder='', config={}, **kwargs):
+        ttk.Combobox.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_.__init__(self, **config, **kwargs)
+
         self.values = []
         if type_.lower() == 'gender': self.changeValues(['Male', 'Female'])
     
@@ -1040,51 +815,49 @@ class PRMP_Combobox(PRMP_Input, ttk.Combobox):
         self['values'] = values
     
     def getValues(self): return self['values']
-    
+PCb = PRMP_Combobox
 
-Cx = PCx = Combobox = PRMP_Combobox
-
-class PRMP_Entry(PRMP_Input, tk.Entry):
-    
-    def __init__(self, master=None, type_='text', config={}, **kwargs):
-        tk.Entry.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, **config, **kwargs)
-        
-        if type_.lower() == 'email':
-            self.bind('<KeyRelease>', self.checkingEmail)
-            self.verification = self.checkingEmail
-    
-    
-
-E = PE = Entry = PRMP_Entry
-
-class PRMP_Message(PRMP_Input, tk.Message):
+class PRMP_LabeledScale(PRMP_Widget, ttk.LabeledScale):
     
     def __init__(self, master=None, config={}, **kwargs):
-        tk.Message.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, **config, **kwargs)
+        ttk.LabeledScale.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+PLS = PRMP_LabeledScale
 
-PMs = PRMP_Message
-
-class PRMP_Text(PRMP_Input, tk.Text):
+class PRMP_Notebook(PRMP_Widget, ttk.Notebook):
     
     def __init__(self, master=None, config={}, **kwargs):
-        tk.Text.__init__(self, master=master, **config)
-        PRMP_Input.__init__(self, **config, **kwargs)
-        
-    def _get(self): return tk.Text.get(self, '1.0', 'end').strip('\n')
+        ttk.Notebook.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+PN = PRMP_Notebook
+
+class PRMP_Panedwindow(PRMP_Widget, ttk.Panedwindow):
     
-    def set(self, values): self.clear(); self.insert('0.0', values)
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Panedwindow.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+PPw = PRMP_Panedwindow
+
+class PRMP_Progressbar(PRMP_Widget, ttk.Progressbar):
     
-    def clear(self): self.delete('0.0', 'end')
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Progressbar.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+PPb = PRMP_Progressbar
+
+class PRMP_Separator(PRMP_Widget, ttk.Separator):
     
-PTx = PRMP_Text
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Spinbox.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+PS = PRMP_Separator
 
-
-
-
-#   from ttk widgets --> PRMP_Style_
-
+class PRMP_Sizegrip(PRMP_Widget, ttk.Sizegrip):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Sizegrip.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+PSg = PRMP_Sizegrip
 
 class PRMP_Style(ttk.Style):
     loaded = False
@@ -1445,14 +1218,229 @@ class PRMP_Style(ttk.Style):
         if not PRMP_Style.loaded: self.createPrmp()
         self.theme_settings('prmp', self.settings)
     theme_use = update
-
 PSt = PRMP_Style
 
+class PRMP_Treeview(PRMP_Widget, ttk.Treeview):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Treeview.__init__(self, master, **config)
+        PRMP_Widget.__init__(self, **config, **kwargs)
+    
+    def set(self, *args):
+        print(args)
+PTv = PRMP_Treeview
 
+#   common to tk and ttk
 
+#   from tk widgets --> PRMP_
+
+class PRMP_Button(PRMP_, tk.Button):
+    
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
+        tk.Button.__init__(self, master=master, **config)
+        PRMP_.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+PSB = PRMP_Button
+
+class PRMP_Checkbutton(PRMP_, tk.Checkbutton):
+    
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        self.var = tk.StringVar()
+        tk.Checkbutton.__init__(self, master=master, variable=self.var, **config)
+        PRMP_.__init__(self, variable=self.var, asLabel=asLabel, **config, **kwargs)
+        
+        self.var.set('0')
+        self.toggleSwitch()
+PSC = PRMP_Checkbutton
+
+class PRMP_Entry(PRMP_, PRMP_Input, tk.Entry):
+    
+    def __init__(self, master=None, type_='text', placeholder='', config={}, **kwargs):
+        tk.Entry.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_.__init__(self, **config, **kwargs)
+        
+        if type_.lower() == 'email':
+            self.bind('<KeyRelease>', self.checkingEmail)
+            self.verification = self.checkingEmail
+PSE = PRMP_Entry
+
+class PRMP_Frame(PRMP_, tk.Frame):
+    
+    def __init__(self, master=None, bd=2, relief='flat', config={}, **kwargs):
+        tk.Frame.__init__(self, master=master, relief=relief, bd=bd, **config)
+        PRMP_.__init__(self, relief=relief, **config, **kwargs)
+PSF = PRMP_Frame
+
+class PRMP_Label(PRMP_, tk.Label):
+    
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
+        tk.Label.__init__(self, master=master, **config)
+        PRMP_.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+PSL = PRMP_Label
+
+class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
+    
+    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
+        tk.LabelFrame.__init__(self, master=master, bd=bd, **config)
+        PRMP_.__init__(self, font=font, **config, **kwargs)
+PSLF = PRMP_LabelFrame
+
+class PRMP_Menubutton(PRMP_, tk.Scrollbar):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Scrollbar.__init__(self, master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
+PSM = PRMP_Menubutton
+
+class PRMP_OptionMenu(PRMP_, tk.OptionMenu):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.OptionMenu.__init__(self, master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
+PSO = PRMP_OptionMenu
+
+class PRMP_PanedWindow(PRMP_, tk.PanedWindow):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.PanedWindow.__init__(self, master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
+PSP = PRMP_PanedWindow
+
+class PRMP_Radiobutton(PRMP_, tk.Radiobutton):
+    
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        tk.Radiobutton.__init__(self, master=master, **config)
+        PRMP_.__init__(self, asLabel=asLabel, **config, **kwargs)
+PSR = PRMP_Radiobutton
+
+class PRMP_Scale(PRMP_, tk.Scale):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Scale.__init__(self, master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
+PSS = PRMP_Scale
+
+class PRMP_Scrollbar(PRMP_, tk.Scrollbar):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Scrollbar.__init__(self, master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
+    
+    def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
+PSSc = PRMP_Scrollbar
+
+class PRMP_Spinbox(PRMP_, tk.Spinbox):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Spinbox.__init__(self, master, **config)
+        PRMP_.__init__(self, **config, **kwargs)
+PSSp = PRMP_Spinbox
+
+#   from ttk widgets --> PRMP_Style_
+
+class PRMP_Style_Button(PRMP_Style_, ttk.Button):
+    
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
+        ttk.Button.__init__(self, master=master, **config)
+        PRMP_Style_.__init__(self, font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+PSB = PRMP_Style_Button
+
+class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton):
+    
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        self.var = tk.StringVar()
+        ttk.Checkbutton.__init__(self, master=master, variable=self.var, **config)
+        PRMP_Style_.__init__(self, variable=self.var, asLabel=asLabel, **config, **kwargs)
+        
+        self.var.set('0')
+        self.toggleSwitch()
+PSC = PRMP_Style_Checkbutton
+
+class PRMP_Style_Entry(PRMP_, PRMP_Input, ttk.Entry):
+    
+    def __init__(self, master=None, type_='text', placeholder='', config={}, **kwargs):
+        ttk.Entry.__init__(self, master=master, **config)
+        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_.__init__(self, **config, **kwargs)
+        
+        if type_.lower() == 'email':
+            self.bind('<KeyRelease>', self.checkingEmail)
+            self.verification = self.checkingEmail
+PSE = PRMP_Style_Entry
+
+class PRMP_Style_Frame(PRMP_Style_, ttk.Frame):
+    
+    def __init__(self, master=None, bd=2, relief='flat', config={}, **kwargs):
+        ttk.Frame.__init__(self, master=master, relief=relief, bd=bd, **config)
+        PRMP_Style_.__init__(self, relief=relief, **config, **kwargs)
+PSF = PRMP_Style_Frame
+
+class PRMP_Style_Label(PRMP_Style_, ttk.Label):
+    
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
+        ttk.Label.__init__(self, master=master, **config)
+        PRMP_Style_.__init__(self, font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+PSL = PRMP_Style_Label
+
+class PRMP_Style_LabelFrame(PRMP_Style_, ttk.LabelFrame):
+    
+    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
+        ttk.LabelFrame.__init__(self, master=master, bd=bd, **config)
+        PRMP_Style_.__init__(self, font=font, **config, **kwargs)
+PSLF = PRMP_Style_LabelFrame
+
+class PRMP_Style_Menubutton(PRMP_Style_, ttk.Scrollbar):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Scrollbar.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, **config, **kwargs)
+PSM = PRMP_Style_Menubutton
+
+class PRMP_Style_OptionMenu(PRMP_Style_, ttk.OptionMenu):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.OptionMenu.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, **config, **kwargs)
+PSO = PRMP_Style_OptionMenu
+
+class PRMP_Style_PanedWindow(PRMP_Style_, ttk.PanedWindow):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.PanedWindow.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, **config, **kwargs)
+PSP = PRMP_Style_PanedWindow
+
+class PRMP_Style_Radiobutton(PRMP_Style_, ttk.Radiobutton):
+    
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        ttk.Radiobutton.__init__(self, master=master, **config)
+        PRMP_Style_.__init__(self, asLabel=asLabel, **config, **kwargs)
+PSR = PRMP_Style_Radiobutton
+
+class PRMP_Style_Scale(PRMP_Style_, ttk.Scale):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Scale.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, **config, **kwargs)
+PSS = PRMP_Style_Scale
+
+class PRMP_Style_Scrollbar(PRMP_Style_, ttk.Scrollbar):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Scrollbar.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, **config, **kwargs)
+    
+    def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
+PSSc = PRMP_Style_Scrollbar
+
+class PRMP_Style_Spinbox(PRMP_Style_, ttk.Spinbox):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        ttk.Spinbox.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, **config, **kwargs)
+PSSp = PRMP_Style_Spinbox
 
 #  windows
-
 
 class PRMP_Window(PRMP_Widget):
     
@@ -1808,24 +1796,19 @@ class PRMP_Window(PRMP_Widget):
     def bindExit(self):
         def ex(e=0): os.sys.exit()
         self.bind_all('<Control-/>', ex)
-
-PWn = PRMP_Window
-
+PW = PRMP_Window
 
 class PRMP_Tk(tk.Tk, PRMP_Window):
     def __init__(self, _ttk_=False, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
-    
-Tk = PTk = PRMP_Tk
+PT = PRMP_Tk
 
 class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
     def __init__(self, master=None, _ttk_=False, **kwargs):
         tk.Toplevel.__init__(self, master)
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
-    
-Top = Toplevel = PTp = PRMP_Toplevel
-
+PTl = PRMP_Toplevel
 
 class PRMP_MainWindow(PRMP_Window):
     
@@ -1851,9 +1834,9 @@ class PRMP_MainWindow(PRMP_Window):
     def __str__(self): return self.root
     
     def __getitem__(self, num): return self.root
-    
-    # def title(self, t): self.root.title(t)
-
 PMW = PRMP_MainWindow
+
+
+
 
 

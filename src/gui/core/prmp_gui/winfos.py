@@ -91,7 +91,7 @@ class Winfos:
 
         Each item in the list consists of a visual name (see winfo_visual), a
         depth and if includeids is true is given also the X identifier."""
-        
+
 
 class Geometry:
     
@@ -173,29 +173,5 @@ class Geometry:
     def winfo_y(self):
         """Return the y coordinate of the upper left corner of this widget
         in the parent."""
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

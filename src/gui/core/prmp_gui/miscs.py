@@ -84,7 +84,6 @@ class Col_Mixins(Mixins):
     def __getitem__(self, num): return self.columns[num]
     
     def __len__(self): return len(self.columns)
-    
 
 class Column(Col_Mixins):
     

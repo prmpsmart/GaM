@@ -130,7 +130,6 @@ class TwoWidgets(PRMP_Frame):
             self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
             self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
         return self
-    
 TW = TwoWidgets
 
 class RadioCombo(TwoWidgets):
@@ -147,19 +146,15 @@ class LabelSpin(TwoWidgets):
         super().__init__(master, top='label', bottom='spinbox', **kwargs)
 
     def set(self, from_=.1, to=1, increment=.1): self.Bottom.config(from_=from_, to=to, increment=increment)
-    
 LS = LabelSpin
 
 class LabelEntry(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='entry', **kwargs)
-    
 LE = LabelEntry
 
 class LabelText(TwoWidgets):
     def __init__(self, master, **kwargs):
         super().__init__(master, top='label', bottom='text', **kwargs)
-    
-    
 LT = LabelText
 
 class LabelCombo(TwoWidgets):
@@ -168,7 +163,6 @@ class LabelCombo(TwoWidgets):
         super().__init__(master, top='label', bottom='combobox', **kwargs)
         
         self.choosen = None
-    
 LC = LabelCombo
 
 class CheckEntry(TwoWidgets):
@@ -178,7 +172,6 @@ CE = CheckEntry
 class CheckCombo(TwoWidgets):
     def __init__(self, master, **kwargs):
         super().__init__(master, top='checkbutton', bottom='combobox',**kwargs)
-
 CC = CheckCombo
 
 class LabelButton(TwoWidgets):
@@ -187,7 +180,6 @@ LB = LabelButton
 
 class LabelDateButton(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='datebutton', **kwargs)
-    
 LDB = LabelDateButton
 
 
