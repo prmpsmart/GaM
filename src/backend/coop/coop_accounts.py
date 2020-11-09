@@ -41,6 +41,7 @@ class CoopAccount(Account):
     
     @property
     def recordsManagers(self): return [self.__levies, self.__loanBonds, self.__materials, self.__savings, self.__shares]
+    
 
 class MemberAccount(CoopAccount):
     Manager = 'Member'

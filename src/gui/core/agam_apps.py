@@ -96,8 +96,9 @@ class Hierachy(PRMP_TreeView):
     def viewRegion(self, e=0):
         current = self.selected()
         if current:
-            if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
-            else: RegionDetails(self, region=current)
+            if current._type == 'reg':
+                if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
+                else: RegionDetails(self, region=current)
 H = Hierachy
 
 
@@ -112,6 +113,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.region = region
         self.personDialog = None
         self.switchState = None
+        self._sub = None
         self.geo_ = geo
         self.expandGeo = expandGeo
         
@@ -132,7 +134,10 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.titleBar.set(region.idText)
         
         person = region.person
-        if person: self.fill(person.values)
+        if person: self.fill(dict(image=person.image))
+
+        self.loadAccounts(region)
+
     
     def _setupApp(self):
        # hierachy
@@ -182,13 +187,19 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
         
-        
     def showPersons(self, e=0):
         if self.personDialog: self.personDialog.destroy()
         if self.region:
             if self.region.level == 5:
                 self.personDialog = PersonDialog(self,  values=self.region.person.values, side=self.side)
             else: print('Level not upto')
+    
+    def loadAccounts(self, region):
+        if region:
+            acc = region.accountsManager
+            headers = [{'text': 'Name', 'width': 120}, 'Date', *[{'type': int, 'text': a} for a in acc.headers]]
+            self.accountsHie.setColumns(headers)
+            self.accountsHie.set(acc)
     
     def switch(self):
         # to switch between subregions and accounts
@@ -220,17 +231,26 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
     def unExpand(self):
         self.accounts.place_forget()
         self.changeGeometry(self.geo_)
+    
+    def _isDeiconed(self):
+        self.root.update()
+        self.placeSubs()
         
     def expand(self):
         self.resize = (1, 1)
         self.changeGeometry(self.expandGeo)
         self.update()
     
-    def placeSubs(self, sub):
-        w, h = sub.master.tupled_winfo_geometry[:2]
-        h -= 189
-        sub.place(x=2, y=183, h=h, w=w-8)
-        # sub.place(x=2, y=183, h=h or 350, w=w or 788)
+    def placeSubs(self, sub=None):
+        if sub: self._sub = sub
+        if self._sub:
+            self._sub.place_forget()
+            w, h = self._sub.master.tupled_winfo_geometry[:2]
+            h -= 189
+            self._sub.place(x=2, y=183, h=h, w=w-8)
+            
+            # print(self._sub, w, time.time())
+           
         
     def showSubRegionsContainer(self):
         self.expand()
@@ -253,5 +273,6 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
         self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
+    
 RD = RegionDetails
 

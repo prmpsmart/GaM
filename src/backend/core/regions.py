@@ -74,6 +74,7 @@ class Region(Object):
     SubRegionsManager = None
     PersonsManager = None
     Person = None
+    _type = 'reg'
     
     
     def __init__(self, manager, name=None, date=None, location=None, phone=None, previous=None, number=None, **kwargs):

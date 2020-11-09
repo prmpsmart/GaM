@@ -5,6 +5,7 @@ from .bases import Object, DateTime
 
 class Record(Object):
     Manager = 'RecordsManager'
+    _type = 'rec'
     
     def __init__(self, manager, money, date=None, note='', **kwargs):
         Object.__init__(self, manager, **kwargs)
@@ -14,6 +15,9 @@ class Record(Object):
     def __int__(self): return self.money
     
     def __str__(self): return f' {self.manager} | {self.className}({self.date} , {self.moneyWithSign} , {self.note or "Note"})'
+
+    @property
+    def name(self): return f'{self.className}({self.moneyWithSign})'
 
     @property
     def region(self): return self.manager.region

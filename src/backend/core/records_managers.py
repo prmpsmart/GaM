@@ -215,6 +215,7 @@ class RecordsManager(ObjectsManager):
     _shortName = 'rec'
     lowest = 50
     ObjectType = Record
+    _type = 'recm'
     
     def __init__(self, account=None): ObjectsManager.__init__(self, account)
     
@@ -229,6 +230,9 @@ class RecordsManager(ObjectsManager):
     @property
     def date(self): return self.account.date
     
+    @property
+    def name(self): return f'{self.className}({self.moneyWithSign})'
+
     @property
     def account(self): return self.master
     

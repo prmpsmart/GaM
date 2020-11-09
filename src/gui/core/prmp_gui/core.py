@@ -1741,6 +1741,8 @@ class PRMP_Window(PRMP_Widget):
             self.zoomed = True
             self.state('zoomed')
     
+    def isMaximized(self): pass
+    
     def addTitleBar(self, title=''):
         if self.titleBar:
             self.titleBar.set(title or self.titleText)

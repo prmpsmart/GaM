@@ -44,6 +44,7 @@ class Mixins:
     @property
     def shortName(self): return self._shortName
     
+    @property
     def AlphabetsSwitch(self):
         d = {}
         for n in range(65, 91):
@@ -55,7 +56,7 @@ class Mixins:
         if name:
             name = str(name)
             nm = name.replace(' ', '')
-            fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
+            fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
             return fin
 
 class ObjectsMixins(Mixins, CompareByDate):
@@ -140,8 +141,7 @@ class ObjectsMixins(Mixins, CompareByDate):
         
         elif isinstance(item, slice): return self.subs[item] if self.subs else []
 
-        elif isinstance(item, self.containers): return [self.getFromSelf(attr) for attr in item]
-            
+        elif isinstance(item, self.containers): return [self.getFromSelf(self.propertize(attr)) for attr in item]
         elif isinstance(item, str): return self.getFromSelf(item)
 
 

@@ -65,7 +65,10 @@ class Account(Object):
     
     def __str__(self): return f'{self.manager} | {self.className}({self.date.dayMonthYear})'
     def __len__(self): return len(self.recordsManagers)
-    
+    def __int__(self): return self.balances
+    @property
+    def name(self): return f'{self.className}({self.date.dayMonthYear})'
+
     @property
     def region(self): return self.manager.region
     
@@ -75,6 +78,9 @@ class Account(Object):
     @property
     def recordsManagers(self): self.notImp()
     
+    @property
+    def headers(self): return [rec.className for rec in self.recordsManagers]
+
     @property
     def nextAccount(self): return self.next
     @property
@@ -151,7 +157,7 @@ class AccountsManager(ObjectsManager):
     def __eq__(self, manager):
         if manager == None: return False
         return self.region == manager.region
-   
+    def __int__(self): return sum([int(acc.balances) for acc in self])
     def __str__(self):
         if self.region != None: return f'{self.region} | {self.className}'
         return f'{self.className}'
@@ -165,7 +171,12 @@ class AccountsManager(ObjectsManager):
     def accounts(self): return self.subs
     @property
     def region(self): return self.master
-   
+    @property
+    def name(self): return f'{self.region.name} | {self.className}'
+
+    @property
+    def headers(self): return self.lastAccount.headers
+
     @property
     def overAllAccounts(self):
         listOfTuple = []

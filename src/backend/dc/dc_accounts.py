@@ -16,6 +16,7 @@ class DCAccount(Account):
         self.__balances = Balances(self)
         
     def __int__(self): return int(self.balances)
+    
     @property
     def region(self):
         if self.manager: return self.manager.region
@@ -23,6 +24,7 @@ class DCAccount(Account):
     
     @property
     def recordsManagers(self): return [self.broughtForwards, self.savings, self.debits, self.upfronts, self.balances]
+
     
     @property
     def broughtForwards(self): return self.__broughtForwards

@@ -260,7 +260,7 @@ class PRMP_TreeView(PRMP_Frame):
         self.attributes = []
         
         self.columns = Columns(columns)
-        self.setColumns()
+        self.setColumns(columns)
         self.bindings()
     
     def bindings(self):
@@ -286,13 +286,16 @@ class PRMP_TreeView(PRMP_Frame):
     tvc = Config = treeviewConfig
 
     def setColumns(self, columns=[]):
-        if columns: self.columns.process(columns)
+        if columns:
+            self.columns.process(columns)
             
-        if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
-
+            if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
+            self.updateHeading()
+            
+    def updateHeading(self):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
-            self.column(column.index, width=column.width, minwidth=10, stretch=1,  anchor="w")
+            self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
     def _set(self, obj=None, parent='', op=False):
         
@@ -312,11 +315,12 @@ class PRMP_TreeView(PRMP_Frame):
             self.firstItem = item
             self.treeview.focus(self.firstItem)
         
-        subs = obj.subRegions
+        subs = obj.subs
         if subs:
             for sub in subs: self._set(sub, item, op)
     
-    def set(self, obj, op=1):
+    def set(self, obj, op=0):
+        if self.firstItem: self.tree.delete(self.firstItem)
         if obj:
             self.obj = obj
             self._set(obj, op=op)
