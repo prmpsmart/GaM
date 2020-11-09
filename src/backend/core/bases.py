@@ -13,7 +13,10 @@ class Mixins:
     _moneySign = naira + chr(32)
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    
+
+    @property
+    def class_(self): return self.__class__
+
     def getFromSelf(self, name): return getattr(self, name, None)
     
     def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
@@ -54,8 +57,6 @@ class Mixins:
             nm = name.replace(' ', '')
             fin = self.AlphabetsSwitch()[nm[0]] + nm[1:]
             return fin
-    
-
 
 class ObjectsMixins(Mixins, CompareByDate):
     

@@ -197,6 +197,7 @@ class PRMP_Theme(Mixins):
     CURRENT_THEME = 'DarkBlue3'
     
     DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_MINUTE_FONT = {'family': 'Segoe Marker', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
@@ -309,6 +310,10 @@ class PRMP_Theme(Mixins):
         return [theme, prev]
     
     def paint(self):
+        if self._ttk_:
+            PRMP_Style().update()
+            # return 
+
         kwargs = { k: v for k, v in self.kwargs.items()}
         
         # theme = PRMP_Theme.currentThemeDict()
@@ -469,7 +474,7 @@ class PRMP_Widget(PRMP_Theme):
         
         if tip: self.addTip(tip, tipGeo=tipGeo)
         
-        self.config = partial(PRMP_Widget.config, self)
+        # self.config = partial(PRMP_Widget.config, self)
         
         self.bind('<Enter>', self.entered)
         self.bind('<Leave>', self.left)
@@ -1512,9 +1517,9 @@ class PRMP_Window(PRMP_Widget):
             addTitleBar = 1
         
         if addTitleBar:
-            if toolWindow: w = 1
-            else: w = 0
-            self.addTitleBar(w=w)
+            if toolWindow: self.__r = 1
+            else: self.__r = 0
+            self.addTitleBar()
             
         if addStatusBar: self.addStatusBar()
         
@@ -1703,6 +1708,7 @@ class PRMP_Window(PRMP_Widget):
     
     def placeContainer(self, e=0, h=0):
         self.container.place(x=2, y=30, w=self.winfo_width()-4, h=h or self.winfo_height()-60)
+        self.placeTitlebar()
         self.placeStatusBar()
     
     @property
@@ -1714,13 +1720,11 @@ class PRMP_Window(PRMP_Widget):
         self.overrideredirect(False)
         self.iconify()
         self.iconed = True
-        # self.placeStatusBar()
     
     def deiconed(self, e=0):
         if self.iconed:
             self.co += 1
             self.iconed = False
-            # self.normal()
             v = self.winfo_viewable()
             if v:
                 if self.noTitleBar: self.overrideredirect(True)
@@ -1728,7 +1732,7 @@ class PRMP_Window(PRMP_Widget):
                 self.iconed = False
         
     def maximize(self, e=0):
-        if not (self.resize[0] and self.resize[1]): return
+        if self.__r: return
         
         if self.zoomed:
             self.zoomed = False
@@ -1737,58 +1741,79 @@ class PRMP_Window(PRMP_Widget):
             self.zoomed = True
             self.state('zoomed')
     
-    
-    def addTitleBar(self, title='', w=0):
+    def addTitleBar(self, title=''):
         if self.titleBar:
             self.titleBar.set(title or self.titleText)
+            self.placeTitlebar()
             return
         if self._ttk_: F, L, B = PRMP_Style_Frame, PRMP_Style_Label, PRMP_Style_Button
         else: F, L, B = PRMP_Frame, PRMP_Label, PRMP_Button
 
+        w, y = self.geo[:2]
+
+
         fr = F(self)
-        self.titleBar = L(fr, config=dict( text=title or self.titleText, anchor='center'), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
-        self.titleBar.place(relx=0, rely=0, relh=1, relw=.85 if w != 1 else .95)
-        self.titleBar.bind('<Double-1>', self.maximize)
-        self.titleBar._moveroot()
-        
-        if not w:
+
+        if not self.__r:
             self.imgMin = PRMP_Image('green', resize=(20, 20))
-            B(fr, config=dict(command=self.minimize, text=self.min_, anchor='n', image=self.imgMin), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT).place(relx=.85, rely=0, relh=1, relw=.05)
+            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, anchor='n', image=self.imgMin), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
 
             self.imgMax = PRMP_Image('yellow', resize=(20, 20))
-            B(fr, config=dict(command=self.maximize, text=self.max_, anchor='n', image=self.imgMax), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT).place(relx=.9, rely=0, relh=1, relw=.05)
-            
+            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, anchor='n', image=self.imgMax), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+
         self.imgExit = PRMP_Image('red', resize=(20, 20))
-        B(fr, config=dict(text=self.x_btn2, command=self.destroy, anchor='n', image=self.imgExit), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT).place(relx=.95, rely=0, relh=1, relw=.05)
-        
-        y = self.y_h[0]
-        
-        fr.place(x=0, y=0, h=y, relw=1)
+        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, anchor='n', image=self.imgExit), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+
+        self.titleBar = L(fr, config=dict( text=title or self.titleText, anchor='center'), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
+        self.titleBar.bind('<Double-1>', self.maximize)
+        self.titleBar._moveroot()
+
+        self.placeTitlebar()
     
-    def editStatus(self, text): self.statusBar.set(text)
+    def placeTitlebar(self):
+        if self.titleBar:
+            x = self.titleBar.master.winfo_width()
+            self.titleBar.master.place(relx=0, rely=0, h=30, relw=1)
+            
+            if x < 0: return
+            w = 34
+            if not self.__r:
+                self._min.place(x=x-94, rely=0, relh=1, w=30)
+                self._max.place(x=x-64, rely=0, relh=1, w=30)
+                w = 94
+            self.titleBar.place(x=0, rely=0, relh=1, w=x-w)
+            self._exit.place(x=x-34, rely=0, relh=1, w=30)
+
+    def editStatus(self, text):
+        if self.statusBar: self.statusBar.set(text)
     
     def addStatusBar(self):
         if self.statusBar:
             self.placeStatusBar()
             return
-        
+    
         if self._ttk_: F, L, B = PRMP_Style_Frame, PRMP_Style_Label, PRMP_Style_Button
         else: F, L, B = PRMP_Frame, PRMP_Label, PRMP_Button
 
         fr = F(self)
         self.statusBar = L(fr, config=dict(text='Status' or self.statusText, relief='groove', anchor='center'), font=PRMP_Theme.DEFAULT_STATUS_FONT)
-        self.statusBar.place(relx=0, rely=0, relh=1, relw=.95)
         self.statusBar._moveroot()
-        up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
-        up.place(relx=.92, rely=0, relh=1, relw=.04)
-        down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
-        down.place(relx=.96, rely=0, relh=1, relw=.04)
+        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme, anchor='n'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
         
         self.placeStatusBar()
         
     def placeStatusBar(self, e=0):
-        if self.statusBar: self.statusBar.master.place(x=0, y=self.winfo_height() - 30, h=30, relw=1)
-    
+        if self.statusBar:
+            y = self.winfo_height()
+            x = self.statusBar.master.winfo_width()
+            if x < 0: return
+            if y < 0: return
+            self.statusBar.master.place(relx=0, y=y-30, h=30, relw=1)
+            self.statusBar.place(x=0, rely=0, relh=1, w=x-64)
+            self._up.place(x=x-64, rely=0, relh=1, w=30)
+            self._down.place(x=x-34, rely=0, relh=1, w=30)
+
     def prevTheme(self):
         theme, index = self._prevTheme()
         self.editStatus(f'Theme({theme}) | Index({index}) ')

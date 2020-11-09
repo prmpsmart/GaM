@@ -530,7 +530,7 @@ class DateTime(datetime):
     def is_leap(cls, year): return _is_leap(year)
     
     @property
-    def isLeap(self): return self.isleap(self.year)
+    def isLeap(self): return self.is_leap(self.year)
     
     @classmethod
     def days_before_year(cls, year): return _days_before_year(year)

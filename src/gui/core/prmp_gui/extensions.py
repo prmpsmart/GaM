@@ -98,7 +98,7 @@ class ImageWidget:
         self.loadImage(imageFile=imageFile or self.default_dp)
         self.bindEntryHighlight()
         
-        self.set = partial(ImageWidget.set, self)
+        # self.set = partial(ImageWidget.set, self)
     
     
     def disabled(self):
@@ -155,18 +155,18 @@ class ImageWidget:
         self.delMenu()
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PTp(self, geo=(50, 50, x, y))
+        self.rt = rt = PRMP_Toplevel(self, geo=(50, 50, x, y))
         rt.overrideredirect(1)
-        btn1 = B(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
+        btn1 = PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
         btn1.place(relx=0, rely=0, relh=.5, relw=1)
         
-        btn2 = B(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT)
+        btn2 = PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT)
         btn2.place(relx=0, rely=.5, relh=.5, relw=1)
         rt.attributes('-topmost', 1)
         rt.paint()
 IW = ImageWidget
 
-class ImageLabel(PRMP_Label, ImageWidget):
+class ImageLabel(ImageWidget, PRMP_Label):
     def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
         PRMP_Label.__init__(self, master, **kwargs)
         ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
@@ -181,7 +181,7 @@ class PRMP_DateButton(PRMP_Button):
         super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
     
     def action(self):
-        self.date = self.CD.generate(geo=(300, 200)).result
+        self.date = self.CD().result
         self.set(str(self.date))
     
     def get(self): return self.date
