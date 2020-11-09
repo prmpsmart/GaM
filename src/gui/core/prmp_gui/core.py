@@ -309,7 +309,7 @@ class PRMP_Theme(Mixins):
         self.paint()
         return [theme, prev]
     
-    def paint(self):
+    def _paint(self):
         if self._ttk_:
             PRMP_Style().update()
             # return 
@@ -431,7 +431,8 @@ class PRMP_Theme(Mixins):
         if self.var and self.var.get() == self.val: self.checked(1)
         
         return self
-        
+    
+    paint = _paint
     
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
@@ -1237,8 +1238,6 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
         ttk.Treeview.__init__(self, master, **config)
         PRMP_Style_.__init__(self, **config, **kwargs)
     
-    def set(self, *args):
-        print(args)
 PTv = PRMP_Treeview
 
 #   common to tk and ttk
@@ -1743,11 +1742,11 @@ class PRMP_Window(PRMP_Widget):
             self.state('zoomed')
             self.isMaximized()
     
-    def isMaximized(self): pass
+    def isMaximized(self): print('maximize')
 
-    def isMinimized(self): pass
+    def isMinimized(self): print('minimize')
     
-    def isNormal(self): pass
+    def isNormal(self): print('normal')
     
     def addTitleBar(self, title=''):
         if self.titleBar:
@@ -1847,32 +1846,44 @@ class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
 PTl = PRMP_Toplevel
 
-class PRMP_MainWindow(PRMP_Window):
+class PRMP_MainWindow(Mixins):
     
     def __init__(self, master=None, _ttk_=False, atb=1, asb=1, **kwargs):
         
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
-        
-        self.__dict__.update(self.root.__dict__)
-        self.tk = self.root.tk
-        self._w = self.root._w
+        # super().__init__()
+        # self.__dict__.update(self.root.__dict__)
+        # self.tk = self.root.tk
+        # self._w = self.root._w
 
-        # self.root.tk_focusFollowsMouse()
+        # # self.root.tk_focusFollowsMouse()
         
-        mro = list(reversed(self.root.__class__.__mro__))
-        
-        for cl in mro:
+        # mro = list(reversed(self.root.__class__.__mro__)) + [self.class_]
+        # # mro = list(self.root.__class__.__mro__)
+        # print(mro)
         # for cl in mro:
-            # if cl in (PRMP_Window, Mixins): continue
-            if cl == PRMP_Window:
-                copyClassMethods(self, cl, self.root)
-        
+        # # for cl in mro:
+        #     # if cl == PRMP_Widget: break
+        #     # if cl in (PRMP_Window, Mixins): continue
+        #     # if cl == PRMP_Window:
+        #     copyClassMethods(self, cl, self.root)
+
+        for k, v in self.class_.__dict__.items():
+            if callable(v): self.root.__dict__[k] = partial(v, self)
+            if k.startswith('is'): self.root.__dict__[k] = partial(v, self)
+                
     def __repr__(self): return self.root
     
     def __str__(self): return self.root
     
-    def __getitem__(self, num): return self.root
+    def __getattr__(self, name):
+        # attr = self.__dict__.get(name, '_prmp_')
+        # if attr != '_prmp_': return attr
+        # else: return getattr(self.root, name)
+        return getattr(self.root, name)
+
+
 PMW = PRMP_MainWindow
 
 

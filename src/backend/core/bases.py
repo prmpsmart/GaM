@@ -131,7 +131,9 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def week(self): return self.date.week
     
-    def __getattr__(self, attr): return None
+    # def __getattr__(self, attr): return None
+    
+    # def __setattr__(self, attr, value): return None
     
     def __setitem__(self, key, value): pass
     

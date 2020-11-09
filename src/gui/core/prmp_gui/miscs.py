@@ -74,7 +74,9 @@ def copyClassMethods(obj, copyClass, *args):
     for key, val in copyClass.__dict__.items():
         if key.startswith('__'): continue
         if callable(val):
-            func = partial(val, *args)
+            if obj.class_ == copyClass: func = partial(val, obj)
+            else: func = partial(val, *args)
+
             setattr(obj, key, func)
 
 class Col_Mixins(Mixins):

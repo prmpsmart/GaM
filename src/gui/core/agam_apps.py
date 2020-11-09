@@ -102,11 +102,11 @@ class Hierachy(PRMP_TreeView):
 H = Hierachy
 
 
-class RegionDetails(PRMP_Tk, FillWidgets):
+class RegionDetails(PRMP_MainWindow, FillWidgets):
     
     def __init__(self, master=None, title='Region Details', geo=(600, 250), expandGeo=(800, 600), values={}, region=None, **kwargs):
         
-        PRMP_Tk.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
+        PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         
         FillWidgets.__init__(self, values=values)
         
@@ -119,7 +119,8 @@ class RegionDetails(PRMP_Tk, FillWidgets):
         
         self._setupApp()
 
-        self.isMaximized = partial(RegionDetails.isMaximized, self)
+        # self.root.isMaximized = self.isMaximized
+        # self.root.isNormal = self.isMaximized
 
         self.fill()
         self.paint()

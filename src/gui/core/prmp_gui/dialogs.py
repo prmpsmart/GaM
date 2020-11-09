@@ -4,10 +4,10 @@ from .extensions import *
 from .pics import Xbms
 
 
-class PRMP_Dialog(PRMP_Toplevel, FillWidgets):
+class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=True, **kwargs):
-        PRMP_Toplevel.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=1, **kwargs)
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=False, **kwargs):
+        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=1, **kwargs)
         FillWidgets.__init__(self, values=values)
         
         self.__result = None
@@ -176,7 +176,7 @@ class CalendarDialog(PRMP_Dialog):
         
         def empty(self):
             self.day = None
-            self.config(text='', state='disabled', relief='flat', background=self.class_.empty_bg)
+            self.config(text='', state='disabled', relief='flat', background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         
         def choosen(self, e=0):
             if self.day: 
@@ -224,13 +224,13 @@ class CalendarDialog(PRMP_Dialog):
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
     def paint(self):
-        super().paint()
-        for btn in [self._back, self._for, self._prev, self._nxt]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+        
+        self.root._paint()
+        for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         
         self.monthNameLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
         self.yearLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
 
-        for btn in self.headers: btn.configure(foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
     
     def _setupDialog(self):
         self.daysButtons = []
@@ -333,24 +333,30 @@ class CalendarDialog(PRMP_Dialog):
     def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, header_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], header_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1],  month_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], month_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], year_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], year_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0],  days_fg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, days_bg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlight_fg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlight_bg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, surf_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], surf_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], empty_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], **kwargs)
 CD = CalendarDialog
 
-class PRMP_MsgBox(PRMP_Toplevel):
+class PRMP_MsgBox(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
     def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', **kwargs):
-        super().__init__(title=title, geo=geo, ntb=1, tm=1, asb=0, tw=1, **kwargs)
         
-        self.__result = None
-        self.addTitleBar()
-        self.placeContainer(h=geo[1]-50)
-        self.label = PRMP_Label(self.container, config=dict(text=message, bitmap='', wraplength=250, relief='flat'))
+        self.message = message
+        self._type = _type
+        self.okText = okText
+        self.ask = ask
+        self._cancel = cancel
+
+        super().__init__(title=title, geo=geo, ntb=1, tm=1, asb=0, **kwargs)
+
+    def _setupDialog(self):
+        self.placeContainer(h=self.geo[1]-50)
+        self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250, relief='flat'))
         
         self.label.place(x=0, y=0, relh=1, relw=.85)
         
-        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(_type)), relief='flat')
+        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)), relief='flat')
         self.bitmap.place(relx=.85, y=0, relh=1, relw=.15)
 
-        self.yes = PRMP_Button(self, config=dict(text='Yes' if ask else okText or 'Ok', command=self.yesCom))
+        self.yes = PRMP_Button(self, config=dict(text='Yes' if self.ask else self.okText or 'Ok', command=self.yesCom))
         
-        if not ask:
+        if not self.ask:
             self.yes.place(relx=.425, rely=.83, relh=.15, relw=.17)
             self.bind('<Return>', lambda e: self.yes.invoke())
         else:
@@ -358,14 +364,10 @@ class PRMP_MsgBox(PRMP_Toplevel):
             self.no = PRMP_Button(self, config=dict(text='No', command=self.noCom))
             self.no.place(relx=.77, rely=.83, relh=.15, relw=.17)
 
-        if cancel:
+        if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
 
-        self.paint()
-        
-        self._isDialog()
-        
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type
@@ -373,10 +375,7 @@ class PRMP_MsgBox(PRMP_Toplevel):
     
     @property
     def _xbms(self): return Xbms.filesDict()
-    
-    @property
-    def result(self): return self.__result
-    def _setResult(self, result): self.__result = result
+
     def yesCom(self):
         self._setResult(True)
         self.destroy()

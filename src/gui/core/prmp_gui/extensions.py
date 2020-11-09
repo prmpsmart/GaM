@@ -76,7 +76,7 @@ class FillWidgets:
                 if widget:
                     try: widget.set(values.get(widgetName, ''))
                     except Exception as er: print(f'ERROR {er}.')
-                else: print(widgetName, widget)
+                else: print(f'Error [{widgetName}, {widget}]')
             self.values = values
             return True
         else:
@@ -178,10 +178,10 @@ class PRMP_DateButton(PRMP_Button):
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
         self.DT = DateTime
-        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, **kwargs)
+        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, anchor='nw', **kwargs)
     
     def action(self):
-        self.date = self.CD().result
+        self.date = self.CD(self).result
         self.set(str(self.date))
     
     def get(self): return self.date
@@ -295,6 +295,7 @@ class PRMP_TreeView(PRMP_Frame):
     def updateHeading(self):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
+            print(column.width, time.time())
             self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
     def _set(self, obj=None, parent='', op=False):
@@ -320,7 +321,10 @@ class PRMP_TreeView(PRMP_Frame):
             for sub in subs: self._set(sub, item, op)
     
     def set(self, obj, op=0):
-        if self.firstItem: self.tree.delete(self.firstItem)
+        self.updateHeading()
+        if self.firstItem:
+            self.tree.delete(self.firstItem)
+            self.firstItem = None
         if obj:
             self.obj = obj
             self._set(obj, op=op)
