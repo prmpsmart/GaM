@@ -1737,11 +1737,17 @@ class PRMP_Window(PRMP_Widget):
         if self.zoomed:
             self.zoomed = False
             self.state('normal')
+            self.isNormal()
         else:
             self.zoomed = True
             self.state('zoomed')
+            self.isMaximized()
     
     def isMaximized(self): pass
+
+    def isMinimized(self): pass
+    
+    def isNormal(self): pass
     
     def addTitleBar(self, title=''):
         if self.titleBar:
@@ -1857,8 +1863,10 @@ class PRMP_MainWindow(PRMP_Window):
         mro = list(reversed(self.root.__class__.__mro__))
         
         for cl in mro:
-            if cl in (PRMP_Window, Mixins): continue
-            copyClassMethods(self, cl, self.root)
+        # for cl in mro:
+            # if cl in (PRMP_Window, Mixins): continue
+            if cl == PRMP_Window:
+                copyClassMethods(self, cl, self.root)
         
     def __repr__(self): return self.root
     

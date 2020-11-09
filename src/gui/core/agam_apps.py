@@ -102,11 +102,11 @@ class Hierachy(PRMP_TreeView):
 H = Hierachy
 
 
-class RegionDetails(PRMP_MainWindow, FillWidgets):
+class RegionDetails(PRMP_Tk, FillWidgets):
     
     def __init__(self, master=None, title='Region Details', geo=(600, 250), expandGeo=(800, 600), values={}, region=None, **kwargs):
         
-        PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
+        PRMP_Tk.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         
         FillWidgets.__init__(self, values=values)
         
@@ -118,6 +118,8 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.expandGeo = expandGeo
         
         self._setupApp()
+
+        self.isMaximized = partial(RegionDetails.isMaximized, self)
 
         self.fill()
         self.paint()
@@ -177,10 +179,12 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
        # accounts
         self.accounts = PRMP_LabelFrame(self.container, config=dict(text='Accounts'))
         self.accountsHie = Hierachy(self.accounts, status='Accounts Details')
+        self.accounts.sub = self.placeAccounts
         
        # subregions
         self.subRegions = PRMP_LabelFrame(self.container, config=dict(text='Sub Regions'))
         self.subRegionsHie = Hierachy(self.subRegions, status='Sub Regions Details')
+        self.subRegions.sub = self.placeSubRegions
         
         
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
@@ -232,9 +236,11 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.accounts.place_forget()
         self.changeGeometry(self.geo_)
     
-    def _isDeiconed(self):
-        self.root.update()
-        self.placeSubs()
+    def isMaximized(self):
+        self.update()
+        if self._sub: self._sub.sub()
+    
+    isNormal = isMaximized
         
     def expand(self):
         self.resize = (1, 1)
@@ -248,9 +254,6 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
             w, h = self._sub.master.tupled_winfo_geometry[:2]
             h -= 189
             self._sub.place(x=2, y=183, h=h, w=w-8)
-            
-            # print(self._sub, w, time.time())
-           
         
     def showSubRegionsContainer(self):
         self.expand()
