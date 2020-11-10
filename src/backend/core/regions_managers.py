@@ -8,9 +8,6 @@ class RegionsManager(ObjectsManager, Mixins):
         self.__master = master
         self.addRegion = self.addSub
         
-    
-    
-    def __getitem__(self, num): return self.regions[num]
     def __len__(self): return len(self.regions)
     def __repr__(self): return f'<{self}>'
     def __str__(self): return f'{self.master} | {self.className}({self.master.name})'

@@ -7,9 +7,7 @@ class PersonDialog(PRMP_Dialog):
     def __init__(self, master=None, title='Person Dialog', person=None, geo=(550, 320), values={}, **kwargs):
         self.person = person
         
-        super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
-
-
+        super().__init__(master=master, title=title, geo=geo, values=values, editable=1, **kwargs)
     
     def _setupDialog(self):
         name = self.values.get('name')
@@ -46,10 +44,15 @@ class RecordDialog(PRMP_Dialog):
     
     def _setupDialog(self):
         self.addEditButton()
-        
+
         self.money = LabelEntry(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(text='Money'), orient='h')
+        def setMoney(money): self.money.B.clear(); self.money.B.insert(0, self.addSignToMoney(money))
+        self.money.set = setMoney
+        self.money.set('')
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), relx=.02, rely=.16, relh=.15, relw=.96, longent=.35, orient='h')
         self.note = LabelText(self.container, topKwargs=dict(text='Note'), relx=.02, rely=.32, relh=.5, relw=.96, longent=.35, orient='h')
+        self.addResultsWidgets(['note', 'money', 'date'])
+
 RecD = RecordDialog
  
 

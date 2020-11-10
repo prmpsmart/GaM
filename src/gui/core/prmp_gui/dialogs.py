@@ -74,7 +74,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         if self.editBtn.var.get() == '1':
             self.placeSubmitBtn(1)
             for widgetName in self.resultsWidgets:
-                wid = self.__dict__.get(widgetName)
+                wid = self[widgetName]
                 if wid: wid.normal()
         else:
             self.placeSubmitBtn()
@@ -343,7 +343,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.ask = ask
         self._cancel = cancel
 
-        super().__init__(title=title, geo=geo, ntb=1, tm=1, asb=0, **kwargs)
+        super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
@@ -367,7 +367,6 @@ class PRMP_MsgBox(PRMP_Dialog):
         if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
-
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type

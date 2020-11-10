@@ -4,6 +4,7 @@ from hashlib import sha224
 import re
 
 class Mixins:
+    _unget = '_prmp_'
     
     containers = list, set, tuple
     naira = chr(8358)
@@ -13,11 +14,26 @@ class Mixins:
     _moneySign = naira + chr(32)
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    def addSignToMoney(self, money): return f'{self._moneySign}{money}'
+   
+    @property
+    def mro(self): return self.class_.__mro__
 
     @property
     def class_(self): return self.__class__
 
-    def getFromSelf(self, name): return getattr(self, name, None)
+    def attrError(self, attr): raise AttributeError(f'{attr} does not exist in {self}')
+
+    def getFromSelf(self, name, unget=None):
+        ret = self.__dict__.get(name, unget)
+        if ret != unget: return ret
+        else:
+            for cl in self.mro:
+                ret = cl.__dict__.get(name, unget)
+                if ret != unget:
+                    if isinstance(ret, property): return ret.fget(self)
+                    return ret
+        return unget
     
     def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
     
@@ -68,7 +84,7 @@ class ObjectsMixins(Mixins, CompareByDate):
     
     
     @property
-    def moneyWithSign(self, hashtag=0): return f'{self._moneySign}{int(self)}'
+    def moneyWithSign(self): return f'{self._moneySign}{int(self)}'
     
     def numWithCommas(self, num=None):
         if num == None: num = int(self)
@@ -131,7 +147,11 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def week(self): return self.date.week
     
-    # def __getattr__(self, attr): return None
+    
+    def __getattr__(self, attr):
+        ret = self.getFromSelf(attr, self._unget)
+        if ret != self._unget: return ret
+        else: self.attrError(attr)
     
     # def __setattr__(self, attr, value): return None
     
@@ -143,11 +163,59 @@ class ObjectsMixins(Mixins, CompareByDate):
         
         elif isinstance(item, slice): return self.subs[item] if self.subs else []
 
-        elif isinstance(item, self.containers): return [self.getFromSelf(self.propertize(attr)) for attr in item]
+        elif isinstance(item, self.containers):
+            res = []
+            for it in item: res.append(self[it])
+            return res
+
         elif isinstance(item, str): return self.getFromSelf(item)
 
+        elif isinstance(item, dict):
+            res = []
+            for k, v in item.items():
+                head = self[k]
+                if isinstance(v, dict):
+                    tail = []
+                    tail_props = [(g, h) for g, h in v.items()]
+                    last = tail_props[-1]
+                    count = 0
+                    length_of_tail_props = len(tail_props)
+                    while count < length_of_tail_props:
+                        tail_prop = tail_props[count]
+                        tail_1 = head[tail_prop[0]]
+                        tail_2 = tail_1[tail_prop[1]]
+                        tail.append(tail_2)
+                        count += 1
 
-class Object(ObjectsMixins):
+                else: tail = head[v]
+                res.append(tail)
+            return res if len(res) > 1 else res[0]
+
+        self.attrError(item)
+
+
+class CompareByNumber:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.number < other.number
+    def __le__(self, other):
+        if other == None: return False
+        return self.number <= other.number
+    def __eq__(self, other):
+        if other == None: return False
+        return self.number == other.number
+    def __ne__(self, other):
+        if other == None: return True
+        return self.number != other.number
+    def __gt__(self, other):
+        if other == None: return True
+        return self.number > other.number
+    def __ge__(self, other):
+        if other == None: return True
+        return self.number >= other.number
+
+
+class Object(CompareByNumber, ObjectsMixins):
     Manager = 'ObjectsManager'
     Managers = ()
     
@@ -230,9 +298,22 @@ class ObjectsManager(ObjectsMixins):
         self.__master = master
         self.__subs = []
     
-    def __getitem__(self, num): return self.subs[num]
-    
     def __len__(self): return len(self.subs)
+
+    def __getattr__(self, attr):
+        ret = self.getFromSelf(attr, self._unget)
+        if ret != self._unget: return ret
+        else: return getattr(self.last, attr)
+
+    def __getitem__(self, item):
+        
+        if isinstance(item, int): return self.subs[item] if self.subs else None
+        
+        elif isinstance(item, slice): return self.subs[item] if self.subs else []
+
+        elif isinstance(item, self.containers): return [self.getFromSelf(self.propertize(attr)) for attr in item]
+
+        elif isinstance(item, str): return self.getFromSelf(item)
     
     @property
     def master(self): return self.__master
@@ -244,7 +325,7 @@ class ObjectsManager(ObjectsMixins):
     def first(self):
         if len(self):
             self.subs.sort()
-            first_ = self[-1]
+            first_ = self[0]
             assert first_.previous == None, f'{self} is not the first.'
             return first_
         

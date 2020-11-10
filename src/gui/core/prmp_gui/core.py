@@ -312,7 +312,7 @@ class PRMP_Theme(Mixins):
     def _paint(self):
         if self._ttk_:
             PRMP_Style().update()
-            # return 
+            return
 
         kwargs = { k: v for k, v in self.kwargs.items()}
         
@@ -610,7 +610,7 @@ class PRMP_Widget(PRMP_Theme):
     
     def normal(self): self.state('normal')
     
-    def state(self, s): self['state'] = s
+    def state(self, s): self.configure(state=s)
     
     def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
 
@@ -1504,7 +1504,6 @@ class PRMP_Window(PRMP_Widget):
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
         
         self.placeOnScreen(side, geometry)
-
     
     def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1):
         
@@ -1849,7 +1848,6 @@ PTl = PRMP_Toplevel
 class PRMP_MainWindow(Mixins):
     
     def __init__(self, master=None, _ttk_=False, atb=1, asb=1, **kwargs):
-        
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
         # super().__init__()
@@ -1870,18 +1868,24 @@ class PRMP_MainWindow(Mixins):
         #     copyClassMethods(self, cl, self.root)
 
         for k, v in self.class_.__dict__.items():
+            if k.startswith('__'): continue
             if callable(v): self.root.__dict__[k] = partial(v, self)
-            if k.startswith('is'): self.root.__dict__[k] = partial(v, self)
+            # if k.startswith('is'): self.root.__dict__[k] = partial(v, self)
+        # for k, v in self.root.__dict__.items():
+            # if callable(v): continue
+            # else: self.__dict__[k] = v
                 
     def __repr__(self): return self.root
     
     def __str__(self): return self.root
     
-    def __getattr__(self, name):
-        # attr = self.__dict__.get(name, '_prmp_')
-        # if attr != '_prmp_': return attr
-        # else: return getattr(self.root, name)
-        return getattr(self.root, name)
+    def __getitem__(self, name):
+        attr = self.__dict__.get(name, '_prmp_')
+        if attr != '_prmp_': return attr
+        else: return getattr(self.root, name)
+
+    
+    def __getattr__(self, name): return getattr(self.root, name)
 
 
 PMW = PRMP_MainWindow
