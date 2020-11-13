@@ -173,15 +173,16 @@ class ImageLabel(ImageWidget, PRMP_Label):
 IL = ImageLabel
 
 class PRMP_DateButton(PRMP_Button):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', **kwargs):
         self.date = None
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
         self.DT = DateTime
         super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, anchor='nw', **kwargs)
+        self['text'] = placeholder
     
     def action(self):
-        self.date = self.CD(self).result
+        self.date = self.CD(self, caller=self.toplevel).result
         self.set(str(self.date))
     
     def get(self): return self.date
@@ -295,7 +296,7 @@ class PRMP_TreeView(PRMP_Frame):
     def updateHeading(self):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
-            print(column.width, time.time())
+            # print(column.width, time.time())
             self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
     def _set(self, obj=None, parent='', op=False):

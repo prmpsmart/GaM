@@ -55,7 +55,7 @@ class Mixins:
     @property
     def className(self): return f'{self.__class__.__name__}'
     
-    def __repr__(self): return f'<{self}>'
+    # def __repr__(self): return f'<{self}>'
     
     @property
     def shortName(self): return self._shortName
@@ -305,16 +305,6 @@ class ObjectsManager(ObjectsMixins):
         if ret != self._unget: return ret
         else: return getattr(self.last, attr)
 
-    def __getitem__(self, item):
-        
-        if isinstance(item, int): return self.subs[item] if self.subs else None
-        
-        elif isinstance(item, slice): return self.subs[item] if self.subs else []
-
-        elif isinstance(item, self.containers): return [self.getFromSelf(self.propertize(attr)) for attr in item]
-
-        elif isinstance(item, str): return self.getFromSelf(item)
-    
     @property
     def master(self): return self.__master
     

@@ -6,7 +6,7 @@ from .pics import Xbms
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=False, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=True, **kwargs):
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=1, **kwargs)
         FillWidgets.__init__(self, values=values)
         
@@ -224,8 +224,7 @@ class CalendarDialog(PRMP_Dialog):
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
     def paint(self):
-        
-        self.root._paint()
+        self.paintAll()
         for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         
         self.monthNameLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
@@ -343,7 +342,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.ask = ask
         self._cancel = cancel
 
-        super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, **kwargs)
+        super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, editable=False, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)

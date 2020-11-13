@@ -4,8 +4,8 @@ from .extensions import *
 #  These widgets doesn't need or can't be used with PRMP_Widget.addWidget()
 
 class TwoWidgets(PRMP_Frame):
-    top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
-    bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox}
+    top_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
+    bottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox}
     events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
@@ -32,12 +32,18 @@ class TwoWidgets(PRMP_Frame):
         
         if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
         else: topKw = dict(**topKwargs)
-            
+        
         self.Top = top_wid(self, **topKwargs)
+        text = topKwargs.get('text')
+        if not text:
+            config = topKwargs.get('config')
+            if config: text = config.get('text')
         
-        placeholder = bottomKwargs.get('placeholder', f'Enter {topKwargs.get("text")}.')
+        placeholder = bottomKwargs.get('placeholder', f'Enter {text}.')
         
-        if bottom in ['label', 'datebutton']: bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
+        if bottom in ['label', 'datebutton']:
+            bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
+            if self._ttk_: bottomKw['style'] = 'entry.Label'
         else:
             if bottomKwargs.get('placeholder'): bottomKw = dict(**bottomKwargs)
             else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
@@ -46,7 +52,6 @@ class TwoWidgets(PRMP_Frame):
         
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
         
-        # del topKwargs, bottomKwargs
         
         events = self.events.get(bottom)
         if events:

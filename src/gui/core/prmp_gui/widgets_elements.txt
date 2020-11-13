@@ -303,6 +303,7 @@ layout:
             textarea
             highlight
             background
+            fieldbackground
 
         TFrame:
             border
