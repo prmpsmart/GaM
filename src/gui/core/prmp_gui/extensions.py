@@ -195,13 +195,14 @@ class PRMP_DateButton(PRMP_Button):
         self['text'] = self.date
 PDB = PRMP_DateButton
 
-class ScrolledTreeView(AutoScroll, PRMP_Treeview):
+class ScrolledTreeView(AutoScroll, ttk.Treeview):
     '''A standard ttk Treeview widget with scrollbars that will
     automatically show/hide as needed.'''
-    @create_container
+    @_create_container
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
+
 STV = ScrolledTreeView
 
 class ScrollableFrame(PRMP_Frame):
@@ -333,72 +334,111 @@ class PRMP_TreeView(PRMP_Frame):
     def reload(self): self.set(self.obj)
 PTV = PRMP_TreeView
 
-class ToolTip:
-    def __init__(self, wdgt, msg=None, font=None, delay=1, follow=True, tipGeo=(100, 40), **kwargs):
-        self.wdgt = wdgt
-        self.parent = self.wdgt.master
-        
-        self.msg = msg
+class ToolTip(tk.Toplevel):
+    """
+    Provides a ToolTip widget for Tkinter.
+    To apply a ToolTip to any Tkinter widget, simply pass the widget to the
+    ToolTip constructor
+    """
+    def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None,
+                 delay=1, follow=True):
+        """
+        Initialize the ToolTip
 
-        self.tipGeo = tipGeo
+        Arguments:
+          wdgt: The widget this ToolTip is assigned to
+          tooltip_font: Font to be used
+          msg:  A static string message assigned to the ToolTip
+          msgFunc: A function that retrieves a string to use as the ToolTip text
+          delay:   The delay in seconds before the ToolTip appears(may be float)
+          follow:  If True, the ToolTip follows motion, otherwise hides
+        """
+        self.wdgt = wdgt
+        # The parent of the ToolTip is the parent of the ToolTips widget
+        self.parent = self.wdgt.master
+        # Initalise the Toplevel
+        tk.Toplevel.__init__(self, self.parent, bg='black', padx=1, pady=1)
+        # Hide initially
+        self.withdraw()
+        # The ToolTip Toplevel should have no frame or title bar
+        self.overrideredirect(True)
+
+        # The msgVar will contain the text displayed by the ToolTip
+        self.msgVar = tk.StringVar()
+        if msg is None:
+            self.msgVar.set('No message provided')
+        else:
+            self.msgVar.set(msg)
+        self.msgFunc = msgFunc
         self.delay = delay
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
-        self.top = None
-        self.font = font
-        self.kwargs = kwargs
-        
-        
+        # The text of the ToolTip is displayed in a Message widget
+        tk.Message(self, textvariable=self.msgVar, bg='#FFFFDD',
+                font=tooltip_font,
+                aspect=1000).grid()
+
+        # Add bindings to the widget.  This will NOT override
+        # bindings that the widget already has
         self.wdgt.bind('<Enter>', self.spawn, '+')
         self.wdgt.bind('<Leave>', self.hide, '+')
         self.wdgt.bind('<Motion>', self.move, '+')
-        
 
     def spawn(self, event=None):
+        """
+        Spawn the ToolTip.  This simply makes the ToolTip eligible for display.
+        Usually this is caused by entering the widget
+
+        Arguments:
+          event: The event that called this funciton
+        """
         self.visible = 1
-        self.wdgt.after(int(self.delay * 1000), self.show)
+        # The after function takes a time argument in miliseconds
+        self.after(int(self.delay * 1000), self.show)
 
     def show(self):
-        spl = self.msg.split('\n')
-        c = 0
-        for v in spl:
-            i = len(v)
-            if i > c: c = i
-        
-        r = len(spl)
-        r = r or 1
-        self.tipGeo = c * 7, r * 20
-
-        self.top = PTp(self.parent, geo=self.tipGeo, ntb=1, tm=1, **self.kwargs)
-        
-        L(self.top, text=self.msg or 'No message provided', background=PTh.DEFAULT_BACKGROUND_COLOR, font=self.font, relief='groove').place(relx=0, rely=0, relh=1, relw=1)
-        # self.withdraw()
-        
-        if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
-        if self.visible == 2: self.top.deiconify()
-        
-        self.top.mainloop()
+        """
+        Displays the ToolTip if the time delay has been long enough
+        """
+        if self.visible == 1 and time() - self.lastMotion > self.delay:
+            self.visible = 2
+        if self.visible == 2:
+            self.deiconify()
 
     def move(self, event):
-        if self.top:
-            self.lastMotion = time.time()
-            if self.follow is False:
-                self.withdraw()
-                self.visible = 1
-            self.top.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-            
-            #To get the present event coordinates
-            # print(event.x_root,event.y_root)
-            
-            # self.top.after(int(self.delay * 1000), self.show)
+        """
+        Processes motion within the widget.
+        Arguments:
+          event: The event that called this function
+        """
+        self.lastMotion = time()
+        # If the follow flag is not set, motion within the
+        # widget will make the ToolTip disappear
+        #
+        if self.follow is False:
+            self.withdraw()
+            self.visible = 1
+
+        # Offset the ToolTip 10x10 pixes southwest of the pointer
+        self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
+        try:
+            # Try to call the message function.  Will not change
+            # the message if the message function is None or
+            # the message function fails
+            self.msgVar.set(self.msgFunc())
+        except:
+            pass
+        self.after(int(self.delay * 1000), self.show)
 
     def hide(self, event=None):
-        if self.top:
-            self.visible = 0
-            # self.top.withdraw()
-            self.top.destroy()
-        # self.parent.state('normal')
+        """
+        Hides the ToolTip.  Usually this is caused by leaving the widget
+        Arguments:
+          event: The event that called this function
+        """
+        self.visible = 0
+        self.withdraw()
 TT = ToolTip
 
 class SolidScreen(PRMP_MainWindow):
@@ -412,6 +452,33 @@ class SolidScreen(PRMP_MainWindow):
 SS = SolidScreen
 
 
+
+class ScrolledText(AutoScroll, tk.Text):
+    '''A standard Tkinter Text widget with scrollbars that will
+    automatically show/hide as needed.'''
+    @_create_container
+    def __init__(self, master, **kw):
+        tk.Text.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
+
+class ScrolledListBox(AutoScroll, tk.Listbox):
+    '''A standard Tkinter Listbox widget with scrollbars that will
+    automatically show/hide as needed.'''
+    @_create_container
+    def __init__(self, master, **kw):
+        tk.Listbox.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
+    def size_(self):
+        sz = tk.Listbox.size(self)
+        return sz
+
+class ScrolledEntry(AutoScroll, tk.Entry):
+    '''A standard Tkinter Entry widget with a horizontal scrollbar
+    that will automatically show/hide as needed.'''
+    @_create_container
+    def __init__(self, master, **kw):
+        tk.Entry.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
 
 
 
