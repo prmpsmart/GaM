@@ -15,5 +15,8 @@ The official accounting software of Goodness and Mercy
 
 - [x] The theme engine works better.
 - [x] The calender dialog is better with good themes.
+    some of the calendar's images are
+   ![Alt text](/cal.PNG?raw=true "Theme 1")
+   ![Alt text](/cal2.PNG?raw=true "Theme 2")
 - [ ] The TreeView is still under construction.
 - []
