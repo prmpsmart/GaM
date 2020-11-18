@@ -1210,20 +1210,23 @@ class PRMP_Style(ttk.Style, Mixins):
             },
             'exit.TButton': {
                 'map': {
-                    'relief': [('hover', 'flat')],
-                    'background': [('hover', 'red')]
+                    # 'relief': [('hover', 'flat')],
+                    'background': [('hover', 'red')],
+                    'anchor': [('hover', 'center')]
                 }
             },
-            'maximize.TButton': {
+            'green.TButton': {
                 'map': {
-                    'relief': [('hover', 'flat')],
-                    'background': [('hover', 'green')]
+                    # 'relief': [('hover', 'flat')],
+                    'background': [('hover', 'green')],
+                    'anchor': [('hover', 'center')]
                 }
             },
-            'minimize.TButton': {
+            'yellow.TButton': {
                 'map': {
-                    'relief': [('hover', 'flat')],
-                    'background': [('hover', 'yellow')]
+                    # 'relief': [('hover', 'flat')],
+                    'background': [('hover', 'yellow')],
+                    'anchor': [('hover', 'center')]
                 }
             },
             'TCheckbutton': {
@@ -1321,13 +1324,13 @@ class PRMP_Style(ttk.Style, Mixins):
             'TRadiobutton': {
                 'configure': {
                     'indicatorcolor': background,
-                    'padding': 2,
-                    'font': buttons_font,
+                    'font': label_font,
                     # 'indicatorrelief': 'flat',
+                    # 'indicatormargin': (1,1,4,1),
+                    # 'indicatorbackground': 'red'
 
                 },
                 'map': {
-                    # 'relief': [('selected', 'solid'), ('hover', 'solid')],
                     'indicatorcolor': [('pressed', background), ('disabled', button_background), ('selected', foreground)]
                 },
                 'layout': [('Radiobutton.border', {'children': [('Radiobutton.focus', {'sticky': 'nswe', 'children': [('Radiobutton.padding', {'sticky': 'nswe', 'children': [('Radiobutton.indicator', {'side': 'left', 'sticky': ''}), ('Radiobutton.label', {'side': 'left', 'sticky': 'nswe', 'expand': 1})]})]})]})]
@@ -1453,17 +1456,46 @@ class PRMP_Style(ttk.Style, Mixins):
             'Treeview': {
                 'configure': {
                     'rowheight': 18,
-                    'background': 'white',
+                    'fieldbackground': background
+                },
+                'map': {
+                    'background': [('selected', text_background), ('hover', button_background)],
+                    'foreground': [('selected', text_foreground), ('hover', button_foreground)]
                 }
             },
+            # 'TreeCtrl': {
+            #     'configure': {
+            #         'background': 'red',
+            #         'itembackground': 'pink',
+            #         'itemfill': 'blue',
+            #         'itemaccentfill': 'yellow'
+            #     }
+            # },
             'Heading': {
                 'configure': {
                     'font': heading_font,
-                    'relief': 'raised'
+                    'relief': 'raised',
+                    'background': text_background,
+                    'foreground': text_foreground
+                },
+                'map': {
+                    'background': [('pressed', background)],
+                    'foreground': [('pressed', foreground)],
+                    # 'relief': [('hover', 'flat')]
                 }
             },
-            'Coloumn': {},
-            'Item': {}
+            # 'Column': {
+            #     'map': {
+            #         'background': [('selected', 'black')],
+            #         'foreground': [('selected', 'white')]
+            #     }
+            # },
+            # 'Item': {
+            #     'map': {
+            #         'background': [('selected', 'red')],
+            #         'foreground': [('selected', 'yellow')]
+            #     }
+            # },
         }
         self.master.event_generate('<<PRMP_STYLE_CHANGED>>')
         return _settings
@@ -1479,8 +1511,7 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
     
     def __init__(self, master=None, config={}, **kwargs):
         ttk.Treeview.__init__(self, master, **config)
-        PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
-    
+        PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)    
 Treeview = PTv = PRMP_Treeview
 
 #   common to tk and ttk
@@ -2014,13 +2045,13 @@ class PRMP_Window(PRMP_Widget):
 
         if not self.__r:
             self.imgMin = PRMP_Image('green', resize=(20, 20))
-            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
 
             self.imgMax = PRMP_Image('yellow', resize=(20, 20))
-            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
 
         self.imgExit = PRMP_Image('red', resize=(20, 20))
-        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
         # self._exit.bindEntryHighlight(bacKLkground='red')
 
         self.titleBar = L(fr, config=dict( text=title or self.titleText), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
@@ -2097,7 +2128,6 @@ class PRMP_Window(PRMP_Widget):
     def bindExit(self):
         def ex(e=0): os.sys.exit()
         self.bind_all('<Control-/>', ex)
-
 PW = PRMP_Window
 
 class PRMP_Tk(tk.Tk, PRMP_Window):
