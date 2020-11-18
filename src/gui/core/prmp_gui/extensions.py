@@ -245,15 +245,33 @@ class PRMP_TreeView(PRMP_Frame):
     
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, **kwargs)
+        self.treeview = None
+        self.xscrollbar = None
+        self.yscrollbar = None
+        self.columns = Columns(columns)
+        self.setColumns(columns)
+        self.create()
         
+    def create(self):
+        if self.treeview:
+            self.treeview.destroy()
+            del self.treeview
+            
+            self.xscrollbar.destroy()
+            del self.xscrollbar
+
+            self.yscrollbar.destroy()
+            del self.yscrollbar
+
+
         self.t = self.tree = self.treeview = PRMP_Treeview(self)
-        xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
-        yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
-        self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
+        self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
+        self.treeview.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
         
-        xscrollbar.pack(side="bottom", fill="x")
+        self.xscrollbar.pack(side="bottom", fill="x")
         self.treeview.pack(side='left', fill='both', expand=1)
-        yscrollbar.pack(side="right", fill="y")
+        self.yscrollbar.pack(side="right", fill="y")
         bound_to_mousewheel(0, self)
         
         self.ivd = self.itemsValuesDict = {}
@@ -261,8 +279,6 @@ class PRMP_TreeView(PRMP_Frame):
         self.current = None
         self.attributes = []
         
-        self.columns = Columns(columns)
-        self.setColumns(columns)
         self.bindings()
     
     def bindings(self):
@@ -288,6 +304,8 @@ class PRMP_TreeView(PRMP_Frame):
     tvc = Config = treeviewConfig
 
     def setColumns(self, columns=[]):
+        self.create()
+
         if columns:
             self.columns.process(columns)
             

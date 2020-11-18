@@ -595,17 +595,13 @@ class PRMP_Widget(PRMP_Theme):
     
     def bindOverrelief(self, wid, relief='solid', **kwargs):
         # if wid._ttk_ or wid.PRMP_WIDGET.endswith('Frame'): return
-        print(wid, kwargs)
         def setRelief(e=0): wid.configure(relief=relief, **kwargs)
         def resetRelief(e=0): wid.paint()
         
         wid.bind('<Enter>', setRelief)
         wid.bind('<Leave>', resetRelief)
     
-    def bindEntryHighlight(self, **kwargs):
-        print(909)
-        self.bindOverrelief(self, **kwargs)
-        print(909)
+    def bindEntryHighlight(self, **kwargs): self.bindOverrelief(self, **kwargs)
     
     def readonly(self, wh=''):
         try: self.state('readonly')
@@ -1190,7 +1186,6 @@ class PRMP_Style(ttk.Style, Mixins):
                 },
                 'map': {
                     'anchor': [('hover', 'nw')],
-                    # 'relief': [('hover', 'solid')]
                     'relief': [('pressed', 'solid'), ('hover', 'solid'), ('selected', 'solid')],
                 }
             },
@@ -1501,10 +1496,8 @@ class PRMP_Style(ttk.Style, Mixins):
         return _settings
 
     def update(self, e=0):
-        
         if not PRMP_Style.loaded: self.createPrmp()
         self.theme_settings('prmp', self.settings)
-
 Style = PSt = PRMP_Style
 
 class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
@@ -2025,11 +2018,11 @@ class PRMP_Window(PRMP_Widget):
             self.state('zoomed')
             self.isMaximized()
     
-    def isMaximized(self): print('maximize')
+    def isMaximized(self): pass
 
-    def isMinimized(self): print('minimize')
+    def isMinimized(self): pass
     
-    def isNormal(self): print('normal')
+    def isNormal(self): pass
     
     def addTitleBar(self, title=''):
         if self.titleBar:

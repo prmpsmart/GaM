@@ -91,7 +91,7 @@ class Hierachy(PRMP_TreeView):
     
     def bindings(self):
         super().bindings()
-        self.tree.bind('<Control-Return>', self.viewRegion)
+        self.treeview.bind('<Control-Return>', self.viewRegion)
 
     def viewRegion(self, e=0):
         current = self.selected()
@@ -150,12 +150,12 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('0')
         
-        self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Office', variable=self.hierachyVar), value='off'), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
+        self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Office', variable=self.hierachyVar, value='off')), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
         
-        self.department = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Department', variable=self.hierachyVar), value='dep'), orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
+        self.department = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Department', variable=self.hierachyVar, value='dep')), orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
         self.office.addReceiver(self.department.receiver)
         
-        self.sup = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Superscript', variable=self.hierachyVar), value='sup'), orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
+        self.sup = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Superscript', variable=self.hierachyVar, value='sup')), orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
         self.department.addReceiver(self.sup.receiver)
         
         self.sub = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Subscript', value='sub', variable= self.hierachyVar)), orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
@@ -204,7 +204,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
             acc = region.accountsManager
             headers = [{'text': 'Name', 'width': 120}, 'Date', *[{'type': int, 'text': a} for a in acc.headers]]
             self.accountsHie.setColumns(headers)
-            self.accountsHie.set(acc)
+            self.accountsHie.set(acc, 1)
     
     def switch(self):
         # to switch between subregions and accounts
