@@ -166,9 +166,9 @@ class ImageWidget:
         rt.paint()
 IW = ImageWidget
 
-class ImageLabel(ImageWidget, PRMP_Label):
+class ImageLabel(ImageWidget, PRMP_Style_Label):
     def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
-        PRMP_Label.__init__(self, master, **kwargs)
+        PRMP_Style_Label.__init__(self, master, **kwargs)
         ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
 IL = ImageLabel
 

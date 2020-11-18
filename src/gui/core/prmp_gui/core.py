@@ -594,7 +594,9 @@ class PRMP_Widget(PRMP_Theme):
         return self
     
     def bindOverrelief(self, wid, relief='solid', **kwargs):
-        # if wid._ttk_ or wid.PRMP_WIDGET.endswith('Frame'): return
+        if wid._ttk_: return
+        print(kwargs)
+
         def setRelief(e=0): wid.configure(relief=relief, **kwargs)
         def resetRelief(e=0): wid.paint()
         
@@ -1246,7 +1248,9 @@ class PRMP_Style(ttk.Style, Mixins):
                     # 'insertwidth': 2,
                     'arrowcolor': foreground
                 },
-                'layout': [('Combobox.border', {'children': [('Combobox.field', {'sticky': 'nswe', 'children': [('Combobox.uparrow', {'side': 'right', 'sticky': 'ns'}), ('Combobox.downarrow', {'side': 'right', 'sticky': 'ns'}), ('Combobox.padding', {'expand': '1', 'sticky': 'nswe', 'children': [('Combobox.textarea', {'sticky': 'nswe'})]})]})]})],
+                'layout': [('Combobox.border', {'children': [('Combobox.field', {'sticky': 'nswe', 'children': [
+                    # ('Combobox.uparrow', {'side': 'right', 'sticky': 'ns'}), 
+                    ('Combobox.downarrow', {'side': 'right', 'sticky': 'ns'}), ('Combobox.padding', {'expand': '1', 'sticky': 'nswe', 'children': [('Combobox.textarea', {'sticky': 'nswe'})]})]})]})],
                 'map': {
                     'relief': [('hover', 'solid')]
                 }
