@@ -203,6 +203,7 @@ class PRMP_Theme(Mixins):
     DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 14, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_BUTTONS_FONT = {'family': 'Buxton Sketch', 'size': 10, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     DEFAULT_SMALL_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_TITLE_FONT = {'family': 'Lucida Calligraphy', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
@@ -211,6 +212,10 @@ class PRMP_Theme(Mixins):
     DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
     DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    NORMAL_FONT = {'family': 'Clarendon BT', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+
+    HEADING_FONT = NORMAL_FONT
 
     themedWidgets = ['Combobox', 'Progressbar', 'Scrollbar', 'Treeview', 'Notebook', 'Panedwindow', 'Progressbar', 'Scale', 'Scrollbar', 'Separator', 'Sizegrip', 'Spinbox', 'Treeview', 'Toolbutton']
     
@@ -364,7 +369,7 @@ class PRMP_Theme(Mixins):
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
                 self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
-                
+
             elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
                 
             elif wt in ['Entry', 'Text']:
@@ -383,36 +388,11 @@ class PRMP_Theme(Mixins):
                             **kwargs)
                 # print(self)
                 self.configure(**_dict)
-
-            elif wt in ['Combobox', 'Progressbar', 'Scrollbar', 'Treeview']:
-                return
+            
+            elif wt in ['Scrollbar']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
-                style = ttk.Style()
-                style.theme_use('clam')
                 
-                try: self.configure(background=background)
-                except: pass
-                
-                if wt == 'Combobox':
-                    font = Font(**PTh.DEFAULT_FONT)
-                    col = PRMP_Theme.DEFAULT_BUTTON_COLOR
-                    if isinstance(col, (tuple, list)):
-                        a, b = col
-                    else: a, b = PRMP_Theme.DEFAULT_BUTTON_COLOR, PRMP_Theme.DEFAULT_FOREGROUND_COLOR
-                    style.configure('m.TCombobox', foreground=foreground, selectbackground=background, fieldbackground=background, selectforeground=foreground, arrowcolor=a,  background=b)
-                    style.map('m.TCombobox', fieldbackground=[('readonly', background)])
-                    self.configure(style='m.TCombobox', font=font)
-                    
-                elif wt == 'Progressbar':
-                    s = ttk.Style()
-                    a, b = PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR
-                    if self.orient == 'h': style_name = "Horizontal.TProgressbar"
-                    else: style_name = "Vertical.TProgressbar"
-                    style.configure(style_name, background=a, troughcolor=b, troughrelief='groove', borderwidth=2, thickness=1)
-                elif wt == 'Scrollbar': pass
-                
-                elif wt == 'Treeview': return
 
             else:
                 try: self.configure(background=background)
@@ -426,12 +406,14 @@ class PRMP_Theme(Mixins):
         children = self._children
         for child in children: child.paint()
     
-    def paint(self):
+    def _paintAll(self):
         self._paint()
         self._paintChildren()
     
-    paintAll = paint
-
+    def paint(self, e=0):
+        # print(e)
+        self._paintAll()
+    
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
 
@@ -611,15 +593,19 @@ class PRMP_Widget(PRMP_Theme):
         
         return self
     
-    def bindOverrelief(self, wid, relief):
-        if wid._ttk_ or wid.PRMP_WIDGET.endswith('Frame'): return
-        re = wid['relief']
-        def setRelief(e=0): wid.configure(relief=relief)
-        def resetRelief(e=0): wid.configure(relief=re)
+    def bindOverrelief(self, wid, relief='solid', **kwargs):
+        # if wid._ttk_ or wid.PRMP_WIDGET.endswith('Frame'): return
+        print(wid, kwargs)
+        def setRelief(e=0): wid.configure(relief=relief, **kwargs)
+        def resetRelief(e=0): wid.paint()
         
         wid.bind('<Enter>', setRelief)
         wid.bind('<Leave>', resetRelief)
     
+    def bindEntryHighlight(self, **kwargs):
+        print(909)
+        self.bindOverrelief(self, **kwargs)
+        print(909)
     
     def readonly(self, wh=''):
         try: self.state('readonly')
@@ -633,7 +619,6 @@ class PRMP_Widget(PRMP_Theme):
     
     def state(self, s): self.configure(state=s)
     
-    def bindEntryHighlight(self): self.bindOverrelief(self, 'solid')
 
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
@@ -1174,14 +1159,18 @@ class PRMP_Style(ttk.Style, Mixins):
         relief = PRMP_Theme.DEFAULT_RELIEF
 
         default_font = self.tupledFont(PRMP_Theme.DEFAULT_FONT)
+        normal_font = self.tupledFont(PRMP_Theme.NORMAL_FONT)
         big_font = self.tupledFont(PRMP_Theme.BIG_FONT)
         menu_font = self.tupledFont(PRMP_Theme.DEFAULT_MENU_FONT)
         button_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTON_FONT)
+        buttons_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTONS_FONT)
         small_button_font = self.tupledFont(PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
         title_font = self.tupledFont(PRMP_Theme.DEFAULT_TITLE_FONT)
         status_font = self.tupledFont(PRMP_Theme.DEFAULT_STATUS_FONT)
         label_font = self.tupledFont(PRMP_Theme.DEFAULT_LABEL_FONT)
         labelframe_font = self.tupledFont(PRMP_Theme.DEFAULT_LABELFRAME_FONT)
+        heading_font = self.tupledFont(PRMP_Theme.HEADING_FONT)
+
 
         oneColor = True
 
@@ -1196,70 +1185,102 @@ class PRMP_Style(ttk.Style, Mixins):
                     'foreground': foreground,
                     'background': background,
                     'relief': 'groove',
-                    'anchor': 'center'
+                    'anchor': 'center',
+                    'font': normal_font
                 },
                 'map': {
                     'anchor': [('hover', 'nw')],
-                    'relief': [('hover', 'solid')]
+                    # 'relief': [('hover', 'solid')]
+                    'relief': [('pressed', 'solid'), ('hover', 'solid'), ('selected', 'solid')],
                 }
-
             },
-
             'TButton': {
                 'configure': {
-                    'relief': 'groove',
                     'anchor': 'center',
                     'font': button_font,
                     'foreground': button_foreground,
                     'background': button_background,
+                    # 'border': 7
                 },
                'map': {
-                    'relief': [('pressed', 'solid'), ('hover', 'solid'), ('focus', 'solid')],
+                    # 'relief': [('pressed', 'solid'), ('hover', 'solid'), ('focus', 'solid'), ('selected', 'solid')],
                     'foreground': [('disabled', 'black')],
                 },
+                'layout': [('Button.border', {'sticky': 'nswe', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'sticky': 'nswe'})]})]})]})]
+            },
+            'exit.TButton': {
+                'map': {
+                    'relief': [('hover', 'flat')],
+                    'background': [('hover', 'red')]
+                }
+            },
+            'maximize.TButton': {
+                'map': {
+                    'relief': [('hover', 'flat')],
+                    'background': [('hover', 'green')]
+                }
+            },
+            'minimize.TButton': {
+                'map': {
+                    'relief': [('hover', 'flat')],
+                    'background': [('hover', 'yellow')]
+                }
             },
             'TCheckbutton': {
                 'configure': {
-                    'relief': 'solid'
-                }
+                    'indicatorcolor': background,
+                    'padding': 2,
+                    'font': buttons_font,
+                    'indicatorrelief': 'solid',
+                },
+                'map': {
+                    # 'relief': [('selected', 'solid'), ('hover', 'solid')],
+                    'indicatorcolor': [('pressed', background), ('disabled', button_background), ('selected', foreground)]
+                },
+                'layout': [('Checkbutton.border', {'children': [('Checkbutton.focus', {'sticky': 'nswe', 'children': [('Checkbutton.padding', {'sticky': 'nswe', 'children': [('Checkbutton.indicator', {'side': 'left', 'sticky': ''}), ('Checkbutton.label', {'side': 'left', 'sticky': 'nswe'})]})]})]})]
             },
             'TCombobox': {
                 'configure': {
                     'foreground': text_foreground,
                     'fieldbackground': text_background,
-                }
-            },
-            'TRadiobutton': {
-                'configure': {
-                    'relief': 'sunken',
-                    'foreground': foreground,
-                    'borderwidth': 2
+                    # 'selectborderwidth': 2,
+                    # 'padding': 2,
+                    # 'insertwidth': 2,
+                    'arrowcolor': foreground
                 },
+                'layout': [('Combobox.border', {'children': [('Combobox.field', {'sticky': 'nswe', 'children': [('Combobox.uparrow', {'side': 'right', 'sticky': 'ns'}), ('Combobox.downarrow', {'side': 'right', 'sticky': 'ns'}), ('Combobox.padding', {'expand': '1', 'sticky': 'nswe', 'children': [('Combobox.textarea', {'sticky': 'nswe'})]})]})]})],
                 'map': {
                     'relief': [('hover', 'solid')]
+                }
+            },
+            'ComboboxPopdownFrame': {
+                'configure': {
+                    'background': background
                 },
-                'layout': [
-                    ('Radiobutton.label', {'side': 'left', 'sticky': 'w','children': [
-                        ('Radiobutton.focus', {'children': [
-                            ('Radiobutton.label', {'children': [
-                                ('Radiobutton.indicator', {'children': [(
-                                    'Radiobutton.button', ''
-                                )]
-                                })
-                            ]})
-                        ]})
-                    ]})
-                ],
+                'layout': [('ComboboxPopdownFrame.background', {'sticky': 'news', 'border': 1, 'children': [('ComboboxPopdownFrame.padding', {'sticky': 'news'})]})]
             },
             'TEntry': {
                 'configure': {
                     'foreground': text_foreground,
                     'fieldbackground': text_background,
+                    # 'selectborderwidth': .5,
+                    # 'padding': .5,
+                    # 'insertwidth': .5,
+                },
+                'layout': [('Entry.border', {'children':[('Entry.field', {'sticky': 'nswe', 'border': '1', 'children': [('Entry.padding', {'sticky': 'nswe', 'children': [('Entry.textarea', {'sticky': 'nswe'})]})]})]})],
+                'map': {
+                    # 'relief': [('hover', 'solid')],
+                    'selectforeground': [('!focus', 'SystemWindow')]
                 }
             },
-            'TEntry.Label': {
+            'LightAll.TEntry': {
                 'configure': {
-                    'relief': 'solid'
+                    'background': text_background
+                }
+            },
+            'LightAll.TCombobox': {
+                'configure': {
+                    'background': text_background
                 }
             },
             'TFrame': {
@@ -1269,32 +1290,186 @@ class PRMP_Style(ttk.Style, Mixins):
             },
             'TLabel': {
                 'configure': {
-                    'relief': 'groove',
                     'anchor': 'center',
                     'font': label_font,
                 },
-                'map': {
-                    'relief': [('active', 'groove'), ('hover', 'solid'),]
-                }
+                'layout': [('Label.border', {'sticky': 'nswe', 'border': '1', 'children': [('Label.padding', {'sticky': 'nswe', 'border': '1', 'children': [('Label.label', {'sticky': 'nswe'})]})]})]
             },
             'entry.TLabel': {
                 'configure': {
-                    'relief': 'sunken',
                     'background': text_background,
                     'foreground': text_foreground,
-                    'overrelief': 'solid',
-                    'font': default_font
-                },
-                'map': {
-                    'relief': [('hover', 'solid')],
+                    'font': default_font,
                 }
             },
-        }
+            'TLabelframe': {
+                'configure': {
+                    'background': background,
+                    # 'labeloutside': 1,
+                    'labelmargins': (14, 0, 14, 4)
+                }
+            },
+            'TLabelframe.Label': {
+                'configure': {
+                    'font': labelframe_font,
+                    'background': background
+                }
+            },
+            'TPanedwindow': {
+                '': ''
+            },
+            'TRadiobutton': {
+                'configure': {
+                    'indicatorcolor': background,
+                    'padding': 2,
+                    'font': buttons_font,
+                    # 'indicatorrelief': 'flat',
 
+                },
+                'map': {
+                    # 'relief': [('selected', 'solid'), ('hover', 'solid')],
+                    'indicatorcolor': [('pressed', background), ('disabled', button_background), ('selected', foreground)]
+                },
+                'layout': [('Radiobutton.border', {'children': [('Radiobutton.focus', {'sticky': 'nswe', 'children': [('Radiobutton.padding', {'sticky': 'nswe', 'children': [('Radiobutton.indicator', {'side': 'left', 'sticky': ''}), ('Radiobutton.label', {'side': 'left', 'sticky': 'nswe', 'expand': 1})]})]})]})]
+            },
+            'Vertical.TScrollbar': {
+                'layout': [('Scrollbar.label', {'children': [('Scrollbar.uparrow', {'side': 'top', 'sticky': 'ns'}),('Scrollbar.downarrow', {'side': 'bottom', 'sticky': 'ns'}), ('Vertical.TScrollbar.thumb', {'side': 'left', 'sticky': 'ns'})
+                    ]})
+                ]
+            },
+            'Vertical.TScrollbar': {
+                'configure': {
+                    'troughcolor': foreground,
+                    'arrowcolor': foreground,
+                }
+            },
+            'Horizontal.TScrollbar': {
+                'layout': [
+                    ('Scrollbar.trough', {'children': [('Scrollbar.leftarrow', {'side': 'left', 'sticky': 'we'}), ('Scrollbar.rightarrow', {'side': 'right', 'sticky': 'we'}), ('Horizontal.TScrollbar.thumb', {'side': 'left', 'expand': '1', 'sticky': 'we'})
+                    ]})
+                ]
+            },
+            'Horizontal.TScrollbar': {
+                'configure': {
+                    'troughcolor': foreground,
+                    'arrowcolor': foreground,
+                }
+            },
+            'Toolbar': {
+                'configure': {
+                    'width': 0,
+                    'relief': 'flat',
+                    'borderwidth': 2,
+                    'padding': 4,
+                    'background': background,
+                    'foreground': '#000000'
+                },
+                # 'map': {
+                #     'background': [
+                #         ('active', selectbg)
+                #     ],
+                #     'foreground': [
+                #         ('active', selectfg)
+                #     ],
+                #     'relief': [
+                #         ('disabled', 'flat'), 
+                #         ('selected', 'sunken'), 
+                #         ('pressed', 'sunken'), 
+                #         ('active', 'raised')
+                #     ]
+                # }
+            },
+            'TNotebook': {
+                'layout': [('client', {'sticky': 'nswe'})]
+            },
+            'TNotebook.Tab': {
+                'layout': [('tab', {'sticky': 'nswe', 'children': [('padding', {'side': 'top', 'sticky': 'nswe', 'children': [('focus', {'side': 'top', 'sticky': 'nswe', 'children': [('label', {'side': 'left', 'sticky': ''}), ('close', {'side': 'left', 'sticky': ''})]})]})]})]
+            },
+            'TProgressbar': {
+                'configure': {
+                    'background': foreground,
+                    'pbarrelief': 'raised',
+                    'troughrelief': 'sunken',
+                    'troughcolor': background,
+                    'period': 100,
+                    'maxphase': 255
+                },
+                'map': {
+                    'pbarrelief': [('hover', 'flat')],
+                    'troughrelief': [('hover', 'solid')]
+                }
+            },
+            'TSpinbox': {
+                'configure': {
+                    'foreground': text_foreground,
+                    'fieldbackground': text_background,
+                    # 'arrowsize': 15,
+                    # 'selectborderwidth': 2,
+                    # 'padding': 2,
+                    # 'insertwidth': 2,
+                    'arrowcolor': foreground,
+                },
+                'layout': [('Spinbox.border', {'children': [('Spinbox.field', {'side': 'top', 'sticky': 'we', 'children': [('null', {'side': 'right', 'sticky': '', 'children': [('Spinbox.uparrow', {'side': 'right', 'sticky': 'e'}), ('Spinbox.downarrow', {'side': 'right', 'sticky': 'e'})]}), ('Spinbox.padding', {'sticky': 'nswe', 'children': [('Spinbox.textarea', {'sticky': 'nswe'})]})]})]})]
+            },
+            'Vertical.TScale': {
+                'configure': {
+                    'relief': 'sunken',
+                    'indicatorcolor': 'red',
+                    'troughcolor': foreground,
+                    'troughrelief': 'sunken',
+                    'sliderrelief': 'flat'
+                },
+                'layout': [('border', {'children': [('Vertical.Scale.trough', {'sticky': 'nswe', 'children': [('Vertical.Scale.slider', {'side': 'top', 'sticky': ''})]})]})],
+                'map': {
+                    'sliderrelief': [('hover', 'solid')]
+                }
+            },
+            'Horizontal.TScale': {
+                'configure': {
+                    'relief': 'sunken',
+                    'indicatorcolor': 'red',
+                    'troughcolor': foreground,
+                    'troughrelief': 'sunken',
+                    'sliderrelief': 'flat',
+                    'sliderwidth': 'ridge'
+                },
+                'layout': [('border', {'children': [('Horizontal.Scale.trough', {'sticky': 'nswe', 'children': [('Horizontal.Scale.slider', {'side': 'left', 'sticky': ''})]})]})],
+                'map': {
+                    'sliderrelief': [('hover', 'solid')]
+                }
+            },
+            'TPanedwindow': {
+                'configure': {
+                    'indicatorrelief': 'solid',
+                },
+                'layout': [('border', {'children': [('Panedwindow.background', {'sticky': ''})]})]
+            },
+            'Sash': {
+                'configure': {
+                    'sashthickness': 6,
+                    'gripcount': 10
+                }
+            },
+            'Treeview': {
+                'configure': {
+                    'rowheight': 18,
+                    'background': 'white',
+                }
+            },
+            'Heading': {
+                'configure': {
+                    'font': heading_font,
+                    'relief': 'raised'
+                }
+            },
+            'Coloumn': {},
+            'Item': {}
+        }
+        self.master.event_generate('<<PRMP_STYLE_CHANGED>>')
         return _settings
 
     def update(self, e=0):
-        # self.master.configure(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
+        
         if not PRMP_Style.loaded: self.createPrmp()
         self.theme_settings('prmp', self.settings)
 
@@ -1528,11 +1703,9 @@ class PRMP_Window(PRMP_Widget):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
         if PRMP_Window.TOPEST == None:
-            print('None')
+            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
             PRMP_Window.TOPEST = self
             PRMP_Window.STYLE = PRMP_Style(self)
-
-
 
         self.resize = resize
         self.container = None
@@ -1848,6 +2021,7 @@ class PRMP_Window(PRMP_Widget):
 
         self.imgExit = PRMP_Image('red', resize=(20, 20))
         self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        # self._exit.bindEntryHighlight(bacKLkground='red')
 
         self.titleBar = L(fr, config=dict( text=title or self.titleText), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
         self.titleBar.bind('<Double-1>', self.maximize)
@@ -1914,10 +2088,7 @@ class PRMP_Window(PRMP_Widget):
     
     def _colorize(self):
         topest = self.topest
-        if topest:
-            # print(repr(topest))
-            topest.style.update()
-            topest.paint()
+        if topest: topest.style.update()
         else: return
 
     @property
@@ -1946,9 +2117,10 @@ class PRMP_MainWindow(Mixins):
     def __init__(self, master=None, _ttk_=False, atb=1, asb=1, **kwargs):
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
+        self.root.root = self.root
 
         for k, v in self.class_.__dict__.items():
-            if k.startswith('__'): continue
+            if k.startswith('__') or k == 'root': continue
             if callable(v): self.root.__dict__[k] = partial(v, self)
                 
     def __repr__(self): return self.root

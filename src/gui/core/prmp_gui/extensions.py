@@ -198,7 +198,7 @@ PDB = PRMP_DateButton
 class ScrolledTreeView(AutoScroll, ttk.Treeview):
     '''A standard ttk Treeview widget with scrollbars that will
     automatically show/hide as needed.'''
-    @_create_container
+    @create_container
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
@@ -247,8 +247,8 @@ class PRMP_TreeView(PRMP_Frame):
         super().__init__(master=master, **kwargs)
         
         self.t = self.tree = self.treeview = PRMP_Treeview(self)
-        xscrollbar = PRMP_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
-        yscrollbar = PRMP_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
+        xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
+        yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
         self.treeview.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
         
         xscrollbar.pack(side="bottom", fill="x")
@@ -445,18 +445,19 @@ class SolidScreen(PRMP_MainWindow):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
         super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, **kwargs)
         
-        self.container['bd'] = 12
-        
-        
+        self.container.configure(borderwidth=12)
+
         self.paint()
+
 SS = SolidScreen
+
 
 
 
 class ScrolledText(AutoScroll, tk.Text):
     '''A standard Tkinter Text widget with scrollbars that will
     automatically show/hide as needed.'''
-    @_create_container
+    @create_container
     def __init__(self, master, **kw):
         tk.Text.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
@@ -464,7 +465,7 @@ class ScrolledText(AutoScroll, tk.Text):
 class ScrolledListBox(AutoScroll, tk.Listbox):
     '''A standard Tkinter Listbox widget with scrollbars that will
     automatically show/hide as needed.'''
-    @_create_container
+    @create_container
     def __init__(self, master, **kw):
         tk.Listbox.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
@@ -475,7 +476,7 @@ class ScrolledListBox(AutoScroll, tk.Listbox):
 class ScrolledEntry(AutoScroll, tk.Entry):
     '''A standard Tkinter Entry widget with a horizontal scrollbar
     that will automatically show/hide as needed.'''
-    @_create_container
+    @create_container
     def __init__(self, master, **kw):
         tk.Entry.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)

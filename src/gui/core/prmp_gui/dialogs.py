@@ -20,13 +20,13 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         self._setupDialog()
         self.fill()
 
-        self.paint()
         self.default()
         
         if editable:
             if values: self.editInput(0)
             else: self.editInput(1)
         
+        self.paint()
         self._isDialog()
         # self.mainloop()
     
@@ -194,37 +194,15 @@ class CalendarDialog(PRMP_Dialog):
         
         self.month = month
         self.dest = dest
-
-        # # colors
-        # self.class_.background = background
-        
-        # self.class_.surf_bg = surf_bg
-        # self.class_.surf_fg = surf_fg
-            
-        # self.class_.header_bg = header_bg
-        # self.class_.header_fg = header_fg
-            
-        # self.class_.month_fg = month_fg
-        # self.class_.month_bg = month_bg
-            
-        # self.class_.year_fg = year_fg
-        # self.class_.year_bg = year_bg
-        
-        # self.class_.DayLabel.days_fg = days_fg
-        # self.class_.DayLabel.days_bg = days_bg
-        
-        # self.class_.DayLabel.empty_bg = empty_bg
-        # self.class_.DayLabel.highlight_bg = highlight_bg
-        # self.class_.DayLabel.highlight_fg = highlight_fg
-        
-        # # colors
-
         if self.dest: self.__dict__[self.dest] = None
-        
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
+
+        
+
     def paint(self):
-        self.paintAll()
+        self._paintAll()
+
         for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         
         self.monthNameLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
