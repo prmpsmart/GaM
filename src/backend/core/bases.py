@@ -168,7 +168,7 @@ class ObjectsMixins(Mixins, CompareByDate):
             for it in item: res.append(self[it])
             return res
 
-        elif isinstance(item, str): return self.getFromSelf(item)
+        elif isinstance(item, str): return self.getFromSelf(self.propertize(item))
 
         elif isinstance(item, dict):
             res = []
