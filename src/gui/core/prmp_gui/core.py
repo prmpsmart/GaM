@@ -196,7 +196,8 @@ class PRMP_Theme(Mixins):
     
     CURRENT_THEME = 'DarkBlue3'
     
-    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 13, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+
     DEFAULT_MINUTE_FONT = {'family': 'Segoe Marker', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
@@ -206,16 +207,18 @@ class PRMP_Theme(Mixins):
     DEFAULT_BUTTONS_FONT = {'family': 'Buxton Sketch', 'size': 10, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     DEFAULT_SMALL_BUTTON_FONT = {'family': 'Buxton Sketch', 'size': 12, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
-    DEFAULT_TITLE_FONT = {'family': 'Lucida Calligraphy', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
-    DEFAULT_STATUS_FONT = {'family': 'Lucida Calligraphy', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
-    
-    DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 11, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
-    
-    DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
-    
-    NORMAL_FONT = {'family': 'Clarendon BT', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_TITLE_FONT = {'family': 'Lucida Calligraphy', 'size': 13, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
-    HEADING_FONT = NORMAL_FONT
+    DEFAULT_STATUS_FONT = DEFAULT_TITLE_FONT
+
+    
+    DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 13, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 15, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    HEADING_FONT = {'family': 'Clarendon BT', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+
+    NORMAL_FONT = {'family': 'Minion Pro', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     themedWidgets = ['Combobox', 'Progressbar', 'Scrollbar', 'Treeview', 'Notebook', 'Panedwindow', 'Progressbar', 'Scale', 'Scrollbar', 'Separator', 'Sizegrip', 'Spinbox', 'Treeview', 'Toolbutton']
     
@@ -935,208 +938,6 @@ class PRMP_Style(ttk.Style, Mixins):
             imageKeys[key] = tkImageName
         return imageKeys
     
-    def createBlue(self):
-        PRMP_Style.loadedThemes.append('blue')
-        
-        frame = "#6699cc"
-        lighter = "#bcd2e8"
-        window = "#e6f3ff"
-        # window = "red"
-        selectbg = "#2d2d66"
-        # selectbg = "blue"
-        selectfg = "#ffffff"
-        selectfg = "yellow"
-        disabledfg = "#666666"
-
-        imagesDict = self.styleImages('blue')
-        
-        # return
-        settings = {
-            '.': {
-                'configure': {
-                    'borderwidth': 1,
-                    'background': frame,
-                    'fieldbackground': window,
-                    'troughcolor': lighter,
-                    'selectbackground': selectbg,
-                    'selectforeground': selectfg
-                },
-                'map': {
-                    'foreground': [
-                        ('disabled', disabledfg)
-                    ]
-                }
-            },
-            'TButton': {
-                'configure': {
-                    'padding': (10, 0),
-                },
-                'layout': [
-                    ('Button.button', {'children': [
-                        ('Button.focus', {'children': [
-                            ('Button.padding', {'children': [
-                                ('Button.label', None)
-                            ]})
-                        ]})
-                    ]})
-                ],
-            },
-            'button': {
-                'element create': ['image', imagesDict['button-n'], ('pressed', imagesDict['button-p']), ('active', imagesDict['button-h']), {'border': 4, 'sticky': 'ew'}]
-            },
-            'Checkbutton.indicator': {
-                'element create': ['image', imagesDict['check-nu'], 
-                    (('active', '!disabled', 'selected'), imagesDict['check-hc']), 
-                    (('active', '!disabled'), imagesDict['check-hu']), 
-                    (('selected', '!disabled'), imagesDict['check-nc']), {'width': 24, 'sticky': 'w'}]
-            },
-            'Radiobutton.indicator': {
-                'element create': ['image', imagesDict['radio-nu'], 
-                    (('active', '!disabled', 'selected'), imagesDict['radio-hc']), 
-                    (('active', '!disabled'), imagesDict['radio-hu']), 
-                    ('selected', imagesDict['radio-nc']), {'width': 24, 'sticky': 'w'}]
-            },
-            'TMenubutton': {
-                'configure': {
-                    'relief': 'raised',
-                    'padding': (10, 2)
-                },
-            },
-            'Toolbar': {
-                'configure': {
-                    'width': 0,
-                    'relief': 'flat',
-                    'borderwidth': 2,
-                    'padding': 4,
-                    'background': frame,
-                    'foreground': '#000000'
-                },
-                'map': {
-                    'background': [
-                        ('active', selectbg)
-                    ],
-                    'foreground': [
-                        ('active', selectfg)
-                    ],
-                    'relief': [
-                        ('disabled', 'flat'), 
-                        ('selected', 'sunken'), 
-                        ('pressed', 'sunken'), 
-                        ('active', 'raised')
-                    ]
-                }
-            },
-            'TEntry': {
-                'configure': {
-                    'selectborderwidth': 1,
-                    'padding': 2,
-                    'insertwidth': 2,
-                    'font': 'TkTextFont'
-                }
-            },
-            'TCombobox': {
-                'configure': {
-                    'selectborderwidth': 1,
-                    'padding': 2,
-                    'insertwidth': 2,
-                    'font': 'TkTextFont'
-                }
-            },
-            'TNotebook.Tab': {
-                'configure': {
-                    'padding': (4, 2, 4, 2)
-                },
-                'map': {
-                    'background': [
-                        ('selected', frame),
-                        ('active', lighter)
-                    ],
-                    'padding': [
-                        ('selected', (4, 4, 4, 2))
-                    ]
-                }
-            },
-            'TLabel': {
-                'configure': {
-                    'relief': 'solid',
-                    'anchor': 'center',
-                    'font': "-family {Times New Roman} -size 11 -weight bold"
-                },
-                'map': {
-                    'relief': [('!active', 'solid'), ('disabled', 'ridge')],
-                    'foreground': [('!disabled', 'black')],
-                    # 'padding':
-                }
-            },
-            'TLabelframe': {
-                'configure': {
-                    'borderwidth': 2,
-                    'relief': 'groove'
-                }
-            },
-            'Vertical.TScrollbar': {
-                'layout': [
-                    ('Scrollbar.trough', {'children': [
-                        ('Scrollbar.uparrow', {'side': 'top'}),
-                        ('Scrollbar.downarrow', {'side': 'bottom'}),
-                        ('Scrollbar.uparrow', {'side': 'bottom'}),
-                        ('Vertical.Scrollbar.thumb', {'side': 'left', 'expand': 'true', 'sticky': 'ns'})
-                    ]})
-                ]
-            },
-            'Horizontal.TScrollbar': {
-                'layout': [
-                    ('Scrollbar.trough', {'children': [
-                        ('Scrollbar.leftarrow', {'side': 'left'}),
-                        ('Scrollbar.rightarrow', {'side': 'right'}),
-                        ('Scrollbar.leftarrow', {'side': 'right'}),
-                        ('Horizontal.Scrollbar.thumb', {'side': 'left', 'expand': 'true', 'sticky': 'we'})
-                    ]})
-                ]
-            },
-            'Horizontal.Scrollbar.thumb': {
-                'element create': ['image', imagesDict['sb-thumb'], (('pressed', '!disabled'), imagesDict['sb-thumb-p']), {'border': 3}]
-            },
-            'Vertical.Scrollbar.thumb': {
-                'element create': ['image', imagesDict['sb-vthumb'], (('pressed', '!disabled'), imagesDict['sb-vthumb-p']), {'border': 3}]
-            },
-            # element create 133
-            # last for loop
-            # element create 138
-            'Scale.slider': {
-                'element create': ['image', imagesDict['slider'], (('pressed', '!disabled'), imagesDict['slider-p'])]
-            },
-            'Vertical.Scale.slider': {
-                'element create': ['image', imagesDict['vslider'], (('pressed', '!disabled'), imagesDict['vslider-p'])]
-            },
-            'Horizontal.Progress.bar': {
-                'element create': ['image', imagesDict['sb-thumb'], {'border': 2}]
-            },
-            
-            'Vertical.Progress.bar': {
-                'element create': ['image', imagesDict['sb-vthumb'], {'border': 2}]
-            },
-            'Treeview': {
-                'map': {
-                    'background': [
-                        ('selected', selectbg)
-                    ],
-                    'foreground': [
-                        ('selected', selectfg)
-                    ]
-                }
-            }
-        }
-        
-        for sd in ['up', 'down', 'left', 'right']:
-            settings.update({f'{sd}arrow': {
-                'element create': ['image', imagesDict[f'arrow{sd}'], ('disabled', imagesDict[f'arrow{sd}']), ('pressed', imagesDict[f'arrow{sd}-p']), ('active', imagesDict[f'arrow{sd}-h']), {'border': 1, 'sticky': ()}]}})
-        
-        # s = sfs(settings)
-        
-        self.theme_create('blue', settings=settings)
-        return self
-
     def createPrmp(self):
         if PRMP_Style.loaded: return
         self.theme_create('prmp', settings=self.settings)
@@ -1188,7 +989,7 @@ class PRMP_Style(ttk.Style, Mixins):
                 },
                 'map': {
                     'anchor': [('hover', 'nw')],
-                    'relief': [('pressed', 'solid'), ('hover', 'solid'), ('selected', 'solid')],
+                    'relief': [('pressed', 'solid'), ('selected', 'solid')],
                 }
             },
             'TButton': {
@@ -1324,15 +1125,25 @@ class PRMP_Style(ttk.Style, Mixins):
                 'configure': {
                     'indicatorcolor': background,
                     'font': label_font,
+                    'anchor': 'top',
                     # 'indicatorrelief': 'flat',
                     # 'indicatormargin': (1,1,4,1),
                     # 'indicatorbackground': 'red'
+                    'padding': (0, 0, 0, 0),
 
                 },
                 'map': {
                     'indicatorcolor': [('pressed', background), ('disabled', button_background), ('selected', foreground)]
                 },
-                'layout': [('Radiobutton.border', {'children': [('Radiobutton.focus', {'sticky': 'nswe', 'children': [('Radiobutton.padding', {'sticky': 'nswe', 'children': [('Radiobutton.indicator', {'side': 'left', 'sticky': ''}), ('Radiobutton.label', {'side': 'left', 'sticky': 'nswe', 'expand': 1})]})]})]})]
+                'layout': [('Radiobutton.border', {'children': [('Radiobutton.focus', {'sticky': 'nswe', 'children': [('Radiobutton.padding', {'sticky': 'nswe', 'children': [('Radiobutton.indicator', {'side': 'left'}), ('Radiobutton.label', {'side': 'left', 'expand': 0})]})]})]})]
+                # 'layout': [('Radiobutton.border', {'children': [('Radiobutton.padding', {'sticky': 'nswe', 'children': [('Radiobutton.indicator', {'side': 'left', 'sticky': ''}), ('Radiobutton.focus', {'side': 'left', 'sticky': '', 'children': [('Radiobutton.label', {'sticky': 'nswe'})]})]})]})]
+            },
+            'Group.TRadiobutton': {
+                'map': {
+                    'indicatorcolor': [('pressed', background), ('disabled', button_background), ('selected', background)],
+                    'background': [('selected', foreground)],
+                    'foreground': [('selected', background)],
+                }
             },
             'Vertical.TScrollbar': {
                 'layout': [('Scrollbar.label', {'children': [('Scrollbar.uparrow', {'side': 'top', 'sticky': 'ns'}),('Scrollbar.downarrow', {'side': 'bottom', 'sticky': 'ns'}), ('Vertical.TScrollbar.thumb', {'side': 'left', 'sticky': 'ns'})
@@ -1454,12 +1265,15 @@ class PRMP_Style(ttk.Style, Mixins):
             },
             'Treeview': {
                 'configure': {
-                    'rowheight': 18,
-                    'fieldbackground': background
+                    'rowheight': 28,
+                    'fieldbackground': background,
+                    'relief': 'raised',
+                    # 'columnfont': heading_font,
                 },
                 'map': {
-                    'background': [('selected', text_background), ('hover', button_background)],
-                    'foreground': [('selected', text_foreground), ('hover', button_foreground)]
+                    'background': [('selected', text_background)],#, ('hover', button_background)],
+                    'foreground': [('selected', text_foreground)]#, ('hover', button_foreground)],
+                    # 'relief': [('hover', 'ridge')]
                 }
             },
             # 'TreeCtrl': {
@@ -1483,18 +1297,39 @@ class PRMP_Style(ttk.Style, Mixins):
                     # 'relief': [('hover', 'flat')]
                 }
             },
-            # 'Column': {
-            #     'map': {
-            #         'background': [('selected', 'black')],
-            #         'foreground': [('selected', 'white')]
-            #     }
-            # },
-            # 'Item': {
-            #     'map': {
-            #         'background': [('selected', 'red')],
-            #         'foreground': [('selected', 'yellow')]
-            #     }
-            # },
+            'Column': {
+                'configure': {
+                    'relief': 'raised'
+                },
+                'map': {
+                    'background': [('selected', 'black')],
+                    'foreground': [('selected', 'white')]
+                }
+            },
+            'Row': {
+                'configure': {
+                    'relief': 'ridge'
+                },
+                'map': {
+                    'rowbackground': [('selected', 'black')],
+                    'foreground': [('selected', 'white')],
+
+                },
+                'layout': [('Treeitem.border', {'children': [('Treeitem.row', {'sticky': 'nswe'})]})]
+            },
+            'Item': {
+                'configure': {
+                    'font': heading_font,
+                    'relief': 'flat'
+                },
+                'map': {
+                    'background': [('selected', 'red')],
+                    'foreground': [('selected', 'yellow')],
+                    'relief': [('hover', 'solid')]
+                },
+                'layout': [('border', {'children': [('Treeitem.padding', {'sticky': 'nswe', 'children': [('Treeitem.indicator', {'side': 'left', 'sticky': 'nw'}), ('Treeitem.image', {'side': 'left', 'sticky': ''}), ('Treeitem.text', {'side': 'left', 'sticky': ''})]})]})]
+                # 'layout': [('border', {'children': [('Treeitem.padding', {'sticky': 'nswe', 'children': [('Treeitem.indicator', {'side': 'left', 'sticky': 'nw'}), ('Treeitem.image', {'side': 'left', 'sticky': ''}), ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [('Treeitem.text', {'side': 'right', 'sticky': ''})]})]})]})]
+            },
         }
         self.master.event_generate('<<PRMP_STYLE_CHANGED>>')
         return _settings
@@ -2096,7 +1931,8 @@ class PRMP_Window(PRMP_Widget):
             xw = self.statusBar.master.master.winfo_width()
             if x < 0: return
             if y < 0: return
-            self.statusBar.master.place(x=0, y=y-30, h=30, w=xw)
+            h = 30
+            self.statusBar.master.place(x=0, y=y-h, h=h, w=xw)
             self.statusBar.place(x=0, rely=0, relh=1, w=x-60)
             self._up.place(x=x-60, rely=0, relh=1, w=30)
             self._down.place(x=x-30, rely=0, relh=1, w=30)

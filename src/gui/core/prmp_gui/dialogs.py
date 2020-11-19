@@ -324,11 +324,11 @@ class PRMP_MsgBox(PRMP_Dialog):
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
-        self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250, relief='flat'))
+        self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250))
         
         self.label.place(x=0, y=0, relh=1, relw=.85)
         
-        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)), relief='flat')
+        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)))
         self.bitmap.place(relx=.85, y=0, relh=1, relw=.15)
 
         self.yes = PRMP_Button(self, config=dict(text='Yes' if self.ask else self.okText or 'Ok', command=self.yesCom))

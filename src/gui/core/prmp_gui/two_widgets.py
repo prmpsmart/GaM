@@ -4,7 +4,7 @@ from .extensions import *
 #  These widgets doesn't need or can't be used with PRMP_Widget.addWidget()
 
 class TwoWidgets(PRMP_Frame):
-    top_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
+    top_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Style_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
     bottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox}
     events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}

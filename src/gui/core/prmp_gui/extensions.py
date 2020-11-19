@@ -248,7 +248,9 @@ class PRMP_TreeView(PRMP_Frame):
         self.treeview = None
         self.xscrollbar = None
         self.yscrollbar = None
+
         self.columns = Columns(columns)
+        # print(self.columns)
         self.setColumns(columns)
         self.create()
         
@@ -293,7 +295,8 @@ class PRMP_TreeView(PRMP_Frame):
     
     def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
         font = Font(**font)
-        return self.tree.tag_configure(tagName, font=font, **kwargs)
+        # return self.tree.tag_configure(tagName, font=font, **kwargs)
+        return self.tree.tag_configure(tagName, **kwargs)
     
     def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
     
@@ -306,11 +309,10 @@ class PRMP_TreeView(PRMP_Frame):
     def setColumns(self, columns=[]):
         self.create()
 
-        if columns:
-            self.columns.process(columns)
+        if columns: self.columns.process(columns)
             
-            if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
-            self.updateHeading()
+        if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
+        self.updateHeading()
             
     def updateHeading(self):
         for column in self.columns:
@@ -341,7 +343,7 @@ class PRMP_TreeView(PRMP_Frame):
             for sub in subs: self._set(sub, item, op)
     
     def set(self, obj, op=0):
-        self.updateHeading()
+        self.setColumns()
         if self.firstItem:
             self.tree.delete(self.firstItem)
             self.firstItem = None
@@ -464,6 +466,7 @@ class SolidScreen(PRMP_MainWindow):
         super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, **kwargs)
         
         self.container.configure(borderwidth=12)
+        print(self.style.layout('Row'))
 
         self.paint()
 
