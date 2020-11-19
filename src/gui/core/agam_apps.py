@@ -104,7 +104,7 @@ H = Hierachy
 
 class RegionDetails(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, title='Region Details', geo=(700, 350), expandGeo=(800, 600), values={}, region=None, **kwargs):
+    def __init__(self, master=None, title='Region Details', geo=(600, 270), expandGeo=(800, 600), values={}, region=None, **kwargs):
         
         PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         
@@ -278,6 +278,5 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
         self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
-    
 RD = RegionDetails
 

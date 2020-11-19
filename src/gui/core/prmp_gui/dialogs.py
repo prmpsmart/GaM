@@ -54,7 +54,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     def addEditButton(self, command=None, submitCommand=None):
         if self.submitBtn == None: self.addSubmitButton(submitCommand)
         x, y = self.containerGeo
-        self.editBtn = xbtn = PRMP_Checkbutton(self.container, text='Edit', command=self.editInput)
+        self.editBtn = xbtn = PRMP_Style_Checkbutton(self.container, config=dict(text='Edit', command=self.editInput))
         xbtn.place(x=10 , y=y-40, h=30, w=60)
     
     def processInput(self):

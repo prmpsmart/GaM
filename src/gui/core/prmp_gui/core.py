@@ -439,6 +439,9 @@ class PRMP_Widget(PRMP_Theme):
     min_ = chr(10134)
     
     @property
+    def topest(self): return PRMP_Window.TOPEST
+    
+    @property
     def _children(self): return self.winfo_children()
     @property
     def toplevel(self):
@@ -718,6 +721,10 @@ class PRMP_Style_(PRMP_Widget):
 
     def __init__(self, highlightable=False, **kwargs):
         super().__init__(_ttk_=True, highlightable=highlightable, **kwargs)
+    
+    @property
+    def style(self): return PRMP_Window.STYLE
+
 PS_ = PRMP_Style_
 
 class PRMP_Input:
@@ -1072,7 +1079,7 @@ class PRMP_Style(ttk.Style, Mixins):
                 },
                 'layout': [('Entry.border', {'children':[('Entry.field', {'sticky': 'nswe', 'border': '1', 'children': [('Entry.padding', {'sticky': 'nswe', 'children': [('Entry.textarea', {'sticky': 'nswe'})]})]})]})],
                 'map': {
-                    # 'relief': [('hover', 'solid')],
+                    'relief': [('hover', 'solid')],
                     'selectforeground': [('!focus', 'SystemWindow')]
                 }
             },

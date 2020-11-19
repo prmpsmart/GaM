@@ -32,7 +32,7 @@ class TwoWidgets(PRMP_Frame):
         
         if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
         else: topKw = dict(**topKwargs)
-        
+        # print(topKwargs)
         self.Top = top_wid(self, **topKwargs)
         text = topKwargs.get('text')
         if not text:

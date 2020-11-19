@@ -178,11 +178,11 @@ class PRMP_DateButton(PRMP_Button):
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
         self.DT = DateTime
-        super().__init__(master=master, command=self.action, font=font, asEntry=asEntry, anchor='nw', **kwargs)
+        super().__init__(master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
         self['text'] = placeholder
     
     def action(self):
-        self.date = self.CD(self, caller=self.toplevel).result
+        self.date = self.CD(self, caller=self.toplevel, side=self.topest.side).result
         self.set(str(self.date))
     
     def get(self): return self.date
@@ -202,7 +202,6 @@ class ScrolledTreeView(AutoScroll, ttk.Treeview):
     def __init__(self, master, **kw):
         ttk.Treeview.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
-
 STV = ScrolledTreeView
 
 class ScrollableFrame(PRMP_Frame):
@@ -469,11 +468,7 @@ class SolidScreen(PRMP_MainWindow):
         print(self.style.layout('Row'))
 
         self.paint()
-
 SS = SolidScreen
-
-
-
 
 class ScrolledText(AutoScroll, tk.Text):
     '''A standard Tkinter Text widget with scrollbars that will
