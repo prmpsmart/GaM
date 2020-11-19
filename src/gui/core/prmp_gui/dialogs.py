@@ -200,8 +200,7 @@ class CalendarDialog(PRMP_Dialog):
 
         
 
-    def paint(self):
-        self._paintAll()
+    def subPaint(self):
 
         for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         
@@ -306,8 +305,6 @@ class CalendarDialog(PRMP_Dialog):
             CalendarDialog.choosen = None
             self.destroy()
 
-    @classmethod
-    def generate(cls, master=None, month=None, dest='', title='Calendar Dialog', **kwargs): return cls(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, header_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], header_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1],  month_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], month_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], year_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], year_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0],  days_fg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, days_bg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlight_fg=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, highlight_bg=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, surf_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], surf_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], empty_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], **kwargs)
 CD = CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):

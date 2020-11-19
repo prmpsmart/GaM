@@ -1954,6 +1954,12 @@ class PRMP_Window(PRMP_Widget):
         topest = self.topest
         if topest: topest.style.update()
         else: return
+    
+    def paint(self, e=0):
+        self._paintAll()
+        self.subPaint()
+    
+    def subPaint(self): pass
 
     @property
     def toplevel(self): return self
