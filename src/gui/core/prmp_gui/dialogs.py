@@ -200,7 +200,7 @@ class CalendarDialog(PRMP_Dialog):
 
         
 
-    def subPaint(self):
+    def afterPaint(self):
 
         for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         

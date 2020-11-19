@@ -1957,9 +1957,9 @@ class PRMP_Window(PRMP_Widget):
     
     def paint(self, e=0):
         self._paintAll()
-        self.subPaint()
+        self.afterPaint()
     
-    def subPaint(self): pass
+    def afterPaint(self): pass
 
     @property
     def toplevel(self): return self
