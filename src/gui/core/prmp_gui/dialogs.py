@@ -6,7 +6,7 @@ from .pics import Xbms
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=True, **kwargs):
+    def __init__(self, master=None, _return=False, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=True, **kwargs):
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=1, **kwargs)
         FillWidgets.__init__(self, values=values)
         
@@ -27,7 +27,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
             else: self.editInput(1)
         
         self.paint()
-        self._isDialog()
+        self._isDialog(_return)
         # self.mainloop()
     
     def _setupDialog(self):
@@ -66,8 +66,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
                 result[widgetName] = wid.get()
         self._setResult(result)
         
-        self.destroy()
-        print(self.result)
+        # self.destroy()
+        return self.result
         
     def editInput(self, e=0):
         if e: self.editBtn.var.set('1')
@@ -197,16 +197,12 @@ class CalendarDialog(PRMP_Dialog):
         if self.dest: self.__dict__[self.dest] = None
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
-
-        
-
     def afterPaint(self):
 
         for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
         
         self.monthNameLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
         self.yearLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
-
     
     def _setupDialog(self):
         self.daysButtons = []

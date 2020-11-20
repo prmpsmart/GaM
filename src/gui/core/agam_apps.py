@@ -104,7 +104,7 @@ H = Hierachy
 
 class RegionDetails(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, title='Region Details', geo=(600, 270), expandGeo=(800, 600), values={}, region=None, **kwargs):
+    def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, **kwargs):
         
         PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
         
@@ -118,9 +118,6 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.expandGeo = expandGeo
         
         self._setupApp()
-
-        # self.root.isMaximized = self.isMaximized
-        # self.root.isNormal = self.isMaximized
 
         self.fill()
         self.paint()
@@ -139,17 +136,17 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         person = region.person
         if person: self.fill(dict(image=person.image))
 
-        self.loadAccounts(region)
+        # self.loadAccounts(region)
 
     
     def _setupApp(self):
         # hierachy
-        print(self.style.layout('Treeview'))
+
         self.hierachy = PRMP_LabelFrame(self.container, config=dict(text='Hierachy'))
         self.hierachy.place(x=2, y=2, h=170, relw=.6)
         
         self.hierachyVar = tk.StringVar()
-        self.hierachyVar.set('0')
+        self.hierachyVar.set('sub')
         
         self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Office', style='Group.TRadiobutton', variable=self.hierachyVar, value='off')), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
         
@@ -254,7 +251,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         if self._sub:
             self._sub.place_forget()
             w, h = self._sub.master.tupled_winfo_geometry[:2]
-            h -= 189
+            h -= 205
             self._sub.place(x=2, y=203, h=h, w=w-8)
         
     def showSubRegionsContainer(self):
@@ -270,7 +267,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.placeSubs(self.accounts)
         self.accounts.update()
         hx, hy = self.accounts.tupled_winfo_geometry[:2]
-        self.accountsHie.place(x=2, y=0, w=hx-8, h=hy-24)
+        self.accountsHie.place(x=2, y=0, w=hx-8, h=hy-30)
         
     def placeSubRegions(self):
         self.placeSubs(self.subRegions)

@@ -186,8 +186,9 @@ class ObjectsMixins(Mixins, CompareByDate):
                         tail_2 = tail_1[tail_prop[1]]
                         tail.append(tail_2)
                         count += 1
-
-                else: tail = head[v]
+                else:
+                    if head: tail = head[v]
+                    else: self.attrError(k)
                 res.append(tail)
             return res if len(res) > 1 else res[0]
 

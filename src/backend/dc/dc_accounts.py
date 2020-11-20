@@ -59,7 +59,7 @@ class ClientAccount(DCAccount):
     
     def __init__(self, manager, ledgerNumber=0, rate=0, **kwargs):
         super().__init__(manager, **kwargs)
-        
+        rate = int(rate)
         self.__ledgerNumber = ledgerNumber
         self.__contributions = Contributions(self)
         self.__rates = Rates(self, rate)

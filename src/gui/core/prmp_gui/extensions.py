@@ -182,7 +182,7 @@ class PRMP_DateButton(PRMP_Button):
         self['text'] = placeholder
     
     def action(self):
-        self.date = self.CD(self, caller=self.toplevel, side=self.topest.side).result
+        self.date = self.CD(self, caller=self.toplevel, side=self.topest.side, _return=1).result
         self.set(str(self.date))
     
     def get(self): return self.date

@@ -15,7 +15,7 @@ class PersonDialog(PRMP_Dialog):
         
         self.addEditButton()
         
-        self.contact = self.addWidget(PRMP_LabelFrame, config=dict(text='Contact Details'), place=dict(x=2, y=2, h=270, relw=.55))
+        self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
         
         self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(placeholder='Love'), orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
         

@@ -468,6 +468,7 @@ class PRMP_Widget(PRMP_Theme):
         
         self.val = self.value = kwargs.get('value', '1')
         self.var = self.variable = kwargs.get('variable')
+    
         self._ttk_ = _ttk_
         
         try:
@@ -792,6 +793,15 @@ class PRMP_Input:
         if get == self.placeholder: get = ''
         return get
 PI = PRMP_Input
+
+class PRMP_InputButtons:
+        
+    def get(self):
+        if self.var: return self.var.get()
+    
+    def setVar(self, val):
+        if self.var: self.var.set(val)
+PIB = PRMP_InputButtons
 
 # based on tk only
 
@@ -1364,7 +1374,7 @@ class PRMP_Button(PRMP_, tk.Button):
         PRMP_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
 Button = PB = PRMP_Button
 
-class PRMP_Checkbutton(PRMP_, tk.Checkbutton):
+class PRMP_Checkbutton(PRMP_, tk.Checkbutton, PRMP_InputButtons):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         self.var = tk.StringVar()
@@ -1373,6 +1383,8 @@ class PRMP_Checkbutton(PRMP_, tk.Checkbutton):
         
         self.var.set('0')
         self.toggleSwitch()
+    
+
 Checkbutton = PC = PRMP_Checkbutton
 
 class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
@@ -1429,7 +1441,7 @@ class PRMP_PanedWindow(PRMP_, tk.PanedWindow):
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
 PanedWindow = PP = PRMP_PanedWindow
 
-class PRMP_Radiobutton(PRMP_, tk.Radiobutton):
+class PRMP_Radiobutton(PRMP_, tk.Radiobutton, PRMP_InputButtons):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         tk.Radiobutton.__init__(self, master, **config)
@@ -1468,7 +1480,7 @@ class PRMP_Style_Button(PRMP_Style_, ttk.Button):
         PRMP_Style_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
 SButton = PSB = PRMP_Style_Button
 
-class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton):
+class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton, PRMP_InputButtons):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         self.var = tk.StringVar()
@@ -1477,6 +1489,7 @@ class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton):
         
         self.var.set('0')
         self.toggleSwitch()
+
 SCheckbutton = PSC = PRMP_Style_Checkbutton
 
 class PRMP_Style_Entry(PRMP_Input, PRMP_Style_, ttk.Entry):
@@ -1508,8 +1521,9 @@ SLabel = PSL = PRMP_Style_Label
 class PRMP_Style_LabelFrame(PRMP_Style_, ttk.LabelFrame):
     
     def __init__(self, master=None, config={}, **kwargs):
-        ttk.LabelFrame.__init__(self, master, bd=bd, **config)
-        PRMP_Style_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
+        print(config)
+        ttk.LabelFrame.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, prmp_master=master, **config, **kwargs)
 SLabelFrame = PSLF = PRMP_Style_LabelFrame
 
 class PRMP_Style_Menubutton(PRMP_Style_, ttk.Scrollbar):
@@ -1533,7 +1547,7 @@ class PRMP_Style_PanedWindow(PRMP_Style_, ttk.PanedWindow):
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
 SPanedWindow = PSP = PRMP_Style_PanedWindow
 
-class PRMP_Style_Radiobutton(PRMP_Style_, ttk.Radiobutton):
+class PRMP_Style_Radiobutton(PRMP_Style_, ttk.Radiobutton, PRMP_InputButtons):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         ttk.Radiobutton.__init__(self, master, **config)
