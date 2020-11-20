@@ -2,11 +2,10 @@
 .spyproject/
 __pycache__/
 database/
-test/
+test*/
 img/
 test_src/
-test_*[a-z].py
-test.py
+test*.py
 creator.py
 *.log
 *.bat

@@ -197,7 +197,7 @@ class PRMP_Theme(Mixins):
     CURRENT_THEME = 'DarkBlue3'
     
     DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 13, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
-
+    
     DEFAULT_MINUTE_FONT = {'family': 'Segoe Marker', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
@@ -437,6 +437,8 @@ class PRMP_Widget(PRMP_Theme):
     
     max_ = chr(9645)
     min_ = chr(10134)
+
+    TIPPING = False
     
     @property
     def topest(self): return PRMP_Window.TOPEST
@@ -453,7 +455,7 @@ class PRMP_Widget(PRMP_Theme):
 
 
 
-    def __init__(self, _ttk_=False, tip=None, tipGeo=(300, 40), status='', relief='groove', nonText=False, highlightable=True, **kwargs):
+    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, highlightable=True, **kwargs):
         self.kwargs = kwargs
         self.kwargs['relief'] = relief
         if kwargs.get('prmp_master'):
@@ -476,10 +478,10 @@ class PRMP_Widget(PRMP_Theme):
             self.useFont(font)
         except: pass
         
-        if tip: self.addTip(tip, tipGeo=tipGeo)
+        if tip: self.addTip(tip)
         
-        self.bind('<Enter>', self.entered)
-        self.bind('<Leave>', self.left)
+        self.bind('<Enter>', self.entered, '+')
+        self.bind('<Leave>', self.left, '+')
         
     
     def entered(self, e=0):
@@ -583,8 +585,8 @@ class PRMP_Widget(PRMP_Theme):
     
     def toggleSwitch(self):
         self.onFg = False
-        if self.toggleGroup: self.bind('<1>', self.switchGroup)
-        else: self.bind('<1>', self.switchOne)
+        if self.toggleGroup: self.bind('<1>', self.switchGroup, '+')
+        else: self.bind('<1>', self.switchOne, '+')
 
     def addToggleGroup(self, group=[]):
         if group:
@@ -607,8 +609,8 @@ class PRMP_Widget(PRMP_Theme):
         def setRelief(e=0): wid.configure(relief=relief, **kwargs)
         def resetRelief(e=0): wid.paint()
         
-        wid.bind('<Enter>', setRelief)
-        wid.bind('<Leave>', resetRelief)
+        wid.bind('<Enter>', setRelief, '+')
+        wid.bind('<Leave>', resetRelief, '+')
     
     def bindEntryHighlight(self, **kwargs): self.bindOverrelief(self, **kwargs)
     
@@ -623,7 +625,6 @@ class PRMP_Widget(PRMP_Theme):
     def normal(self): self.state('normal')
     
     def state(self, s): self.configure(state=s)
-    
 
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
@@ -633,9 +634,8 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
        
-    def addTip(self, tip='Tip', tipGeo=(100, 20), font=PTh.DEFAULT_FONT, delay=0, follow=True):
-        from .commons import ToolTip
-        ToolTip(self, msg=tip, tipGeo=tipGeo, font=font, delay=delay, follow=follow, bg=PTh.DEFAULT_BACKGROUND_COLOR)
+    def addTip(self, tip='Tip', delay=0, follow=True):
+        if PRMP_Widget.TIPPING: from .extensions import ToolTip; ToolTip(self, msg=tip, delay=delay, follow=follow)
     
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
@@ -680,18 +680,18 @@ class PRMP_Widget(PRMP_Theme):
     
     def _moveroot(self):
         root = self.winfo_toplevel()
-        self.bind("<ButtonPress-1>", partial(PRMP_Widget._move, root))
-        self.bind("<ButtonRelease-1>", partial(PRMP_Widget._move, root))
-        self.bind("<B1-Motion>", partial(PRMP_Widget._onMotion, root))
+        self.bind("<ButtonPress-1>", partial(PRMP_Widget._move, root), '+')
+        self.bind("<ButtonRelease-1>", partial(PRMP_Widget._move, root), '+')
+        self.bind("<B1-Motion>", partial(PRMP_Widget._onMotion, root), '+')
         
-        self.bind("<ButtonPress-3>", partial(PRMP_Widget._move, root))
-        self.bind("<ButtonRelease-3>", partial(PRMP_Widget._move, root))
-        self.bind("<B3-Motion>", partial(PRMP_Widget._onMotion, root))
+        self.bind("<ButtonPress-3>", partial(PRMP_Widget._move, root), '+')
+        self.bind("<ButtonRelease-3>", partial(PRMP_Widget._move, root), '+')
+        self.bind("<B3-Motion>", partial(PRMP_Widget._onMotion, root), '+')
     
     def _grab_anywhere_on(self):
-        self.bind("<ButtonPress-3>", self._move)
-        self.bind("<ButtonRelease-3>", self._move)
-        self.bind("<B3-Motion>", self._onMotion)
+        self.bind("<ButtonPress-3>", self._move, '+')
+        self.bind("<ButtonRelease-3>", self._move, '+')
+        self.bind("<B3-Motion>", self._onMotion, '+')
     
     def _grab_anywhere_off(self):
         self.unbind("<ButtonPress-3>")
@@ -709,8 +709,8 @@ class PRMP_Widget(PRMP_Theme):
             print('on motion error', e)
     
     def bindToWidget(self, *args):
-        for arg in args: self.bind(arg[0], arg[1])
-PW = PRMP_Widget
+        for arg in args: self.bind(arg[0], arg[1], '+')
+PWd = PRMP_Widget
 
 class PRMP_(PRMP_Widget):
 
@@ -730,15 +730,15 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
     
-    def __init__(self, placeholder=''):
+    def __init__(self, placeholder='', **kwargs):
         self.verification = None
         
         # if placeholder:
         self.placeholder = placeholder
         self.set(self.placeholder)
         
-        self.bind("<FocusIn>", self._clear_placeholder)
-        self.bind("<FocusOut>", self._add_placeholder)
+        self.bind("<FocusIn>", self._clear_placeholder, '+')
+        self.bind("<FocusOut>", self._add_placeholder, '+')
         
     def entered(self, e=0):
         super().entered()
@@ -812,12 +812,12 @@ class PRMP_Canvas(PRMP_, tk.Canvas):
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
 Canvas = PCv = PRMP_Canvas
 
-class PRMP_Message(PRMP_, tk.Message):
+class PRMP_Message(PRMP_, PRMP_Input, tk.Message):
     
     def __init__(self, master=None, config={}, **kwargs):
         tk.Message.__init__(self, master=master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
-        PRMP_Input.__init__(self, **config, **kwargs)
+        PRMP_Input.__init__(self, **kwargs)
 Message = PM = PRMP_Message
 
 class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
@@ -1369,9 +1369,9 @@ Treeview = PTv = PRMP_Treeview
 
 class PRMP_Button(PRMP_, tk.Button):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, config={}, **kwargs):
         tk.Button.__init__(self, master, **config)
-        PRMP_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+        PRMP_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, **config, **kwargs)
 Button = PB = PRMP_Button
 
 class PRMP_Checkbutton(PRMP_, tk.Checkbutton, PRMP_InputButtons):
@@ -1395,7 +1395,7 @@ class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
         PRMP_Input.__init__(self, placeholder=placeholder)
         
         if type_.lower() == 'email':
-            self.bind('<KeyRelease>', self.checkingEmail)
+            self.bind('<KeyRelease>', self.checkingEmail, '+')
             self.verification = self.checkingEmail
 Entry = PE = PRMP_Entry
 
@@ -1408,9 +1408,9 @@ Frame = PF = PRMP_Frame
 
 class PRMP_Label(PRMP_, tk.Label):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, config={}, **kwargs):
         tk.Label.__init__(self, master, **config)
-        PRMP_.__init__(self, prmp_master=master,font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+        PRMP_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
 Label = PL = PRMP_Label
 
 class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
@@ -1475,9 +1475,9 @@ Spinbox = PSp = PRMP_Spinbox
 
 class PRMP_Style_Button(PRMP_Style_, ttk.Button):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, tip=None, tipGeo=None, config={}, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, config={}, **kwargs):
         ttk.Button.__init__(self, master, **config)
-        PRMP_Style_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+        PRMP_Style_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, **config, **kwargs)
 SButton = PSB = PRMP_Style_Button
 
 class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton, PRMP_InputButtons):
@@ -1500,7 +1500,7 @@ class PRMP_Style_Entry(PRMP_Input, PRMP_Style_, ttk.Entry):
         PRMP_Input.__init__(self, placeholder=placeholder)
         
         if type_.lower() == 'email':
-            self.bind('<KeyRelease>', self.checkingEmail)
+            self.bind('<KeyRelease>', self.checkingEmail, '+')
             self.verification = self.checkingEmail
 SEntry = PSE = PRMP_Style_Entry
 
@@ -1513,9 +1513,9 @@ SFrame = PSF = PRMP_Style_Frame
 
 class PRMP_Style_Label(PRMP_Style_, ttk.Label):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, tip=None, tipGeo=None, config={}, **kwargs):
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, config={}, **kwargs):
         ttk.Label.__init__(self, master, **config)
-        PRMP_Style_.__init__(self, prmp_master=master,font=font, tip=tip, tipGeo=tipGeo, **config, **kwargs)
+        PRMP_Style_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
 SLabel = PSL = PRMP_Style_Label
 
 class PRMP_Style_LabelFrame(PRMP_Style_, ttk.LabelFrame):
@@ -1587,7 +1587,7 @@ class PRMP_Window(PRMP_Widget):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
         if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
+            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint, '+')
             PRMP_Window.TOPEST = self
             PRMP_Window.STYLE = PRMP_Style(self)
 
@@ -1618,7 +1618,6 @@ class PRMP_Window(PRMP_Widget):
         if atb != None: addTitleBar = atb
         if asb != None: addStatusBar = asb
         
-        
         if notResizable: resize = (0, 0)
         
         if bindExit: self.bindExit()
@@ -1642,9 +1641,7 @@ class PRMP_Window(PRMP_Widget):
         self.resizable(*self.resize)
         
         self.noTitleBar = noTitleBar
-        if noTitleBar:
-            self.overrideredirect(True)
-            addTitleBar = 1
+        if noTitleBar: self.overrideredirect(True)
         
         if addTitleBar:
             if toolWindow: self.__r = 1
@@ -1665,7 +1662,7 @@ class PRMP_Window(PRMP_Widget):
         
         self._geometry = geometry
         
-        if side:
+        if side and geometry:
             if '-' in side:
                 one, two = side.split('-')
                 sides = one, two
@@ -1898,17 +1895,17 @@ class PRMP_Window(PRMP_Widget):
 
         if not self.__r:
             self.imgMin = PRMP_Image('green', resize=(20, 20))
-            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
 
             self.imgMax = PRMP_Image('yellow', resize=(20, 20))
-            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), tip='Maximize', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
 
         self.imgExit = PRMP_Image('red', resize=(20, 20))
-        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), tip='Exit', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
         # self._exit.bindEntryHighlight(bacKLkground='red')
 
         self.titleBar = L(fr, config=dict( text=title or self.titleText), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
-        self.titleBar.bind('<Double-1>', self.maximize)
+        self.titleBar.bind('<Double-1>', self.maximize, '+')
         self.titleBar._moveroot()
 
         self.placeTitlebar()
@@ -1940,8 +1937,8 @@ class PRMP_Window(PRMP_Widget):
         fr = F(self)
         self.statusBar = L(fr, config=dict(text='Status' or self.statusText, ), font=PRMP_Theme.DEFAULT_STATUS_FONT)
         self.statusBar._moveroot()
-        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
-        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, tip='Previous Theme')
+        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, tip='Next Theme')
         
         self.placeStatusBar()
         

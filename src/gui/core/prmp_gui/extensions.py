@@ -316,7 +316,7 @@ class PRMP_TreeView(PRMP_Frame):
     def updateHeading(self):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
-            # print(column.width, time.time())
+            # print(column.width, time.time.time())
             self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
     def _set(self, obj=None, parent='', op=False):
@@ -353,20 +353,19 @@ class PRMP_TreeView(PRMP_Frame):
     def reload(self): self.set(self.obj)
 PTV = PRMP_TreeView
 
-class ToolTip(tk.Toplevel):
+class ToolTip(PRMP_Toplevel):
     """
     Provides a ToolTip widget for Tkinter.
     To apply a ToolTip to any Tkinter widget, simply pass the widget to the
     ToolTip constructor
     """
-    def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None,
-                 delay=1, follow=True):
+    def __init__(self, wdgt, msg=None, msgFunc=None, delay=1, follow=True):
         """
         Initialize the ToolTip
 
         Arguments:
           wdgt: The widget this ToolTip is assigned to
-          tooltip_font: Font to be used
+          font: Font to be used
           msg:  A static string message assigned to the ToolTip
           msgFunc: A function that retrieves a string to use as the ToolTip text
           delay:   The delay in seconds before the ToolTip appears(may be float)
@@ -374,9 +373,9 @@ class ToolTip(tk.Toplevel):
         """
         self.wdgt = wdgt
         # The parent of the ToolTip is the parent of the ToolTips widget
-        self.parent = self.wdgt.master
+        # self.parent = self.wdgt.master
         # Initalise the Toplevel
-        tk.Toplevel.__init__(self, self.parent, bg='black', padx=1, pady=1)
+        super().__init__(self.wdgt.topest, padx=1, pady=1, asb=0, atb=0, geo=())
         # Hide initially
         self.withdraw()
         # The ToolTip Toplevel should have no frame or title bar
@@ -384,19 +383,16 @@ class ToolTip(tk.Toplevel):
 
         # The msgVar will contain the text displayed by the ToolTip
         self.msgVar = tk.StringVar()
-        if msg is None:
-            self.msgVar.set('No message provided')
-        else:
-            self.msgVar.set(msg)
+        if msg is None: self.msgVar.set('No message provided')
+        else: self.msgVar.set(msg)
         self.msgFunc = msgFunc
         self.delay = delay
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
         # The text of the ToolTip is displayed in a Message widget
-        tk.Message(self, textvariable=self.msgVar, bg='#FFFFDD',
-                font=tooltip_font,
-                aspect=1000).grid()
+        self.msgwid = PRMP_Message(self, config=dict(textvariable=self.msgVar, aspect=1000), font=PRMP_Theme.DEFAULT_MINUTE_FONT, background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
+        self.msgwid.grid()
 
         # Add bindings to the widget.  This will NOT override
         # bindings that the widget already has
@@ -420,9 +416,10 @@ class ToolTip(tk.Toplevel):
         """
         Displays the ToolTip if the time delay has been long enough
         """
-        if self.visible == 1 and time() - self.lastMotion > self.delay:
+        if self.visible == 1 and time.time() - self.lastMotion > self.delay:
             self.visible = 2
         if self.visible == 2:
+            self.msgwid.configure(background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
             self.deiconify()
 
     def move(self, event):
@@ -431,7 +428,7 @@ class ToolTip(tk.Toplevel):
         Arguments:
           event: The event that called this function
         """
-        self.lastMotion = time()
+        self.lastMotion = time.time()
         # If the follow flag is not set, motion within the
         # widget will make the ToolTip disappear
         #
