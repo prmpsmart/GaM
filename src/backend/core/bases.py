@@ -14,7 +14,19 @@ class Mixins:
     _moneySign = naira + chr(32)
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    def addSignToMoney(self, money): return f'{self._moneySign}{money}'
+    
+    def addSignToMoney(self, money):
+        int(money)
+        return f'{self._moneySign}{money}'
+    
+    numberToMoney = addSignToMoney
+
+    def stripSignFromMoney(self, money):
+        money = money.replace(self._moneySign, '')
+        money = money.replace(' ', '')
+        return money.replace(' ', '').replace(self._moneySign, '')
+
+    moneyToNumber = stripSignFromMoney
    
     @property
     def mro(self): return self.class_.__mro__
@@ -38,6 +50,20 @@ class Mixins:
     def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
+    
+    def checkNumber(self, number):
+        try:
+            int(number)
+            return True
+        except: return False
+    
+    def checkMoney(self, money):
+        try:
+            if self._moneySign in money:
+                int(self.stripSignFromMoney(money))
+                return True
+            return False
+        except: return False
 
     def testPrint(self, *args):
         print()

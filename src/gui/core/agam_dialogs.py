@@ -19,9 +19,9 @@ class PersonDialog(PRMP_Dialog):
         
         self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(placeholder='Love'), orient='h', relx=.02, rely=0, relh=.15, relw=.96, longent=.25)
         
-        self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), relx=.02, rely=.14, relh=.15, relw=.96, longent=.5, orient='h')
+        self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), relx=.02, rely=.14, relh=.15, relw=.96, longent=.5, orient='h')
         
-        self.email = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Email')), bottomKwargs=dict(type_='email'), relx=.02, rely=.28, relh=.15, relw=.96, longent=.25, orient='h')
+        self.email = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Email')), bottomKwargs=dict(_type='email'), relx=.02, rely=.28, relh=.15, relw=.96, longent=.25, orient='h')
         
         self.gender = LabelCombo(self.contact,  topKwargs=dict(config=dict(text='Gender')), bottomKwargs=dict(type_='gender'), relx=.02, rely=.42, relh=.15, relw=.96, longent=.25, orient='h')
         
@@ -46,10 +46,7 @@ class RecordDialog(PRMP_Dialog):
     def _setupDialog(self):
         self.addEditButton()
 
-        self.money = LabelEntry(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(config=dict(text='Money')), orient='h')
-        def setMoney(money): self.money.B.clear(); self.money.B.insert(0, self.addSignToMoney(money))
-        self.money.set = setMoney
-        self.money.set('')
+        self.money = LabelEntry(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(config=dict(text='Money')), orient='h', bottomKwargs=dict(_type='money'))
         self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), relx=.02, rely=.16, relh=.15, relw=.96, longent=.35, orient='h')
         self.note = LabelText(self.container, topKwargs=dict(config=dict(text='Note')), relx=.02, rely=.32, relh=.5, relw=.96, longent=.35, orient='h')
         self.addResultsWidgets(['note', 'money', 'date'])

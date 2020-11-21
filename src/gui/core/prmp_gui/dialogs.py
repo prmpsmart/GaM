@@ -67,6 +67,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         self._setResult(result)
         
         # self.destroy()
+        print(result)
         return self.result
         
     def editInput(self, e=0):

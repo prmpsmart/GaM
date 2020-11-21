@@ -731,15 +731,50 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
     
-    def __init__(self, placeholder='', **kwargs):
+    def __init__(self, placeholder='', _type='text', **kwargs):
         self.verification = None
-        
-        # if placeholder:
+        _type = _type.lower()
         self.placeholder = placeholder
         self.set(self.placeholder)
         
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
+
+        
+        if _type == 'email':
+            self.bind('<KeyRelease>', self.checkingEmail, '+')
+            self.verification = self.checkingEmail
+        elif _type == 'number':
+            self.set = self.setNumber
+            self.get = self.getNumber
+            self.bind('<KeyRelease>', self.checkingNumber, '+')
+            self.verification = self.checkingNumber
+        elif _type == 'money':
+            self.placeholder = self._moneySign
+            self.set = self.setMoney
+            self.get = self.getMoney
+            self.bind('<KeyRelease>', self.checkingMoney, '+')
+            self.verification = self.checkingMoney
+    
+    def setNumber(self, number=None):
+        self.clear()
+        if not self.checkNumber(number): raise
+        self.insert(0, number)
+        
+    def getNumber(self):
+        number = self._get()
+        if self.checkNumber(number): return number
+
+    def setMoney(self, money=None):
+        self.clear()
+        if money == self.placeholder or not money: money = self.placeholder
+        elif not self.checkMoney(money): money = self.numberToMoney(money)
+        self.insert(0, money)
+        
+    def getMoney(self):
+        money = self._get()
+        if self.checkMoney(money): return self.moneyToNumber(money)
+        return money
         
     def entered(self, e=0):
         super().entered()
@@ -751,11 +786,19 @@ class PRMP_Input:
         self._add_placeholder()
     
     def checkingEmail(self, e=0):
-        email = self.get()
+        email = self._get()
         if email:
             if self.checkEmail(email): self.configure(background='white', foreground='green')
             else: self.configure(background='white', foreground='red')
-        # else: self.paint()
+    
+    def checkingNumber(self, e=0):
+        number = self._get()
+        if number:
+            if self.checkNumber(number): self.configure(background='white', foreground='green')
+            else: self.configure(background='white', foreground='red')
+    
+    def checkingMoney(self, e=0):
+        return True
         
     def verify(self):
         if self.verification: return self.verification()
@@ -1390,14 +1433,12 @@ Checkbutton = PC = PRMP_Checkbutton
 
 class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
     
-    def __init__(self, master=None, type_='text', placeholder='', config={}, **kwargs):
+    def __init__(self, master=None, config={}, **kwargs):
         tk.Entry.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
-        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_Input.__init__(self, Kwargs)
         
-        if type_.lower() == 'email':
-            self.bind('<KeyRelease>', self.checkingEmail, '+')
-            self.verification = self.checkingEmail
+
 Entry = PE = PRMP_Entry
 
 class PRMP_Frame(PRMP_, tk.Frame):
@@ -1495,14 +1536,11 @@ SCheckbutton = PSC = PRMP_Style_Checkbutton
 
 class PRMP_Style_Entry(PRMP_Input, PRMP_Style_, ttk.Entry):
     
-    def __init__(self, master=None, type_='text', placeholder='', config={}, **kwargs):
+    def __init__(self, master=None, config={}, **kwargs):
         ttk.Entry.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master, **config, **kwargs)
-        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_Input.__init__(self, **kwargs)
         
-        if type_.lower() == 'email':
-            self.bind('<KeyRelease>', self.checkingEmail, '+')
-            self.verification = self.checkingEmail
 SEntry = PSE = PRMP_Style_Entry
 
 class PRMP_Style_Frame(PRMP_Style_, ttk.Frame):
@@ -1522,7 +1560,6 @@ SLabel = PSL = PRMP_Style_Label
 class PRMP_Style_LabelFrame(PRMP_Style_, ttk.LabelFrame):
     
     def __init__(self, master=None, config={}, **kwargs):
-        print(config)
         ttk.LabelFrame.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master, **config, **kwargs)
 SLabelFrame = PSLF = PRMP_Style_LabelFrame
