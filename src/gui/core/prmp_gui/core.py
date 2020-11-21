@@ -8,6 +8,7 @@ from random import randint
 from tkinter.filedialog import askopenfilename
 from .pics import PRMP_Image
 from .miscs import Mixins, partial, copyClassMethods
+from ctypes import windll
 
 # superclasses
 
@@ -1586,11 +1587,7 @@ class PRMP_Window(PRMP_Widget):
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, alp=1, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, **kwargs):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
-        if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint, '+')
-            PRMP_Window.TOPEST = self
-            PRMP_Window.STYLE = PRMP_Style(self)
-
+        
         self.resize = resize
         self.container = None
         self.zoomed = False
@@ -1604,7 +1601,7 @@ class PRMP_Window(PRMP_Widget):
         self.co = 0
 
         if container:
-            self.container = PRMP_Style_Frame(self, style='TFrame.cont')
+            self.container = PRMP_Style_Frame(self)
             self.container.configure(relief='groove')
         
         if geo != None: geometry = geo
@@ -1623,6 +1620,13 @@ class PRMP_Window(PRMP_Widget):
         if bindExit: self.bindExit()
 
         self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar)
+
+        if PRMP_Window.TOPEST == None:
+            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint, '+')
+            PRMP_Window.TOPEST = self
+            PRMP_Window.STYLE = PRMP_Style(self)
+            if ntb or noTitleBar: self.after(10, self.addWindowToTaskBar)
+
         
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
@@ -1651,6 +1655,15 @@ class PRMP_Window(PRMP_Widget):
         if addStatusBar: self.addStatusBar()
         
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
+
+    def addWindowToTaskBar(self):
+        winfo_id = self.winfo_id()
+        parent = windll.user32.GetParent(winfo_id)
+        res = windll.user32.SetWindowLongW(parent, -20, 0)
+        print(winfo_id, parent, res)
+
+        self.withdraw()
+        self.deiconify()
  
     def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
@@ -1862,6 +1875,7 @@ class PRMP_Window(PRMP_Widget):
                 if self.noTitleBar: self.overrideredirect(True)
                 self.normal()
                 self.iconed = False
+                self.addWindowToTaskBar()
         
     def maximize(self, e=0):
         if self.__r: return
@@ -2009,7 +2023,7 @@ class PRMP_MainWindow(Mixins):
         for k, v in self.class_.__dict__.items():
             if k.startswith('__') or k == 'root': continue
             if callable(v): self.root.__dict__[k] = partial(v, self)
-                
+
     def __repr__(self): return self.root
     
     def __str__(self): return self.root
@@ -2021,6 +2035,7 @@ class PRMP_MainWindow(Mixins):
 
     
     def __getattr__(self, name): return getattr(self.root, name)
+    
 MainWindow = PMW = PRMP_MainWindow
 
 
