@@ -1621,12 +1621,6 @@ class PRMP_Window(PRMP_Widget):
 
         self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar)
 
-        if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint, '+')
-            PRMP_Window.TOPEST = self
-            PRMP_Window.STYLE = PRMP_Style(self)
-            if ntb or noTitleBar: self.after(10, self.addWindowToTaskBar)
-
         
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
@@ -1639,6 +1633,13 @@ class PRMP_Window(PRMP_Widget):
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
         
         self.placeOnScreen(side, geometry)
+
+        if PRMP_Window.TOPEST == None:
+            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint, '+')
+            PRMP_Window.TOPEST = self
+            PRMP_Window.STYLE = PRMP_Style(self)
+            self.iconed = True
+            if ntb or noTitleBar: self.after(10, self.addWindowToTaskBar)
     
     def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1):
         
@@ -1656,14 +1657,14 @@ class PRMP_Window(PRMP_Widget):
         
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
 
-    def addWindowToTaskBar(self):
+    def addWindowToTaskBar(self, e=0):
+        self.withdraw()
         winfo_id = self.winfo_id()
         parent = windll.user32.GetParent(winfo_id)
         res = windll.user32.SetWindowLongW(parent, -20, 0)
-        print(winfo_id, parent, res)
-
-        self.withdraw()
+        # print(winfo_id, parent, res)
         self.deiconify()
+        if not (parent or res): self.after(10, self.addWindowToTaskBar)
  
     def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
@@ -1874,7 +1875,6 @@ class PRMP_Window(PRMP_Widget):
             if v:
                 if self.noTitleBar: self.overrideredirect(True)
                 self.normal()
-                self.iconed = False
                 self.addWindowToTaskBar()
         
     def maximize(self, e=0):
