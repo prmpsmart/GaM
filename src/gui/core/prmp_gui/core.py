@@ -1968,6 +1968,7 @@ class PRMP_Window(PRMP_Widget):
     
     def addTitleBar(self, title=''):
         if self.titleBar:
+            self.title(title)
             self.titleBar.set(title or self.titleText)
             self.placeTitlebar()
             return
