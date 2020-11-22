@@ -5,18 +5,14 @@ The official accounting software of Goodness and Mercy
 
 #### The features of the underlying gui library are as follows:
 1. Themed widgets, auto-updating the child widgets of a widget if its theme changes.
-2. Highly extensible through subclassing.
+2. Highly extensible through subclassing and options.
 3. The dialogs:
     * Calendar Dialog.
     * Message Dialog.
-    <!-- * -->
+    * Message Box.
 
 
 
 - [x] The theme engine works better.
 - [x] The calender dialog is better with good themes.
-    some of the calendar's images are
-   ![Alt text](/cal.PNG?raw=true "Theme 1")
-   ![Alt text](/cal2.PNG?raw=true "Theme 2")
-- [ ] The TreeView is still under construction.
-- []
+- [x] The TreeView's construction is completed.
