@@ -71,6 +71,7 @@ class PRMP_Image:
     def __init__(self, picName, ext='png', resize=(), thumb=()):
         
         pic = None
+        self.imageFile = None
         self.imgClass = PhotoImage
 
         if isinstance(picName, str):
@@ -78,6 +79,7 @@ class PRMP_Image:
             self.__image = None
             self.__tkImage = None
             self.__name = picName
+            
             e = path.splitext(picName)[-1]
             if e in ['.png', '.xbm', '.gif', '.jpg', '.jpeg']: self.__ext = e[1:]
             else: self.__ext = ext
@@ -89,13 +91,16 @@ class PRMP_Image:
             else: pic = picName
             
         elif isinstance(picName, ImageFile):
+            self.imageFile = picName
             self.__name = picName.name
             self.__ext = picName.ext
             
         if pic == None: pic = picName
         if self.ext == 'xbm': self.imgClass = BitmapImage
 
-        if pic:
+        if not self.imageFile: self.imageFile = ImageFile(pic)
+
+        if self.imageFile:
             img = self.__image = Image.open(pic)
 
             if resize and len(resize) == 2:

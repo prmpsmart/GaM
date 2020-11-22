@@ -51,11 +51,7 @@ class Mixins:
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
     
-    def checkNumber(self, number):
-        try:
-            int(number)
-            return True
-        except: return False
+    def checkNumber(self, number): return str(number).isdigit()
     
     def checkMoney(self, money):
         try:
@@ -108,6 +104,9 @@ class ObjectsMixins(Mixins, CompareByDate):
         try: return len(self[:])
         except: return 1
     
+    def get(self, attr, default=None):
+        try: return self[attr]
+        except: return default
     
     @property
     def moneyWithSign(self): return f'{self._moneySign}{int(self)}'

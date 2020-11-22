@@ -24,12 +24,8 @@ class Person(Object):
         
         self.__phone = phone
         
-        if image:
-            from ...gui.core.prmp_gui.pics import ImageFile
-            assert os.path.isfile(image) and os.path.splitext(image)[1] in ['.png', 'jpeg', '.jpg', '.gif', '.xbm'], f'{image} file given is not a valid picture file.'
-            self.__image = ImageFile(image)
-            
-        else: self.__image = None
+        self.__image = image
+
         self.__email = None
         if self.checkEmail(email): self.__email = email
         

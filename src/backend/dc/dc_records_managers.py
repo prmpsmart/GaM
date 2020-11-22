@@ -52,12 +52,22 @@ class BroughtToOffices(DCRecordsManager): pass
     
 
 class CardDues(DCRecordsManager):
-    def __init__(self, account, cardDue=True):
-        super().__init__(account)
-        if cardDue == True: self.createRecord(100, account.date)
+    def __init__(self, client, cardDue=True):
+        super().__init__(client)
+        self.client = client
+        if cardDue == True: self.createRecord(100, client.date)
     
     @property
     def cardDues(self): return self.totalMonies
+
+    @property
+    def cardDue(self):
+        accs = self.client.accountsManager[:]
+        paids = self.cardDues
+        d, m = divmod(accs, 12)
+        if m: d += 1
+        return paids == d * 100
+
 
 class Commissions(DCRecordsManager): pass
 

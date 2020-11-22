@@ -27,8 +27,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
             else: self.editInput(1)
         
         self.paint()
-        self._isDialog(_return)
-        # self.mainloop()
+        if master: self._isDialog(_return)
+        else: self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
@@ -59,29 +59,34 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def processInput(self):
         result = {}
+
         self.resultsWidgets.sort()
         for widgetName in self.resultsWidgets:
             wid = self.__dict__.get(widgetName)
             if wid:
-                result[widgetName] = wid.get()
+                get = wid.get()
+                verify = getattr(wid, 'verify', None)
+                if verify:
+                    if verify(): result[widgetName] = get
+                    else:
+                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()} is required to proceed!', _type='error', okText='Understood')
+                        return
+                else: result[widgetName] = get
         self._setResult(result)
         
         # self.destroy()
-        print(result)
+        # print(result)
         return self.result
         
     def editInput(self, e=0):
         if e: self.editBtn.var.set('1')
-        if self.editBtn.var.get() == '1':
-            self.placeSubmitBtn(1)
-            for widgetName in self.resultsWidgets:
-                wid = self[widgetName]
-                if wid: wid.normal()
-        else:
-            self.placeSubmitBtn()
-            for widgetName in self.resultsWidgets:
-                wid = self.__dict__.get(widgetName)
-                if wid: wid.disabled()
+        if self.editBtn.var.get() == '1':self.placeSubmitBtn(1)
+        else: self.placeSubmitBtn()
+        for widgetName in self.resultsWidgets:
+            wid = self[widgetName]
+            if self.editBtn.var.get() == '1': wid.normal()
+            else: wid.disabled()
+
 PD = PRMP_Dialog
 
 class CalendarDialog(PRMP_Dialog):
@@ -313,7 +318,8 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.okText = okText
         self.ask = ask
         self._cancel = cancel
-
+        if okText: self.ask = 0
+        # print(kwargs)
         super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, editable=False, **kwargs)
 
     def _setupDialog(self):
@@ -328,7 +334,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.yes = PRMP_Button(self, config=dict(text='Yes' if self.ask else self.okText or 'Ok', command=self.yesCom))
         
         if not self.ask:
-            self.yes.place(relx=.425, rely=.83, relh=.15, relw=.17)
+            self.yes.place(relx=.3, rely=.83, relh=.15, relw=.37)
             self.bind('<Return>', lambda e: self.yes.invoke())
         else:
             self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)

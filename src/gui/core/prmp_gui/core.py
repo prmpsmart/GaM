@@ -410,7 +410,7 @@ class PRMP_Theme(Mixins):
         children = self._children
         for child in children: child.paint()
     
-    def _paintAll(self):
+    def _paintAll(self, e=0):
         self._paint()
         self._paintChildren()
     
@@ -732,33 +732,45 @@ PS_ = PRMP_Style_
 class PRMP_Input:
     
     def __init__(self, placeholder='', _type='text', **kwargs):
-        self.verification = None
         _type = _type.lower()
         self.placeholder = placeholder
-        self.set(self.placeholder)
+        self.values = []
         
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
-
         
         if _type == 'email':
             self.bind('<KeyRelease>', self.checkingEmail, '+')
-            self.verification = self.checkingEmail
+            self.verify = self.checkingEmail
         elif _type == 'number':
             self.set = self.setNumber
             self.get = self.getNumber
             self.bind('<KeyRelease>', self.checkingNumber, '+')
-            self.verification = self.checkingNumber
+            self.verify = self.checkingNumber
         elif _type == 'money':
             self.placeholder = self._moneySign
             self.set = self.setMoney
             self.get = self.getMoney
             self.bind('<KeyRelease>', self.checkingMoney, '+')
-            self.verification = self.checkingMoney
+            self.verify = self.checkingMoney
+        else:
+            self.bind('<KeyRelease>', self.normVery, '+')
+            self.verify = self.normVery
+        
+        self.set(self.placeholder)
     
+    def normVery(self, e=0):
+        get = self._get()
+        if self.values: 
+            if get in self.values: return self.green()
+            else: return self.red()
+        elif get not in [self.placeholder, '']: return self.green()
+        else:  return self.red()
+
     def setNumber(self, number=None):
         self.clear()
-        if not self.checkNumber(number): raise
+        if number == self.placeholder: pass
+        elif not self.checkNumber(number): return
         self.insert(0, number)
         
     def getNumber(self):
@@ -785,23 +797,39 @@ class PRMP_Input:
         self.focus()
         self._add_placeholder()
     
+    def green(self):
+        self.configure(foreground='green')
+        return True
+    
+    def red(self):
+        self.configure(foreground='red')
+        return False
+    
     def checkingEmail(self, e=0):
         email = self._get()
         if email:
-            if self.checkEmail(email): self.configure(background='white', foreground='green')
-            else: self.configure(background='white', foreground='red')
+            if self.checkEmail(email): return self.green()
+            else: return self.red()
     
     def checkingNumber(self, e=0):
         number = self._get()
         if number:
-            if self.checkNumber(number): self.configure(background='white', foreground='green')
-            else: self.configure(background='white', foreground='red')
+            if self.checkNumber(number): return self.green()
+            else: return self.red()
     
     def checkingMoney(self, e=0):
-        return True
-        
-    def verify(self):
-        if self.verification: return self.verification()
+        money = self._get()
+        if money:
+            if self.checkMoney(money): return self.green()
+            elif money == self._moneySign:  self.configure(foreground='orange')
+            elif self.moneyToNumber(money).isalnum(): return self.red()
+            else:
+                self.clear()
+                self.set(self._moneySign)
+                return self.red()
+        else:
+            self.clear()
+            self.set(self._moneySign)
     
     def normal(self):
         super().normal()
@@ -1149,6 +1177,7 @@ class PRMP_Style(ttk.Style, Mixins):
             },
             'TFrame': {
                 'configure': {
+                    'background': background,
                     'relief': 'flat'
                 }
             },
@@ -1204,6 +1233,7 @@ class PRMP_Style(ttk.Style, Mixins):
                     'indicatorcolor': [('pressed', background), ('disabled', button_background), ('selected', background)],
                     'background': [('selected', foreground)],
                     'foreground': [('selected', background)],
+                    'relief': [('hover', 'solid')]
                 }
             },
             'Vertical.TScrollbar': {
@@ -1392,7 +1422,7 @@ class PRMP_Style(ttk.Style, Mixins):
                 # 'layout': [('border', {'children': [('Treeitem.padding', {'sticky': 'nswe', 'children': [('Treeitem.indicator', {'side': 'left', 'sticky': 'nw'}), ('Treeitem.image', {'side': 'left', 'sticky': ''}), ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [('Treeitem.text', {'side': 'right', 'sticky': ''})]})]})]})]
             },
         }
-        self.master.event_generate('<<PRMP_STYLE_CHANGED>>')
+        PRMP_Window.TOPEST.event_generate('<<PRMP_STYLE_CHANGED>>')
         return _settings
 
     def update(self, e=0):
@@ -1427,6 +1457,11 @@ class PRMP_Checkbutton(PRMP_, tk.Checkbutton, PRMP_InputButtons):
         
         self.var.set('0')
         self.toggleSwitch()
+
+    def disabled(self):
+        
+        self['fg'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+        self.state('disabled')
     
 
 Checkbutton = PC = PRMP_Checkbutton
@@ -1672,7 +1707,7 @@ class PRMP_Window(PRMP_Widget):
         self.placeOnScreen(side, geometry)
 
         if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint, '+')
+            self.bind('<<PRMP_STYLE_CHANGED>>', self._paintAll)
             PRMP_Window.TOPEST = self
             PRMP_Window.STYLE = PRMP_Style(self)
             self.iconed = True
@@ -1898,7 +1933,6 @@ class PRMP_Window(PRMP_Widget):
     def x_w(self): return (2, self.geo[0]-4)
     
     def minimize(self, e=0):
-        
         self.withdraw()
         self.overrideredirect(False)
         self.iconify()
@@ -2021,7 +2055,9 @@ class PRMP_Window(PRMP_Widget):
     
     def _colorize(self):
         topest = self.topest
-        if topest: topest.style.update()
+        if topest:
+            topest.style.update()
+            topest._paintAll()
         else: return
     
     def paint(self, e=0):

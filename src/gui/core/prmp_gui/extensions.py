@@ -74,7 +74,9 @@ class FillWidgets:
             for widgetName in self.resultsWidgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
-                    try: widget.set(values.get(widgetName, ''))
+                    try:
+                        val = values.get(widgetName, '')
+                        widget.set(val)
                     except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
             self.values = values
@@ -117,7 +119,6 @@ class ImageWidget:
             self.image = self.__image = imageFile
 
             if imageFile.ext == 'xbm': self.image = imageFile.resizeTk(self.resize)
-            # else: self.image = imageFile.thumbnailTk(self.thumb)
             
             self.configure(image=self.image)
     
@@ -143,7 +144,7 @@ class ImageWidget:
         self.unbind('<3>')
         # self.unbind('<Double-1>')
     
-    def get(self): return self.__image
+    def get(self): return self.__image.imageFile
     
     def delMenu(self, e=0):
         if self.rt:
@@ -375,11 +376,11 @@ class ToolTip(PRMP_Toplevel):
         # The parent of the ToolTip is the parent of the ToolTips widget
         # self.parent = self.wdgt.master
         # Initalise the Toplevel
-        super().__init__(self.wdgt.topest, padx=1, pady=1, asb=0, atb=0, geo=())
+        super().__init__(self.wdgt.topest, padx=1, pady=1, asb=0, atb=0, geo=(), ntb=1)
         # Hide initially
         self.withdraw()
         # The ToolTip Toplevel should have no frame or title bar
-        self.overrideredirect(True)
+        # self.overrideredirect(True)
 
         # The msgVar will contain the text displayed by the ToolTip
         self.msgVar = tk.StringVar()
@@ -399,6 +400,8 @@ class ToolTip(PRMP_Toplevel):
         self.wdgt.bind('<Enter>', self.spawn, '+')
         self.wdgt.bind('<Leave>', self.hide, '+')
         self.wdgt.bind('<Motion>', self.move, '+')
+
+        self.withdraw()
 
     def spawn(self, event=None):
         """
@@ -455,6 +458,7 @@ class ToolTip(PRMP_Toplevel):
         """
         self.visible = 0
         self.withdraw()
+
 TT = ToolTip
 
 class SolidScreen(PRMP_MainWindow):

@@ -81,6 +81,8 @@ class TwoWidgets(PRMP_Frame):
         self.disabled('b')
         self.T.unlight()
     
+    def verify(self): return self.Bottom.verify()
+    
     def toggleSwitch(self):
         self.onFg = False
         if self.toggleGroup: self.T.bind('<1>', self.switchGroup)

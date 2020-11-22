@@ -37,17 +37,23 @@ class Client(DCRegion):
     
     def __init__(self, manager, name, date=None, rate=None, cardDue=False, **kwargs):
         super().__init__(manager=manager, name=name, date=date, rate=rate, **kwargs)
-        self.__detail = ClientDetail(self, **kwargs)
+        # self.__detail = ClientDetail(self, **kwargs)
         self.__cardDues = CardDues(self, cardDue)
 
-    # def __str__(self): return f"{self.manager} | {self.className}({self.name})"
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     @property
     def spacedID(self): return f'{self.sup.spacedID} | C{self.number}'
     @property
     def area(self): return self.manager.area
+    
     @property
     def cardDues(self): return self.__cardDues
+    
+    @property
+    def cardDue(self): return self.__cardDues
+    
+    @property
+    def rate(self): return int(self.accountsManager.rate)
     
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
