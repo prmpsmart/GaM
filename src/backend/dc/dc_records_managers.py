@@ -42,14 +42,12 @@ class Balances(DCRecordsManager):
     
     def __init__(self, account):
         super().__init__(account, True)
-    
 
 class BroughtForwards(DCRecordsManager):
     def __init__(self, account):
         super().__init__(account, True)
 
 class BroughtToOffices(DCRecordsManager): pass
-    
 
 class CardDues(DCRecordsManager):
     def __init__(self, client, cardDue=True):
@@ -68,28 +66,21 @@ class CardDues(DCRecordsManager):
         if m: d += 1
         return paids == d * 100
 
-
 class Commissions(DCRecordsManager): pass
 
 class Contributions(DCRecordsManager):
     ObjectType = Contribution
-    
-    def __init__(self, account):
-        super().__init__(account)
         
-        self.__savings = 0
-    
     def payUp(self, rate, payup):
         payUpBal = self.account.rates.payUpBal(rate)
         if payUpBal != -1:
             if payup == payUpBal: self.account.rates.changeRate(rate)
 
     def addContribution(self, contribution, note=None, **kwargs):
+        assert contribution != 0, 'Contributions can not be zero.'
         newContributions = int(self) + contribution
         if newContributions < 32:
-            self.savings.addSaving(contribution * self.account.rate, **kwargs)
-            self.createRecord(contribution, **kwargs)
-            
+            _note = ''
             if not self.upfronts.paid:
                 
                 out = self.upfronts.outstanding
@@ -100,43 +91,23 @@ class Contributions(DCRecordsManager):
                 repay, remain = money, 0 - money
                 
                 self.upfronts.repayUpfront(repay, note=note, **kwargs)
-                self.savings.addSaving(remain, note=f'Repay of Upfront Loan. {note}', **kwargs)
+                _note = f'Repay of Upfront Loan. {note}'
+                self.savings.addSaving(remain, note=_note, **kwargs)
+            
+            else: self.savings.addSaving(contribution * self.account.rate, **kwargs)
+
+            self.createRecord(contribution, note=_note, **kwargs)
                 
             # self.balance()
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
     
-    # def addContribution(self, contribution, **kwargs):
-    #     newContributions = int(self) + contribution
-    #     assert contribution != 0, 'Contributions can not be zero.'
-    #     if newContributions < 32:
-            
-    #         self.__savings += contribution * self.account.rate
-            
-    #         self.createRecord(contribution, **kwargs)
-            
-            
-    #         if not self.upfronts.paid:
-    #             out = self.upfronts.outstanding
-                
-    #             if out > self.__savings:
-    #                 self.upfronts.repayUpfront(self.__savings, **kwargs)
-    #                 self.__savings = 0
-                
-    #             else:
-    #                 self.upfronts.repayUpfront(out, **kwargs)
-    #                 self.__savings = self.__savings - out
-                    
-    #     else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
-    
-    # @property
-    # def savings(self): return sum([rec.savings for rec in self])
-    
+    @property
+    def savings(self): return self.account.savings
     @property
     def upfronts(self): return self.account.upfronts
     
-    @property
-    def savings(self): return self.account.savings
-
+    # @property
+    # def savings(self): return sum(cont.savings for cont in self)
 
 class Debits(DCRecordsManager):
     lowest = Rates.lowest
@@ -147,14 +118,9 @@ class Debits(DCRecordsManager):
             if toDebit <= balance: self.createRecord(toDebit, **kwargs)
             else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
 
-
 class Deficits(DCRecordsManager): pass
-    
-
 
 class Excesses(DCRecordsManager): pass
-    
-
 
 class Savings(DCRecordsManager):
     
@@ -162,8 +128,6 @@ class Savings(DCRecordsManager):
         super().__init__(account)
     
     def addSaving(self, saving, **kwargs): self.createRecord(saving, **kwargs)
-
-
 
 class Upfronts(RepaymentsManager):
     _shortName = 'upf'

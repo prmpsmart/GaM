@@ -6,8 +6,8 @@ import os
 class Person(Object):
     Manager = 'PersonsManager'
     
-    __male = 'male', 'm'
-    __female = 'female', 'f'
+    _male = 'male', 'm'
+    _female = 'female', 'f'
     
     def __init__(self, manager=None, gender='n', phone='', image=None, email='', address='', date=None, name='', **kwargs):
         
@@ -17,52 +17,24 @@ class Person(Object):
 
         gender = gender.lower()
         
-        if gender in self.__male:  self.__gender = self.__male[0].title()
-        elif gender in self.__female:  self.__gender = self.__female[0].title()
+        if gender in self._male:  self._gender = self._male[0].title()
+        elif gender in self._female:  self._gender = self._female[0].title()
         
-        else: self.__gender = 'Neutral'
+        else: self._gender = 'Neutral'
         
-        self.__phone = phone
+        self.phone = phone
         
-        self.__image = image
+        self.image = image
 
-        self.__email = None
-        if self.checkEmail(email): self.__email = email
+        self.email = None
+        if self.checkEmail(email): self.email = email
         
-        self.__address = address
+        self.address = address
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     
     @property
     def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
-    
-    
-    @property
-    def gender(self): return self.__gender
-    @property
-    def address(self): return self.__address
-    @address.setter
-    def address(self, addr):
-        assert addr, 'Address must be str and not empty.'
-        self.__address = addr
-    @property
-    def image(self): return self.__image
-    @property
-    def email(self): return self.__email
-    @email.setter
-    def email(self, em): 
-        # confirm if email is valid
-        self.__email = em
-    @property
-    def phone(self): return self.__phone
-    @phone.setter
-    def phone(self, number):
-        assert number, 'Number must be valid.'
-        # confirm if number is valid
-        self.__phone = number
-    
-    def show(self):
-        pass
 
 class Region(Object):
     AccountsManager = AccountsManager
@@ -78,22 +50,22 @@ class Region(Object):
         Object.__init__(self, manager, previous=previous, date=date, name=name, number=number, **kwargs)
         
         
-        self.__person = None
-        self.__personsManager = None
-        self.__subRegionsManager = None
+        self._person = None
+        self._personsManager = None
+        self._subRegionsManager = None
         
-        self.__location = location
+        self._location = location
         
         
-        self.__accountsManager = self.AccountsManager(self, **kwargs)
+        self._accountsManager = self.AccountsManager(self, **kwargs)
         
         if self.SubRegionsManager:
-            self.__subRegionsManager = self.SubRegionsManager(self)
+            self._subRegionsManager = self.SubRegionsManager(self)
             
-            if self.PersonsManager: self.__personsManager = self.PersonsManager(self)
+            if self.PersonsManager: self._personsManager = self.PersonsManager(self)
 
         else:
-            if self.Person: self.__person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
+            if self.Person: self._person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
     
     def __getattr__(self, name):
         ret = self.getFromSelf(name, self._unget)
@@ -105,7 +77,7 @@ class Region(Object):
         sret = getattr(self.accountsManager, name, self._unget)
         if str(sret) != self._unget: return sret
 
-        self.attrError()
+        self.attrError(name)
     
     def __len__(self): return len(self.accountsManager)
     
@@ -192,14 +164,14 @@ class Region(Object):
     @property
     def person(self):
         if self.personsManager: return self.personsManager.lastPerson
-        return self.__person
+        return self._person
         
     @property
-    def personsManager(self): return self.__personsManager
+    def personsManager(self): return self._personsManager
     @property
-    def location(self): return self.__location
+    def location(self): return self._location
     @property
-    def subRegionsManager(self): return self.__subRegionsManager
+    def subRegionsManager(self): return self._subRegionsManager
     
     @property
     def subs(self): return self.accountsManager if self.accountsManager else []
@@ -214,7 +186,7 @@ class Region(Object):
     def lastAccount(self): return self.accountsManager.lastAccount
     
     @property
-    def accountsManager(self): return self.__accountsManager
+    def accountsManager(self): return self._accountsManager
     
     def balanceAccounts(self, month=None):
         if month: self.accountsManager.balanceAccount(month)
@@ -222,8 +194,7 @@ class Region(Object):
     
     def subRegionsActiveByMonth(self, month):
         subRegions = []
-        for subRegion in self:
-        # for subRegion in self.subRegionsManager:
+        for subRegion in self.subRegionsManager:
             monthAccount = subRegion.accountsManager.getAccount(month)
             if monthAccount != None: subRegions.append(subRegion)
         return subRegions
@@ -288,64 +259,40 @@ class Staff(Region):
 
 class ThirdPartySurety(ObjectsMixins):
     
-    def __init__(self, loanBondDetails='', name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
+    def __init__(self, loanBondDetails=None, name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
     
-        self.__loanBondDetails = loanBondDetails
-        self.__name = None
+        self.loanBondDetails = loanBondDetails
+        self.name = None
         
-        self.__dob = dob
-        self.__maritalStatus = maritalStatus
-        self.__phone = phone
-        self.__address = address
-        self.__officeAddress = officeAddress
-        self.__religion = religion
-        self.__homeTown = homeTown
-        self.__stateOfOrigin = stateOfOrigin
-        self.__occupation = occupation
-        self.__knowledgeOfMember = knowledgeOfMember
-        self.__relationshipWithMember = relationshipWithMember
-        self.__image = image
+        self.dob = dob
+        self.maritalStatus = maritalStatus
+        self.phone = phone
+        self.address = address
+        self.officeAddress = officeAddress
+        self.religion = religion
+        self.homeTown = homeTown
+        self.stateOfOrigin = stateOfOrigin
+        self.occupation = occupation
+        self.knowledgeOfMember = knowledgeOfMember
+        self.relationshipWithMember = relationshipWithMember
+        self.image = image
         
-        self.__email = None
-        if self.checkEmail(email): self.__email = email
-        
-    @property
-    def dob(self): return self.__dob
-    @property
-    def maritalStatus(self): return self.__maritalStatus
-    @property
-    def image(self): return self.__image
-    @property
-    def phone(self): return self.__phone
-    @property
-    def address(self): return self.__address
-    @property
-    def officeAddress(self): return self.__officeAddress
-    @property
-    def religion(self): return self.__religion
-    @property
-    def homeTown(self): return self.__homeTown
-    @property
-    def stateOfOrigin(self): return self.__stateOfOrigin
-    @property
-    def occupation(self): return self.__occupation
-    @property
-    def knowledgeOfMember(self): return self.__knowledgeOfMember
-    @property
-    def relationshipWithMember(self): return self.__relationshipWithMember
+        self.email = None
+        if self.checkEmail(email): self.email = email
+
 
 
 class LoanBondDetails:
-    thirdPartySurety = ThirdPartySurety
+    _thirdPartySurety = ThirdPartySurety
 
     def __init__(self, loanBond):
     
-        self.__loanBond = loanBond
-        self.__proposedLoan = loanBond.proposedLoan
-        self.__thirdPartySurety = None
-        self.__image = None
+        self.loanBond = loanBond
+        self.proposedLoan = loanBond.proposedLoan
+        self.thirdPartySurety = None
+        self.image = None
         
-        self.__interest = None
+        self.interest = None
     
     @property
     def image(self): return self.__image
@@ -356,6 +303,6 @@ class LoanBondDetails:
     def proposedLoan(self): return self.__proposedLoan
     
     def setThirdPartySurety(self, **kwargs): 
-        self.__thirdPartySurety = self.thirdPartySurety(self, **kwargs)
+        self.thirdPartySurety = self._thirdPartySurety(self, **kwargs)
 
 

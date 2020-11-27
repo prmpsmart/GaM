@@ -1656,7 +1656,7 @@ class PRMP_Window(PRMP_Widget):
     TOPEST = None
     STYLE = None
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, alp=1, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, **kwargs):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
         
@@ -1681,7 +1681,6 @@ class PRMP_Window(PRMP_Widget):
         if ntb != None: noTitleBar = ntb
         if tm != None: topMost = tm
         if nrz != None: notResizable = nrz
-        if alp != None: alpha = alp
         if tw != None: toolWindow = tw
         if be != None: bindExit = be
         if atb != None: addTitleBar = atb
@@ -1692,15 +1691,9 @@ class PRMP_Window(PRMP_Widget):
         if bindExit: self.bindExit()
 
         self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar)
-
         
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
-        
-        if noTitleBar:
-            self.withdraw()
-            self.overrideredirect(True)
-            self.normal()
         
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
         
@@ -1710,8 +1703,7 @@ class PRMP_Window(PRMP_Widget):
             self.bind('<<PRMP_STYLE_CHANGED>>', self._paintAll)
             PRMP_Window.TOPEST = self
             PRMP_Window.STYLE = PRMP_Style(self)
-            self.iconed = True
-            if ntb or noTitleBar: self.after(10, self.addWindowToTaskBar)
+            if noTitleBar: self.after(10, self.addWindowToTaskBar)
     
     def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1):
         
@@ -1727,6 +1719,11 @@ class PRMP_Window(PRMP_Widget):
         
         if addStatusBar: self.addStatusBar()
         
+        self.toolWindow = toolWindow
+        self.topMost = topMost
+        self.alpha = alpha
+
+
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
 
     def addWindowToTaskBar(self, e=0):
@@ -1734,7 +1731,7 @@ class PRMP_Window(PRMP_Widget):
         winfo_id = self.winfo_id()
         parent = windll.user32.GetParent(winfo_id)
         res = windll.user32.SetWindowLongW(parent, -20, 0)
-        # print(winfo_id, parent, res)
+        self.attributes('-topmost', self.topMost, '-toolwindow', self.toolWindow, '-alpha', self.alpha)
         self.deiconify()
         if not (parent or res): self.after(10, self.addWindowToTaskBar)
  

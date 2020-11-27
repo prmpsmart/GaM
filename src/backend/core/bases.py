@@ -34,7 +34,7 @@ class Mixins:
     @property
     def class_(self): return self.__class__
 
-    def attrError(self, attr): raise AttributeError(f'{attr} does not exist in {self}')
+    def attrError(self, attr): raise AttributeError(f'"{attr}" does not exist in {self}')
 
     def getFromSelf(self, name, unget=None):
         ret = self.__dict__.get(name, unget)
@@ -172,7 +172,6 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def week(self): return self.date.week
     
-    
     def __getattr__(self, attr):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
@@ -256,23 +255,23 @@ class Object(CompareByNumber, ObjectsMixins):
         
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
-        self.__number = number
-        self.__sup = sup
+        self._number = number
+        self._sup = sup
         
-        self.__name = name if not nameFromNumber else f'{self.className} {self.number}'
-        self.__date = date
-        self.__manager = manager
-        self.__previous = previous
-        self.__next = None
+        self._name = name if not nameFromNumber else f'{self.className} {self.number}'
+        self._date = date
+        self._manager = manager
+        self._previous = previous
+        self._next = None
         
-        self.__uniqueID = sha224(self.id.encode()).hexdigest()
+        self._uniqueID = sha224(self.id.encode()).hexdigest()
     
     
     @property
     def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
     
     @property
-    def sup(self): return self.__sup
+    def sup(self): return self._sup
     
     @property
     def spacedID(self):
@@ -283,13 +282,13 @@ class Object(CompareByNumber, ObjectsMixins):
     def subs(self): return []
     
     @property
-    def uniqueID(self): return self.__uniqueID
+    def uniqueID(self): return self._uniqueID
         
     @property
-    def name(self): return self.__name
+    def name(self): return self._name
     
     @property
-    def manager(self): return self.__manager
+    def manager(self): return self._manager
     
     @property
     def master(self):
@@ -297,20 +296,20 @@ class Object(CompareByNumber, ObjectsMixins):
         return self.manager.master
     
     @property
-    def number(self): return self.__number
+    def number(self): return self._number
     
     @property
-    def date(self): return self.__date
+    def date(self): return self._date
     
     @property
-    def previous(self): return self.__previous
+    def previous(self): return self._previous
     
     @property
-    def next(self): return self.__next
+    def next(self): return self._next
     
     @next.setter
     def next(self, next_):
-        if self.__next == None: self.__next = next_
+        if self._next == None: self._next = next_
         else: raise self.Error('A next is already set.')
 
 
@@ -321,8 +320,8 @@ class ObjectsManager(ObjectsMixins):
     def __init__(self, master=None):
         assert master != None, 'Master can not be None.'
         
-        self.__master = master
-        self.__subs = []
+        self._master = master
+        self._subs = []
     
     def __len__(self): return len(self.subs)
 
@@ -332,10 +331,15 @@ class ObjectsManager(ObjectsMixins):
         else: return getattr(self.last, attr)
 
     @property
-    def master(self): return self.__master
+    def master(self): return self._master
     
     @property
-    def subs(self): return self.__subs
+    def subs(self): return self._subs
+    
+    @subs.setter
+    def subs(self, subs): self._subs = subs
+
+
     
     @property
     def first(self):
@@ -354,13 +358,13 @@ class ObjectsManager(ObjectsMixins):
             return last_
     
     
-    def addSub(self, sub): self.__subs.append(sub)
+    def addSub(self, sub): self._subs.append(sub)
     
     def getSub(self, attrs_vals={}):
         if len(self):
             for sub in self:
                 count = []
-                for attr, val in attrs_vals.item():
+                for attr, val in attrs_vals.items():
                     if val == None: v = True
                     
                     elif 'date' in attr:
@@ -387,8 +391,9 @@ class ObjectsManager(ObjectsMixins):
         return sub
 
     def deleteSubs(self):
-        del self.__subs
+        del self._subs
         self._subs = []
+    
 
 
 

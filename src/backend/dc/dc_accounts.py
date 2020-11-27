@@ -103,8 +103,7 @@ class ClientAccount(DCAccount):
     # @property
     # def savings(self): return self.contributions.savings
     
-    
-    
+     
 class AreaAccount(DCAccount):
     Manager = 'AreaAccountsManager'
     
@@ -146,8 +145,8 @@ class AreaAccount(DCAccount):
     @property
     def deficits(self): return self.__deficits
     
-    def _balanceAccount(self):
-        clientsAccounts = self.manager.sortClientsAccountsByMonth(self.date)
+    def _balanceAccount(self, date=None):
+        clientsAccounts = self.manager.sortClientsAccountsByMonth(date or self.date)
         if clientsAccounts:
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
             
@@ -157,7 +156,7 @@ class AreaAccount(DCAccount):
             
             self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
             
-            self.savings.updateWithOtherManagers([account.contributions for account in clientsAccounts])
+            self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
             
             self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
         
@@ -204,6 +203,7 @@ class ClientAccountsManager(DCAccountsManager):
     def addUpfront(self, upfront, month):
         assert DateTime.now().isSameMonth(month)
         pass
+
 
 class AreaAccountsManager(DCAccountsManager):
     ObjectType = AreaAccount

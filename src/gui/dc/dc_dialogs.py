@@ -37,8 +37,8 @@ class ClientDialog(PersonDialog):
 
         self.addResultsWidgets(['rate', 'cardDue'])
     
-    def processInput(self):
-        result = super().processInput()
+    def processInput(self, e=0):
+        result = super().processInput(e)
 
         if result == None: return
 

@@ -25,7 +25,6 @@ class Contribution(DCRecord):
     @property
     def savings(self): return super().__int__()
 
-
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1

@@ -50,7 +50,10 @@ class RecordDialog(PRMP_Dialog):
         self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), relx=.02, rely=.16, relh=.15, relw=.96, longent=.35, orient='h')
         self.note = LabelText(self.container, topKwargs=dict(config=dict(text='Note')), relx=.02, rely=.32, relh=.5, relw=.96, longent=.35, orient='h')
         self.addResultsWidgets(['note', 'money', 'date'])
-
+    
+    def processInput(self):
+        result = super().processInput()
+        print(result)
 RecD = RecordDialog
  
 

@@ -434,12 +434,7 @@ class RepaymentsManager(RecordsManager):
         return rep
     
     def updateWithOtherManagers(self, managers):
-        out, rep = 0, 0
-        for manager in managers:
-            out += manager.outstanding
-            rep += manager.repaid
-        self.outstanding = out
-        self.repaid = rep
+        self.subs = managers
         
     def addRepayment(self, repay, **kwargs):
         outs = self.outstanding
@@ -495,11 +490,11 @@ class LoanBonds(RepaymentsManager):
         if last:
             outstandingLoan = last.outstandingLoan
             
-            if last.granted:
+            if last.paid and last.granted:
                 if last.paidLoan: pass
                 elif outstandingLoan: raise Errors.LoanBondsError(f'There is a paid loan bond with an outstanding loan ({outstandingLoan}).')
-            elif last.paid: raise Errors.LoanBondsError('There is a paid loan bond with an pending loan.')
-            else: raise Errors.LoanBondsError('There is an outstanding loan bond.')
+            elif not last.granted: raise Errors.LoanBondsError('There is a paid loan bond with a pending loan.')
+            else: raise Errors.LoanBondsError('There is an outstanding loan bond not yet paid.')
             
         loanBond = self.createRecord(money,  proposedLoan=proposedLoan, **kwargs)
         return loanBond

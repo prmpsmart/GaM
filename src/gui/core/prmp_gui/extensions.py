@@ -182,6 +182,10 @@ class PRMP_DateButton(PRMP_Button):
         super().__init__(master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
         self['text'] = placeholder
     
+    def verify(self):
+        if self.DT.checkDateTime(self.date): return True
+        else: return False
+
     def action(self):
         self.date = self.CD(self, caller=self.toplevel, side=self.topest.side, _return=1).result
         self.set(str(self.date))

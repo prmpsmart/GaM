@@ -13,7 +13,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         self.__result = None
         
         self._return = _return
-        
+        self.command = None
         self.submitBtn = None
         self.editBtn = None
         
@@ -41,23 +41,30 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     def _setResult(self, result): self.__result = result
     
     def addSubmitButton(self, command=None):
-        self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=command or self.processInput))            
+        self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=command or self.processInput))
+    
+    def bindCR(self): self.bind('<Control-Return>', self.command or self.processInput)
+    def unbindCR(self): self.unbind('<Control-Return>')
     
     def placeSubmitBtn(self, wh=0):
         if wh:
+            self.bindCR()
             self.container.paint()
             geo = self.kwargs.get('geo')
             x, y = self.containerGeo
             self.submitBtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
-        else: self.submitBtn.place_forget()
+        else:
+            self.unbindCR()
+            self.submitBtn.place_forget()
     
     def addEditButton(self, command=None, submitCommand=None):
+        self.command = submitCommand
         if self.submitBtn == None: self.addSubmitButton(submitCommand)
         x, y = self.containerGeo
         self.editBtn = xbtn = PRMP_Style_Checkbutton(self.container, config=dict(text='Edit', command=self.editInput))
         xbtn.place(x=10 , y=y-40, h=30, w=60)
     
-    def processInput(self):
+    def processInput(self, e=0):
         result = {}
 
         self.resultsWidgets.sort()

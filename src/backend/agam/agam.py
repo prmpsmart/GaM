@@ -9,7 +9,7 @@ class CEOsManager(PersonsManager):
     ObjectType = CEO
 
     def createCEO(self, **kwargs): return self.createPerson(**kwargs)
-    
+
 
 class AGAM(Region):
     SubRegionsManager = OfficesManager

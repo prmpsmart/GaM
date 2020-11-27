@@ -1,4 +1,5 @@
-from .bases import Object, DateTime
+from .bases import Object, DateTime, Errors
+from datetime import timedelta
 
 # Record is the {money, date} recieved daily a.k.a DayRecord
 
@@ -76,6 +77,8 @@ class Repayment(Record):
     
     @property
     def repaid(self): return int(self.repaymentsManager)
+    @property
+    def repayment(self): return self.repaid
     
     @property
     def repaymentsManager(self): return self.__repaymentsManager
@@ -146,25 +149,17 @@ class LoanBond(Repayment):
         validLoan = manager.validLoan
         assert validLoan >= proposedLoan, f'Loan {proposedLoan} exceed maximum valid loan of {validLoan}.'
         
-        self.__grantedDate = None
-        self.__proposedLoan = proposedLoan
-        self.__details = None
-        self.__loan = None
-    
-    @property
-    def proposedLoan(self): return self.__proposedLoan
-    
-    @property
-    def loan(self): return self.__loan
+        self.grantedDate = None
+        self.proposedLoan = proposedLoan
+        self.details = None
+        self.loan = None
     
     def addLoanRepayment(self, money, **kwargs):
-        if self.loan: return self.loan.addRepayment(money, **kwargs)
+        if self.granted: return self.loan.addRepayment(money, **kwargs)
+        else: raise Errors.LoanRepaymentsError("Not yet granted. There's no loan to repay.")
     
     @property
     def outstandingLoan(self): return self.loan.outstanding if self.loan else 0
-    
-    @property
-    def grantedDate(self): return self.__grantedDate
     
     @property
     def granted(self):
@@ -173,9 +168,6 @@ class LoanBond(Repayment):
     
     @property
     def paidLoan(self): return self.loan.paid
-    
-    @property
-    def details(self): return self.__details
     
     @property
     def filledLoanBond(self):
@@ -188,7 +180,7 @@ class LoanBond(Repayment):
     def fillLoanBond(self, ):
         pass
     
-    def grant(self, interestRate=.1, dueTime=None, date=None): self.__loan = self.LoanType(self, date=date, interestRate=interestRate, dueTime=dueTime)
+    def grant(self, interestRate=.1, dueTime=None, date=None): self.loan = self.LoanType(self, date=date, interestRate=interestRate, dueTime=dueTime)
 
 class LoanInterest(Repayment):
     duing = False

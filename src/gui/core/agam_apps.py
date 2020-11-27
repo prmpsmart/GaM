@@ -104,9 +104,9 @@ H = Hierachy
 
 class RegionDetails(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, **kwargs):
+    def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, tm=1, gaw=1, **kwargs):
         
-        PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=1, ntb=1, tm=1, atb=1, asb=1, **kwargs)
+        PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=gaw, ntb=1, tm=tm, atb=1, asb=1, **kwargs)
         
         FillWidgets.__init__(self, values=values)
         
@@ -131,7 +131,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         if not region or (region is self.region): return
     
         self.region = region
-        self.titleBar.set(region.idText)
+        self.addTitleBar(region.idText)
         
         person = region.person
         if person: self.fill(dict(image=person.image))

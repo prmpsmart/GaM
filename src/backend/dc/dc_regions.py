@@ -12,8 +12,6 @@ class DC_CO(Person):
 
 class DC_COsManager(PersonsManager):
     ObjectType = DC_CO
-    
-    
     def createDC_CO(self, **kwargs): return self.createPerson(**kwargs)
 
 class DCRegionsManager(RegionsManager):
@@ -37,8 +35,7 @@ class Client(DCRegion):
     
     def __init__(self, manager, name, date=None, rate=None, cardDue=False, **kwargs):
         super().__init__(manager=manager, name=name, date=date, rate=rate, **kwargs)
-        # self.__detail = ClientDetail(self, **kwargs)
-        self.__cardDues = CardDues(self, cardDue)
+        self.cardDues = CardDues(self, cardDue)
 
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     @property
@@ -47,10 +44,7 @@ class Client(DCRegion):
     def area(self): return self.manager.area
     
     @property
-    def cardDues(self): return self.__cardDues
-    
-    @property
-    def cardDue(self): return self.__cardDues
+    def cardDue(self): return self.cardDues
     
     @property
     def rate(self): return int(self.accountsManager.rate)
