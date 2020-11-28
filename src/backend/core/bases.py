@@ -182,12 +182,7 @@ class ObjectsMixins(Mixins, CompareByDate):
     def __setitem__(self, key, value): pass
     
     def __getitem__(self, item):
-        
-        if isinstance(item, int): return self.subs[item] if self.subs else None
-        
-        elif isinstance(item, slice): return self.subs[item] if self.subs else []
-
-        elif isinstance(item, self.containers):
+        if isinstance(item, self.containers):
             res = []
             for it in item: res.append(self[it])
             return res
@@ -216,7 +211,8 @@ class ObjectsMixins(Mixins, CompareByDate):
                 res.append(tail)
             return res if len(res) > 1 else res[0]
 
-        self.attrError(item)
+        # self.attrError(item)
+        return self.subs[item]
 
 
 class CompareByNumber:
@@ -339,8 +335,6 @@ class ObjectsManager(ObjectsMixins):
     @subs.setter
     def subs(self, subs): self._subs = subs
 
-
-    
     @property
     def first(self):
         if len(self):

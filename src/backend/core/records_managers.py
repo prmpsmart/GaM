@@ -52,7 +52,7 @@ class SeasonRecord(Mixins):
         elif season == 'day':
             for rec in self:
                 if wh == rec.day: return rec
-    
+
 class WeekRecord(SeasonRecord, CompareByWeek):
     maximum = 7
     
@@ -80,7 +80,7 @@ class WeekRecord(SeasonRecord, CompareByWeek):
     def friday(self): return self.__day('Friday')
     @property
     def saturday(self): return self.__day('Saturday')
-   
+
 class MonthRecord(SeasonRecord, CompareByMonth):
     maximum = 5
     
@@ -126,7 +126,7 @@ class MonthRecord(SeasonRecord, CompareByMonth):
     def week4(self): return self.__week(3)
     @property
     def week5(self): return self.__week(4)
-    
+
 class YearRecord(SeasonRecord, CompareByYear):
     maximum = 12
     
@@ -210,7 +210,6 @@ class RecordsWithSameSeasons(SeasonRecord):
     
     def __str__(self): return f'{self.manager} | {self.className}s | {self.moneyWithSign}'
 
-
 class RecordsManager(ObjectsManager):
     _shortName = 'rec'
     lowest = 50
@@ -221,11 +220,11 @@ class RecordsManager(ObjectsManager):
     
     def __int__(self): return self.totalMonies
     
-    def __str__(self): return f'{self.account} | {self.className}({self.moneyWithSign})'
-    
-    def __getitem__(self, num): return self.records[num]
+    def __str__(self): return f'{self.account} | {self.name}'
     
     def __len__(self): return len(self.records)
+
+    def name(self): return f'{self.className}({self.moneyWithSign})'
 
     @property
     def date(self): return self.account.date
@@ -249,7 +248,7 @@ class RecordsManager(ObjectsManager):
     def lastRecord(self): return self.last
     
     @property
-    def totalMonies(self): return sum([int(record) for record in self])
+    def totalMonies(self): return sum([int(record) for record in self[:]])
     
     @property
     def recordDateTuples(self): return [(str(record.date), int(record)) for record in self]
@@ -402,14 +401,6 @@ class RecordsManager(ObjectsManager):
         years = self.recordsYears
         yearsRecs = [self.sortRecordsByYear(DateTime.creatDateTime(year=year)) for year in years]
         
-        # for rec in self:
-        #     for yr in range(len(years)):
-        #         if rec.year == years[yr]:
-        #             yearsRecs[yr].append(rec)
-        #             break
-        
-        # yearsRecords = [YearRecord(y) for y in yearsRecs]
-        
         return SeasonRecord(yearsRecs)
 
 class RepaymentsManager(RecordsManager):
@@ -417,14 +408,15 @@ class RepaymentsManager(RecordsManager):
     
     @property
     def paid(self):
-        for repay in self:
-            if not repay.paid: return False
+        for repay in self[:]:
+            if repay and (not repay.paid): return False
         return True
     
     @property
     def outstanding(self):
         out = 0
-        for record in self: out += record.outstanding
+        for record in self:
+            if record: out += record.outstanding
         return out
     
     @property
@@ -450,12 +442,10 @@ class RepaymentsManager(RecordsManager):
                         rep.addRepayment(rem_outs, **kwargs)
                     rem_outs = 0
 
-
 class SalariesManager(RecordsManager):
     ObjectType = Salary
     def person(self): return self.account
     def addSalary(self, salary, date=None): return self.createRecord(salary, date=date)
-
 
 class LoanInterests(RepaymentsManager):
     ObjectType = LoanInterest

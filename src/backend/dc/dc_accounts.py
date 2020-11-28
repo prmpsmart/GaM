@@ -9,11 +9,11 @@ class DCAccount(Account):
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
         
-        self.__broughtForwards = BroughtForwards(self)
-        self.__savings = Savings(self)
-        self.__debits = Debits(self)
-        self.__upfronts = Upfronts(self)
-        self.__balances = Balances(self)
+        self.broughtForwards = BroughtForwards(self)
+        self.savings = Savings(self)
+        self.debits = Debits(self)
+        self.upfronts = Upfronts(self)
+        self.balances = Balances(self)
         
     def __int__(self): return int(self.balances)
     
@@ -25,34 +25,25 @@ class DCAccount(Account):
     @property
     def recordsManagers(self): return [self.broughtForwards, self.savings, self.debits, self.upfronts, self.balances]
 
-    
-    @property
-    def broughtForwards(self): return self.__broughtForwards
-    @property
-    def savings(self): return self.__savings
-    @property
-    def debits(self): return self.__debits
-    @property
-    def upfronts(self): return self.__upfronts
     @property
     def pendingUpfronts(self): return self.upfronts.lastRecord.outstanding
+    
     @property
     def repaidUpfronts(self): return self.upfronts.lastRecord.repaid
-    @property
-    def balances(self): return self.__balances
+
     def addBroughtForward(self, bf, date=None): return self.broughtForwards.createRecord(bf, date=date)
     
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
         if self.nextAccount: self.nextAccount.addBroughtForward(int(self.balances))
-        
+
 
 class DCAccountsManager(AccountsManager):
     ObjectType = DCAccount
     
     def __init__(self, region, **kwargs):
         super().__init__(region, **kwargs)
-        
+
 
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
@@ -60,10 +51,12 @@ class ClientAccount(DCAccount):
     def __init__(self, manager, ledgerNumber=0, rate=0, **kwargs):
         super().__init__(manager, **kwargs)
         rate = int(rate)
-        self.__ledgerNumber = ledgerNumber
-        self.__contributions = Contributions(self)
-        self.__rates = Rates(self, rate)
-        
+        self.ledgerNumber = ledgerNumber
+        self.contributions = Contributions(self)
+        self.rates = Rates(self, rate)
+    
+    @property
+    def income(self): return 
         
     @property
     def recordsManagers(self):
@@ -74,15 +67,6 @@ class ClientAccount(DCAccount):
     
     @property
     def rate(self): return int(self.rates)
-    
-    @property
-    def rates(self): return self.__rates
-    
-    @property
-    def contributions(self): return self.__contributions
-    
-    @property
-    def ledgerNumber(self): return self.__ledgerNumber
     
     def _balanceAccount(self, date=None):
         rate = int(self.rates)
@@ -102,28 +86,18 @@ class ClientAccount(DCAccount):
 
     # @property
     # def savings(self): return self.contributions.savings
-    
-     
+
+
 class AreaAccount(DCAccount):
     Manager = 'AreaAccountsManager'
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
         
-        self.__savings = Savings(self)
-        self.__commissions = Commissions(self)
-        self.__broughtToOffices = BroughtToOffices(self)#
-        self.__excesses = Excesses(self)
-        self.__deficits = Deficits(self)
-    
-    # @property
-    # def savings(self): return self.contributions
-    
-    @property
-    def commissions(self): return self.__commissions
-    
-    @property
-    def savings(self): return self.__savings
+        self.commissions = Commissions(self)
+        self.broughtToOffices = BroughtToOffices(self)#
+        self.excesses = Excesses(self)
+        self.deficits = Deficits(self)
     
     @property
     def recordsManagers(self):
@@ -131,22 +105,10 @@ class AreaAccount(DCAccount):
         return recordsManagers
     
     @property
-    def broughtToOffices(self): return self.__broughtToOffices
-    
-    @property
     def btos(self): return self.broughtToOffices
     
-    @property
-    def commissions(self): return self.__commissions
-    
-    @property
-    def excesses(self): return self.__excesses
-    
-    @property
-    def deficits(self): return self.__deficits
-    
     def _balanceAccount(self, date=None):
-        clientsAccounts = self.manager.sortClientsAccountsByMonth(date or self.date)
+        clientsAccounts = self.manager.sortClientsAccountsByMonth(self.date)
         if clientsAccounts:
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
             
@@ -159,10 +121,9 @@ class AreaAccount(DCAccount):
             self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
             
             self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
-        
-            ###############
-            
-            self.btos
+    
+    def addBto(self, bto, date=None):
+            self.btos.createRecord(bto, date)
             self.excesses
             self.deficits
 
@@ -171,14 +132,11 @@ class ClientAccountsManager(DCAccountsManager):
     ObjectType = ClientAccount
     
     def __init__(self, region, **kwargs):
-        self.__startRate = kwargs.get('rate', 0)
+        self.startRate = kwargs.get('rate', 0)
         super().__init__(region, **kwargs)
     
     @property
     def areaAccountsManager(self): return self.master.accountsManager
-    
-    @property
-    def startRate(self): return self.__startRate
     
     def createAccount(self, rate=0, **kwargs):
         # prmp needs proper thinking

@@ -8,35 +8,28 @@ class Record(Object):
     Manager = 'RecordsManager'
     _type = 'rec'
     
-    def __init__(self, manager, money, date=None, note='', **kwargs):
+    def __init__(self, manager, money, date=None, note='Note', **kwargs):
         Object.__init__(self, manager, **kwargs)
-        self.__money = money
-        self.__note = note
+        self.money = money
+        self.note = note
     
     def __int__(self): return self.money
     
-    def __str__(self): return f' {self.manager} | {self.className}({self.date} , {self.moneyWithSign} , {self.note or "Note"})'
+    def __str__(self): return f'{self.manager} | {self.name}'
+
+    def __repr__(self): return f'<{self}>'
 
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'
 
     @property
     def region(self): return self.manager.region
     
-    @property
-    def money(self): return self.__money
+    def set(self, money): self.money = money
     
-    @property
-    def note(self): return self.__note
+    def add(self, money): self.money += money
     
-    @note.setter
-    def note(self, detail): self.__note = detail
-    
-    def set(self, money): self.__money = money
-    
-    def add(self, money): self.__money += money
-    
-    def substract(self, money): self.__money -= money
+    def substract(self, money): self.money -= money
 
 DayRecord = Record
 
@@ -61,14 +54,18 @@ class Repayment(Record):
         self.__repaymentsManager = RecordsManager(self)
     
     def __getitem__(self, num): return self.repaymentsManager[num]
+    
     def __len__(self): return len(self.repaymentsManager)
     
     @property
     def records(self): return self.repaymentsManager.records
+    
     @property
     def isDue(self): return DateTime.now() > self.dueDate
+    
     @property
     def dueDate(self): return self.__dueDate
+    
     @property
     def outstanding(self): return int(self) - self.repaid
     
@@ -77,6 +74,7 @@ class Repayment(Record):
     
     @property
     def repaid(self): return int(self.repaymentsManager)
+    
     @property
     def repayment(self): return self.repaid
     

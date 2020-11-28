@@ -33,6 +33,7 @@ class Levies(CoopRepayment):
     def __init__(self, manager, money=0, date=None):
         super().__init__(manager, money=money, date=date)
     
+    def __int__(self): return self.repayment
     
     @property
     def reignMonths(self): return self.manager.region.reignMonths
@@ -54,7 +55,6 @@ class Levies(CoopRepayment):
         if outLevy:
             self.addLevy(outLevy)
             self.manager.savings.addSaving(-(outLevy))
-
     
     def addLevy(self, repay, **kwargs):
         if self.outstanding == 0: raise CoopErrors.LeviesError('No outstanding levy.')

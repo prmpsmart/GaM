@@ -106,8 +106,8 @@ class Contributions(DCRecordsManager):
     @property
     def upfronts(self): return self.account.upfronts
     
-    # @property
-    # def savings(self): return sum(cont.savings for cont in self)
+    @property
+    def contributed(self): return sum(cont.savings for cont in self)
 
 class Debits(DCRecordsManager):
     lowest = Rates.lowest
