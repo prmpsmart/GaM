@@ -1,7 +1,7 @@
 
 from .errors import Errors
 from .date_time import DateTime, CompareByMonth, CompareByWeek, CompareByYear, DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES, timedelta
-from .bases import ObjectsManager, Mixins
+from .bases import ObjectsManager, ObjectsMixins
 from .records import *
 
 # RecordsManager is the manager of records. It has a property 'records' which is a list of Records
@@ -14,7 +14,7 @@ from .records import *
 # YearlyRecords comprises of the DailyRecords,WeeklyRecords and MonthlyRecords (as specified to the constructor) recieved and accounted for in a Year.
 
 
-class SeasonRecord(Mixins):
+class SeasonRecord(ObjectsMixins):
     maximum = 0
     def __init__(self, records):
         assert records, 'Records cannot be empty.'
@@ -224,13 +224,13 @@ class RecordsManager(ObjectsManager):
     
     def __len__(self): return len(self.records)
 
-    def name(self): return f'{self.className}({self.moneyWithSign})'
+    def __repr__(self): return f'<{self.name}>'
 
     @property
     def date(self): return self.account.date
     
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date})'
 
     @property
     def account(self): return self.master
@@ -343,13 +343,14 @@ class RecordsManager(ObjectsManager):
     
     def sortRecordsByDate(self, date):
         DateTime.checkDateTime(date)
-        for record in self:
-            if record.date == date: return record
+        _rec = [rec for rec in self if rec.date == date]
+        if len(_rec) == 1: return _rec[0]
+        return _rec
     
     #Day Sorting
-    def sortRecordsByDay(self, dayName):
-        recs = [record for record in self if record.date.dayName == dayName]
-        return RecordsWithSameSeasons(recs, dayName)
+    def sortRecordsByDay(self, date):
+        recs = [record for record in self if record.date.dayName == date.dayName]
+        return RecordsWithSameSeasons(recs, date.dayName)
     
     def sortRecordsIntoDaysInWeek(self, week):
         DateTime.checkDateTime(week)

@@ -1,6 +1,6 @@
 from .regions import *
 
-class RegionsManager(ObjectsManager, Mixins):
+class RegionsManager(ObjectsManager, ObjectsMixins):
     ObjectType = Region
     
     def __init__(self, master):

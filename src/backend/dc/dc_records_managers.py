@@ -97,6 +97,7 @@ class Contributions(DCRecordsManager):
             else: self.savings.addSaving(contribution * self.account.rate, **kwargs)
 
             self.createRecord(contribution, note=_note, **kwargs)
+            self.account.incomes.createRecord(contribution*self.account.rate, note=_note, **kwargs)
                 
             # self.balance()
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
@@ -121,6 +122,8 @@ class Debits(DCRecordsManager):
 class Deficits(DCRecordsManager): pass
 
 class Excesses(DCRecordsManager): pass
+
+class Incomes(DCRecordsManager): pass
 
 class Savings(DCRecordsManager):
     

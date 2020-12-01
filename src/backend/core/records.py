@@ -17,7 +17,7 @@ class Record(Object):
     
     def __str__(self): return f'{self.manager} | {self.name}'
 
-    def __repr__(self): return f'<{self}>'
+    def __repr__(self): return f'<{self.name}>'
 
     @property
     def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'

@@ -211,7 +211,6 @@ class ObjectsMixins(Mixins, CompareByDate):
                 res.append(tail)
             return res if len(res) > 1 else res[0]
 
-        # self.attrError(item)
         return self.subs[item]
 
 

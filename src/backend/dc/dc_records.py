@@ -2,7 +2,7 @@ from src.backend.core.records_managers import Repayment, DateTime, RecordsManage
 from .dc_errors import DCErrors
 
 class DCRecord(Record):
-    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', '', '')
+    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes')
 
 class DCRepayment(Repayment):
     Managers = ('Upfronts', )

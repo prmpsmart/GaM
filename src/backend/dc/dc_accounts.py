@@ -1,5 +1,5 @@
 
-from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings
+from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings, Incomes
 from ..core.accounts import DateTime, Account, AccountsManager
 
 
@@ -8,7 +8,7 @@ class DCAccount(Account):
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
-        
+        self.incomes = Incomes(self)
         self.broughtForwards = BroughtForwards(self)
         self.savings = Savings(self)
         self.debits = Debits(self)
@@ -55,9 +55,12 @@ class ClientAccount(DCAccount):
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate)
     
-    @property
-    def income(self): return 
-        
+    def income(self, date=None):
+        if date == None: date = DateTime.now()
+        DateTime.checkDateTime(date)
+
+        return sum([rec.savings for rec in self.contributions if rec.date.month == date.month])
+    
     @property
     def recordsManagers(self):
         recordsManagers_ =  super().recordsManagers
@@ -93,11 +96,11 @@ class AreaAccount(DCAccount):
     
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
-        
         self.commissions = Commissions(self)
         self.broughtToOffices = BroughtToOffices(self)#
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
+    
     
     @property
     def recordsManagers(self):
@@ -108,8 +111,10 @@ class AreaAccount(DCAccount):
     def btos(self): return self.broughtToOffices
     
     def _balanceAccount(self, date=None):
-        clientsAccounts = self.manager.sortClientsAccountsByMonth(self.date)
+        clientsAccounts = self.clientsAccounts
         if clientsAccounts:
+            self.incomes.updateWithOtherManagers([account.incomes for account in clientsAccounts])
+            
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
             
             self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
@@ -123,9 +128,16 @@ class AreaAccount(DCAccount):
             self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
     
     def addBto(self, bto, date=None):
-            self.btos.createRecord(bto, date)
-            self.excesses
-            self.deficits
+        clientsAccounts = self.clientsAccounts
+        contributed = sum([acc.income(date) for acc in clientsAccounts])
+
+        if bto > contributed: self.excesses.createRecord(bto - contributed, date)
+        elif contributed > bto: self.deficits.createRecord(contributed - bto, date)
+        
+        self.btos.createRecord(bto, date)
+    
+    @property
+    def clientsAccounts(self, month=None): return self.manager.sortClientsAccountsByMonth(month or self.date)
 
 
 class ClientAccountsManager(DCAccountsManager):
