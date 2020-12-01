@@ -25,6 +25,14 @@ class Contribution(DCRecord):
     @property
     def savings(self): return super().__int__()
 
+class Debit(DCRecord):
+
+     def __init__(self, manager, debit, _type='w', **kwargs):
+        if _type == 'w': self.type = 'withdrawal'
+        else: self.type = 'paidout'
+
+        super().__init__(manager, debit, **kwargs)
+
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1

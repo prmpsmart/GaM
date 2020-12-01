@@ -112,7 +112,8 @@ class Contributions(DCRecordsManager):
 
 class Debits(DCRecordsManager):
     lowest = Rates.lowest
-    
+    ObjectType = Debit
+
     def addDebit(self, toDebit, **kwargs):
         if self.checkMoney(toDebit):
             balance = int(self.account.balances)

@@ -14,5 +14,5 @@ creator.py
 *.zip
 prmpsmart_temp.py
 text.txt
-page/
+# page/
 tx.py
