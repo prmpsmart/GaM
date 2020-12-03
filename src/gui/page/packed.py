@@ -129,10 +129,12 @@ class DateTimeView(tk.LabelFrame):
 
         self.date = tk.Label(self, activebackground="#ffaa7f", activeforeground="black", background="#d9d9d9", disabledforeground="#bf6030", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#ff8040", highlightcolor="black", relief="ridge", text='Tuesday 1, December 2020')
         self.date.place(relx=.39, rely=.4, relh=.48, relw=.6, bordermode='ignore')
-        
+
         self.tim()
     
-    def tim(self):
+    def tim(self): self.update()
+    
+    def update(self):
         now = DateTime.now()
         day = now.day
         dayN = now.dayName
@@ -140,7 +142,14 @@ class DateTimeView(tk.LabelFrame):
         year = now.year
 
         date = f'{dayN} {day}, {month} {year}'
-        print(date)
+        self.date['text'] = date
+
+        hour = now.hour
+        minute = now.minute
+        second = now.second
+
+        time = f'{dayN} {day}, {month} {year}'
+        self.time['text'] = time
 
 
 

@@ -354,27 +354,32 @@ class DateTime(datetime):
         else: raise error
     
     @classmethod
-    def createDateTime(cls, year=None, month=1, day=1, auto=False, obj=None, week=None):
-        if isinstance(obj, (date, datetime)): return cls(obj.year, obj.month, obj.day)
+    def createDateTime(cls, year=None, month=1, day=1, auto=False, obj=None, week=None, hour=0, minute=0, second=0):
+        if isinstance(obj, (date,datetime)):
+            year = obj.year
+            month = obj.month
+            day = obj.day
+            try:
+                hour = obj.hour
+                minute = obj.minute
+                second = obj.second
+            except: pass
         
-        if auto: return cls.now()
+        elif auto: return cls.now()
         
-        if week:
+        elif week:
             assert month and year, 'Month and Year are also required.'
             weeks = cls.monthWeekDays(year, month)
             return weeks[week-1][0]
         
-        if isinstance(month, str): monthNum = cls.getMonthNum(month) 
-        else: monthNum = month
+        if isinstance(month, str): month = cls.getMonthNum(month) 
         
-        if isinstance(day, str): dayNum = cls.getDayNum(month)
-        else: dayNum = day
-        
-        year, month, day = int(year), int(monthNum), int(dayNum)
-        
+        if isinstance(day, str): day = cls.getDayNum(month)
+                
         dummy = cls(year, month, 1).totalDays
-        if dummy < day: return cls(year, month, dummy)
-        else: return cls(year, month, day)
+        if dummy < day: day = dummy
+
+        return cls(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
 
     @property
     def dayNum(self): return self.day
