@@ -5,7 +5,7 @@ class FramedCanvas(tk.Frame):
     def __init__(self, master, canvasConfig={}, **kwargs):
         super().__init__(master, **kwargs)
         self.canvas = tk.Canvas(self, **canvasConfig)
-        self.canvas.place(relx=.012, rely=.017, relh=.966, relw=.976)
+        self.canvas.place(relx=.005, rely=.005, relh=.99, relw=.99)
 
 class DC_Digits(tk.Frame):
     def __init__(self, master, **kwargs):
@@ -108,6 +108,17 @@ class DC_Overview(tk.Frame):
     
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
+
+        
+        self.plotCanvas1 = FramedCanvas(self, relief='groove', borderwidth="2", background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black", canvasConfig=dict(background="white", borderwidth="2", highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black", relief="groove", selectbackground="#c4c4c4", selectforeground="black"))
+        self.plotCanvas1.place(relx=.375, rely=0, relh=.5, relw=.625)
+
+        self.plotCanvas2 = FramedCanvas(self, relief='groove', borderwidth="2", background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black", canvasConfig=dict(background="white", borderwidth="2", highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black", relief="groove", selectbackground="#c4c4c4", selectforeground="black"))
+        self.plotCanvas2.place(relx=.375, rely=.5, relh=.5, relw=.625)
+
+
+        self.dcDigits = DC_Digits(self, relief='groove', borderwidth="2", background="#d9d9d9")
+        self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
 
 
 
