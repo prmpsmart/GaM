@@ -408,7 +408,8 @@ class PRMP_Theme(Mixins):
 
     def _paintChildren(self):
         children = self._children
-        for child in children: child.paint()
+        for child in children:
+            if getattr(child, 'paint', None): child.paint()
     
     def _paintAll(self, e=0):
         self._paint()
@@ -486,9 +487,7 @@ class PRMP_Widget(PRMP_Theme):
         
     
     def entered(self, e=0):
-        
         if not self.nonText: self.statusShow()
-
         if self.highlightable:
             try: self.configure(relief='solid')
             except: pass
@@ -502,7 +501,7 @@ class PRMP_Widget(PRMP_Theme):
     
     def statusShow(self):
         root = self.winfo_toplevel()
-        if root and root.statusBar: root.statusBar.set(self.status)
+        if root and getattr(root, 'statusBar', None): root.statusBar.set(self.status)
         
     def getWid_H_W(self, wid):
         wid.update()

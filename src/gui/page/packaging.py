@@ -11,10 +11,6 @@ class Toplevel:
         _ana1color = '#d9d9d9' # X11 color: 'gray85'
         _ana2color = '#ececec' # Closest X11 color: 'gray92'
 
-        top.geometry("1047x646")
-        top.title("New Toplevel")
-        top.configure(background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
-
         self.Label1 = tk.Label(top, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Areas')
         self.Label1.place(relx=.01, rely=.062, h=33, w=123)
 

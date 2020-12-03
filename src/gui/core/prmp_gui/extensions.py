@@ -462,7 +462,6 @@ class ToolTip(PRMP_Toplevel):
         """
         self.visible = 0
         self.withdraw()
-
 TT = ToolTip
 
 class SolidScreen(PRMP_MainWindow):
@@ -502,6 +501,43 @@ class ScrolledEntry(AutoScroll, tk.Entry):
         tk.Entry.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
+class FramedCanvas(Frame):
+    def __init__(self, master, canvasConfig={}, **kwargs):
+        super().__init__(master, **kwargs)
+        self.canvas = Canvas(self, **canvasConfig)
+        self.canvas.place(relx=.005, rely=.005, relh=.99, relw=.99)
+
+class DateTimeView(LabelFrame):
+    def __init__(self, master, text='Date and Time', **kwargs):
+        super().__init__(master, text=text, **kwargs)
+        
+        self.time = Label(self)
+        self.time.place(relx=.01, rely=.4, relh=.48, relw=.37, bordermode='ignore')
+
+        self.date = Label(self)
+        self.date.place(relx=.39, rely=.4, relh=.48, relw=.6, bordermode='ignore')
+
+        self.update()
+    
+    def update(self):
+        now = DateTime.now()
+        day = now.day
+        dayN = now.dayName
+        month = now.monthName
+        year = now.year
+
+        date = f'{dayN} {day}, {month} {year}'
+        self.date['text'] = date
+
+        hour = now.hour % 12
+        minute = now.minute
+        second = now.second
+        m = now.strftime('%p')
+
+        time = f'{hour} : {minute} : {second} {m}'
+        self.time['text'] = time
+        
+        self.after(10, self.update)
 
 
 
