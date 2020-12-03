@@ -104,7 +104,10 @@ class DC_Digits(tk.Frame):
         self.excessesS = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000exc')
         self.excessesS.place(relx=.53, rely=.82, relh=.14, relw=.44, bordermode='ignore')
 
-
+class DC_Overview(tk.Frame):
+    
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
 
 
 
