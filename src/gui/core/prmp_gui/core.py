@@ -323,7 +323,7 @@ class PRMP_Theme(Mixins):
     def _paint(self):
         if not self._ttk_:
             kwargs = {k: v for k, v in self.kwargs.items()}
-            
+            print(kwargs)
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
             activebackground = kwargs.pop('activebackground', foreground)
@@ -377,7 +377,7 @@ class PRMP_Theme(Mixins):
             
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
-                # print(kwargs, 9)
+                print(kwargs, 9)
                 self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
 
             elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
@@ -464,10 +464,11 @@ class PRMP_Widget(PRMP_Theme):
 
 
     def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, highlightable=True, **kwargs):
-        self.kwargs = kwargs
+        self.kwargs = kwargs.copy()
         self.kwargs['relief'] = relief
-        if kwargs.get('prmp_master'):
-            self.prmp_master = kwargs.pop('prmp_master')
+
+        if self.kwargs.get('prmp_master'):
+            self.prmp_master = self.kwargs.pop('prmp_master')
         else: self.prmp_master = None
         self._status = status
         self.font = None
@@ -476,13 +477,13 @@ class PRMP_Widget(PRMP_Theme):
 
         self.toggleGroup = []
         
-        self.val = self.value = kwargs.get('value', '1')
-        self.var = self.variable = kwargs.get('variable')
+        self.val = self.value = self.kwargs.get('value', '1')
+        self.var = self.variable = self.kwargs.get('variable')
     
         self._ttk_ = _ttk_
         
         try:
-            font = kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
+            font = self.kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
             self.useFont(font)
         except: pass
         
