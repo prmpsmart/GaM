@@ -18,7 +18,7 @@ class Toplevel:
         top.configure(highlightcolor="black")
 
         self.Label1 = tk.Label(top)
-        self.Label1.place(relx=0.01, rely=0.062, height=33,w=123)
+        self.Label1.place(relx=.01, rely=.062, height=33,w=123)
         self.Label1.configure(activebackground="#f9f9f9")
         self.Label1.configure(activeforeground="black")
         self.Label1.configure(background="#d9d9d9")
@@ -31,7 +31,7 @@ class Toplevel:
         self.Label1.configure(text='''Areas''')
 
         self.Label2 = tk.Label(top)
-        self.Label2.place(relx=0.143, rely=0.062, height=33,w=103)
+        self.Label2.place(relx=.143, rely=.062, height=33,w=103)
         self.Label2.configure(activebackground="#f9f9f9")
         self.Label2.configure(activeforeground="black")
         self.Label2.configure(anchor='ne')
@@ -46,7 +46,7 @@ class Toplevel:
         self.Label2.configure(text='''006''')
 
         self.Frame1_11 = tk.Frame(top)
-        self.Frame1_11.place(relx=0.344, rely=0.062, relh=0.937, relw=0.654)
+        self.Frame1_11.place(relx=.344, rely=.062, relh=.937, relw=.654)
         self.Frame1_11.configure(relief='groove')
         self.Frame1_11.configure(borderwidth="2")
         self.Frame1_11.configure(relief="groove")
@@ -55,17 +55,17 @@ class Toplevel:
         self.Frame1_11.configure(highlightcolor="black")
 
         self.Frame1_1 = FramedCanvas(self.Frame1_11, relief='groove', borderwidth="2", background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black", canvasConfig=dict(background="yellow", borderwidth="2", highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black", relief="groove", selectbackground="#c4c4c4", selectforeground="black"))
-        self.Frame1_1.place(relx=0.38, rely=0.0, relh=0.488, relw=0.62)
+        self.Frame1_1.place(relx=.375, rely=0, relh=.5, relw=.625)
 
         self.Frame1_2 = FramedCanvas(self.Frame1_11, relief='groove', borderwidth="2", background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black", canvasConfig=dict(background="yellow", borderwidth="2", highlightbackground="#d9d9d9", highlightcolor="black", insertbackground="black", relief="groove", selectbackground="#c4c4c4", selectforeground="black"))
-        self.Frame1_2.place(relx=0.38, rely=0.504, relh=0.488, relw=0.62)
+        self.Frame1_2.place(relx=.375, rely=.5, relh=.5, relw=.625)
 
 
-        self.Frame2 = DC_Digits(self.Frame1_11, relief='groove', borderwidth="2", background="red")
-        self.Frame2.place(relx=0.0, rely=0.0, relh=0.993, relw=0.369)
+        self.Frame2 = DC_Digits(self.Frame1_11, relief='groove', borderwidth="2", background="#d9d9d9")
+        self.Frame2.place(relx=0, rely=0, relh=1, relw=.369)
 
         self.Frame1 = tk.Frame(top)
-        self.Frame1.place(relx=0.01, rely=0.139, relh=0.859, relw=0.33)
+        self.Frame1.place(relx=.01, rely=.139, relh=.859, relw=.33)
         self.Frame1.configure(relief='groove')
         self.Frame1.configure(borderwidth="2")
         self.Frame1.configure(relief="groove")
@@ -74,7 +74,7 @@ class Toplevel:
         self.Frame1.configure(highlightcolor="black")
 
         self.Labelframe1 = tk.LabelFrame(self.Frame1)
-        self.Labelframe1.place(relx=0.029, rely=0.144, relh=0.297, relw=0.957)
+        self.Labelframe1.place(relx=.029, rely=.144, relh=.297, relw=.957)
         self.Labelframe1.configure(relief='groove')
         self.Labelframe1.configure(font="-family {Times New Roman} -size 11 -weight bold")
         self.Labelframe1.configure(foreground="black")
@@ -84,7 +84,7 @@ class Toplevel:
         self.Labelframe1.configure(highlightcolor="black")
 
         self.Label1_14 = tk.Label(self.Labelframe1)
-        self.Label1_14.place(relx=0.061, rely=0.121, height=33,w=183, bordermode='ignore')
+        self.Label1_14.place(relx=.061, rely=.121, height=33,w=183, bordermode='ignore')
         self.Label1_14.configure(activebackground="#f9f9f9")
         self.Label1_14.configure(activeforeground="black")
         self.Label1_14.configure(background="#d9d9d9")
@@ -97,7 +97,7 @@ class Toplevel:
         self.Label1_14.configure(text='''December''')
 
         self.Label1_15 = tk.Label(self.Labelframe1)
-        self.Label1_15.place(relx=0.667, rely=0.121, height=33,w=93, bordermode='ignore')
+        self.Label1_15.place(relx=.667, rely=.121, height=33,w=93, bordermode='ignore')
         self.Label1_15.configure(activebackground="#f9f9f9")
         self.Label1_15.configure(activeforeground="black")
         self.Label1_15.configure(background="#d9d9d9")
@@ -110,7 +110,7 @@ class Toplevel:
         self.Label1_15.configure(text='''2020''')
 
         self.Label1_8 = tk.Label(self.Labelframe1)
-        self.Label1_8.place(relx=0.061, rely=0.424, height=23,w=113, bordermode='ignore')
+        self.Label1_8.place(relx=.061, rely=.424, height=23,w=113, bordermode='ignore')
         self.Label1_8.configure(activebackground="#f9f9f9")
         self.Label1_8.configure(activeforeground="black")
         self.Label1_8.configure(background="#d9d9d9")
@@ -123,7 +123,7 @@ class Toplevel:
         self.Label1_8.configure(text='''Clients''')
 
         self.Label2_9 = tk.Label(self.Labelframe1)
-        self.Label2_9.place(relx=0.485, rely=0.424, height=23,w=93, bordermode='ignore')
+        self.Label2_9.place(relx=.485, rely=.424, height=23,w=93, bordermode='ignore')
         self.Label2_9.configure(activebackground="#f9f9f9")
         self.Label2_9.configure(activeforeground="black")
         self.Label2_9.configure(anchor='ne')
@@ -138,7 +138,7 @@ class Toplevel:
         self.Label2_9.configure(text='''340''')
 
         self.Button1 = tk.Button(self.Labelframe1)
-        self.Button1.place(relx=0.061, rely=0.788, height=28,w=45, bordermode='ignore')
+        self.Button1.place(relx=.061, rely=.788, height=28,w=45, bordermode='ignore')
         self.Button1.configure(activebackground="#ececec")
         self.Button1.configure(activeforeground="#000000")
         self.Button1.configure(background="#d9d9d9")
@@ -151,7 +151,7 @@ class Toplevel:
         self.Button1.configure(text='''Prev''')
 
         self.Button1_9 = tk.Button(self.Labelframe1)
-        self.Button1_9.place(relx=0.394, rely=0.788, height=28,w=65, bordermode='ignore')
+        self.Button1_9.place(relx=.394, rely=.788, height=28,w=65, bordermode='ignore')
         self.Button1_9.configure(activebackground="#ececec")
         self.Button1_9.configure(activeforeground="#000000")
         self.Button1_9.configure(background="#d9d9d9")
@@ -164,7 +164,7 @@ class Toplevel:
         self.Button1_9.configure(text='''Current''')
 
         self.Button1_10 = tk.Button(self.Labelframe1)
-        self.Button1_10.place(relx=0.788, rely=0.788, height=28,w=45, bordermode='ignore')
+        self.Button1_10.place(relx=.788, rely=.788, height=28,w=45, bordermode='ignore')
         self.Button1_10.configure(activebackground="#ececec")
         self.Button1_10.configure(activeforeground="#000000")
         self.Button1_10.configure(background="#d9d9d9")
@@ -177,7 +177,7 @@ class Toplevel:
         self.Button1_10.configure(text='''Next''')
 
         self.Labelframe1_13 = tk.LabelFrame(self.Frame1)
-        self.Labelframe1_13.place(relx=0.029, rely=0.505, relh=0.477, relw=0.957)
+        self.Labelframe1_13.place(relx=.029, rely=.505, relh=.477, relw=.957)
         self.Labelframe1_13.configure(relief='groove')
         self.Labelframe1_13.configure(font="-family {Times New Roman} -size 11 -weight bold")
         self.Labelframe1_13.configure(foreground="black")
@@ -187,7 +187,7 @@ class Toplevel:
         self.Labelframe1_13.configure(highlightcolor="black")
 
         self.Labelframe1_9 = tk.LabelFrame(self.Frame1)
-        self.Labelframe1_9.place(relx=0.029, rely=0.018, relh=0.099, relw=0.957)
+        self.Labelframe1_9.place(relx=.029, rely=.018, relh=.099, relw=.957)
         self.Labelframe1_9.configure(relief='groove')
         self.Labelframe1_9.configure(font="-family {Times New Roman} -size 11 -weight bold")
         self.Labelframe1_9.configure(foreground="black")
@@ -197,7 +197,7 @@ class Toplevel:
         self.Labelframe1_9.configure(highlightcolor="black")
 
         self.Label3 = tk.Label(self.Labelframe1_9)
-        self.Label3.place(relx=0.03, rely=0.364, height=23,w=103, bordermode='ignore')
+        self.Label3.place(relx=.03, rely=.364, height=23,w=103, bordermode='ignore')
         self.Label3.configure(activebackground="#ffaa7f")
         self.Label3.configure(activeforeground="black")
         self.Label3.configure(background="#d9d9d9")
@@ -210,7 +210,7 @@ class Toplevel:
         self.Label3.configure(text='''03 : 23 AM''')
 
         self.Label3_11 = tk.Label(self.Labelframe1_9)
-        self.Label3_11.place(relx=0.394, rely=0.364, height=23,w=193, bordermode='ignore')
+        self.Label3_11.place(relx=.394, rely=.364, height=23,w=193, bordermode='ignore')
         self.Label3_11.configure(activebackground="#ffaa7f")
         self.Label3_11.configure(activeforeground="black")
         self.Label3_11.configure(background="#d9d9d9")
