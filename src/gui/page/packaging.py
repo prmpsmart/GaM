@@ -17,8 +17,8 @@ class Toplevel:
         self.Label2 = tk.Label(top, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='006')
         self.Label2.place(relx=.143, rely=.062, h=33, w=103)
 
-        self.Frame1_11 = DC_Overview(top, relief='groove', borderwidth="2", background="#d9d9d9", highlightbackground="#ff8040", highlightcolor="black")
-        self.Frame1_11.place(relx=.35, rely=0, relh=1, relw=.65)
+        self.Frame1_11 = DC_Overview(top)
+        self.Frame1_11.place(relx=.35, rely=.005, relh=.99, relw=.65)
 
 
         self.Frame1 = tk.Frame(top, relief='groove', borderwidth="2", background="#d9d9d9", highlightbackground="#ff8040", highlightcolor="black")
