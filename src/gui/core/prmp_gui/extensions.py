@@ -508,9 +508,12 @@ class FramedCanvas(Frame):
         self.canvas.place(relx=.005, rely=.005, relh=.99, relw=.99)
 
 class DateTimeView(LabelFrame):
+
     def __init__(self, master, text='Date and Time', **kwargs):
-        super().__init__(master, config={'text': text}, **kwargs)
-        
+        print(kwargs, 'first', text)
+
+        super().__init__(master, text=text, **kwargs)
+        print(kwargs, 'last')
         self.time = Label(self)
         self.time.place(relx=.01, rely=.4, relh=.48, relw=.37)
 
