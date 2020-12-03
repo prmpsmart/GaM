@@ -16,7 +16,8 @@ try:
     import ttk
     py3 = False
 except ImportError:
-    import tkinter.ttk as ttk
+    import tkinter.ttk as ttkpage
+    
     py3 = True
 
 def init(top, gui, *args, **kwargs):
