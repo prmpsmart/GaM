@@ -12,6 +12,8 @@ from ctypes import windll
 
 # superclasses
 
+'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'
+
 class PRMP_Theme(Mixins):
     # exerpt from PySimpleGUI theming engine
     
