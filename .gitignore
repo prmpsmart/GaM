@@ -4,7 +4,6 @@ __pycache__/
 database/
 test*/
 img/
-test_src/
 test*.py
 creator.py
 *.log
