@@ -5,101 +5,104 @@ class FramedCanvas(tk.Frame):
     def __init__(self, master, canvasConfig={}, **kwargs):
         super().__init__(master, **kwargs)
         self.canvas = tk.Canvas(self, **canvasConfig)
-        self.canvas.place(relx=0.012, rely=0.017, relh=0.966, relw=0.976)
+        self.canvas.place(relx=.012, rely=.017, relh=.966, relw=.976)
 
 class DC_Digits(tk.Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
     # Incomes
         self.incomes = tk.LabelFrame(self, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Incomes', background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
-        self.incomes.place(relx=0.02, rely=0.008, relh=0.248, relw=0.96)
+        self.incomes.place(relx=.02, rely=.008, relh=.248, relw=.96)
 
         self.incomesS = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 3,000,000i')
-        self.incomesS.place(relx=0.041, rely=0.134, h=33, w=223, bordermode='ignore')
+        self.incomesS.place(relx=.03, rely=.134, relh=.225, relw=.94, bordermode='ignore')
 
         self.savings = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Savings')
-        self.savings.place(relx=0.041, rely=0.403, h=23, w=113, bordermode='ignore')
+        self.savings.place(relx=.03, rely=.403, relh=.17, relw=.48, bordermode='ignore')
 
         self.savingsS = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 50,000s')
-        self.savingsS.place(relx=0.576, rely=0.403, h=23, w=93, bordermode='ignore')
+        self.savingsS.place(relx=.53, rely=.403, relh=.17, relw=.44, bordermode='ignore')
 
         self.transfers = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Transfers')
-        self.transfers.place(relx=0.041, rely=0.604, h=23, w=113, bordermode='ignore')
+        self.transfers.place(relx=.03, rely=.604, relh=.17, relw=.48, bordermode='ignore')
 
         self.transfersS = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000tr')
-        self.transfersS.place(relx=0.576, rely=0.57, h=23, w=93, bordermode='ignore')
+        self.transfersS.place(relx=.53, rely=.604, relh=.17, relw=.44, bordermode='ignore')
 
         self.commissions = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Commissions')
-        self.commissions.place(relx=0.041, rely=0.772, h=23, w=113, bordermode='ignore')
+        self.commissions.place(relx=.03, rely=.8, relh=.17, relw=.48, bordermode='ignore')
 
-        self.commissions = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000c')
-        self.commissions.place(relx=0.576, rely=0.772, h=23, w=93, bordermode='ignore')
+        self.commissionsS = tk.Label(self.incomes, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000c')
+        self.commissionsS.place(relx=.53, rely=.8, relh=.17, relw=.44, bordermode='ignore')
+
     # Debits
-        self.Labelframe1_6 = tk.LabelFrame(self, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Debits', background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
-        self.Labelframe1_6.place(relx=0.02, rely=0.258, relh=0.205, relw=0.96)
+        self.debits = tk.LabelFrame(self, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Debits', background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
+        self.debits.place(relx=.02, rely=.267, relh=.205, relw=.96)
 
-        self.Label1_4 = tk.Label(self.Labelframe1_6, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Withdrawals')
-        self.Label1_4.place(relx=0.041, rely=0.488, h=23, w=113, bordermode='ignore')
+        self.debitsS = tk.Label(self.debits, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 80,000d')
+        self.debitsS.place(relx=.03, rely=.163, relh=.27, relw=.94, bordermode='ignore')
 
-        self.Label2_1 = tk.Label(self.Labelframe1_6, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 50,000')
-        self.Label2_1.place(relx=0.576, rely=0.488, h=23, w=93, bordermode='ignore')
+        self.withdrawals = tk.Label(self.debits, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Withdrawals')
+        self.withdrawals.place(relx=.03, rely=.488, relh=.2, relw=.48, bordermode='ignore')
 
-        self.Label1_2 = tk.Label(self.Labelframe1_6, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Paidouts')
-        self.Label1_2.place(relx=0.041, rely=0.732, h=23, w=113, bordermode='ignore')
+        self.withdrawalsS = tk.Label(self.debits, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 50,000w')
+        self.withdrawalsS.place(relx=.53, rely=.488, relh=.2, relw=.44, bordermode='ignore')
 
-        self.Label2_3 = tk.Label(self.Labelframe1_6, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000')
-        self.Label2_3.place(relx=0.576, rely=0.732, h=23, w=93, bordermode='ignore')
+        self.paidouts = tk.Label(self.debits, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Paidouts')
+        self.paidouts.place(relx=.03, rely=.732, relh=.2, relw=.48, bordermode='ignore')
 
-        self.Label2_8 = tk.Label(self.Labelframe1_6, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 80,000')
-        self.Label2_8.place(relx=0.041, rely=0.163, h=33, w=223, bordermode='ignore')
+        self.paidoutsS = tk.Label(self.debits, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000p')
+        self.paidoutsS.place(relx=.53, rely=.732, relh=.2, relw=.44, bordermode='ignore')
+
     # Upfronts
-        self.Labelframe1_4 = tk.LabelFrame(self, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Upfronts', background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
-        self.Labelframe1_4.place(relx=0.02, rely=0.474, relh=0.198, relw=0.96)
+        self.upfronts = tk.LabelFrame(self, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Upfronts', background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
+        self.upfronts.place(relx=.02, rely=.48, relh=.198, relw=.96)
 
-        self.Label1_3 = tk.Label(self.Labelframe1_4, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Repaid')
-        self.Label1_3.place(relx=0.041, rely=0.462, h=23, w=113, bordermode='ignore')
+        self.upfrontsS = tk.Label(self.upfronts, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 980,000up')
+        self.upfrontsS.place(relx=.03, rely=.168, relh=.225, relw=.94, bordermode='ignore')
 
-        self.Label2_4 = tk.Label(self.Labelframe1_4, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 850,000')
-        self.Label2_4.place(relx=0.576, rely=0.462, h=23, w=93, bordermode='ignore')
+        self.repaid = tk.Label(self.upfronts, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Repaid')
+        self.repaid.place(relx=.03, rely=.462, relh=.17, relw=.44, bordermode='ignore')
 
-        self.Label1_7 = tk.Label(self.Labelframe1_4, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Overdue')
-        self.Label1_7.place(relx=0.041, rely=0.714, h=23, w=113, bordermode='ignore')
+        self.repaidS = tk.Label(self.upfronts, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 850,000r')
+        self.repaidS.place(relx=.53, rely=.462, relh=.17, relw=.44, bordermode='ignore')
 
-        self.Label2_9 = tk.Label(self.Labelframe1_4, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 130,000')
-        self.Label2_9.place(relx=0.576, rely=0.714, h=23, w=93, bordermode='ignore')
+        self.overdue = tk.Label(self.upfronts, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Overdue')
+        self.overdue.place(relx=.03, rely=.714, relh=.17, relw=.44, bordermode='ignore')
 
-        self.Label2_5 = tk.Label(self.Labelframe1_4, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 980,000')
-        self.Label2_5.place(relx=0.041, rely=0.168, h=33, w=223, bordermode='ignore')
+        self.overdueS = tk.Label(self.upfronts, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 130,000ov')
+        self.overdueS.place(relx=.53, rely=.714, relh=.17, relw=.44, bordermode='ignore')
+
     # Balances
         self.balances = tk.LabelFrame(self, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Balances', background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black")
-        self.balances.place(relx=0.02, rely=0.69, relh=0.304, relw=0.96)
+        self.balances.place(relx=.02, rely=.69, relh=.304, relw=.96)
 
         self.balancesS = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 1,080,000')
-        self.balancesS.place(relx=0.041, rely=0.109, h=33, w=223, bordermode='ignore')
+        self.balancesS.place(relx=.03, rely=.109, relh=.225, relw=.94, bordermode='ignore')
 
         self.broughts = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Brought-Fs')
-        self.broughts.place(relx=0.041, rely=0.328, h=23, w=113, bordermode='ignore')
+        self.broughts.place(relx=.03, rely=.328, relh=.17, relw=.44, bordermode='ignore')
 
         self.broughtsS = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 500,000br')
-        self.broughtsS.place(relx=0.576, rely=0.328, h=23, w=93, bordermode='ignore')
+        self.broughtsS.place(relx=.53, rely=.328, relh=.17, relw=.44, bordermode='ignore')
 
         self.btos = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='B-T-Os')
-        self.btos.place(relx=0.041, rely=0.492, h=23, w=113, bordermode='ignore')
+        self.btos.place(relx=.03, rely=.492, relh=.17, relw=.44, bordermode='ignore')
 
         self.btosS = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000bto')
-        self.btosS.place(relx=0.576, rely=0.492, h=23, w=93, bordermode='ignore')
+        self.btosS.place(relx=.53, rely=.492, relh=.17, relw=.44, bordermode='ignore')
 
         self.deficits = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Deficits')
-        self.deficits.place(relx=0.041, rely=0.656, h=23, w=113, bordermode='ignore')
+        self.deficits.place(relx=.03, rely=.656, relh=.17, relw=.44, bordermode='ignore')
 
         self.deficitsS = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000def')
-        self.deficitsS.place(relx=0.576, rely=0.656, h=23, w=93, bordermode='ignore')
+        self.deficitsS.place(relx=.53, rely=.656, relh=.17, relw=.44, bordermode='ignore')
 
         self.excesses = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Excesses')
-        self.excesses.place(relx=0.041, rely=0.82, h=23, w=113, bordermode='ignore')
+        self.excesses.place(relx=.03, rely=.82, relh=.17, relw=.44, bordermode='ignore')
 
         self.excessesS = tk.Label(self.balances, activebackground="#f9f9f9", activeforeground="black", anchor='ne', background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", justify='left', relief="sunken", text='₦ 30,000exc')
-        self.excessesS.place(relx=0.576, rely=0.82, h=23, w=93, bordermode='ignore')
+        self.excessesS.place(relx=.53, rely=.82, relh=.17, relw=.44, bordermode='ignore')
 
 
 
