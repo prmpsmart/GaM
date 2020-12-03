@@ -377,6 +377,7 @@ class PRMP_Theme(Mixins):
             
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
+                # print(kwargs, 9)
                 self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
 
             elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
@@ -721,6 +722,8 @@ class PRMP_(PRMP_Widget):
 
     def __init__(self, **kwargs):
         super().__init__( _ttk_=False, **kwargs)
+
+
 P_ = PRMP_
 
 class PRMP_Style_(PRMP_Widget):
@@ -1496,8 +1499,8 @@ Label = PL = PRMP_Label
 
 class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
     
-    def __init__(self, master=None, bd=2, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
-        tk.LabelFrame.__init__(self, master, bd=bd, **config)
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
+        tk.LabelFrame.__init__(self, master,  **config)
         PRMP_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
 LabelFrame = PLF = PRMP_LabelFrame
 

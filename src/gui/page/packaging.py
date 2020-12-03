@@ -51,5 +51,5 @@ class Toplevel:
         self.Labelframe1_13 = tk.LabelFrame(self.Frame1, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Sort and Search', background="#d9d9d9", highlightbackground="#ff8040", highlightcolor="black")
         self.Labelframe1_13.place(relx=.029, rely=.505, relh=.477, relw=.957)
 
-        self.datetime = DateTimeView(self.Frame1, relief='groove', font="-family {Times New Roman} -size 11 -weight bold", foreground="black", text='Date and Time', background="#d9d9d9", highlightbackground="#ff8040", highlightcolor="black")
+        self.datetime = DateTimeView(self.Frame1)
         self.datetime.place(relx=.029, rely=.018, relh=.099, relw=.957)
