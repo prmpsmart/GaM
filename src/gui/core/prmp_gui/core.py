@@ -7,7 +7,7 @@ import tkinter.ttk as ttk
 from random import randint
 from tkinter.filedialog import askopenfilename
 from .pics import PRMP_Image
-from .miscs import Mixins, partial, copyClassMethods
+from .miscs import Mixins, partial, copyClassMethods, DateTime
 from ctypes import windll
 
 # superclasses

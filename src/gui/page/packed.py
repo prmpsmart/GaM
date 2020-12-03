@@ -120,6 +120,29 @@ class DC_Overview(tk.Frame):
         self.dcDigits = DC_Digits(self, relief='groove', borderwidth="2", background="#d9d9d9")
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
 
+class DateTimeView(tk.LabelFrame):
+    def __init__(self, master, text='Date and Time', **kwargs):
+        super().__init__(master, text=text, **kwargs)
+        
+        self.time = tk.Label(self, activebackground="#ffaa7f", activeforeground="black", background="#d9d9d9", disabledforeground="#bf6030", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#ff8040", highlightcolor="black", relief="ridge", text='03 : 23 : 45 AM')
+        self.time.place(relx=.01, rely=.4, relh=.48, relw=.37, bordermode='ignore')
+
+        self.date = tk.Label(self, activebackground="#ffaa7f", activeforeground="black", background="#d9d9d9", disabledforeground="#bf6030", font="-family {Times New Roman} -size 11 -weight bold", foreground="#000000", highlightbackground="#ff8040", highlightcolor="black", relief="ridge", text='Tuesday 1, December 2020')
+        self.date.place(relx=.39, rely=.4, relh=.48, relw=.6, bordermode='ignore')
+        
+        self.tim()
+    
+    def tim(self):
+        now = DateTime.now()
+        day = now.day
+        dayN = now.dayName
+        month = now.monthName
+        year = now.year
+
+        date = f'{dayN} {day}, {month} {year}'
+        print(date)
+
+
 
 
 
