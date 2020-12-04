@@ -10,6 +10,29 @@ class CoopOfficeAccount(UnitAccount):
 class DCOfficeAccount(AreaAccount):
     Manager = 'DCOfficeAccountsManager'
 
+    def _balanceAccount(self, date=None):
+        areasAccounts = self.clientsAccounts
+        if areasAccounts:
+            self.incomes.updateWithOtherManagers([account.incomes for account in areasAccounts])
+            
+            self.balances.updateWithOtherManagers([account.balances for account in areasAccounts])
+            
+            self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in areasAccounts])
+            
+            self.commissions.updateWithOtherManagers([account.commissions for account in areasAccounts])
+            
+            self.debits.updateWithOtherManagers([account.debits for account in areasAccounts])
+            
+            self.savings.updateWithOtherManagers([account.savings for account in areasAccounts])
+            
+            self.upfronts.updateWithOtherManagers([account.upfronts for account in areasAccounts])
+            
+            self.excesses.updateWithOtherManagers([account.excesses for account in areasAccounts])
+            
+            self.deficits.updateWithOtherManagers([account.deficits for account in areasAccounts])
+            
+            self.btos.updateWithOtherManagers([account.btos for account in areasAccounts])
+
 
 class DCOfficeAccountsManager(AreaAccountsManager):
     ObjectType = DCOfficeAccount
