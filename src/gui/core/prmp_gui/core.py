@@ -518,6 +518,7 @@ class PRMP_Widget(PRMP_Theme):
         
         try:
             font = self.kwargs.get('font', 'DEFAULT_FONT')
+            # font = self.kwargs.get('font', 'PRMP_FONT')
             self.useFont(font)
         except: pass
         
@@ -1093,18 +1094,31 @@ class PRMP_Style(ttk.Style, Mixins):
         progressbar_color = PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR
         relief = PRMP_Theme.DEFAULT_RELIEF
 
-        default_font = self.tupledFont(PRMP_Theme.DEFAULT_FONT)
-        normal_font = self.tupledFont(PRMP_Theme.NORMAL_FONT)
-        big_font = self.tupledFont(PRMP_Theme.BIG_FONT)
-        menu_font = self.tupledFont(PRMP_Theme.DEFAULT_MENU_FONT)
-        button_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTON_FONT)
-        buttons_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTONS_FONT)
-        small_button_font = self.tupledFont(PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
-        title_font = self.tupledFont(PRMP_Theme.DEFAULT_TITLE_FONT)
-        status_font = self.tupledFont(PRMP_Theme.DEFAULT_STATUS_FONT)
-        label_font = self.tupledFont(PRMP_Theme.DEFAULT_LABEL_FONT)
-        labelframe_font = self.tupledFont(PRMP_Theme.DEFAULT_LABELFRAME_FONT)
-        heading_font = self.tupledFont(PRMP_Theme.HEADING_FONT)
+        # default_font = self.tupledFont(PRMP_Theme.DEFAULT_FONT)
+        # normal_font = self.tupledFont(PRMP_Theme.NORMAL_FONT)
+        # big_font = self.tupledFont(PRMP_Theme.BIG_FONT)
+        # menu_font = self.tupledFont(PRMP_Theme.DEFAULT_MENU_FONT)
+        # button_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTON_FONT)
+        # buttons_font = self.tupledFont(PRMP_Theme.DEFAULT_BUTTONS_FONT)
+        # small_button_font = self.tupledFont(PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        # title_font = self.tupledFont(PRMP_Theme.DEFAULT_TITLE_FONT)
+        # status_font = self.tupledFont(PRMP_Theme.DEFAULT_STATUS_FONT)
+        # label_font = self.tupledFont(PRMP_Theme.DEFAULT_LABEL_FONT)
+        # labelframe_font = self.tupledFont(PRMP_Theme.DEFAULT_LABELFRAME_FONT)
+        # heading_font = self.tupledFont(PRMP_Theme.HEADING_FONT)
+
+        default_font = 'DEFAULT_FONT'
+        normal_font = 'NORMAL_FONT'
+        big_font = 'BIG_FONT'
+        menu_font = 'DEFAULT_MENU_FONT'
+        button_font = 'DEFAULT_BUTTON_FONT'
+        buttons_font = 'DEFAULT_BUTTONS_FONT'
+        small_button_font = 'DEFAULT_SMALL_BUTTON_FONT'
+        title_font = 'DEFAULT_TITLE_FONT'
+        status_font = 'DEFAULT_STATUS_FONT'
+        label_font = 'DEFAULT_LABEL_FONT'
+        labelframe_font = 'DEFAULT_LABELFRAME_FONT'
+        heading_font = 'HEADING_FONT'
 
 
         oneColor = True
@@ -1491,7 +1505,7 @@ Treeview = PTv = PRMP_Treeview
 
 class PRMP_Button(PRMP_, tk.Button):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, config={}, **kwargs):
+    def __init__(self, master=None, font='DEFAULT_BUTTON_FONT', asEntry=False, asLabel=False, config={}, **kwargs):
         tk.Button.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, **config, **kwargs)
     
@@ -1544,7 +1558,7 @@ Frame = PF = PRMP_Frame
 
 class PRMP_Label(PRMP_, tk.Label):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, config={}, **kwargs):
+    def __init__(self, master=None, font='DEFAULT_LABEL_FONT', config={}, **kwargs):
         tk.Label.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
 
@@ -1554,7 +1568,7 @@ Label = PL = PRMP_Label
 
 class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
+    def __init__(self, master=None, font='DEFAULT_LABELFRAME_FONT', config={}, **kwargs):
         tk.LabelFrame.__init__(self, master,  **config)
         PRMP_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
     
@@ -1620,7 +1634,7 @@ Spinbox = PSp = PRMP_Spinbox
 
 class PRMP_Style_Button(PRMP_Style_, ttk.Button):
     
-    def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, config={}, **kwargs):
+    def __init__(self, master=None, font='DEFAULT_BUTTON_FONT', asEntry=False, asLabel=False, config={}, **kwargs):
         ttk.Button.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, **config, **kwargs)
 SButton = PSB = PRMP_Style_Button
@@ -1655,7 +1669,7 @@ SFrame = PSF = PRMP_Style_Frame
 
 class PRMP_Style_Label(PRMP_Style_, ttk.Label):
     
-    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, config={}, **kwargs):
+    def __init__(self, master=None, font='DEFAULT_LABEL_FONT', config={}, **kwargs):
         ttk.Label.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
 SLabel = PSL = PRMP_Style_Label
@@ -1733,7 +1747,7 @@ class PRMP_Window(PRMP_Widget):
             PRMP_Window.STYLE = PRMP_Style(self)
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
-        
+
         self.resize = resize
         self.container = None
         self.zoomed = False
@@ -2047,15 +2061,15 @@ class PRMP_Window(PRMP_Widget):
 
         if not self.__r:
             self.imgMin = PRMP_Image('green', resize=(20, 20))
-            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
             self.imgMax = PRMP_Image('yellow', resize=(20, 20))
-            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), tip='Maximize', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+            self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), tip='Maximize', font='DEFAULT_SMALL_BUTTON_FONT')
 
         self.imgExit = PRMP_Image('red', resize=(20, 20))
-        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), tip='Exit', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
+        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), tip='Exit', font='DEFAULT_SMALL_BUTTON_FONT')
 
-        self.titleBar = L(fr, config=dict( text=title or self.titleText), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
+        self.titleBar = L(fr, config=dict( text=title or self.titleText), font='DEFAULT_TITLE_FONT', relief='groove')
         self.titleBar.bind('<Double-1>', self.maximize, '+')
         self.titleBar._moveroot()
 
@@ -2086,10 +2100,10 @@ class PRMP_Window(PRMP_Widget):
         F, L, B = PRMP_Style_Frame, PRMP_Style_Label, PRMP_Style_Button
 
         fr = F(self)
-        self.statusBar = L(fr, config=dict(text='Status' or self.statusText, ), font=PRMP_Theme.DEFAULT_STATUS_FONT)
+        self.statusBar = L(fr, config=dict(text='Status' or self.statusText, ), font='DEFAULT_STATUS_FONT')
         self.statusBar._moveroot()
-        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, tip='Previous Theme')
-        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme), font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT, tip='Next Theme')
+        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme), font='DEFAULT_SMALL_BUTTON_FONT', tip='Previous Theme')
+        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme), font='DEFAULT_SMALL_BUTTON_FONT', tip='Next Theme')
         
         self.placeStatusBar()
         
