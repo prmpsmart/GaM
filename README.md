@@ -10,7 +10,12 @@ The official accounting software of Goodness and Mercy
     * Calendar Dialog.
     * Message Dialog.
     * Message Box.
-
+4. The font mechanism is awesome.
+5. Widgets can be position at the same time when creating it.
+    * No two lines again
+    * One for creating it.
+    * The second on for positioning the widget
+    * The positioning mechanism [place, pack, grid] can be passed as place={}, pack={}, grid={} to the constructor of the widgets.
 
 
 - [x] The theme engine works better.
