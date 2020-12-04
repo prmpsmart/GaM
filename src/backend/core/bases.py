@@ -101,6 +101,9 @@ class Mixins:
 class ObjectsMixins(Mixins, CompareByDate):
     
     
+    @property
+    def strManager(self): return isinstance(self.manager, str)
+    
     def __len__(self):
         try: return len(self[:])
         except: return 1
@@ -247,7 +250,7 @@ class Object(CompareByNumber, ObjectsMixins):
         from .date_time import DateTime
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
-        
+
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
         self._number = number
@@ -260,7 +263,6 @@ class Object(CompareByNumber, ObjectsMixins):
         self._next = None
         
         self._uniqueID = sha224(self.id.encode()).hexdigest()
-    
     
     @property
     def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')

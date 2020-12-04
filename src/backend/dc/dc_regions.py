@@ -5,17 +5,20 @@ class ClientDetail(Person):
     Manager = 'Client'
     @property
     def client(self): return self.manager
-    
+
 
 class DC_CO(Person):
     'Daily Contribution Cash Officer.'
+
 
 class DC_COsManager(PersonsManager):
     ObjectType = DC_CO
     def createDC_CO(self, **kwargs): return self.createPerson(**kwargs)
 
+
 class DCRegionsManager(RegionsManager):
     pass
+
 
 class DCRegion(Region):
     Errors = DCErrors
@@ -25,6 +28,7 @@ class DCRegion(Region):
     
     @property
     def subs(self): return self.accountsManager[:] if self.accountsManager else []
+
 
 class Client(DCRegion):
     
@@ -65,6 +69,7 @@ class Client(DCRegion):
         assert DateTime.now().isSameMonth(month)
         pass
 
+
 class ClientsManager(DCRegionsManager):
     ObjectType = Client
     
@@ -102,6 +107,7 @@ class Area(DCRegion):
     def clientsInMonth(self, month): return self.clientsManager.clientsInMonth(month)
     def createClient(self, name, rate, cardDue=False, **kwargs): return self.clientsManager.createClient(name=name, rate=rate, cardDue=cardDue, **kwargs)
 
+
 class AreasManager(DCRegionsManager):
     ObjectType = Area
     
@@ -111,3 +117,13 @@ class AreasManager(DCRegionsManager):
     def createArea(self, autoAccount=True, **kwargs): return self.createRegion(autoAccount=autoAccount, **kwargs)
     
     def getArea(self, number): return self.getFromAllRegions(number)
+
+
+
+
+
+
+
+
+
+

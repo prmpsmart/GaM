@@ -2,29 +2,31 @@ from ..core.records_managers import RecordsManager, DateTime, Repayment, Repayme
 
 from .coop_errors import CoopErrors
 
+class CoopManagers:  Managers = ('UnitAccount', 'MemberAccount', 'CoopOfficeAccount')
+
+
 class CoopRecord(Record):
     Managers = ('Savings', )
 
-class CoopRecordsManager(RecordsManager):
+class CoopRecordsManager(CoopManagers, RecordsManager):
     Errors = CoopErrors
-    Managers = ('UnitAccount', 'MemberAccount')
     ObjectType = CoopRecord
-    
     
     def getMonthRecords(self, month): return self.sortRecordsIntoDaysInMonth(month)
     def getYearRecords(self, year): return self.sortRecordsByYear(year)
 
-class CoopRepayment(Repayment):
-    Managers = ('UnitAccount', 'MemberAccount')
+class CoopRepayment(CoopManagers, Repayment): pass
 
-class CoopRepaymentsManager(RepaymentsManager):
-    Managers = ('UnitAccount', 'MemberAccount')
-    
+
+class CoopRepaymentsManager(CoopManagers, RepaymentsManager):
+
     @property
     def region(self): return self.account
 
+
 class Expenses(CoopRecordsManager):
     pass
+
 
 class Levies(CoopRepayment):
     duing = False
@@ -60,6 +62,7 @@ class Levies(CoopRepayment):
         if self.outstanding == 0: raise CoopErrors.LeviesError('No outstanding levy.')
         return self.repaymentsManager.createRecord(repay, **kwargs)
 
+
 class LoanInterest(CoopRepayment):
     duing = False
     
@@ -72,6 +75,7 @@ class LoanInterest(CoopRepayment):
     def interestRate(self): return self.__interestRate
 
     def repayInterest(self, interest, **kwargs): return self.createRecord(interest, **kwargs)
+
 
 class LoanInterests(CoopRepaymentsManager):
     ObjectType = LoanInterest
@@ -94,11 +98,11 @@ class LoanInterests(CoopRepaymentsManager):
             if not interest.paid: return False
         return True
 
+
 class CoopLoan(Loan):
     dueSeason = 'year'
     dueTime = 11
     rate = 2
-    # Manager = ''
     
 
 class CoopLoanBond(LoanBond):
@@ -120,9 +124,21 @@ class CoopLoanBonds(LoanBonds):
 class Materials(CoopRepayment):
     duing = False
 
+
 class Savings(CoopRecordsManager):
     
     def addSaving(self, savings, **kwargs): self.createRecord(savings, **kwargs)
 
+
 class Shares(CoopRecordsManager):
     pass
+
+
+
+
+
+
+
+
+
+

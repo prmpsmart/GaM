@@ -7,15 +7,19 @@ class MemberDetail(Person):
     @property
     def member(self): return self.manager
 
+
 class CoopCO(Person):
     'Cooperative Cash Officer.'
+
 
 class CoopCOsManager(PersonsManager):
     ObjectType = CoopCO
     def createCoopCo(self, **kwargs): return self.createDetail(**kwargs)
 
+
 class CoopThirdPartySurety(ThirdPartySurety):
     pass
+
 
 class CoopLoanBondDetails(LoanBondDetails):
     thirdPartySurety = CoopThirdPartySurety
@@ -68,16 +72,18 @@ class CoopLoanBondDetails(LoanBondDetails):
         self.__secondSurety = self.unit.getMember(number=members[1])
         self.__thirdSurety = self.unit.getMember(number=members[2])
 
+
 class CoopRegion(Region):
     
     Errors = CoopErrors
     AccountsManager = CoopAccount
     Manager = 'CoopRegionsManager'
-    
+
 
 class CoopRegionsManager(RegionsManager):
     ObjectType = CoopRegion
     # def __str__(self): return f'{self.master} {self.className}'
+
 
 class Member(CoopRegion):
     AccountsManager = MemberAccount
@@ -112,6 +118,7 @@ class Member(CoopRegion):
     
     def balanceAccount(self): return self.accountsManager.balanceAccount()
 
+
 class MembersManager(CoopRegionsManager):
     ObjectType = Member
    
@@ -124,6 +131,7 @@ class MembersManager(CoopRegionsManager):
     def createMember(self, **kwargs): return self.createRegion(**kwargs)
     
     def memberExists(self, **kwargs): return self.regionExists(**kwargs)
+
 
 class Unit(CoopRegion):
     AccountsManager = UnitAccount
@@ -148,6 +156,7 @@ class Unit(CoopRegion):
     def memberExists(self, **kwargs): return self.membersManager.memberExists(**kwargs)
     
     def getMember(self, **kwargs): return self.getRegion(**kwargs)
+
 
 class UnitsManager(CoopRegionsManager):
     ObjectType = Unit

@@ -184,6 +184,3 @@ class AreaAccountsManager(DCAccountsManager):
     def sortClientsAccountsByMonth(self, month): return self.sortSubRegionsAccountsByMonth(month)
 
 
-
-
-

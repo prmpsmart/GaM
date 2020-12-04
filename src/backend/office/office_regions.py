@@ -28,7 +28,7 @@ class OfficeManagerDetailsManager(PersonsManager):
 
 
 class Office(Region):
-    AccountsManager = OfficeAccountsManager
+    AccountsManager = AccountsManager
     Manager = 'OfficesManager'
     PersonsManager = OfficeManagerDetailsManager
     
@@ -67,13 +67,18 @@ class OfficesManager(RegionsManager):
 class SubOffice(Region):
     DEPARTMENT = 'SO'
     Manager = 'Office'
-    def __str__(self): return f'{self.manager.master} | {self.name} '
+
+    def __str__(self):
+        master = self.manager if self.strManager else self.manager.master
+        return f'{master} | {self.name} '
     @property
-    def name(self): return f'{self.office.name} {self.DEPARTMENT}'
+    def name(self):
+        _name = self.manager if self.strManager else self.manager.name
+        return f'{_name} {self.DEPARTMENT}'
     @property
     def office(self): return self.manager
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | {self.DEPARTMENT} '
+    def spacedID(self): return super().spacedID + f' | {self.DEPARTMENT} '
 
 class DCOffice(SubOffice):
     AccountsManager = DCOfficeAccountsManager
@@ -86,10 +91,10 @@ class DCOffice(SubOffice):
     
 
 class CoopOffice(SubOffice):
-    AccountsManager = CoopOfficeAccountsManager
+    AccountsManager = CoopOfficeAccount
     SubRegionsManager = UnitsManager
     PersonsManager = CoopManagerDetailsManager
-    DEPARTMENT = 'Coop'
+    DEPARTMENT = 'COOP'
     
     def addUnit(self, unit):
         pass

@@ -54,6 +54,7 @@ class YearlyAccounts(ObjectsMixins):
     pass
 
 class Account(Object):
+    Manager = 'AccountsManager'
     
     def __init__(self, manager, **kwargs):
         assert manager != None, 'No manager passed.'

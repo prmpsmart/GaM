@@ -1,20 +1,15 @@
 from ..core.accounts import Account, AccountsManager
+from ..dc.dc_accounts import AreaAccount, AreaAccountsManager
+from ..coop.coop_accounts import UnitAccount
 
 
-class OfficeAccount(Account):
-    Manager = 'OfficeAccountsManager'
+class CoopOfficeAccount(UnitAccount):
+    Manager = 'CoopOffice'
 
-class OfficeAccountsManager(AccountsManager):
-    ObjectType = OfficeAccount
 
-class CoopOfficeAccount(OfficeAccount):
-    Manager = 'CoopOfficeAccountsManager'
-
-class CoopOfficeAccountsManager(OfficeAccountsManager):
-    ObjectType = CoopOfficeAccount
-
-class DCOfficeAccount(OfficeAccount):
+class DCOfficeAccount(AreaAccount):
     Manager = 'DCOfficeAccountsManager'
 
-class DCOfficeAccountsManager(OfficeAccountsManager):
+
+class DCOfficeAccountsManager(AreaAccountsManager):
     ObjectType = DCOfficeAccount

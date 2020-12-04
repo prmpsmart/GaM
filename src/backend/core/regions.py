@@ -88,7 +88,12 @@ class Region(Object):
     
     @property
     def totalSubs(self): return len(self.subs)
-    
+
+    @property
+    def spacedID(self):
+        sup = self.manager if self.strManager else self.sup.spacedID
+        return f'{str(sup).replace(" ", "")}'
+        
     @property
     def sups(self):
         ss = []
