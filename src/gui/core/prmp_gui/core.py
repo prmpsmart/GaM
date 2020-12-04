@@ -335,6 +335,8 @@ class PRMP_Theme(Mixins):
             
             relief = kwargs.pop('relief',  PRMP_Theme.DEFAULT_RELIEF)
             wt = widgetType = self.PRMP_WIDGET
+
+            _dict = {}
             
             asLabel = kwargs.get('asLabel')
             if asLabel != None:
@@ -345,7 +347,7 @@ class PRMP_Theme(Mixins):
             if asEntry != None:
                 asEntry = kwargs.pop('asEntry')
                 wt = 'Entry' if asEntry else wt
-                self.configure(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background)
+                _dict.update(dict(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background))
             
             oneColor = True
             col = PRMP_Theme.DEFAULT_BUTTON_COLOR
@@ -361,7 +363,7 @@ class PRMP_Theme(Mixins):
                         if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
 
                 else: font = Font(**kwargs.pop('font', PTh.DEFAULT_LABEL_FONT))
-                _dict = dict(activebackground=activebackground,
+                _dict.update(dict(activebackground=activebackground,
                             activeforeground=activeforeground,
                             background=background,
                             borderwidth=borderwidth,
@@ -371,40 +373,39 @@ class PRMP_Theme(Mixins):
                             highlightcolor=highlightcolor,
                             font=font,
                             highlightthickness=highlightthickness,
-                            relief=relief, **kwargs)
-                self.configure(**_dict)
+                            relief=relief, **kwargs))
             
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
-                self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
+                print(self, foreground)
+                _dict.update(dict(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font))
 
-            elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
+            elif wt == 'Scale': _dict.update(dict(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR))
                 
             elif wt in ['Entry', 'Text']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_FONT))
-                _dict = dict(background=background,
+                _dict.update(dict(background=background,
                             borderwidth=borderwidth,
-                            # disabledforeground=disabledforeground,
                             foreground=foreground,
                             highlightbackground=highlightbackground,
                             highlightcolor=highlightcolor,
                             highlightthickness=highlightthickness,
                             relief='sunken', 
                             font=font,
-                            **kwargs)
-                # print(self)
-                self.configure(**_dict)
+                            **kwargs))
             
             elif wt in ['Scrollbar']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
-                
 
             else:
                 try: self.configure(background=background)
                 except: pass
+                return self
+
+            self.configure(**_dict)
 
         if self.var and self.var.get() == self.val: self.checked(1)
         
@@ -499,13 +500,11 @@ class PRMP_Widget(PRMP_Theme):
 
         self.positionWidget(place=place, pack=pack, grid=grid)
         
-    
     def entered(self, e=0):
         if not self.nonText: self.statusShow()
         if self.highlightable:
             try: self.configure(relief='solid')
             except: pass
-    
     
     def left(self, e=0):
         if self.highlightable:
@@ -732,8 +731,6 @@ class PRMP_(PRMP_Widget):
 
     def __init__(self, **kwargs):
         super().__init__( _ttk_=False, **kwargs)
-
-
 P_ = PRMP_
 
 class PRMP_Style_(PRMP_Widget):
@@ -743,7 +740,6 @@ class PRMP_Style_(PRMP_Widget):
     
     @property
     def style(self): return PRMP_Window.STYLE
-
 PS_ = PRMP_Style_
 
 class PRMP_Input:
@@ -921,6 +917,9 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
     def set(self, values): self.clear(); self.insert('0.0', values)
     
     def clear(self): self.delete('0.0', 'end')
+
+    @property
+    def PRMP_WIDGET(self): return 'Text'
 Text = PTx = PRMP_Text
 
 # based on ttk only
@@ -934,6 +933,9 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
 
         self.values = []
         if type_.lower() == 'gender': self.changeValues(['Male', 'Female'])
+    
+    @property
+    def PRMP_WIDGET(self): return 'Combobox'
     
     def changeValues(self, values):
         self.values = values
@@ -1463,6 +1465,9 @@ class PRMP_Button(PRMP_, tk.Button):
     def __init__(self, master=None, font=PTh.DEFAULT_BUTTON_FONT, asEntry=False, asLabel=False, config={}, **kwargs):
         tk.Button.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, **config, **kwargs)
+    
+    @property
+    def PRMP_WIDGET(self): return 'Button'
 Button = PB = PRMP_Button
 
 class PRMP_Checkbutton(PRMP_, tk.Checkbutton, PRMP_InputButtons):
@@ -1475,6 +1480,8 @@ class PRMP_Checkbutton(PRMP_, tk.Checkbutton, PRMP_InputButtons):
         self.var.set('0')
         self.toggleSwitch()
 
+    @property
+    def PRMP_WIDGET(self): return 'Checkbutton'
     def disabled(self):
         
         self['fg'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
@@ -1488,7 +1495,10 @@ class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
     def __init__(self, master=None, config={}, **kwargs):
         tk.Entry.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
-        PRMP_Input.__init__(self, Kwargs)
+        PRMP_Input.__init__(self, kwargs)
+    
+    @property
+    def PRMP_WIDGET(self): return 'Entry'
         
 
 Entry = PE = PRMP_Entry
@@ -1498,6 +1508,9 @@ class PRMP_Frame(PRMP_, tk.Frame):
     def __init__(self, master=None, bd=2, relief='flat', highlightable=False, config={}, **kwargs):
         tk.Frame.__init__(self, master, relief=relief, bd=bd, **config)
         PRMP_.__init__(self, prmp_master=master,relief=relief, highlightable=highlightable, nonText=True, **config, **kwargs)
+
+    @property
+    def PRMP_WIDGET(self): return 'Frame'
 Frame = PF = PRMP_Frame
 
 class PRMP_Label(PRMP_, tk.Label):
@@ -1505,6 +1518,9 @@ class PRMP_Label(PRMP_, tk.Label):
     def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABEL_FONT, config={}, **kwargs):
         tk.Label.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
+
+    @property
+    def PRMP_WIDGET(self): return 'Label'
 Label = PL = PRMP_Label
 
 class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
@@ -1512,6 +1528,9 @@ class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
     def __init__(self, master=None, font=PRMP_Theme.DEFAULT_LABELFRAME_FONT, config={}, **kwargs):
         tk.LabelFrame.__init__(self, master,  **config)
         PRMP_.__init__(self, prmp_master=master,font=font, **config, **kwargs)
+    
+    @property
+    def PRMP_WIDGET(self): return 'LabelFrame'
 LabelFrame = PLF = PRMP_LabelFrame
 
 class PRMP_Menubutton(PRMP_, tk.Scrollbar):
@@ -1540,6 +1559,9 @@ class PRMP_Radiobutton(PRMP_, tk.Radiobutton, PRMP_InputButtons):
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         tk.Radiobutton.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,asLabel=asLabel, **config, **kwargs)
+    
+    @property
+    def PRMP_WIDGET(self): return 'Radiobutton'
 Radiobutton = PR = PRMP_Radiobutton
 
 class PRMP_Scale(PRMP_, tk.Scale):

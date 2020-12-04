@@ -115,3 +115,4 @@ class DC_Overview(Frame):
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
 
 
+
