@@ -1,102 +1,49 @@
 from ..core.prmp_gui.extensions import *
 
-
 class DC_Digits(Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
     # Incomes
-        self.incomes = LabelFrame(self, text='Incomes')
-        self.incomes.place(relx=.02, rely=.008, relh=.256, relw=.96)
+        incomes = LabelFrame(self, text='Incomes', place=dict(relx=.02, rely=.008, relh=.256, relw=.96))
+        Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
+        Label(incomes, text='Transfers', place=dict(relx=.03, rely=.51, relh=.21, relw=.48))
+        Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48))
 
-        self.incomesS = Label(self.incomes, text='₦ 3,000,000i', asEntry=True, font='DEFAULT_FONT')
-        self.incomesS.place(relx=.03, rely=0, relh=.24, relw=.94)
-
-        self.savings = Label(self.incomes, text='Savings')
-        self.savings.place(relx=.03, rely=.27, relh=.21, relw=.48)
-
-        self.savingsS = Label(self.incomes, text='₦ 50,000s', asEntry=True, font='DEFAULT_FONT')
-        self.savingsS.place(relx=.53, rely=.27, relh=.21, relw=.44)
-
-        self.transfers = Label(self.incomes, text='Transfers')
-        self.transfers.place(relx=.03, rely=.51, relh=.21, relw=.48)
-
-        self.transfersS = Label(self.incomes, text='₦ 30,000tr', asEntry=True, font='DEFAULT_FONT')
-        self.transfersS.place(relx=.53, rely=.51, relh=.21, relw=.44)
-
-        self.commissions = Label(self.incomes, text='Commissions')
-        self.commissions.place(relx=.03, rely=.74, relh=.21, relw=.48)
-
-        self.commissionsS = Label(self.incomes, text='₦ 30,000c', asEntry=True, font='DEFAULT_FONT')
-        self.commissionsS.place(relx=.53, rely=.74, relh=.22, relw=.44)
+        self.incomes = Entry_Label(incomes, text='₦ 3,000,000i', place=dict(relx=.03, rely=0, relh=.24, relw=.94))
+        self.savings = Entry_Label(incomes, text='₦ 50,000s', place=dict(relx=.53, rely=.27, relh=.21, relw=.44))
+        self.transfersS = Entry_Label(incomes, text='₦ 30,000tr', place=dict(relx=.53, rely=.51, relh=.21, relw=.44))
+        self.commissionsS = Entry_Label(incomes, text='₦ 30,000c', place=dict(relx=.53, rely=.74, relh=.22, relw=.44))
 
     # Debits
-        self.debits = LabelFrame(self, text='Debits')
-        self.debits.place(relx=.02, rely=.267, relh=.21, relw=.96)
+        debits = LabelFrame(self, text='Debits', place=dict(relx=.02, rely=.267, relh=.21, relw=.96))
+        Label(debits, text='Withdrawals', place=dict(relx=.03, rely=.35, relh=.3, relw=.48))
+        Label(debits, text='Paidouts', place=dict(relx=.03, rely=.68, relh=.28, relw=.48))
 
-        self.debitsS = Label(self.debits, text='₦ 80,000d', asEntry=True, font='DEFAULT_FONT')
-        self.debitsS.place(relx=.03, rely=0, relh=.32, relw=.94)
-
-        self.withdrawals = Label(self.debits, text='Withdrawals')
-        self.withdrawals.place(relx=.03, rely=.35, relh=.3, relw=.48)
-
-        self.withdrawalsS = Label(self.debits, text='₦ 50,000w', asEntry=True, font='DEFAULT_FONT')
-        self.withdrawalsS.place(relx=.53, rely=.35, relh=.3, relw=.44)
-
-        self.paidouts = Label(self.debits, text='Paidouts')
-        self.paidouts.place(relx=.03, rely=.68, relh=.28, relw=.48)
-
-        self.paidoutsS = Label(self.debits, text='₦ 30,000p', asEntry=True, font='DEFAULT_FONT')
-        self.paidoutsS.place(relx=.53, rely=.68, relh=.28, relw=.44)
+        self.debitsS = Entry_Label(debits, text='₦ 80,000d', place=dict(relx=.03, rely=0, relh=.32, relw=.94))
+        self.withdrawalsS = Entry_Label(debits, text='₦ 50,000w', place=dict(relx=.53, rely=.35, relh=.3, relw=.44))
+        self.paidoutsS = Entry_Label(debits, text='₦ 30,000p', place=dict(relx=.53, rely=.68, relh=.28, relw=.44))
 
     # Upfronts
-        self.upfronts = LabelFrame(self, text='Upfronts')
-        self.upfronts.place(relx=.02, rely=.48, relh=.198, relw=.96)
+        upfronts = LabelFrame(self, text='Upfronts', place=dict(relx=.02, rely=.48, relh=.198, relw=.96))
+        Label(upfronts, text='Repaid', place=dict(relx=.03, rely=.4, relh=.25, relw=.48))
+        Label(upfronts, text='Overdue', place=dict(relx=.03, rely=.7, relh=.25, relw=.48))
 
-        self.upfrontsS = Label(self.upfronts, text='₦ 980,000up', asEntry=True, font='DEFAULT_FONT')
-        self.upfrontsS.place(relx=.03, rely=.05, relh=.32, relw=.94)
-
-        self.repaid = Label(self.upfronts, text='Repaid')
-        self.repaid.place(relx=.03, rely=.4, relh=.25, relw=.48)
-
-        self.repaidS = Label(self.upfronts, text='₦ 850,000r', asEntry=True, font='DEFAULT_FONT')
-        self.repaidS.place(relx=.53, rely=.4, relh=.25, relw=.44)
-
-        self.overdue = Label(self.upfronts, text='Overdue')
-        self.overdue.place(relx=.03, rely=.7, relh=.25, relw=.48)
-
-        self.overdueS = Label(self.upfronts, text='₦ 130,000ov', asEntry=True, font='DEFAULT_FONT')
-        self.overdueS.place(relx=.53, rely=.7, relh=.25, relw=.44)
+        self.upfronts = Entry_Label(upfronts, text='₦ 980,000up', place=dict(relx=.03, rely=.05, relh=.32, relw=.94))
+        self.repaid = Entry_Label(upfronts, text='₦ 850,000r', place=dict(relx=.53, rely=.4, relh=.25, relw=.44))
+        self.overdue = Entry_Label(upfronts, text='₦ 130,000ov', place=dict(relx=.53, rely=.7, relh=.25, relw=.44))
 
     # Balances
-        self.balances = LabelFrame(self, text='Balances')
-        self.balances.place(relx=.02, rely=.68, relh=.312, relw=.96)
+        balances = LabelFrame(self, text='Balances', place=dict(relx=.02, rely=.68, relh=.312, relw=.96))
+        Label(balances, text='Brought-Fs', place=dict(relx=.03, rely=.2, relh=.18, relw=.48))
+        Label(balances, text='B-T-Os', place=dict(relx=.03, rely=.4, relh=.18, relw=.48))
+        Label(balances, text='Deficits', place=dict(relx=.03, rely=.6, relh=.18, relw=.48))
+        Label(balances, text='Excesses', place=dict(relx=.03, rely=.8, relh=.18, relw=.48))
 
-        self.balancesS = Label(self.balances, text='₦ 1,080,000', asEntry=True, font='DEFAULT_FONT')
-        self.balancesS.place(relx=.03, rely=0, relh=.18, relw=.94)
-
-        self.broughts = Label(self.balances, text='Brought-Fs')
-        self.broughts.place(relx=.03, rely=.2, relh=.18, relw=.48)
-
-        self.broughtsS = Label(self.balances, text='₦ 500,000br', asEntry=True, font='DEFAULT_FONT')
-        self.broughtsS.place(relx=.53, rely=.2, relh=.18, relw=.44)
-
-        self.btos = Label(self.balances, text='B-T-Os')
-        self.btos.place(relx=.03, rely=.4, relh=.18, relw=.48)
-
-        self.btosS = Label(self.balances, text='₦ 30,000bto', asEntry=True, font='DEFAULT_FONT')
-        self.btosS.place(relx=.53, rely=.4, relh=.18, relw=.44)
-
-        self.deficits = Label(self.balances, text='Deficits')
-        self.deficits.place(relx=.03, rely=.6, relh=.18, relw=.48)
-
-        self.deficitsS = Label(self.balances, text='₦ 30,000def', asEntry=True, font='DEFAULT_FONT')
-        self.deficitsS.place(relx=.53, rely=.6, relh=.18, relw=.44)
-
-        self.excesses = Label(self.balances, text='Excesses')
-        self.excesses.place(relx=.03, rely=.8, relh=.18, relw=.48)
-
-        self.excessesS = Label(self.balances, text='₦ 30,000exc', asEntry=True, font='DEFAULT_FONT')
-        self.excessesS.place(relx=.53, rely=.8, relh=.14, relw=.44)
+        self.balances = Entry_Label(balances, text='₦ 1,080,000', place=dict(relx=.03, rely=0, relh=.18, relw=.94))
+        self.broughts = Entry_Label(balances, text='₦ 500,000br', place=dict(relx=.53, rely=.2, relh=.18, relw=.44))
+        self.btos = Entry_Label(balances, text='₦ 30,000bto', place=dict(relx=.53, rely=.4, relh=.18, relw=.44))
+        self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))
+        self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.14, relw=.44))
 
 class DC_Overview(Frame):
     

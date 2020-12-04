@@ -755,7 +755,9 @@ class Calendar(Frame):
         if self.dest: self.__dict__[self.dest] = day
         if self.hook: self.hook()
 
+class Entry_Label(Label):
 
+    def __init__(self, master, **kwargs): super().__init__(master, asEntry=True, font='DEFAULT_FONT', **kwargs)
 
 
 
