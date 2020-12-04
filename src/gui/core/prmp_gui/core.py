@@ -226,7 +226,7 @@ class PRMP_Theme(Mixins):
     
     PRMP_FONT = {'family': 'Times New Roman', 'size': 11, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
-    PRMP_FONTS = ["DEFAULT_FONT", "DEFAULT_MINUTE_FONT", "BIG_FONT", "DEFAULT_MENU_FONT", "DEFAULT_BUTTON_FONT", "DEFAULT_BUTTONS_FONT", "DEFAULT_SMALL_BUTTON_FONT", "DEFAULT_TITLE_FONT", "DEFAULT_STATUS_FONT", "DEFAULT_LABEL_FONT", "DEFAULT_LABELFRAME_FONT", "HEADING_FONT", "NORMAL_FONT", "PRMP_FONT"]
+    PRMP_FONTS = []
 
     themedWidgets = ['Combobox', 'Progressbar', 'Scrollbar', 'Treeview', 'Notebook', 'Panedwindow', 'Progressbar', 'Scale', 'Scrollbar', 'Separator', 'Sizegrip', 'Spinbox', 'Treeview', 'Toolbutton']
     
@@ -301,21 +301,31 @@ class PRMP_Theme(Mixins):
         total = len(themes)
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
+    @property
+    def fontsNames(self): return self.tk.splitlist(self.tk.call("font", "names"))
+    
+    def parseFont(self, font):
+        if isinstance(font, str):
+            if font in self.fontsNames: return font
+            return Font(name=font)
+        elif isinstance(font, dict): return Font(**font)
 
-    def deriveFontName(self, name, default, kwargs):
-        pass
-    def deriveFontDict(self, fontDict, default, kwargs):
-        pass
+    def deriveFont(self, kwargs={}, default='DEFAULT_FONT'):
+        if not kwargs: font = self.kwargs.get('font')
+        else: font = kwargs.pop('font')
 
-    def deriveFont(self, font, default, kwargs={}):
-        if isinstance(font, str): return self.deriveFontName(font, default, kwargs)
-        elif isinstance(font, dict): return self.deriveFontName(font, default, kwargs)
-        return 'DEFAULT_FONT'
+        default = self.parseFont(default)
+        try:
+            font = self.parseFont(font)
+            return font
+        except: return default
 
     def createDefaultFonts(self):
-        for df in PRMP_Theme.PRMP_FONTS:
+        fonts = ['DEFAULT_FONT', 'DEFAULT_MINUTE_FONT', 'BIG_FONT', 'DEFAULT_MENU_FONT', 'DEFAULT_BUTTON_FONT', 'DEFAULT_BUTTONS_FONT', 'DEFAULT_SMALL_BUTTON_FONT', 'DEFAULT_TITLE_FONT', 'DEFAULT_STATUS_FONT', 'DEFAULT_LABEL_FONT', 'DEFAULT_LABELFRAME_FONT', 'HEADING_FONT', 'NORMAL_FONT', 'PRMP_FONT']
+        for df in fonts:
             font = PRMP_Theme.__dict__[df]
-            Font(df, **fonts)
+            fo = Font(name=df, **font)
+            PRMP_Theme.PRMP_FONTS.append(fo)
 
 
     def _prevTheme(self):
@@ -340,7 +350,8 @@ class PRMP_Theme(Mixins):
     
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items()}
+            kwargs = {k: v for k, v in self.kwargs.items() if k != 'font'}
+            
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
             activebackground = kwargs.pop('activebackground', foreground)
@@ -375,12 +386,12 @@ class PRMP_Theme(Mixins):
             if wt in ['Button', 'Label', 'Radiobutton', 'Checkbutton']:
                 
                 if wt == 'Button':
-                    font = Font(**kwargs.pop('font', PTh.DEFAULT_BUTTON_FONT))
+                    font = self.deriveFont(default='DEFAULT_BUTTON_FONT')
                     if oneColor == False:
                         if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
                         if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
 
-                else: font = Font(**kwargs.pop('font', PTh.DEFAULT_LABEL_FONT))
+                else: font = self.deriveFont(default='DEFAULT_LABEL_FONT')
                 _dict.update(dict(activebackground=activebackground,
                             activeforeground=activeforeground,
                             background=background,
@@ -394,7 +405,7 @@ class PRMP_Theme(Mixins):
                             relief=relief, **kwargs))
             
             elif wt == 'LabelFrame':
-                font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
+                font = self.deriveFont(default='DEFAULT_LABELFRAME_FONT')
                 _dict.update(dict(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font))
 
             elif wt == 'Scale': _dict.update(dict(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR))
@@ -402,7 +413,7 @@ class PRMP_Theme(Mixins):
             elif wt in ['Entry', 'Text']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
-                font = Font(**kwargs.pop('font', PTh.DEFAULT_FONT))
+                font = self.deriveFont(default='DEFAULT_FONT')
                 _dict.update(dict(background=background,
                             borderwidth=borderwidth,
                             foreground=foreground,
@@ -506,7 +517,7 @@ class PRMP_Widget(PRMP_Theme):
         self._ttk_ = _ttk_
         
         try:
-            font = self.kwargs.get('font', PRMP_Theme.DEFAULT_FONT)
+            font = self.kwargs.get('font', 'DEFAULT_FONT')
             self.useFont(font)
         except: pass
         
@@ -630,7 +641,7 @@ class PRMP_Widget(PRMP_Theme):
         for one in group: one.addToggleGroup(group)
     
     def useFont(self, font=None):
-        if font: self.font = Font(**font)
+        if font: self.font = self.parseFont(font)
         if self.font: self['font'] = self.font
         
         return self
@@ -1120,6 +1131,7 @@ class PRMP_Style(ttk.Style, Mixins):
             'TButton': {
                 'configure': {
                     'anchor': 'center',
+                    # 'font': 'DEFAULT_BUTON_FONT',
                     'font': button_font,
                     'foreground': button_foreground,
                     'background': button_background,
@@ -1714,6 +1726,12 @@ class PRMP_Window(PRMP_Widget):
 
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, **kwargs):
         
+        if PRMP_Window.TOPEST == None:
+            self.bind('<<PRMP_STYLE_CHANGED>>', self._paintAll)
+            PRMP_Window.TOPEST = self
+            self.createDefaultFonts()
+            PRMP_Window.STYLE = PRMP_Style(self)
+        
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
         
         self.resize = resize
@@ -1755,11 +1773,7 @@ class PRMP_Window(PRMP_Widget):
         
         self.placeOnScreen(side, geometry)
 
-        if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self._paintAll)
-            PRMP_Window.TOPEST = self
-            PRMP_Window.STYLE = PRMP_Style(self)
-            if noTitleBar: self.after(10, self.addWindowToTaskBar)
+        if noTitleBar: self.after(10, self.addWindowToTaskBar)
     
     def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1):
         
