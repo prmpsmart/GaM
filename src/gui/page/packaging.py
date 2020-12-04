@@ -1,7 +1,7 @@
 from .packed import *
 
 
-class Toplevel:
+class _Toplevel:
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window. top is the toplevel containing window.'''
 
@@ -53,3 +53,17 @@ class Toplevel:
 
         self.datetime = DateTimeView(self.Frame1)
         self.datetime.place(relx=.029, rely=.018, relh=.099, relw=.957)
+
+class Toplevel:
+    def __init__(self, top=None):
+        self.datetime = DateTimeView(top)
+        self.datetime.place(relx=.005, rely=.01, relh=.1, relw=.99)
+
+        self.dc = DC_Overview(top)
+        self.dc.place(relx=.005, rely=.115, relh=.88, relw=.99)
+
+
+
+
+
+

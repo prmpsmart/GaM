@@ -376,7 +376,6 @@ class PRMP_Theme(Mixins):
             
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
-                # print(kwargs, 9)
                 self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
 
             elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
@@ -414,7 +413,11 @@ class PRMP_Theme(Mixins):
     def _paintChildren(self):
         children = self._children
         for child in children:
-            if getattr(child, 'paint', None): child.paint()
+            if hasattr(child, 'paint'):
+                if str(child) == '.!prmp_style_frame.!datetimeview': 
+                    child.paint()
+                
+                child.paint()
     
     def _paintAll(self, e=0):
         self._paint()
@@ -462,8 +465,11 @@ class PRMP_Widget(PRMP_Theme):
 
 
 
-    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, highlightable=True, place={}, grid={}, pack={}, **kwargs):
+    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, **kwargs):
         self.kwargs = kwargs.copy()
+        if asEntry:
+            relief = 'sunken'
+            self.kwargs['asEntry'] = asEntry
         self.kwargs['relief'] = relief
 
         if self.kwargs.get('prmp_master'):
@@ -1996,7 +2002,6 @@ class PRMP_Window(PRMP_Widget):
 
         self.imgExit = PRMP_Image('red', resize=(20, 20))
         self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), tip='Exit', font=PRMP_Theme.DEFAULT_SMALL_BUTTON_FONT)
-        # self._exit.bindEntryHighlight(bacKLkground='red')
 
         self.titleBar = L(fr, config=dict( text=title or self.titleText), font=PRMP_Theme.DEFAULT_TITLE_FONT, relief='groove')
         self.titleBar.bind('<Double-1>', self.maximize, '+')

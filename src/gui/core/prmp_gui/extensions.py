@@ -510,13 +510,12 @@ class FramedCanvas(Frame):
 class DateTimeView(LabelFrame):
 
     def __init__(self, master, text='Date and Time', **kwargs):
-        super().__init__(master, text=text, **kwargs)
-        print(self.kwargs, 'last')
+        super().__init__(master, config=dict(text=text), **kwargs)
         self.time = Label(self)
-        self.time.place(relx=.01, rely=.4, relh=.48, relw=.37)
+        self.time.place(relx=.005, rely=0, relh=.98, relw=.37)
 
         self.date = Label(self)
-        self.date.place(relx=.39, rely=.4, relh=.48, relw=.6)
+        self.date.place(relx=.39, rely=0, relh=.98, relw=.6)
 
         self.update()
     
@@ -530,9 +529,9 @@ class DateTimeView(LabelFrame):
         date = f'{dayN} {day}, {month} {year}'
         self.date['text'] = date
 
-        hour = now.hour % 12
-        minute = now.minute
-        second = now.second
+        hour = str(now.hour % 12).zfill(2)
+        minute = str(now.minute).zfill(2)
+        second = str(now.second).zfill(2)
         m = now.strftime('%p')
 
         time = f'{hour} : {minute} : {second} {m}'
