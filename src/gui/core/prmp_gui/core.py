@@ -323,7 +323,6 @@ class PRMP_Theme(Mixins):
     def _paint(self):
         if not self._ttk_:
             kwargs = {k: v for k, v in self.kwargs.items()}
-            print(kwargs)
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
             activebackground = kwargs.pop('activebackground', foreground)
@@ -377,7 +376,7 @@ class PRMP_Theme(Mixins):
             
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
-                print(kwargs, 9)
+                # print(kwargs, 9)
                 self.configure(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
 
             elif wt == 'Scale': self.config(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
@@ -611,7 +610,6 @@ class PRMP_Widget(PRMP_Theme):
     
     def bindOverrelief(self, wid, relief='solid', **kwargs):
         if wid._ttk_: return
-        print(kwargs)
 
         def setRelief(e=0): wid.configure(relief=relief, **kwargs)
         def resetRelief(e=0): wid.paint()

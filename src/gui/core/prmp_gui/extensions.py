@@ -176,8 +176,8 @@ IL = ImageLabel
 class PRMP_DateButton(PRMP_Button):
     def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', **kwargs):
         self.date = None
-        from .dialogs import CalendarDialog, DateTime
-        self.CD = CalendarDialog
+        from .dialogs import Calendar, DateTime
+        self.CD = Calendar
         self.DT = DateTime
         super().__init__(master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
         self['text'] = placeholder
@@ -540,7 +540,222 @@ class DateTimeView(LabelFrame):
         
         self.after(10, self.update)
 
+class Calendar(Frame):
+    _both = '◄►'
+    _next = '►'
+    _previous = '◄'
+    _forward = '⏭'
+    _backward = '⏮'
+    choosen = None
+    _version_ = '3.3.0' # Alpha by PRMPSmart
 
+    background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+    header_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
+    header_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
+    month_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
+    month_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
+    year_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
+    year_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
+    
+    surf_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
+    surf_bg=PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
+
+    
+    class DayLabel(PRMP_Label):
+        highlight_bg = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+        highlight_fg = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
+        now_fg = 'white'
+        now_bg = 'green'
+        now_highlight_fg = 'green'
+        now_highlight_bg = 'white'
+        empty_bg = PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
+        choosen_fg = 'white'
+        choosen_bg = 'black'
+        days_fg = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+        days_bg = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
+        notPart = False # for buttons not part of the days button
+        
+        def __init__(self, master=None, returnMethod=None,  **kw):
+            super().__init__(master=master, background=self.days_bg, foreground=self.days_fg, font=PRMP_Theme.DEFAULT_FONT, **kw)
+            self.day = None
+            
+            self.returnMethod = returnMethod
+            
+            self.bind('<Enter>', self.onButton)
+            self.bind('<Leave>', self.offButton)
+            self.bind('<ButtonPress-1>', self.choosen)
+
+        def onButton(self, e=0):
+            self.statusShow()
+            if self.notPart: return
+            if self.day:
+                if self.now: self.config(background=self.class_.now_highlight_bg, foreground=self.class_.now_highlight_fg)
+                else: self.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
+        
+        @property
+        def status(self): return self.day
+        
+        def offButton(self, e=0):
+            if self.notPart: return
+            if self == Calendar.choosen: self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
+            elif self.now: self.config(background=self.class_.now_bg, foreground=self.class_.now_fg)
+            else:
+                if self.day: self.config(background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground='red' if self.redDay else PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
+                else: self.config(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+        
+        paint = offButton
+
+        def config(self, day=None, command=None, notPart=False, **kwargs):
+            self.notPart = notPart
+            if day: self.changeDay(day)
+            if command:
+                self.unbind('<ButtonPress-1>')
+                self.bind('<ButtonPress-1>', command)
+            
+            background, foreground = kwargs.get('background'), kwargs.get('foreground')
+            self.configure(**kwargs)
+            
+            if foreground:
+                self['foreground'] = foreground
+            if background:
+                self['bg'] = background
+        
+        @property
+        def now(self): return self.day == DateTime.now()
+        
+        def changeDay(self, day):
+            now = DateTime.now()
+            if day == now: self.config(background=self.class_.now_bg, foreground=self.class_.now_fg)
+            self.day = day
+            self.redDay = day.dayName in ['Saturday', 'Sunday']
+            self.config(text=self.day.dayNum, state='normal', relief='groove')
+            self.offButton()
+        
+        def empty(self):
+            self.day = None
+            self.config(text='', state='disabled', relief='flat', background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+        
+        def choosen(self, e=0):
+            if self.day: 
+                if self.notPart: return
+                b4 = Calendar.choosen
+                Calendar.choosen = self
+                if b4: b4.offButton()
+                self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
+                self.returnMethod(self.day)
+    
+    def __init__(self, master=None, month=None, dest='', hook=None, **kwargs):
+        super().__init__(master, **kwargs)
+        
+        if month == None: month = DateTime.now()
+        DateTime.checkDateTime(month)
+        
+        self.__date = None
+        self.month = month
+        self.hook = hook
+        self.dest = dest
+        if self.dest: self.__dict__[self.dest] = None
+        self.daysButtons = []
+        
+        self._back = PRMP_Button(self, text=self._backward, command=self.previousYear, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], font=PRMP_Theme.DEFAULT_MINUTE_FONT)
+        self._back.place(relx=0, rely=0, relw=.12, relh=.1)
+
+        self._prev = PRMP_Button(self, text=self._previous, command=self.previousMonth, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+        self._prev.place(relx=.12, rely=0, relw=.12, relh=.1)
+
+        self.monthNameLbl = PRMP_Label(self, text=self.month.monthName, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
+        self.monthNameLbl.place(relx=.24, rely=0, relw=.36, relh=.1)
+
+        self.yearLbl = PRMP_Label(self, text=self.month.year, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
+        self.yearLbl.place(relx=.6, rely=0, relw=.16, relh=.1)
+
+        self._nxt = PRMP_Button(self, text=self._next, command=self.nextMonth, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+        self._nxt.place(relx=.76, rely=0, relw=.12, relh=.1)
+
+        self._for = PRMP_Button(self, text=self._forward, command=self.nextYear, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], font=PRMP_Theme.DEFAULT_MINUTE_FONT)
+        self._for.place(relx=.88, rely=0, relw=.12, relh=.1)
+        
+        col = 0
+        self.headers = []
+        daysAbbrs = [DateTime.daysAbbr[-1]] + DateTime.daysAbbr[:-1]
+        w = 1/7
+        for dayAbbr in daysAbbrs:
+            x = col * w
+            d = PRMP_Label(self, text=dayAbbr, relief='groove', background=self.header_bg, foreground=self.header_fg)
+            d.place(relx=x, rely=.1, relw=w, relh=.15)
+            self.headers.append(d)
+            col += 1
+        
+        h = .75 / 6
+        y = .25
+        for d in range(42):
+            m = d % 7
+            x = m * w
+            if (d != 0) and (m == 0): y += h
+            btn = self.DayLabel(self, returnMethod=self.choosenDay, text=d, relief='groove')
+            btn.place(relx=x, rely=y, relw=w, relh=h)
+            self.daysButtons.append(btn)
+            
+        
+        self.reset = self.daysButtons[-4]
+        self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', notPart=1, relief='ridge')
+
+        self.updateDays()
+    
+    # def afterPaint(self):
+    #     for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+        
+    #     self.monthNameLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
+    #     self.yearLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
+    
+    def resetDate(self, e=0):
+        self.month = DateTime.now()
+        self.updateDays()
+    
+    def nextYear(self):
+        self.month += 12
+        self.updateDays()
+    
+    def nextMonth(self, e=0):
+        self.month += 1
+        self.updateDays()
+    
+    def previousYear(self):
+        self.month -= 12
+        self.updateDays()
+    
+    def previousMonth(self):
+        self.month -= 1
+        self.updateDays()
+    
+    def updateDays(self):
+        self.monthNameLbl.config(text=self.month.monthName)
+        self.yearLbl.config(text=self.month.year)
+        monthDates = self.month.monthDates
+        totalDays = len(monthDates)
+        
+        remainingBtns = self.daysButtons[totalDays:]
+        for day in monthDates:
+            index = monthDates.index(day)
+            DayLabel = self.daysButtons[index]
+            if DayLabel == self.reset: continue
+            
+            if day.month == self.month.month: DayLabel.config(day=day)
+            else: DayLabel.empty()
+
+        for btn in remainingBtns:
+            if btn == self.reset: continue
+            btn.empty()
+        
+        # for dayBtn in self.daysButtons: dayBtn.offButton()
+    
+    @property
+    def date(self): return self.__date
+    
+    def choosenDay(self, day):
+        self.__date = day
+        if self.dest: self.__dict__[self.dest] = day
+        if self.hook: self.hook()
 
 
 

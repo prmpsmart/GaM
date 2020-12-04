@@ -97,6 +97,7 @@ class Mixins:
             fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
             return fin
 
+
 class ObjectsMixins(Mixins, CompareByDate):
     
     
@@ -128,7 +129,6 @@ class ObjectsMixins(Mixins, CompareByDate):
             to += 1
         return "".join(num_list)
     
-
     def __bool__(self): return True
     
     def addMoneySign(self, money): return f'{self._moneySign}{money}'
