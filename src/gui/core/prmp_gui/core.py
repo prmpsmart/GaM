@@ -462,7 +462,7 @@ class PRMP_Widget(PRMP_Theme):
 
 
 
-    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, highlightable=True, **kwargs):
+    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, highlightable=True, place={}, grid={}, pack={}, **kwargs):
         self.kwargs = kwargs.copy()
         self.kwargs['relief'] = relief
 
@@ -490,6 +490,8 @@ class PRMP_Widget(PRMP_Theme):
         
         self.bind('<Enter>', self.entered, '+')
         self.bind('<Leave>', self.left, '+')
+
+        self.positionWidget(place=place, pack=pack, grid=grid)
         
     
     def entered(self, e=0):
@@ -554,17 +556,20 @@ class PRMP_Widget(PRMP_Theme):
     
     
     def addWidget(self, widget, config={}, place={}, grid={}, pack={}, container=None):
-        trues = [bool(pos) for pos in [place, pack, grid]].count(True)
         container = container or self.container
         
-        if not trues or (trues > 1): raise ValueError('only one is required between [place, pack, grid]')
+        widget = widget(container, **config, place=place, pack=pack, grid=grid)
+        widget.paint()
+        return widget
+    
+    def positionWidget(self, widget=None, place={}, grid={}, pack={}):
+        if widget == None: widget = self
+        trues = [bool(pos) for pos in [place, pack, grid]].count(True)
+        if trues > 1: raise ValueError('only one is required between [place, pack, grid]')
         else:
-            wid = widget(container, **config)
-            if place: wid.place(**place)
-            elif pack: wid.pack(**pack)
-            elif grid: wid.grid(**grid)
-            wid.paint()
-            return wid
+            if place: widget.place(**place)
+            elif pack: widget.pack(**pack)
+            elif grid: widget.grid(**grid)
     
     def switchOne(self, e=0):
         val = self.var.get()
