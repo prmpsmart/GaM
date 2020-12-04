@@ -469,7 +469,6 @@ class SolidScreen(PRMP_MainWindow):
         super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, **kwargs)
         
         self.container.configure(borderwidth=12)
-        print(self.style.layout('Row'))
 
         self.paint()
 SS = SolidScreen

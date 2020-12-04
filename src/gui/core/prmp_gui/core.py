@@ -224,7 +224,9 @@ class PRMP_Theme(Mixins):
 
     NORMAL_FONT = {'family': 'Minion Pro', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     
-    _NORMAL_FONT = {'family': 'Times New Roman', 'size': 11, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    PRMP_FONT = {'family': 'Times New Roman', 'size': 11, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    PRMP_FONTS = ["DEFAULT_FONT", "DEFAULT_MINUTE_FONT", "BIG_FONT", "DEFAULT_MENU_FONT", "DEFAULT_BUTTON_FONT", "DEFAULT_BUTTONS_FONT", "DEFAULT_SMALL_BUTTON_FONT", "DEFAULT_TITLE_FONT", "DEFAULT_STATUS_FONT", "DEFAULT_LABEL_FONT", "DEFAULT_LABELFRAME_FONT", "HEADING_FONT", "NORMAL_FONT", "PRMP_FONT"]
 
     themedWidgets = ['Combobox', 'Progressbar', 'Scrollbar', 'Treeview', 'Notebook', 'Panedwindow', 'Progressbar', 'Scale', 'Scrollbar', 'Separator', 'Sizegrip', 'Spinbox', 'Treeview', 'Toolbutton']
     
@@ -299,6 +301,22 @@ class PRMP_Theme(Mixins):
         total = len(themes)
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
+
+    def deriveFontName(self, name, default, kwargs):
+        pass
+    def deriveFontDict(self, fontDict, default, kwargs):
+        pass
+
+    def deriveFont(self, font, default, kwargs={}):
+        if isinstance(font, str): return self.deriveFontName(font, default, kwargs)
+        elif isinstance(font, dict): return self.deriveFontName(font, default, kwargs)
+        return 'DEFAULT_FONT'
+
+    def createDefaultFonts(self):
+        for df in PRMP_Theme.PRMP_FONTS:
+            font = PRMP_Theme.__dict__[df]
+            Font(df, **fonts)
+
 
     def _prevTheme(self):
         cur = PRMP_Theme.CURRENT_THEME
@@ -377,7 +395,6 @@ class PRMP_Theme(Mixins):
             
             elif wt == 'LabelFrame':
                 font = Font(**kwargs.pop('font', PTh.DEFAULT_LABELFRAME_FONT))
-                print(self, foreground)
                 _dict.update(dict(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font))
 
             elif wt == 'Scale': _dict.update(dict(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR))
@@ -1770,9 +1787,8 @@ class PRMP_Window(PRMP_Widget):
         winfo_id = self.winfo_id()
         parent = windll.user32.GetParent(winfo_id)
         res = windll.user32.SetWindowLongW(parent, -20, 0)
-        self.attributes('-topmost', self.topMost, '-toolwindow', self.toolWindow, '-alpha', self.alpha)
         self.deiconify()
-        if not (parent or res): self.after(10, self.addWindowToTaskBar)
+        if not res: self.after(10, self.addWindowToTaskBar)
  
     def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
