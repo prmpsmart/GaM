@@ -1738,6 +1738,9 @@ class PRMP_Window(PRMP_Widget):
     TOPEST = None
     STYLE = None
 
+    TKICON = ''
+    PRMPICON = ''
+
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
         
         if PRMP_Window.TOPEST == None:
@@ -1807,8 +1810,8 @@ class PRMP_Window(PRMP_Widget):
         self.topMost = topMost
         self.alpha = alpha
 
-        if tkIcon: self.setTkIcon(tkIcon)
-        if prmpIcon: self.setPRMPIcon(prmpIcon)
+        self.setTkIcon(tkIcon or PRMP_Window.TKICON)
+        self.setPRMPIcon(prmpIcon or PRMP_Window.PRMPICON)
 
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
 
@@ -2084,6 +2087,7 @@ class PRMP_Window(PRMP_Widget):
     def setPRMPIcon(self, icon):
         self.imgIcon = PRMP_Image(icon, resize=(20, 20))
         self._icon['image'] = self.imgIcon
+        print(icon)
     
     def placeTitlebar(self):
         if self.titleBar:
