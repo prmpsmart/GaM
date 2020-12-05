@@ -1738,7 +1738,7 @@ class PRMP_Window(PRMP_Widget):
     TOPEST = None
     STYLE = None
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
         
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self._paintAll)
@@ -1778,7 +1778,7 @@ class PRMP_Window(PRMP_Widget):
         
         if bindExit: self.bindExit()
 
-        self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar)
+        self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar, prmpIcon=prmpIcon, tkIcon=tkIcon)
         
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
@@ -1789,7 +1789,7 @@ class PRMP_Window(PRMP_Widget):
 
         if noTitleBar: self.after(10, self.addWindowToTaskBar)
     
-    def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1):
+    def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1, tkIcon='', prmpIcon=''):
         
         self.resizable(*self.resize)
         
@@ -1807,6 +1807,8 @@ class PRMP_Window(PRMP_Widget):
         self.topMost = topMost
         self.alpha = alpha
 
+        if tkIcon: self.setTkIcon(tkIcon)
+        if prmpIcon: self.setPRMPIcon(prmpIcon)
 
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
 
@@ -2069,11 +2071,19 @@ class PRMP_Window(PRMP_Widget):
         self.imgExit = PRMP_Image('red', resize=(20, 20))
         self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), tip='Exit', font='DEFAULT_SMALL_BUTTON_FONT')
 
+        self._icon = L(fr)
+
         self.titleBar = L(fr, config=dict( text=title or self.titleText), font='DEFAULT_TITLE_FONT', relief='groove')
         self.titleBar.bind('<Double-1>', self.maximize, '+')
         self.titleBar._moveroot()
 
         self.placeTitlebar()
+    
+    def setTkIcon(self, icon): self.iconbitmap(icon)
+
+    def setPRMPIcon(self, icon):
+        self.imgIcon = PRMP_Image(icon, resize=(20, 20))
+        self._icon['image'] = self.imgIcon
     
     def placeTitlebar(self):
         if self.titleBar:
@@ -2086,7 +2096,8 @@ class PRMP_Window(PRMP_Widget):
                 self._min.place(x=x-90, rely=0, relh=1, w=30)
                 self._max.place(x=x-60, rely=0, relh=1, w=30)
                 w = 90
-            self.titleBar.place(x=0, rely=0, relh=1, w=x-w)
+            self._icon.place(x=0, rely=0, relh=1, w=30)
+            self.titleBar.place(x=30, rely=0, relh=1, w=x-w-30)
             self._exit.place(x=x-30, rely=0, relh=1, w=30)
 
     def editStatus(self, text):
