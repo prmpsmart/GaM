@@ -141,7 +141,7 @@ class ObjectsMixins(Mixins, CompareByDate):
     
     def __len__(self):
         try: return len(self[:])
-        except: return 1
+        except: return -1
     
     def get(self, attr, default=None):
         try: return self[attr]
