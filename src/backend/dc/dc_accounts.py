@@ -35,9 +35,10 @@ class DCAccount(Account):
     
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
-        if self.nextAccount:
-            print(self.balances)
-            self.nextAccount.addBroughtForward(int(self.balances))
+        self.updateBroughtForwards()
+    
+    def updateBroughtForwards(self):
+        if self.nextAccount: self.nextAccount.addBroughtForward(int(self.balances))
 
 
 class DCAccountsManager(AccountsManager):
@@ -129,7 +130,7 @@ class AreaAccount(DCAccount):
             
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
             
-            self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
+            # self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
             
             self.commissions.updateWithOtherManagers([account.rates for account in clientsAccounts])
             

@@ -50,7 +50,6 @@ class DC_Digits(Frame):
         debits = account.debits
 
         upfronts = account.upfronts
-        print(account.manager[:])
         
         fillDict = dict(
             incomes=int(account.incomes),
