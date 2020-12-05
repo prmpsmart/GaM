@@ -1,5 +1,5 @@
 
-from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings, Incomes
+from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings, Incomes, Transfers
 from ..core.accounts import DateTime, Account, AccountsManager
 
 
@@ -35,7 +35,9 @@ class DCAccount(Account):
     
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
-        if self.nextAccount: self.nextAccount.addBroughtForward(int(self.balances))
+        if self.nextAccount:
+            print(self.balances)
+            self.nextAccount.addBroughtForward(int(self.balances))
 
 
 class DCAccountsManager(AccountsManager):
@@ -70,7 +72,10 @@ class ClientAccount(DCAccount):
     
     @property
     def rate(self): return int(self.rates)
-    
+    @property
+    def withdrawals(self): return self.debits.withdrawals
+    @property
+    def paidouts(self): return self.debits.paidouts
     def _balanceAccount(self, date=None):
         rate = int(self.rates)
         bal = int(self.broughtForwards) + int(self.savings) - int(self.upfronts.outstanding) - int(self.debits) - rate
@@ -79,9 +84,9 @@ class ClientAccount(DCAccount):
 
     def addContribution(self, contribution): self.contributions.addContribution(contribution)
     
-    def addDebit(self, debit, up=0):
+    def addDebit(self, debit, up=1, _type='w'):
         if up: self._balanceAccount()
-        self.debits.addDebit(debit)
+        self.debits.addDebit(debit, _type=_type)
     
     def addUpfront(self, upfront):
         # assert DateTime.now().isSameMonth(month)
@@ -100,7 +105,10 @@ class AreaAccount(DCAccount):
         self.broughtToOffices = BroughtToOffices(self)#
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
-    
+        self.transfers = Transfers(self)
+        
+        self.paidouts = 0
+        self.withdrawals = 0
     
     @property
     def recordsManagers(self):
@@ -113,6 +121,10 @@ class AreaAccount(DCAccount):
     def _balanceAccount(self, date=None):
         clientsAccounts = self.clientsAccounts
         if clientsAccounts:
+            
+            self.paidouts = 0
+            self.withdrawals = 0
+
             self.incomes.updateWithOtherManagers([account.incomes for account in clientsAccounts])
             
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
@@ -126,16 +138,25 @@ class AreaAccount(DCAccount):
             self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
             
             self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
+
+            for account in clientsAccounts:
+                self.paidouts += account.paidouts
+                self.withdrawals += account.withdrawals
+    
+    def addTransfer(self, transfer, date=None): self.transfers.createRecord(transfer, date, notAdd=True)
     
     def addBto(self, bto, date=None):
         clientsAccounts = self.clientsAccounts
+
         contributed = sum([acc.income(date) for acc in clientsAccounts])
+        transfers = sum([rec.money for rec in self.transfers.sortRecordsByDate(date)])
+        
+        self.btos.createRecord(bto, date)
+        bto += transfers
 
         if bto > contributed: self.excesses.createRecord(bto - contributed, date)
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date)
-        
-        self.btos.createRecord(bto, date)
-    
+
     @property
     def clientsAccounts(self, month=None): return self.manager.sortClientsAccountsByMonth(month or self.date)
 
@@ -182,5 +203,8 @@ class AreaAccountsManager(DCAccountsManager):
     def clientsManager(self): return self.region.clientsManager
     
     def sortClientsAccountsByMonth(self, month): return self.sortSubRegionsAccountsByMonth(month)
+
+
+
 
 

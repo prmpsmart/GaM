@@ -15,9 +15,30 @@ class Mixins:
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
+    def numWithCommas(self, num=None):
+        if num == None: num = int(self)
+        
+        div = 3
+        str_num = str(num)
+        num_list = list(str_num)
+        num_len = len(str_num)
+        num_rem = num_len % div
+        num_div = num_len // div
+        if not num_rem: num_div -= 1
+        co, to = -3, 0
+        for _ in range(num_div):
+            num_list.insert(co - to, ",")
+            co -= 3
+            to += 1
+        return "".join(num_list)
+    
+    def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num))
+    
+    def addSignToNum(self, money): return f'{self._moneySign}{money}'
+    
     def addSignToMoney(self, money):
         int(money)
-        return f'{self._moneySign}{money}'
+        return self.addSignToNum(money)
     
     numberToMoney = addSignToMoney
 
@@ -66,21 +87,32 @@ class Mixins:
         for a in args: print(a, end='=')
         print()
     
-    @property
-    def withCommas(self): return self.numWithCommas(self.money)
+    def __bool__(self): return True
+        
+    def moneyWithSign_ListInList(self, listInList):
+        try: listInList[0][0]
+        except: raise AssertionError('Data must be list in another list')
+        newListInList = []
+        for list1 in listInList:
+            newList = []
+            for data in list1:
+                try:
+                    if isinstance(data, Mixins): raise
+                    money = int(data)
+                    new = self.addSignToMoney(money)
+                    newList.append(new)
+                except: newList.append(data)
+            newListInList.append(newList)
+        return newListInList
 
     @classmethod
     def setMoneySign(cls, sign): Mixins._moneySign = sign
     
     @classmethod
     def notImp(cls): raise NotImplementedError(f'A subclass of {cls} should call this method.')
+
     @property
     def className(self): return f'{self.__class__.__name__}'
-    
-    # def __repr__(self): return f'<{self}>'
-    
-    @property
-    def shortName(self): return self._shortName
     
     @property
     def AlphabetsSwitch(self):
@@ -102,6 +134,9 @@ class ObjectsMixins(Mixins, CompareByDate):
     
     
     @property
+    def withCommas(self): return self.numWithCommas(self.money)
+
+    @property
     def strManager(self): return isinstance(self.manager, str)
     
     def __len__(self):
@@ -115,42 +150,6 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def moneyWithSign(self): return f'{self._moneySign}{int(self)}'
     
-    def numWithCommas(self, num=None):
-        if num == None: num = int(self)
-        
-        div = 3
-        str_num = str(num)
-        num_list = list(str_num)
-        num_len = len(str_num)
-        num_rem = num_len % div
-        num_div = num_len // div
-        if not num_rem: num_div -= 1
-        co, to = -3, 0
-        for _ in range(num_div):
-            num_list.insert(co - to, ",")
-            co -= 3
-            to += 1
-        return "".join(num_list)
-    
-    def __bool__(self): return True
-    
-    def addMoneySign(self, money): return f'{self._moneySign}{money}'
-    
-    def moneyWithSign_ListInList(self, listInList):
-        try: listInList[0][0]
-        except: raise AssertionError('Data must be list in another list')
-        newListInList = []
-        for list1 in listInList:
-            newList = []
-            for data in list1:
-                try:
-                    if isinstance(data, Mixins): raise
-                    money = int(data)
-                    new = self.addMoneySign(money)
-                    newList.append(new)
-                except: newList.append(data)
-            newListInList.append(newList)
-        return newListInList
     @property
     def day(self): return self.date.day
     @property

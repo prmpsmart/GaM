@@ -2,7 +2,7 @@ from src.backend.core.records_managers import Repayment, DateTime, RecordsManage
 from .dc_errors import DCErrors
 
 class DCRecord(Record):
-    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes')
+    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers')
 
 class DCRepayment(Repayment):
     Managers = ('Upfronts', )
@@ -28,8 +28,8 @@ class Contribution(DCRecord):
 class Debit(DCRecord):
 
      def __init__(self, manager, debit, _type='w', **kwargs):
-        if _type == 'w': self.type = 'withdrawal'
-        else: self.type = 'paidout'
+        if 'w' in _type: self._type = 'withdrawal'
+        else: self._type = 'paidout'
 
         super().__init__(manager, debit, **kwargs)
 

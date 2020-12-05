@@ -14,6 +14,9 @@ class DCRecordsManager(RecordsManager):
     
     def balance(self): return self.account.balanceAccount()
 
+class Transfers(DCRecordsManager): pass
+
+
 class Rates(DCRecordsManager):
     lowest = 50
     
@@ -21,7 +24,9 @@ class Rates(DCRecordsManager):
         super().__init__(accounts, True)
         self.setRate(rate)
         
-    def __int__(self): return int(self[-1])
+    def __int__(self):
+        try: return int(self[-1])
+        except: return 0
     
     def payUpBal(self, rate):
         contributions = int(self.account.contributions)
@@ -37,6 +42,7 @@ class Rates(DCRecordsManager):
     
     def setRate(self, rate):
         if self.checkRate(rate): self.createRecord(rate)
+
 
 class Balances(DCRecordsManager):
     
@@ -119,6 +125,10 @@ class Debits(DCRecordsManager):
             balance = int(self.account.balances)
             if toDebit <= balance: self.createRecord(toDebit, **kwargs)
             else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
+    @property
+    def withdrawals(self): return sum(int(rec) for rec in self if rec._type == 'withdrawal')
+    @property
+    def paidouts(self): return sum(int(rec) for rec in self if rec._type == 'paidout')
 
 class Deficits(DCRecordsManager): pass
 
@@ -134,7 +144,6 @@ class Savings(DCRecordsManager):
     def addSaving(self, saving, **kwargs): self.createRecord(saving, **kwargs)
 
 class Upfronts(RepaymentsManager):
-    _shortName = 'upf'
     ObjectType = Upfront
     
     def __init__(self, accounts):
@@ -150,6 +159,9 @@ class Upfronts(RepaymentsManager):
     
     @property
     def repaidUpfronts(self): return self.repaid
+    
+    @property
+    def overdue(self): return self.outstanding
     
     @property
     def pendingdUpfronts(self): return self.outstanding

@@ -1,15 +1,8 @@
 from .packed import *
 
 
-class Toplevel:
+class Big:
     def __init__(self, top=None):
-        '''This class configures and populates the toplevel window. top is the toplevel containing window.'''
-
-        _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
-        _fgcolor = '#000000'  # X11 color: 'black'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
 
         self.Label1 = tk.Label(top, activebackground="#f9f9f9", activeforeground="black", background="#d9d9d9", disabledforeground="#a3a3a3", font="-family {Times New Roman} -size 14 -weight bold", foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove", text='Areas')
         self.Label1.place(relx=.01, rely=.062, h=33, w=123)
@@ -54,13 +47,14 @@ class Toplevel:
         self.datetime = DateTimeView(self.Frame1)
         self.datetime.place(relx=.029, rely=.018, relh=.099, relw=.957)
 
-class _Toplevel:
+class Small:
     def __init__(self, top=None):
         self.datetime = DateTimeView(top)
         self.datetime.place(relx=.005, rely=.01, relh=.1, relw=.99)
 
         self.dc = DC_Overview(top)
         self.dc.place(relx=.005, rely=.115, relh=.88, relw=.99)
+        self.fillDCDigits = self.dc.fillDCDigits
 
 
 

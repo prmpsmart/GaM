@@ -211,10 +211,8 @@ class RecordsWithSameSeasons(SeasonRecord):
     def __str__(self): return f'{self.manager} | {self.className}s | {self.moneyWithSign}'
 
 class RecordsManager(ObjectsManager):
-    _shortName = 'rec'
     lowest = 50
     ObjectType = Record
-    _type = 'recm'
     
     def __init__(self, account=None): ObjectsManager.__init__(self, account)
     
@@ -258,9 +256,7 @@ class RecordsManager(ObjectsManager):
     
     def _setRecords(self, records): self.__records = records
     
-    def getRecordByDate(self, date): return self.sortRecordsByDate(date)
-    
-    def createRecord(self, money, date=None, newRecord=True,notAdd=False, **kwargs):
+    def createRecord(self, money, date=None, newRecord=True, notAdd=False, **kwargs):
         '''
         money: type int; transaction to be in the record.
         date: type DateTime; date of the transaction.
@@ -275,7 +271,6 @@ class RecordsManager(ObjectsManager):
         # if money == 0: newRecord, notAdd = False, True
         
         # assert money != 0, 'Money must not be zero.'
-        
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         
@@ -283,7 +278,8 @@ class RecordsManager(ObjectsManager):
         else:
             if date in list(self.dates):
                 new = False
-                record = self.getRecordByDate(date)
+                record = self.sortRecordsByDate(date)
+                if isinstance(record, list): record = record[0]
                 if record:
                     if notAdd: record.set(money)
                     else: record.add(money)
@@ -342,9 +338,10 @@ class RecordsManager(ObjectsManager):
     #Date Sorting
     
     def sortRecordsByDate(self, date):
+        if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
-        _rec = [rec for rec in self if rec.date == date]
-        if len(_rec) == 1: return _rec[0]
+
+        _rec = [rec for rec in self if str(rec.date) == str(date)]
         return _rec
     
     #Day Sorting

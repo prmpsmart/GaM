@@ -30,7 +30,6 @@ class Record(Object):
     def add(self, money): self.money += money
     
     def substract(self, money): self.money -= money
-
 DayRecord = Record
 
 
