@@ -50,7 +50,7 @@ def create_container(func):
     '''Creates a Frame with a given master, and use this new frame to
     place the scrollbars and the widget.'''
     def wrapped(cls, master, **kw):
-        from .prmp_tk import PRMP_Frame
+        from .core import PRMP_Frame
         container = PRMP_Frame(master)
         container.bind('<Enter>', lambda e: bound_to_mousewheel(e, container))
         container.bind('<Leave>', lambda e: unbound_to_mousewheel(e, container))

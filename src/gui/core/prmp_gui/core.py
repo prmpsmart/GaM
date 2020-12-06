@@ -1153,7 +1153,8 @@ class PRMP_Style(ttk.Style, Mixins):
                 },
                'map': {
                     # 'relief': [('pressed', 'solid'), ('hover', 'solid'), ('focus', 'solid'), ('selected', 'solid')],
-                    'foreground': [('disabled', 'black')],
+                    'foreground': [('disabled', 'black'), ('pressed', background)],
+                    'background': [('pressed', foreground)],
                 },
                 'layout': [('Button.border', {'sticky': 'nswe', 'children': [('Button.focus', {'sticky': 'nswe', 'children': [('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'sticky': 'nswe'})]})]})]})]
             },
@@ -1797,12 +1798,16 @@ class PRMP_Window(PRMP_Widget):
         self.resizable(*self.resize)
         
         self.noTitleBar = noTitleBar
+        self._addStatusBar = addStatusBar
+        self._addTitleBar = addTitleBar
+
         if noTitleBar: self.overrideredirect(True)
         
         if addTitleBar:
             if toolWindow: self.__r = 1
             else: self.__r = 0
             self.addTitleBar()
+            self.setPRMPIcon(prmpIcon or PRMP_Window.PRMPICON)
         
         if addStatusBar: self.addStatusBar()
         
@@ -1811,7 +1816,6 @@ class PRMP_Window(PRMP_Widget):
         self.alpha = alpha
 
         self.setTkIcon(tkIcon or PRMP_Window.TKICON)
-        self.setPRMPIcon(prmpIcon or PRMP_Window.PRMPICON)
 
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
 
@@ -2010,7 +2014,17 @@ class PRMP_Window(PRMP_Widget):
     
     
     def placeContainer(self, e=0, h=0):
-        self.container.place(x=0, y=30, w=self.winfo_width(), h=h or self.winfo_height()-60)
+        if self._addTitleBar:
+            top = 30
+            if self._addStatusBar: bottom = 60
+            else: bottom = 30
+        else:
+            top = 0
+            if self._addStatusBar: bottom = 30
+            else: bottom = 0
+
+        self.container.place(x=0, y=top, w=self.winfo_width(), h=h or self.winfo_height()-bottom)
+
         self.placeTitlebar()
         self.placeStatusBar()
     
@@ -2087,7 +2101,6 @@ class PRMP_Window(PRMP_Widget):
     def setPRMPIcon(self, icon):
         self.imgIcon = PRMP_Image(icon, resize=(20, 20))
         self._icon['image'] = self.imgIcon
-        print(icon)
     
     def placeTitlebar(self):
         if self.titleBar:
