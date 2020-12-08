@@ -85,7 +85,7 @@ class Tabling:
                     del columns[1]
                     yield columns
             elif header == "clnt_days":
-                columns = cls.day_yield(region, week=week)
+                columns = list(cls.day_yield(region, week=week))
                 if columns:
                     for column in columns: yield column
                     del columns[2]

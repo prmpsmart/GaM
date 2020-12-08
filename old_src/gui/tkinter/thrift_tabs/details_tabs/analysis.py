@@ -464,7 +464,8 @@ class Thrift_Analysis(Frame):
 
         if not spec: self.small_details.thrift_update(region=region, week=week, day=day, month=month)
 
-        if region.which == "client" and header == "days": pass
+        if isinstance(region, str): pass
+        elif region.which == "client" and header == "days": pass
         else: self.full_details(title=title, region=region, header=header, week=week, day=day, month=month, spec=spec, area=area)
 
         if region == Years: region = "All Years"
