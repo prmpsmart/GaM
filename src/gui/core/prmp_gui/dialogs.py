@@ -99,9 +99,11 @@ PD = PRMP_Dialog
 class CalendarDialog(PRMP_Dialog):
    
     def __init__(self, master=None, month=None, dest='', title='Calendar Dialog', geo=(300, 300), **kwargs): super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
-    def _setupDialog(self):
-        self.calendar = self.addWidget(Calendar, config=dict(hook=self.hook), place=dict(relx=0, rely=0, relh=1, relw=1))
+
+    def _setupDialog(self): self.calendar = self.addWidget(Calendar, config=dict(hook=self.hook), place=dict(relx=0, rely=0, relh=1, relw=1))
     
+    def afterPaint(self): self.calendar.afterPaint()
+
     def hook(self):
         self._setResult(self.calendar.date)
         if self._return:

@@ -196,8 +196,8 @@ IL = ImageLabel
 class PRMP_DateButton(PRMP_Button):
     def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', **kwargs):
         self.date = None
-        from .dialogs import Calendar, DateTime
-        self.CD = Calendar
+        from .dialogs import CalendarDialog, DateTime
+        self.CD = CalendarDialog
         self.DT = DateTime
         super().__init__(master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
         self['text'] = placeholder
@@ -720,11 +720,16 @@ class Calendar(Frame):
 
         self.updateDays()
     
-    # def afterPaint(self):
-    #     for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
+    def afterPaint(self):
+        dic = dict(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
         
-    #     self.monthNameLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
-    #     self.yearLbl.configure(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[1])
+        background = PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
+        foreground = PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
+
+        for btn in [self._back, self._for, self._prev, self._nxt, *self.headers]: btn.config(background=background, foreground=foreground)
+        
+        self.monthNameLbl.config(**dic)
+        self.yearLbl.config(**dic)
     
     def resetDate(self, e=0):
         self.month = DateTime.now()

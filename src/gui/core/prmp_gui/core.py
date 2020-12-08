@@ -1745,7 +1745,7 @@ class PRMP_Window(PRMP_Widget):
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
         
         if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self._paintAll)
+            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
             PRMP_Window.TOPEST = self
             self.createDefaultFonts()
             PRMP_Window.STYLE = PRMP_Style(self)
