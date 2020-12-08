@@ -1,6 +1,6 @@
 from ..core.prmp_gui.extensions import *
 
-class DC_Digits(Frame):
+class DC_Digits(Frame, FillWidgets):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
      # Incomes
@@ -45,7 +45,7 @@ class DC_Digits(Frame):
         self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))
         self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.18, relw=.44))
 
-    def fill(self, account):
+    def update(self, account):
         
         debits = account.debits
 
@@ -72,10 +72,12 @@ class DC_Digits(Frame):
             deficits=int(account.deficits),
             excesses=int(account.excesses))
         
-        for k, v in fillDict.items():
-            val = self.numWithSign_Commas(v)
-            wid = self.__dict__[k]
-            wid.config(text=val)
+        for key in fillDict:
+            val = fillDict[key]
+            new_val = self.numWithSign_Commas(val)
+            fillDict[key] = new_val
+        
+        self.set(fillDict)
 
 
 class DC_Overview(Frame):
@@ -93,7 +95,7 @@ class DC_Overview(Frame):
         self.dcDigits = DC_Digits(self, relief='groove')
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
     
-    def fillDCDigits(self, account): self.dcDigits.fill(account)
+    def updateDCDigits(self, account): self.dcDigits.update(account)
 
 
 

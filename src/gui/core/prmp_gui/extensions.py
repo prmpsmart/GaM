@@ -69,8 +69,8 @@ class FillWidgets:
     @property
     def resultsWidgets(self): return self.__resultsWidgets
     
-    def fill(self, values={}):
-        if values:
+    def set(self, values={}):
+        if values and isinstance(values, dict):
             for widgetName in self.resultsWidgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
@@ -79,10 +79,30 @@ class FillWidgets:
                         widget.set(val)
                     except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
-            self.values = values
+            self.values.update(values)
             return True
         else:
-            if self.values: return self.fill(self.values)
+            if self.values: return self.set(self.values)
+    
+    def get(self):
+        result = {}
+
+        self.resultsWidgets.sort()
+        for widgetName in self.resultsWidgets:
+            wid = self.__dict__.get(widgetName)
+            if wid:
+                get = wid.get()
+                verify = getattr(wid, 'verify', None)
+                if verify:
+                    if verify(): result[widgetName] = get
+                    else:
+                        from .dialogs import PRMP_MsgBox
+                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()} is required to proceed!', _type='error', okText='Understood')
+                        return
+                else: result[widgetName] = get
+        return result
+
+
 FW = FillWidgets
 
 class ImageWidget:

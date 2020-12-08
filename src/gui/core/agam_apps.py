@@ -119,7 +119,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         self._setupApp()
 
-        self.fill()
+        self.set()
         self.paint()
         
         if self.region:
@@ -134,7 +134,7 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.addTitleBar(region.idText)
         
         person = region.person
-        if person: self.fill(dict(image=person.image))
+        if person: self.set(dict(image=person.image))
 
         # self.loadAccounts(region)
 
