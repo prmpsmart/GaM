@@ -194,11 +194,13 @@ class ImageLabel(ImageWidget, PRMP_Style_Label):
 IL = ImageLabel
 
 class PRMP_DateButton(PRMP_Button):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', low=None, high=None, **kwargs):
         self.date = None
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
         self.DT = DateTime
+        self.low = low
+        self.high = high
         super().__init__(master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
         self['text'] = placeholder
     
