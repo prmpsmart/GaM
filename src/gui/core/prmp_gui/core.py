@@ -1752,7 +1752,6 @@ class PRMP_Window(PRMP_Widget):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
 
-        self.resize = resize
         self.container = None
         self.zoomed = False
         self.iconed = False
@@ -1782,7 +1781,7 @@ class PRMP_Window(PRMP_Widget):
         
         if bindExit: self.bindExit()
 
-        self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar, prmpIcon=prmpIcon, tkIcon=tkIcon)
+        self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar, prmpIcon=prmpIcon, tkIcon=tkIcon, resize=resize)
         
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
@@ -1793,7 +1792,8 @@ class PRMP_Window(PRMP_Widget):
 
         if noTitleBar: self.after(10, self.addWindowToTaskBar)
     
-    def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1, tkIcon='', prmpIcon=''):
+    def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1, tkIcon='', prmpIcon='', resize=(1, 1)):
+        self.resize = resize
         
         self.resizable(*self.resize)
         
@@ -2049,6 +2049,7 @@ class PRMP_Window(PRMP_Widget):
         
     def maximize(self, e=0):
         if self.__r: return
+        if self.resize.count(True) < 2: return
         
         if self.zoomed:
             self.zoomed = False

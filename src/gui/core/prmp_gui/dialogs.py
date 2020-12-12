@@ -6,8 +6,8 @@ from .pics import Xbms
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=False, values={}, ntb=1, nrz=0, tm=1, gaw=1, editable=True, **kwargs):
-        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=1, **kwargs)
+    def __init__(self, master=None, _return=False, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, **kwargs):
+        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
         FillWidgets.__init__(self, values=values)
         
         self.__result = None
