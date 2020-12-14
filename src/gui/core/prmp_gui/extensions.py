@@ -101,8 +101,6 @@ class FillWidgets:
                         return
                 else: result[widgetName] = get
         return result
-
-
 FW = FillWidgets
 
 class ImageWidget:
@@ -194,13 +192,13 @@ class ImageLabel(ImageWidget, PRMP_Style_Label):
 IL = ImageLabel
 
 class PRMP_DateButton(PRMP_Button):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', low=None, high=None, **kwargs):
+    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, **kwargs):
         self.date = None
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
         self.DT = DateTime
-        self.low = low
-        self.high = high
+        self.min = min_
+        self.max = max_
         super().__init__(master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
         self['text'] = placeholder
     
@@ -209,7 +207,7 @@ class PRMP_DateButton(PRMP_Button):
         else: return False
 
     def action(self):
-        self.date = self.CD(self, caller=self.toplevel, side=self.topest.side, _return=1).result
+        self.date = self.CD(self, caller=self.toplevel, side=self.topest.side, _return=1, min_=self.min, max_=self.max).result
         self.set(str(self.date))
     
     def get(self): return self.date
@@ -664,12 +662,14 @@ class Calendar(Frame):
                 self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
                 self.returnMethod(self.day)
     
-    def __init__(self, master=None, month=None, dest='', hook=None, **kwargs):
+    def __init__(self, master=None, month=None, dest='', hook=None, min_=None, max_=None, **kwargs):
         super().__init__(master, **kwargs)
         
         if month == None: month = DateTime.now()
         DateTime.checkDateTime(month)
         
+        self.min = DateTime.getDMYFromDate(min_)
+        self.max = DateTime.getDMYFromDate(max_)
         self.__date = None
         self.month = month
         self.hook = hook
@@ -738,19 +738,28 @@ class Calendar(Frame):
         self.updateDays()
     
     def nextYear(self):
-        self.month += 12
+        new = self.month + 12
+        if self.max and (new.ymdToOrd > self.max.ymdToOrd): return
+        self.month = new
         self.updateDays()
     
     def nextMonth(self, e=0):
-        self.month += 1
+        new = self.month + 1
+        if self.max and (new.ymdToOrd > self.max.ymdToOrd): return
+        self.month = new
         self.updateDays()
     
     def previousYear(self):
-        self.month -= 12
+        new = self.month - 12
+        if self.min and (new.ymdToOrd < self.min.ymdToOrd): return
+        self.month = new
         self.updateDays()
     
     def previousMonth(self):
-        self.month -= 1
+        new = self.month - 1
+        if self.min and (new.ymdToOrd < self.min.ymdToOrd): return
+        self.month = new
+        # print(new, self.month, self.min)
         self.updateDays()
     
     def updateDays(self):

@@ -507,11 +507,13 @@ class DateTime(datetime):
 
     @classmethod
     def getDMYFromDate(cls, date):
-        if cls.verifyDateFormat(date):
-            day, month, year = date.split('/')
-            day, month, year = int(day), int(month), int(year)
-            dt = cls(year, month, day)
-            return dt
+        if date:
+            if isinstance(date, str) and cls.verifyDateFormat(date):
+                day, month, year = date.split('/')
+                day, month, year = int(day), int(month), int(year)
+                dt = cls(year, month, day)
+                return dt
+            elif isinstance(date, cls): return date
     
     def isSameDate(self, date):
         self.checkDateTime(date)
