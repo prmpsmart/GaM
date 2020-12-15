@@ -1,4 +1,5 @@
 from ..core.agam_dialogs import *
+from .dc_extensions import *
 from ...backend.dc.dc_regions import *
 
 class ClientDialog(PersonDialog):

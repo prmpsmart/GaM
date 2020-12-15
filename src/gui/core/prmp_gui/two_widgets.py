@@ -10,10 +10,8 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, relx=0, rely=0, relw=0, relh=0, top='', bottom='', func=None, orient='v', relief="groove", command=None, longent=.5, ilh=0, topKwargs=dict(), bottomKwargs=dict(), disableOnTogle=True, dot=None):
-        super().__init__(master)
-        
-        self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
+    def __init__(self, master, top='', bottom='', func=None, orient='v', relief='groove', command=None, longent=.5, ilh=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, **kwargs):
+        super().__init__(master, **kwargs)
         
         self.ilh = ilh
         self.top = top.lower()
@@ -21,8 +19,8 @@ class TwoWidgets(PRMP_Frame):
         self.orient = orient
         self.longent = longent
         
-        if dot != None: disableOnTogle = dot
-        self.disableOnTogle = disableOnTogle
+        if dot != None: disableOnToggle = dot
+        self.disableOnToggle = disableOnToggle
         
         
         top_wid = self.top_widgets[top]
@@ -92,7 +90,7 @@ class TwoWidgets(PRMP_Frame):
         except Exception as e: self.disabled('b')
         
     def disabled(self, wh=''):
-        if not self.disableOnTogle: return
+        if not self.disableOnToggle: return
         
         if wh == 't': self.Top.disabled()
         elif wh == 'b': self.Bottom.disabled()
@@ -125,7 +123,6 @@ class TwoWidgets(PRMP_Frame):
     def config(self, **kwargs): self.Top.configure(**kwargs)
 
     def place_widgs(self):
-        self.place(relx=self.relx, rely=self.rely, relh=self.relh, relw=self.relw)
         if self.orient == 'h':
             if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.longent)
             else: self.Top.place(relx=0, rely=0, relh=1, relw=self.longent)

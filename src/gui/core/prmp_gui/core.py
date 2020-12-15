@@ -350,7 +350,7 @@ class PRMP_Theme(Mixins):
     
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k != 'font'}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder']}
             
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -495,6 +495,7 @@ class PRMP_Widget(PRMP_Theme):
 
 
     def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, **kwargs):
+
         self.kwargs = kwargs.copy()
         if asEntry:
             relief = 'sunken'
@@ -773,13 +774,16 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
     
-    def __init__(self, placeholder='', _type='text', **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], very=False, **kwargs):
         _type = _type.lower()
+
         self.placeholder = placeholder
-        self.values = []
+        self.values = values
         
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
+
+        types = ['email', 'number', 'money']
         
         if _type == 'email':
             self.bind('<KeyRelease>', self.checkingEmail, '+')
@@ -799,9 +803,13 @@ class PRMP_Input:
             self.bind('<KeyRelease>', self.normVery, '+')
             self.verify = self.normVery
         
+        if self.values or (_type in types): self.very = True
+        else: self.very = False or very
+
         self.set(self.placeholder)
     
     def normVery(self, e=0):
+        if not self.very: return
         get = self._get()
         if self.values: 
             if get in self.values: return self.green()
@@ -936,10 +944,10 @@ Message = PM = PRMP_Message
 
 class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
     
-    def __init__(self, master=None, placeholder='', config={}, **kwargs):
+    def __init__(self, master=None, config={}, **kwargs):
         tk.Text.__init__(self, master=master, **config)
         PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
-        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_Input.__init__(self, **kwargs)
         
     def _get(self): return tk.Text.get(self, '1.0', 'end').strip('\n')
     
@@ -955,13 +963,16 @@ Text = PTx = PRMP_Text
 
 class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
     
-    def __init__(self, master=None, type_='', placeholder='', config={}, **kwargs):
+    def __init__(self, master=None, type_='', config={}, values=[], **kwargs):
+
+        if type_.lower() == 'gender': values = ['Male', 'Female']
+
         ttk.Combobox.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
-        PRMP_Input.__init__(self, placeholder=placeholder)
+        PRMP_Input.__init__(self, values=values, **kwargs)
 
-        self.values = []
-        if type_.lower() == 'gender': self.changeValues(['Male', 'Female'])
+        self.changeValues(values)
+
     
     @property
     def PRMP_WIDGET(self): return 'Combobox'
@@ -1538,8 +1549,8 @@ class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
     
     def __init__(self, master=None, config={}, **kwargs):
         tk.Entry.__init__(self, master, **config)
-        PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
-        PRMP_Input.__init__(self, kwargs)
+        PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
+        PRMP_Input.__init__(self, **kwargs)
     
     @property
     def PRMP_WIDGET(self): return 'Entry'

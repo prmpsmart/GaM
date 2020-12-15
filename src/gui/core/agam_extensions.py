@@ -1,5 +1,84 @@
 from .prmp_gui.extensions import *
+from .prmp_gui.two_widgets import *
 
+class RegionRadioCombo(RadioCombo):
+    
+    def __init__(self, master=None, region=None, regionLevel=5, recievers=[], **kwargs):
+        super().__init__(master, **kwargs)
+        
+        self._subRegionDict = {}
+        self.subRegionDict = {}
+        self.set(region)
+        self.choosen = None
+        self.region = region
+        self._receivers = recievers
+        self.regionLevel = regionLevel
+    
+    def addReceiver(self, receiver):
+        if receiver not in self._receivers: self._receivers.append(receiver)
+        elif isinstance(receiver, (list, tuple)): 
+            for recv in receiver: self.addReceiver(recv)
+    
+    def clicked(self, e=0):
+        val = super().clicked()
+        regVal = self.get()
+        
+        if regVal and self._receivers:
+            for recv in self._receivers: recv((self, regVal))
+    
+    def get(self):
+        val = self.B.get()
+        regVal = self.subRegionDict.get(val)
+        _regval = self._subRegionDict.get(val)
+        
+        if regVal: return regVal
+        elif _regval: return _regval
+        else: return self.choosen
+    
+    def receiver(self, tup):
+        wid, region = tup
+        self.var.set(self.val)
+        wid.unlight()
+        self.light()
+        self.set(region)
+        
+    def processRegionSubs(self, region):
+        rm = region.subRegions
+        
+        if rm:
+            for region in rm:
+                rname = region.name
+                self._subRegionDict[rname] = region
+                try: number = region.number
+                except: number = rm.index(region) + 1
+                name = f'{number})  {rname}'
+                self.subRegionDict[name] = region
+        # else: self.subRegionDict[region.name] = region
+    
+    def setKeys(self, region=None):
+        if region:
+            self.processRegionSubs(region)
+            keys = self.getSubKeys()
+            if keys:
+                self.changeValues(keys)
+                self.B.set(keys[0])
+        
+    def set(self, region):
+        if region:
+            self.subRegionDict = {}
+            self._subRegionDict = {}
+            regionLevel = len(region.hierachy)
+            
+            assert regionLevel  == self.regionLevel, f'Incorrect region of level {regionLevel} given, level must be {self.regionLevel}'
+            self.setKeys(region)
+            self.region = region
+    
+    def getSubKeys(self):
+        keys = list(self.subRegionDict.keys())
+        keys.sort()
+        
+        return keys
+RRC = RegionRadioCombo
 
 class OfficeDetails(LabelFrame):
     def __init__(self, master=None, text='Office Details', office=None, **kwargs):
@@ -11,13 +90,13 @@ class OfficeDetails(LabelFrame):
 
         Label(self, text='Areas', place=dict(relx=.02, rely=.32, relh=.32, relw=.35))
 
-        Label(self, text='Clients', place=dict(relx=.02, rely=.64, relh=.32, relw=.35))
+        Label(self, text='Clients', place=dict(relx=.02, rely=.66, relh=.32, relw=.35))
 
         self.name = Label(self, asEntry=True, font='PRMP_FONT', text='Owode', place=dict(relx=.4, rely=0, relh=.3, relw=.58))
 
         self.areas = Label(self, asEntry=True, font='PRMP_FONT', text='6', place=dict(relx=.4, rely=.32, relh=.3, relw=.58))
 
-        self.clients = Label(self, asEntry=True, font='PRMP_FONT', text='1280', place=dict(relx=.4, rely=.64, relh=.3, relw=.58))
+        self.clients = Label(self, asEntry=True, font='PRMP_FONT', text='1280', place=dict(relx=.4, rely=.66, relh=.3, relw=.58))
 
 
 class MonthBox(LabelFrame):
