@@ -1,27 +1,4 @@
-from .agam_dialogs import *
-from .prmp_gui.extensions import *
-
-
-
-class Hierachy(PRMP_TreeView):
-    __shows = ['tree', 'headings']
-    __slots__ = ['tree']
-    
-    def __init__(self, master=None, columns=[], **kwargs):
-        super().__init__(master=master, columns=columns, **kwargs)
-        
-    
-    def bindings(self):
-        super().bindings()
-        self.treeview.bind('<Control-Return>', self.viewRegion)
-
-    def viewRegion(self, e=0):
-        current = self.selected()
-        if current:
-            if current._type == 'reg':
-                if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
-                else: RegionDetails(self, region=current)
-H = Hierachy
+from .agam_extensions import *
 
 
 class RegionDetails(PRMP_MainWindow, FillWidgets):

@@ -42,16 +42,7 @@ class Toplevel1(LabelFrame):
 
 
 
-        self.details = Notebook(self, place=dict(relx=.005, rely=.005, relh=.4, relw=.44))
-
-        self.recordDetails = RecordDetails(self.details, text='Record Details', place=dict(relx=.005, rely=.005, relh=.8 , relw=.44))
-        self.details.add(self.recordDetails, padding=3)
-        self.details.tab(0, text='Regions', compound='left', underline='-1')
-
-        self.personalDetails = PersonalDetails(self.details, text='Personal Details', place=dict(relx=.022, rely=.032, relh=.328 , relw=.25))
-        self.details.add(self.personalDetails, padding=3)
-        self.details.tab(1, text='Records', compound='left', underline='-1')
-
+        self.details = Details(self, place=dict(relx=.005, rely=.005, relh=.44, relw=.4))
 
 
 

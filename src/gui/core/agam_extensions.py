@@ -1,5 +1,5 @@
 from .prmp_gui.extensions import *
-from .prmp_gui.two_widgets import *
+from .agam_dialogs import *
 
 class RegionRadioCombo(RadioCombo):
     
@@ -80,6 +80,29 @@ class RegionRadioCombo(RadioCombo):
         return keys
 RRC = RegionRadioCombo
 
+
+class Hierachy(PRMP_TreeView):
+    __shows = ['tree', 'headings']
+    __slots__ = ['tree']
+    
+    def __init__(self, master=None, columns=[], **kwargs):
+        super().__init__(master=master, columns=columns, **kwargs)
+        
+        from .agam_apps import RegionDetails
+        self.RD = RegionDetails
+    
+    def bindings(self):
+        super().bindings()
+        self.treeview.bind('<Control-Return>', self.viewRegion)
+
+    def viewRegion(self, e=0):
+        current = self.selected()
+        if current:
+            if current._type == 'reg':
+                if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
+                else: self.RD(self, region=current)
+H = Hierachy
+
 class OfficeDetails(LabelFrame):
     def __init__(self, master=None, text='Office Details', office=None, **kwargs):
         super().__init__(master=master, text=text, **kwargs)
@@ -152,3 +175,95 @@ class AccountHighlight(LabelFrame):
         self.Scrolledtreeview1.column("Col1",minw="20")
         self.Scrolledtreeview1.column("Col1",stretch="1")
         self.Scrolledtreeview1.column("Col1",anchor="w")
+
+
+class PersonalDetails(LabelFrame):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        Label(self, text='Name', place=dict(relx=.02, rely=0, relh=.15, relw=.25))
+        self.name = Entry(self, place=dict(relx=.3, rely=0, relh=.15, relw=.68))
+
+        Label(self, text='Number', place=dict(relx=.02, rely=.16, relh=.15, relw=.25))
+        self.number = Entry(self, place=dict(relx=.3, rely=.16, relh=.15, relw=.68))
+
+        Label(self, text='Phone', place=dict(relx=.02, rely=.32, relh=.15, relw=.25))
+        self.phone = Entry(self, place=dict(relx=.3, rely=.32, relh=.15, relw=.68))
+
+        Label(self, text='ID', place=dict(relx=.02, rely=.48, relh=.15, relw=.25))
+        self.id = Entry(self, place=dict(relx=.3, rely=.48, relh=.15, relw=.68))
+
+        Label(self, text='Gender', place=dict(relx=.02, rely=.64, relh=.15, relw=.25))
+        self.gender = Combobox(self, type_='gender', place=dict(relx=.3, rely=.64, relh=.15 , relw=.68))
+
+        Label(self, text='Address', place=dict(relx=.02, rely=.8, relh=.15, relw=.25))
+        self.address = Entry(self, place=dict(relx=.3, rely=.8, relh=.15, relw=.68))
+
+
+class RecordDetails(LabelFrame):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        Label(self, text='Date', place=dict(relx=.02, rely=0, relh=.25, relw=.2))
+        self.date = Button(self, text='06/12/2020', place=dict(relx=.24, rely=0, relh=.25, relw=.25))
+
+        Label(self, text='Range', place=dict(relx=.02, rely=.27, relh=.25, relw=.2))
+
+        self.range1 = Entry(self, place=dict(relx=.24, rely=.27, relh=.25, relw=.25))
+
+        Label(self, text='- to -', relief='flat', place=dict(relx=.51, rely=.27, relh=.25, relw=.2))
+
+        self.range2 = Entry(self, place=dict(relx=.73, rely=.27, relh=.25, relw=.25))
+
+        Label(self, text='Note', place=dict(relx=.02, rely=.54, relh=.25, relw=.2 ))
+        self.note = Text(self, wrap='word', place=dict(relx=.24, rely=.54, relh=.42, relw=.74), very=True)
+
+
+class DateSearch(LabelFrame):
+    
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.date = Button(self, text='06/12/2020', place=dict(relx=.02, rely=0, relh=.2, relw=.3))
+
+        self.season = tk.StringVar()
+        self.season.set('sub')
+
+        self.year = Radiobutton(self, text='Year', variable=self.season, value='year', place=dict(relx=.02, rely=.22, relh=.25 , relw=.22))
+
+        self.month = Radiobutton(self, text='Month', variable=self.season, value='month', place=dict(relx=.25, rely=.22, relh=.25 , relw=.22))
+
+        self.week = Radiobutton(self, text='Week', variable=self.season, value='week', place=dict(relx=.48, rely=.22, relh=.25 , relw=.24))
+
+        self.day = Radiobutton(self, text='Day', variable=self.season, value='day', place=dict(relx=.73, rely=.22, relh=.25 , relw=.24))
+
+        self.setRadioGroups([self.day, self.week, self.month, self.year])
+
+        
+        self.seasonNames = tk.StringVar()
+        self.seasonNames.set('sub')
+
+        self.dayName = RadioEntry(self, topKwargs=dict(config=dict(text='Day Name', style='Group.TRadiobutton', variable=self.seasonNames, value='dayName')), orient='h', place=dict(relx=.02, rely=.48, relh=.25 , relw=.45))
+
+        self.monthName = RadioEntry(self, topKwargs=dict(config=dict(text='Month Name', style='Group.TRadiobutton', variable=self.seasonNames, value='monthName')), orient='h', place=dict(relx=.5, rely=.48, relh=.25 , relw=.45))
+
+        self.weekNumber = RadioEntry(self, topKwargs=dict(config=dict(text='Week Number', style='Group.TRadiobutton', variable=self.seasonNames, value='weekNumber')), orient='h', place=dict(relx=.02, rely=.75, relh=.25 , relw=.45))
+
+        self.yearNumber = RadioEntry(self, topKwargs=dict(config=dict(text='Year Number', style='Group.TRadiobutton', variable=self.seasonNames, value='yearNumber')), orient='h', place=dict(relx=.5, rely=.75, relh=.25 , relw=.456))
+
+        self.setRadioGroups([self.dayName, self.weekNumber, self.monthName, self.yearNumber])
+
+
+class Details(Notebook):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        
+        self.personalDetails = PersonalDetails(self, text='Personal Details', place=dict(relx=.022, rely=.032, relh=.328 , relw=.25))
+        self.add(self.personalDetails, padding=3)
+        self.tab(0, text='Records', compound='left', underline='-1')
+
+        self.recordDetails = RecordDetails(self, text='Record Details', place=dict(relx=.005, rely=.005, relh=.4 , relw=.35))
+        self.add(self.recordDetails, padding=3)
+        self.tab(1, text='Regions', compound='left', underline='-1')
+

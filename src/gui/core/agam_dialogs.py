@@ -1,7 +1,6 @@
 
 from .prmp_gui.two_widgets import *
 from .prmp_gui.dialogs import *
-from .agam_extensions import *
 
 class PersonDialog(PRMP_Dialog):
     
