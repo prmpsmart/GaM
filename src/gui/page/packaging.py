@@ -8,13 +8,12 @@ class Toplevel1(LabelFrame):
 
         self.Labelframe2 = DateSearch(self, text='Date Search', place=dict(relx=.5, rely=.032, relh=.344 , relw=.456))
 
-        self.Labelframe3 = RecordDetails(self, text='Record Details', place=dict(relx=.029, rely=.368, relh=.24 , relw=.379))
+        # self.Frame1 = Frame(self, relief='groove', borderw='2')
+        # self.Frame1.place(relx=.5, rely=.384, relh=.312, relw=.457 )
 
-        self.Frame1 = tk.Frame(self, relief='groove', borderw='2')
-        self.Frame1.place(relx=.5, rely=.384, relh=.312, relw=.457 )
-
-        self.TNotebook1 = ttk.Notebook(self.Frame1)
-        self.TNotebook1.place(relx=.0, rely=.026, relh=.974 , relw=.987)
+        self.TNotebook1 = ttk.Notebook(self)
+        self.TNotebook1.place(relx=.5, rely=.384, relh=.312, relw=.457)
+        # self.TNotebook1.place(relx=.0, rely=.026, relh=.974 , relw=.987)
         self.TNotebook1_t0 = tk.Frame(self.TNotebook1)
         self.TNotebook1.add(self.TNotebook1_t0, padding=3)
         self.TNotebook1.tab(0, text='Sub-regions', compound='left', underline='-1')
@@ -41,17 +40,36 @@ class Toplevel1(LabelFrame):
         self.Scrolledtreeview1.column('Col1',stretch='1')
         self.Scrolledtreeview1.column('Col1',anchor='w')
 
-        self.Labelframe4 = PersonalDetails(self, text='Personal Details', place=dict(relx=.022, rely=.032, relh=.328 , relw=.25))
 
 
-        self.Frame1_8 = tk.Frame(self, relief='groove', borderw='2')
-        self.Frame1_8.place(relx=.029, rely=.672, relh=.312 , relw=.375)
+        self.details = Notebook(self, place=dict(relx=.005, rely=.005, relh=.4, relw=.44))
 
-        self.TNotebook1_9 = ttk.Notebook(self.Frame1_8)
-        self.TNotebook1_9.place(relx=.0, rely=.026, relh=.974 , relw=.988)
-        self.TNotebook1_9_t0 = tk.Frame(self.TNotebook1_9)
-        self.TNotebook1_9.add(self.TNotebook1_9_t0, padding=3)
-        self.TNotebook1_9.tab(0, text='Regions', compound='left', underline='-1')# )
-        self.TNotebook1_9_t1 = tk.Frame(self.TNotebook1_9)
-        self.TNotebook1_9.add(self.TNotebook1_9_t1, padding=3)
-        self.TNotebook1_9.tab(1, text='Records', compound='left', underline='-1')# )
+        self.recordDetails = RecordDetails(self.details, text='Record Details', place=dict(relx=.005, rely=.005, relh=.8 , relw=.44))
+        self.details.add(self.recordDetails, padding=3)
+        self.details.tab(0, text='Regions', compound='left', underline='-1')
+
+        self.personalDetails = PersonalDetails(self.details, text='Personal Details', place=dict(relx=.022, rely=.032, relh=.328 , relw=.25))
+        self.details.add(self.personalDetails, padding=3)
+        self.details.tab(1, text='Records', compound='left', underline='-1')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
