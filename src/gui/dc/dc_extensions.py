@@ -7,7 +7,7 @@ class DC_Digits(FillWidgets, Frame):
         Frame.__init__(self, master, **kwargs)
         FillWidgets.__init__(self, values)
         font = self.DEFAULT_FONT
-        font['size'] = 34
+        font['size'] = 20
      # Incomes
         incomes = LabelFrame(self, text='Incomes', place=dict(relx=.02, rely=.008, relh=.256, relw=.96))
         Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
@@ -24,7 +24,7 @@ class DC_Digits(FillWidgets, Frame):
         Label(debits, text='Withdrawals', place=dict(relx=.03, rely=.35, relh=.3, relw=.48))
         Label(debits, text='Paidouts', place=dict(relx=.03, rely=.68, relh=.28, relw=.48))
 
-        self.debits = Entry_Label(debits, text='₦ 80,000d', place=dict(relx=.03, rely=0, relh=.32, relw=.94))
+        self.debits = Entry_Label(debits, text='₦ 80,000d', place=dict(relx=.03, rely=0, relh=.32, relw=.94), font=font)
         self.withdrawals = Entry_Label(debits, text='₦ 50,000w', place=dict(relx=.53, rely=.35, relh=.3, relw=.44))
         self.paidouts = Entry_Label(debits, text='₦ 30,000p', place=dict(relx=.53, rely=.68, relh=.28, relw=.44))
 
@@ -33,7 +33,7 @@ class DC_Digits(FillWidgets, Frame):
         Label(upfronts, text='Repaid', place=dict(relx=.03, rely=.4, relh=.25, relw=.48))
         Label(upfronts, text='Overdue', place=dict(relx=.03, rely=.7, relh=.25, relw=.48))
 
-        self.upfronts = Entry_Label(upfronts, text='₦ 980,000up', place=dict(relx=.03, rely=.05, relh=.32, relw=.94))
+        self.upfronts = Entry_Label(upfronts, text='₦ 980,000up', place=dict(relx=.03, rely=.05, relh=.32, relw=.94), font=font)
         self.repaid = Entry_Label(upfronts, text='₦ 850,000r', place=dict(relx=.53, rely=.4, relh=.25, relw=.44))
         self.overdue = Entry_Label(upfronts, text='₦ 130,000ov', place=dict(relx=.53, rely=.7, relh=.25, relw=.44))
 
@@ -44,7 +44,7 @@ class DC_Digits(FillWidgets, Frame):
         Label(balances, text='Deficits', place=dict(relx=.03, rely=.6, relh=.18, relw=.48))
         Label(balances, text='Excesses', place=dict(relx=.03, rely=.8, relh=.18, relw=.48))
 
-        self.balances = Entry_Label(balances, text='₦ 1,080,000', place=dict(relx=.03, rely=0, relh=.18, relw=.94))
+        self.balances = Entry_Label(balances, text='₦ 1,080,000', place=dict(relx=.03, rely=0, relh=.18, relw=.94), font=font)
         self.broughts = Entry_Label(balances, text='₦ 500,000br', place=dict(relx=.53, rely=.2, relh=.18, relw=.44))
         self.btos = Entry_Label(balances, text='₦ 30,000bto', place=dict(relx=.53, rely=.4, relh=.18, relw=.44))
         self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))

@@ -808,7 +808,7 @@ class Calendar(Frame):
 
 class Entry_Label(Label):
 
-    def __init__(self, master, **kwargs): super().__init__(master, asEntry=True, font='DEFAULT_FONT', **kwargs)
+    def __init__(self, master, font='DEFAULT_FONT', **kwargs): super().__init__(master, asEntry=True, font=font, **kwargs)
 
 
 
