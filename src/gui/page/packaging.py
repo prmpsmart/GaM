@@ -8,18 +8,15 @@ class Toplevel1(LabelFrame):
 
         self.Labelframe2 = DateSearch(self, text='Date Search', place=dict(relx=.5, rely=.032, relh=.344 , relw=.456))
 
-        # self.Frame1 = Frame(self, relief='groove', borderw='2')
-        # self.Frame1.place(relx=.5, rely=.384, relh=.312, relw=.457 )
 
-        self.TNotebook1 = ttk.Notebook(self)
+        self.TNotebook1 = Notebook(self)
         self.TNotebook1.place(relx=.5, rely=.384, relh=.312, relw=.457)
-        # self.TNotebook1.place(relx=.0, rely=.026, relh=.974 , relw=.987)
-        self.TNotebook1_t0 = tk.Frame(self.TNotebook1)
+        self.TNotebook1_t0 = Frame(self.TNotebook1)
         self.TNotebook1.add(self.TNotebook1_t0, padding=3)
         self.TNotebook1.tab(0, text='Sub-regions', compound='left', underline='-1')
-        self.TNotebook1_t1 = tk.Frame(self.TNotebook1)
+        self.TNotebook1_t1 = Frame(self.TNotebook1)
         self.TNotebook1.add(self.TNotebook1_t1, padding=3)
-        self.TNotebook1.tab(1, text='Accounts',compound='left',underline='-1')
+        self.TNotebook1.tab(1, text='Accounts', compound='left',underline='-1')
 
         self.Scrolledlistbox1_3 = ScrolledListBox(self.TNotebook1_t0, background='white', disabledforeground='#a3a3a3', foreground='black', highlightbackground='#d9d9d9', highlightcolor='#800080', selectbackground='#c4c4c4', selectforeground='black')
         self.Scrolledlistbox1_3.place(relx=.0, rely=.0, relh=1.0 , relw=1.00)

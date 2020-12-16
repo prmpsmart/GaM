@@ -669,12 +669,13 @@ class PRMP_Widget(PRMP_Theme):
     
     def normal(self): self.state('normal')
     
-    def state(self, s): self.configure(state=s)
+    def state(self, s):
+        try: self.configure(state=s)
+        except: super().state(s)
 
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
         self.configure(**kwargs)
-        # self.paint()
     
     @property
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
@@ -996,6 +997,44 @@ class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
     def __init__(self, master=None, config={}, **kwargs):
         ttk.Notebook.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
+    
+        self.bind('<Button-1>', self._button_press)
+        self.bind('<ButtonRelease-1>', self._button_release)
+        self.bind('<Motion>', self._mouse_over)
+    
+    def _button_press(self, event):
+        widget = event.widget
+        element = widget.identify(event.x, event.y)
+        if "close" in element:
+            index = widget.index("@%d,%d" % (event.x, event.y))
+            widget.state(['pressed'])
+            widget._active = index
+
+    def _button_release(self, event):
+        widget = event.widget
+        if not widget.instate(['pressed']):
+                return
+        element = widget.identify(event.x, event.y)
+        try:
+            index = widget.index("@%d,%d" % (event.x, event.y))
+        except tk.TclError:
+            pass
+        if "close" in element and widget._active == index:
+            widget.forget(index)
+            widget.event_generate("<<NotebookTabClosed>>")
+
+        widget.state(['!pressed'])
+        widget._active = None
+
+    def _mouse_over(self, event):
+        widget = event.widget
+        element = widget.identify(event.x, event.y)
+        # print(widget)
+        if "close" in element:
+            widget.state(['alternate'])
+        else:
+            widget.state(['!alternate'])
+
 Notebook = PN = PRMP_Notebook
 
 class PRMP_Panedwindow(PRMP_Style_, ttk.Panedwindow):
@@ -1088,7 +1127,38 @@ class PRMP_Style(ttk.Style, Mixins):
     
     def createPrmp(self):
         if PRMP_Style.loaded: return
-        self.theme_create('prmp', settings=self.settings)
+        
+        self._images = (
+
+         tk.PhotoImage("img_close", data='''R0lGODlhDAAMAIQUADIyMjc3Nzk5OT09PT
+                 8/P0JCQkVFRU1NTU5OTlFRUVZWVmBgYGF hYWlpaXt7e6CgoLm5ucLCwszMzNbW
+                 1v//////////////////////////////////// ///////////yH5BAEKAB8ALA
+                 AAAAAMAAwAAAUt4CeOZGmaA5mSyQCIwhCUSwEIxHHW+ fkxBgPiBDwshCWHQfc5
+                 KkoNUtRHpYYAADs= '''),
+
+         tk.PhotoImage("img_closeactive", data='''R0lGODlhDAAMAIQcALwuEtIzFL46
+                 INY0Fdk2FsQ8IdhAI9pAIttCJNlKLtpLL9pMMMNTP cVTPdpZQOBbQd60rN+1rf
+                 Czp+zLxPbMxPLX0vHY0/fY0/rm4vvx8Pvy8fzy8P//////// ///////yH5BAEK
+                 AB8ALAAAAAAMAAwAAAVHYLQQZEkukWKuxEgg1EPCcilx24NcHGYWFhx P0zANBE
+                 GOhhFYGSocTsax2imDOdNtiez9JszjpEg4EAaA5jlNUEASLFICEgIAOw== '''),
+
+         tk.PhotoImage("img_closepressed", data='''R0lGODlhDAAMAIQeAJ8nD64qELE
+                 rELMsEqIyG6cyG7U1HLY2HrY3HrhBKrlCK6pGM7lD LKtHM7pKNL5MNtiViNaon
+                 +GqoNSyq9WzrNyyqtuzq+O0que/t+bIwubJw+vJw+vTz+zT z////////yH5BAE
+                 KAB8ALAAAAAAMAAwAAAVJIMUMZEkylGKuwzgc0kPCcgl123NcHWYW Fs6Gp2mYB
+                 IRgR7MIrAwVDifjWO2WwZzpxkxyfKVCpImMGAeIgQDgVLMHikmCRUpMQgA7 '''),
+        )
+
+        elements_creating = {
+            'close': {
+                'element create': ['image', 'img_close', ("active", "pressed", "!disabled", "img_closepressed"), ("active", "alternate", "!disabled", "img_closeactive"), {'border': 8, 'sticky': ''}]
+            },
+        }
+        settings = self.settings
+        elements_creating.update(settings)
+        settings = elements_creating
+        
+        self.theme_create('prmp', settings=settings)
         PRMP_Style.loaded = True
     
     @property
