@@ -19,10 +19,10 @@ class ClientDialog(PersonDialog):
         clientDetails = PRMP_LabelFrame(self, config=dict(text='Client Details'))
         clientDetails.place(x=2, y=290, h=100, relw=.35)
         
-        self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number'),orient='h', relx=.02, rely=0, relh=.45, relw=.8, longent=.45)
+        self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number'),orient='h', place=dict(relx=.02, rely=0, relh=.45, relw=.8), longent=.45)
         
-        self.cardDue = PRMP_Checkbutton(clientDetails, config=dict(text='Card Due'))
-        self.cardDue.place(relx=.02, rely=.5, relh=.45, relw=.8)
+        self.cardDue = PRMP_Checkbutton(clientDetails, config=dict(text='Card Due'), place=dict(relx=.02, rely=.5, relh=.45, relw=.8))
+        # self.addNotEditables('regDate')
 
         def setCard(val):
             if val: self.cardDue.var.set('1')

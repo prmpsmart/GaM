@@ -1,15 +1,20 @@
 from ..core.prmp_gui.extensions import *
+from ...backend.dc.dc_regions import Client
 
-class DC_Digits(Frame, FillWidgets):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
+class DC_Digits(FillWidgets, Frame):
+    
+    def __init__(self, master, values={}, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        FillWidgets.__init__(self, values)
+        font = self.DEFAULT_FONT
+        font['size'] = 34
      # Incomes
         incomes = LabelFrame(self, text='Incomes', place=dict(relx=.02, rely=.008, relh=.256, relw=.96))
         Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
         Label(incomes, text='Transfers', place=dict(relx=.03, rely=.51, relh=.21, relw=.48))
         Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48))
 
-        self.incomes = Entry_Label(incomes, text='₦ 3,000,000i', place=dict(relx=.03, rely=0, relh=.24, relw=.94))
+        self.incomes = Entry_Label(incomes, text='₦ 3,000,000i', place=dict(relx=.03, rely=0, relh=.24, relw=.94), font=font)
         self.savings = Entry_Label(incomes, text='₦ 50,000s', place=dict(relx=.53, rely=.27, relh=.21, relw=.44))
         self.transfers = Entry_Label(incomes, text='₦ 30,000tr', place=dict(relx=.53, rely=.51, relh=.21, relw=.44))
         self.commissions = Entry_Label(incomes, text='₦ 30,000c', place=dict(relx=.53, rely=.74, relh=.22, relw=.44))
@@ -45,17 +50,16 @@ class DC_Digits(Frame, FillWidgets):
         self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))
         self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.18, relw=.44))
 
+        self.addResultsWidgets(['incomes', 'savings', 'debits', 'withdrawals', 'paidouts', 'upfronts', 'repaid', 'overdue', 'balances', 'broughts', 'commissions', 'btos', 'transfers', 'deficits', 'excesses'])
+
     def update(self, account):
         
         debits = account.debits
-
         upfronts = account.upfronts
         
         fillDict = dict(
             incomes=int(account.incomes),
             savings=int(account.savings),
-            transfers=int(account.transfers),
-            commissions=int(account.commissions),
         
             debits=int(debits),
 
@@ -67,17 +71,24 @@ class DC_Digits(Frame, FillWidgets):
             overdue=upfronts.overdue,
 
             balances=int(account.balances),
-            broughts=int(account.broughtForwards),
-            btos=int(account.btos),
-            deficits=int(account.deficits),
-            excesses=int(account.excesses))
+            broughts=int(account.broughtForwards))
+        
+        if not isinstance(account.region, Client):
+            not_client = dict(
+                commissions=int(account.commissions),
+                btos=int(account.btos),
+                transfers=int(account.transfers),
+                deficits=int(account.deficits),
+                excesses=int(account.excesses))
+            fillDict.update(not_client)
         
         for key in fillDict:
             val = fillDict[key]
             new_val = self.numWithSign_Commas(val)
             fillDict[key] = new_val
-        
-        self.set(fillDict)
+            
+
+        self.fill(fillDict)
 
 
 class DC_Overview(Frame):
@@ -90,7 +101,6 @@ class DC_Overview(Frame):
 
         self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
         self.plotCanvas2.place(relx=.375, rely=.5, relh=.5, relw=.625)
-
 
         self.dcDigits = DC_Digits(self, relief='groove')
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)

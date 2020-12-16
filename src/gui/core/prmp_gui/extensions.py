@@ -58,19 +58,30 @@ class FillWidgets:
     
     def __init__(self, values={}):
         self.__resultsWidgets = []
+        self.__notEditables = []
         self.values = values
+        self.fill = self.set
+        self.empty = self.get
         
     def addResultsWidgets(self, child):
         if child not in self.__resultsWidgets:
             if isinstance(child, (list, tuple)):
                 for ch in child: self.addResultsWidgets(ch)
             else: self.__resultsWidgets.append(child)
+        
+    def addNotEditables(self, child):
+        if child not in self.__notEditables:
+            if isinstance(child, (list, tuple)):
+                for ch in child: self.addNotEditables(ch)
+            else: self.__notEditables.append(child)
     
+    @property
+    def notEditables(self): return self.__notEditables
     @property
     def resultsWidgets(self): return self.__resultsWidgets
     
     def set(self, values={}):
-        if values and isinstance(values, dict):
+        if values:
             for widgetName in self.resultsWidgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
@@ -79,7 +90,7 @@ class FillWidgets:
                         widget.set(val)
                     except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
-            self.values.update(values)
+            if isinstance(values, dict): self.values.update(values)
             return True
         else:
             if self.values: return self.set(self.values)
@@ -89,6 +100,8 @@ class FillWidgets:
 
         self.resultsWidgets.sort()
         for widgetName in self.resultsWidgets:
+            if widgetName in self.__notEditables: continue
+
             wid = self.__dict__.get(widgetName)
             if wid:
                 get = wid.get()
@@ -213,10 +226,12 @@ class PRMP_DateButton(PRMP_Button):
     def get(self): return self.date
     
     def set(self, date):
-        if '-' in date: d, m, y = date.split('-')
-        elif '/' in date: d, m, y = date.split('/')
-        else: return
-        self.date = self.DT.createDateTime(int(y), int(m), int(d))
+        if isinstance(date, str):
+            if '-' in date: d, m, y = date.split('-')
+            elif '/' in date: d, m, y = date.split('/')
+            else: return
+            self.date = self.DT.createDateTime(int(y), int(m), int(d))
+        elif isinstance(date, self.DT): self.date = date
         self['text'] = self.date
 PDB = PRMP_DateButton
 

@@ -245,6 +245,7 @@ class DateSearch(LabelFrame):
 
         self.dayName = RadioEntry(self, topKwargs=dict(config=dict(text='Day Name', style='Group.TRadiobutton', variable=self.seasonNames, value='dayName')), orient='h', place=dict(relx=.02, rely=.48, relh=.25 , relw=.45))
 
+
         self.monthName = RadioEntry(self, topKwargs=dict(config=dict(text='Month Name', style='Group.TRadiobutton', variable=self.seasonNames, value='monthName')), orient='h', place=dict(relx=.5, rely=.48, relh=.25 , relw=.45))
 
         self.weekNumber = RadioEntry(self, topKwargs=dict(config=dict(text='Week Number', style='Group.TRadiobutton', variable=self.seasonNames, value='weekNumber')), orient='h', place=dict(relx=.02, rely=.75, relh=.25 , relw=.45))

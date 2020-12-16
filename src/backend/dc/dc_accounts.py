@@ -130,8 +130,6 @@ class AreaAccount(DCAccount):
             
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
             
-            # self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in clientsAccounts])
-            
             self.commissions.updateWithOtherManagers([account.rates for account in clientsAccounts])
             
             self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
@@ -143,6 +141,14 @@ class AreaAccount(DCAccount):
             for account in clientsAccounts:
                 self.paidouts += account.paidouts
                 self.withdrawals += account.withdrawals
+        
+        broughts = 0
+        clients = self.region.clients
+        broughtForwards = [cl.lastAccount.broughtForwards for cl in clients]
+        self.broughtForwards.updateWithOtherManagers(broughtForwards)
+
+        # print(broughtForwards)
+        
     
     def addTransfer(self, transfer, date=None): self.transfers.createRecord(transfer, date, notAdd=True)
     

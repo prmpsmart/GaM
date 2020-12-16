@@ -151,6 +151,8 @@ class ObjectsMixins(Mixins, CompareByDate):
     def moneyWithSign(self): return f'{self._moneySign}{int(self)}'
     
     @property
+    def regDate(self): return self.date
+    @property
     def day(self): return self.date.day
     @property
     def dayName(self): return self.date.dayName
