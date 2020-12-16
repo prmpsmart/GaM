@@ -55,7 +55,10 @@ class ClientDialog(PersonDialog):
         print(result)
 
 
+class DCHome(PRMP_Dialog):
 
+    def __init__(self):
+        pass
 
 
 

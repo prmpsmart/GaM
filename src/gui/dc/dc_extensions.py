@@ -9,7 +9,7 @@ class DC_Digits(FillWidgets, Frame):
         font = self.DEFAULT_FONT
         font['size'] = 20
      # Incomes
-        incomes = LabelFrame(self, text='Incomes', place=dict(relx=.02, rely=.008, relh=.256, relw=.96))
+        self._incomes = incomes = LabelFrame(self, text='Incomes')
         Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
         Label(incomes, text='Transfers', place=dict(relx=.03, rely=.51, relh=.21, relw=.48))
         Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48))
@@ -20,7 +20,7 @@ class DC_Digits(FillWidgets, Frame):
         self.commissions = Entry_Label(incomes, text='₦ 30,000c', place=dict(relx=.53, rely=.74, relh=.22, relw=.44))
 
      # Debits
-        debits = LabelFrame(self, text='Debits', place=dict(relx=.02, rely=.267, relh=.21, relw=.96))
+        self._debits = debits = LabelFrame(self, text='Debits')
         Label(debits, text='Withdrawals', place=dict(relx=.03, rely=.35, relh=.3, relw=.48))
         Label(debits, text='Paidouts', place=dict(relx=.03, rely=.68, relh=.28, relw=.48))
 
@@ -29,16 +29,16 @@ class DC_Digits(FillWidgets, Frame):
         self.paidouts = Entry_Label(debits, text='₦ 30,000p', place=dict(relx=.53, rely=.68, relh=.28, relw=.44))
 
      # Upfronts
-        upfronts = LabelFrame(self, text='Upfronts', place=dict(relx=.02, rely=.48, relh=.198, relw=.96))
-        Label(upfronts, text='Repaid', place=dict(relx=.03, rely=.4, relh=.25, relw=.48))
-        Label(upfronts, text='Overdue', place=dict(relx=.03, rely=.7, relh=.25, relw=.48))
+        self._upfronts = upfronts = LabelFrame(self, text='Upfronts')
+        Label(upfronts, text='Repaid', place=dict(relx=.03, rely=.35, relh=.3, relw=.48))
+        Label(upfronts, text='Overdue', place=dict(relx=.03, rely=.68, relh=.28, relw=.48))
 
-        self.upfronts = Entry_Label(upfronts, text='₦ 980,000up', place=dict(relx=.03, rely=.05, relh=.32, relw=.94), font=font)
-        self.repaid = Entry_Label(upfronts, text='₦ 850,000r', place=dict(relx=.53, rely=.4, relh=.25, relw=.44))
-        self.overdue = Entry_Label(upfronts, text='₦ 130,000ov', place=dict(relx=.53, rely=.7, relh=.25, relw=.44))
+        self.upfronts = Entry_Label(upfronts, text='₦ 980,000up', place=dict(relx=.03, rely=0, relh=.32, relw=.94), font=font)
+        self.repaid = Entry_Label(upfronts, text='₦ 850,000r', place=dict(relx=.53, rely=.35, relh=.3, relw=.44))
+        self.overdue = Entry_Label(upfronts, text='₦ 130,000ov', place=dict(relx=.53, rely=.68, relh=.28, relw=.44))
 
      # Balances
-        balances = LabelFrame(self, text='Balances', place=dict(relx=.02, rely=.68, relh=.312, relw=.96))
+        self._balances = balances = LabelFrame(self, text='Balances')
         Label(balances, text='Brought-Fs', place=dict(relx=.03, rely=.2, relh=.18, relw=.48))
         Label(balances, text='B-T-Os', place=dict(relx=.03, rely=.4, relh=.18, relw=.48))
         Label(balances, text='Deficits', place=dict(relx=.03, rely=.6, relh=.18, relw=.48))
@@ -51,6 +51,18 @@ class DC_Digits(FillWidgets, Frame):
         self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.18, relw=.44))
 
         self.addResultsWidgets(['incomes', 'savings', 'debits', 'withdrawals', 'paidouts', 'upfronts', 'repaid', 'overdue', 'balances', 'broughts', 'commissions', 'btos', 'transfers', 'deficits', 'excesses'])
+
+    def placeVertically(self):
+        self._incomes.place(relx=.02, rely=.008, relh=.256, relw=.96)
+        self._debits.place(relx=.02, rely=.267, relh=.21, relw=.96)
+        self._upfronts.place(relx=.02, rely=.48, relh=.198, relw=.96)
+        self._balances.place(relx=.02, rely=.68, relh=.312, relw=.96)
+
+    def placeHorizontally(self):
+        self._incomes.place(relx=0, rely=0, relh=1, relw=.25)
+        self._debits.place(relx=.25, rely=0, relh=1, relw=.25)
+        self._upfronts.place(relx=.5, rely=0, relh=1, relw=.25)
+        self._balances.place(relx=.75, rely=0, relh=1, relw=.25)
 
     def update(self, account):
         
@@ -93,17 +105,30 @@ class DC_Digits(FillWidgets, Frame):
 
 class DC_Overview(Frame):
     
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, orient='v', **kwargs):
         super().__init__(master, **kwargs)
         
         self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
-        self.plotCanvas1.place(relx=.375, rely=0, relh=.5, relw=.625)
 
         self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
-        self.plotCanvas2.place(relx=.375, rely=.5, relh=.5, relw=.625)
 
         self.dcDigits = DC_Digits(self, relief='groove')
+
+        if orient == 'v': self.placeVertically()
+        else: self.placeHorizontally()
+    
+    def placeVertically(self):
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
+        self.dcDigits.placeVertically()
+        self.plotCanvas1.place(relx=.375, rely=0, relh=.5, relw=.625)
+        self.plotCanvas2.place(relx=.375, rely=.5, relh=.5, relw=.625)
+
+
+    def placeHorizontally(self):
+        self.dcDigits.place(relx=0, rely=0, relh=.4, relw=1)
+        self.dcDigits.placeHorizontally()
+        self.plotCanvas1.place(relx=0, rely=.4, relh=.6, relw=.5)
+        self.plotCanvas2.place(relx=.5, rely=.4, relh=.6, relw=.5)
     
     def updateDCDigits(self, account): self.dcDigits.update(account)
 
