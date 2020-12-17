@@ -181,23 +181,19 @@ class PersonalDetails(LabelFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        Label(self, text='Name', place=dict(relx=.02, rely=0, relh=.15, relw=.25))
-        self.name = Entry(self, place=dict(relx=.3, rely=0, relh=.15, relw=.68))
+        self.name = LabelEntry(self, topKwargs=dict(config=dict(text='Name', anchor='center')), place=dict(relx=.02, rely=0, relh=.18, relw=.5), orient='h', longent=.25)
 
-        Label(self, text='Number', place=dict(relx=.02, rely=.16, relh=.15, relw=.25))
-        self.number = Entry(self, place=dict(relx=.3, rely=.16, relh=.15, relw=.68))
+        self.number = LabelEntry(self, topKwargs=dict(config=dict(text='Number', anchor='center')), place=dict(relx=.57, rely=0, relh=.18, relw=.35), orient='h', longent=.4)
 
-        Label(self, text='Phone', place=dict(relx=.02, rely=.32, relh=.15, relw=.25))
-        self.phone = Entry(self, place=dict(relx=.3, rely=.32, relh=.15, relw=.68))
+        self.phone = LabelEntry(self, topKwargs=dict(config=dict(text='Phone', anchor='center')), place=dict(relx=.02, rely=.22, relh=.18, relw=.35), orient='h', longent=.3)
 
-        Label(self, text='ID', place=dict(relx=.02, rely=.48, relh=.15, relw=.25))
-        self.id = Entry(self, place=dict(relx=.3, rely=.48, relh=.15, relw=.68))
+        self.email = LabelEntry(self, topKwargs=dict(config=dict(text='Email', anchor='center')), bottomKwargs=dict(_type='email'), place=dict(relx=.4, rely=.22, relh=.18, relw=.5), orient='h', longent=.3)
 
-        Label(self, text='Gender', place=dict(relx=.02, rely=.64, relh=.15, relw=.25))
-        self.gender = Combobox(self, type_='gender', place=dict(relx=.3, rely=.64, relh=.15 , relw=.68))
+        self.id = LabelEntry(self, topKwargs=dict(config=dict(text='ID', anchor='center')), place=dict(relx=.02, rely=.42, relh=.18, relw=.4), orient='h', longent=.2)
 
-        Label(self, text='Address', place=dict(relx=.02, rely=.8, relh=.15, relw=.25))
-        self.address = Entry(self, place=dict(relx=.3, rely=.8, relh=.15, relw=.68))
+        self.gender = LabelEntry(self, topKwargs=dict(config=dict(text='Gender', anchor='center')), place=dict(relx=.46, rely=.42, relh=.18, relw=.5), orient='h', longent=.3)
+
+        self.address = LabelText(self, topKwargs=dict(config=dict(text='Address', anchor='center')), place=dict(relx=.02, rely=.62, relh=.36, relw=.7), orient='h', longent=.23, widthent=.43)
 
 
 class RecordDetails(LabelFrame):
@@ -260,15 +256,15 @@ class Details(Notebook):
         super().__init__(master, **kwargs)
 
         
-        self.personalDetails = PersonalDetails(self, text='Personal Details', place=dict(relx=.022, rely=.032, relh=.328 , relw=.25))
+        self.personalDetails = PersonalDetails(self, text='Personal Details')
         self.add(self.personalDetails, padding=3)
         self.tab(0, text='Regions', compound='left', underline='-1')
 
-        self.recordDetails = RecordDetails(self, text='Record Details', place=dict(relx=.005, rely=.005, relh=.4 , relw=.35))
+        self.recordDetails = RecordDetails(self, text='Record Details')
         self.add(self.recordDetails, padding=3)
         self.tab(1, text='Records', compound='left', underline='-1')
 
-        self.dateSearch = DateSearch(self, text='Record Details', place=dict(relx=.005, rely=.005, relh=.4 , relw=.35))
+        self.dateSearch = DateSearch(self, text='Record Details')
         self.add(self.dateSearch, padding=3)
         self.tab(2, text='Date', compound='left', underline='-1')
 
@@ -280,4 +276,5 @@ class SortNSearch(LabelFrame):
         self.details = Details(self, place=dict(relx=.005, rely=.005, relh=.4, relw=.99))
         
         self.results = PRMP_TreeView(LabelFrame(self, text='Results', place=dict(relx=.005, rely=.4, relh=.6, relw=.99)), place=dict(relx=.0, rely=.0, relh=1.0 , relw=1.0))
+
 

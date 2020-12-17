@@ -10,14 +10,14 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, top='', bottom='', func=None, orient='v', relief='groove', command=None, longent=.5, ilh=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, **kwargs):
+    def __init__(self, master, top='', bottom='', func=None, orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, **kwargs):
         super().__init__(master, **kwargs)
-        
-        self.ilh = ilh
+
         self.top = top.lower()
         self.bottom = bottom.lower()
         self.orient = orient
         self.longent = longent
+        self.widthent = widthent
         
         if dot != None: disableOnToggle = dot
         self.disableOnToggle = disableOnToggle
@@ -124,7 +124,7 @@ class TwoWidgets(PRMP_Frame):
 
     def place_widgs(self):
         if self.orient == 'h':
-            if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.ilh or .3, relw=self.longent)
+            if self.bottom == 'text': self.Top.place(relx=0, rely=0, relh=self.widthent or .3, relw=self.longent)
             else: self.Top.place(relx=0, rely=0, relh=1, relw=self.longent)
             self.Bottom.place(relx=self.longent + .02, rely=0, relh=.945, relw=1 - self.longent - .02)
         else:
