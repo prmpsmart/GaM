@@ -207,7 +207,7 @@ class RecordDetails(LabelFrame):
 
         self.range1 = Entry(self, place=dict(relx=.24, rely=.27, relh=.25, relw=.25))
 
-        Label(self, text='- to -', relief='flat', place=dict(relx=.51, rely=.27, relh=.25, relw=.2))
+        SLabel(self, config=dict(text='- to -', relief='flat', anchor='center'), place=dict(relx=.51, rely=.27, relh=.25, relw=.2))
 
         self.range2 = Entry(self, place=dict(relx=.73, rely=.27, relh=.25, relw=.25))
 
@@ -273,8 +273,8 @@ class SortNSearch(LabelFrame):
     def __init__(self, master, text='Sort and Search'):
         super().__init__(master, text=text, place=dict(relx=.014, rely=.014, relh=.969 , relw=.969))
 
-        self.details = Details(self, place=dict(relx=.005, rely=.005, relh=.4, relw=.99))
+        self.details = Details(self, place=dict(relx=.005, rely=.005, relh=.37, relw=.99))
         
-        self.results = PRMP_TreeView(LabelFrame(self, text='Results', place=dict(relx=.005, rely=.4, relh=.6, relw=.99)), place=dict(relx=.0, rely=.0, relh=1.0 , relw=1.0))
+        self.results = PRMP_TreeView(LabelFrame(self, text='Results', place=dict(relx=.005, rely=.38, relh=.6, relw=.99)), place=dict(relx=.0, rely=.0, relh=1.0 , relw=1.0))
 
 
