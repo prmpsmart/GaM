@@ -108,29 +108,53 @@ class DC_Overview(Frame):
     def __init__(self, master, orient='v', **kwargs):
         super().__init__(master, **kwargs)
         
+        self.dcDigits = DC_Digits(self, relief='groove')
+
+        self.plotDialog = Button(self, text='Plot Dialog')
+
         self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
         self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
-
-        self.dcDigits = DC_Digits(self, relief='groove')
 
         if orient == 'v': self.placeVertically()
         else: self.placeHorizontally()
     
     def placeVertically(self):
+        x, y = self.toplevel.geo
+
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
+        self.plotDialog.place(relx=.85, y=0, relw=.15, relh=.04)
         self.dcDigits.placeVertically()
-        self.plotCanvas1.place(relx=.375, rely=0, relh=.5, relw=.625)
-        self.plotCanvas2.place(relx=.375, rely=.5, relh=.5, relw=.625)
+        self.plotCanvas1.place(relx=.375, rely=.04, relh=.48, relw=.625)
+        self.plotCanvas2.place(relx=.375, rely=.52, relh=.48, relw=.625)
 
 
     def placeHorizontally(self):
         self.dcDigits.place(relx=0, rely=0, relh=.4, relw=1)
         self.dcDigits.placeHorizontally()
-        self.plotCanvas1.place(relx=0, rely=.4, relh=.6, relw=.5)
-        self.plotCanvas2.place(relx=.5, rely=.4, relh=.6, relw=.5)
+        self.plotDialog.place(relx=.425, rely=.41, relh=.065, relw=.15)
+        self.plotCanvas1.place(relx=0, rely=.475, relh=.525, relw=.5)
+        self.plotCanvas2.place(relx=.5, rely=.475, relh=.525, relw=.5)
     
     def updateDCDigits(self, account): self.dcDigits.update(account)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

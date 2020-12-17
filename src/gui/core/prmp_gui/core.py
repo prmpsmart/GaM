@@ -918,12 +918,16 @@ class PRMP_Input:
 PI = PRMP_Input
 
 class PRMP_InputButtons:
-        
-    def get(self):
-        if self.var: return self.var.get()
     
-    def setVar(self, val):
-        if self.var: self.var.set(val)
+    def set(self, val):
+        if val: self.var.set(val)
+        else: self.var.set('0')
+    
+    def get(self):
+        val = self.var.get()
+        if val == self.val: return True
+        else: return False
+    
 PIB = PRMP_InputButtons
 
 # based on tk only
@@ -1595,7 +1599,7 @@ class PRMP_Button(PRMP_, tk.Button):
     def PRMP_WIDGET(self): return 'Button'
 Button = PB = PRMP_Button
 
-class PRMP_Checkbutton(PRMP_, tk.Checkbutton, PRMP_InputButtons):
+class PRMP_Checkbutton(PRMP_InputButtons, PRMP_, tk.Checkbutton):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         self.var = tk.StringVar()
@@ -1679,7 +1683,7 @@ class PRMP_PanedWindow(PRMP_, tk.PanedWindow):
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
 PanedWindow = PP = PRMP_PanedWindow
 
-class PRMP_Radiobutton(PRMP_, tk.Radiobutton, PRMP_InputButtons):
+class PRMP_Radiobutton(PRMP_InputButtons, PRMP_, tk.Radiobutton):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         tk.Radiobutton.__init__(self, master, **config)
@@ -1721,7 +1725,7 @@ class PRMP_Style_Button(PRMP_Style_, ttk.Button):
         PRMP_Style_.__init__(self, prmp_master=master,font=font, asEntry=asEntry, **config, **kwargs)
 SButton = PSB = PRMP_Style_Button
 
-class PRMP_Style_Checkbutton(PRMP_Style_, ttk.Checkbutton, PRMP_InputButtons):
+class PRMP_Style_Checkbutton(PRMP_InputButtons, PRMP_Style_, ttk.Checkbutton):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         self.var = tk.StringVar()
@@ -1784,7 +1788,7 @@ class PRMP_Style_PanedWindow(PRMP_Style_, ttk.PanedWindow):
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
 SPanedWindow = PSP = PRMP_Style_PanedWindow
 
-class PRMP_Style_Radiobutton(PRMP_Style_, ttk.Radiobutton, PRMP_InputButtons):
+class PRMP_Style_Radiobutton(PRMP_InputButtons, PRMP_Style_, ttk.Radiobutton):
     
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         ttk.Radiobutton.__init__(self, master, **config)

@@ -147,11 +147,11 @@ class PRMP_MsgBox(PRMP_Dialog):
         else:
             self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)
             self.no = PRMP_Button(self, config=dict(text='No', command=self.noCom))
-            self.no.place(relx=.77, rely=.83, relh=.15, relw=.17)
+            self.no.place(relx=.63, rely=.83, relh=.15, relw=.17)
 
         if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
-            self.cancel.place(relx=.769, rely=.769, height=28, relw=.3)
+            self.cancel.place(relx=.33, rely=.83, height=28, relw=.2)
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type
