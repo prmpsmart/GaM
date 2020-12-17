@@ -262,9 +262,22 @@ class Details(Notebook):
         
         self.personalDetails = PersonalDetails(self, text='Personal Details', place=dict(relx=.022, rely=.032, relh=.328 , relw=.25))
         self.add(self.personalDetails, padding=3)
-        self.tab(0, text='Records', compound='left', underline='-1')
+        self.tab(0, text='Regions', compound='left', underline='-1')
 
         self.recordDetails = RecordDetails(self, text='Record Details', place=dict(relx=.005, rely=.005, relh=.4 , relw=.35))
         self.add(self.recordDetails, padding=3)
-        self.tab(1, text='Regions', compound='left', underline='-1')
+        self.tab(1, text='Records', compound='left', underline='-1')
+
+        self.dateSearch = DateSearch(self, text='Record Details', place=dict(relx=.005, rely=.005, relh=.4 , relw=.35))
+        self.add(self.dateSearch, padding=3)
+        self.tab(2, text='Date', compound='left', underline='-1')
+
+
+class SortNSearch(LabelFrame):
+    def __init__(self, top=None):
+        super().__init__(top, place=dict(relx=.014, rely=.014, relh=.969 , relw=.969))
+
+        self.details = Details(self, place=dict(relx=.005, rely=.005, relh=.4, relw=.99))
+        
+        self.results = PRMP_TreeView(LabelFrame(self, text='Results', place=dict(relx=.005, rely=.4, relh=.6, relw=.99)), place=dict(relx=.0, rely=.0, relh=1.0 , relw=1.0))
 
