@@ -274,8 +274,8 @@ class Details(Notebook):
 
 
 class SortNSearch(LabelFrame):
-    def __init__(self, top=None):
-        super().__init__(top, place=dict(relx=.014, rely=.014, relh=.969 , relw=.969))
+    def __init__(self, master, text='Sort and Search'):
+        super().__init__(master, text=text, place=dict(relx=.014, rely=.014, relh=.969 , relw=.969))
 
         self.details = Details(self, place=dict(relx=.005, rely=.005, relh=.4, relw=.99))
         
