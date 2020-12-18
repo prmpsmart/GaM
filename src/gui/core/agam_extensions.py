@@ -254,7 +254,6 @@ class DateSearch(LabelFrame):
 class Details(Notebook):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-
         
         self.personalDetails = PersonalDetails(self, text='Personal Details')
         self.add(self.personalDetails, padding=3)

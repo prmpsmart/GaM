@@ -93,7 +93,6 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
             wid = self[widgetName]
             if self.editBtn.var.get() == '1': wid.normal()
             else: wid.disabled()
-
 PD = PRMP_Dialog
 
 class CalendarDialog(PRMP_Dialog):
@@ -113,8 +112,6 @@ class CalendarDialog(PRMP_Dialog):
         if self._return:
             Calendar.choosen = None
             self.destroy()
-
-
 CD = CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):

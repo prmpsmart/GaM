@@ -105,8 +105,8 @@ class DC_Digits(FillWidgets, Frame):
 
 class DC_Overview(Frame):
     
-    def __init__(self, master, orient='v', **kwargs):
-        super().__init__(master, **kwargs)
+    def __init__(self, master, title='DC Overview', orient='v', **kwargs):
+        super().__init__(master, title=title, **kwargs)
         
         self.dcDigits = DC_Digits(self, relief='groove')
 
