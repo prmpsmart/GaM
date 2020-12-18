@@ -350,7 +350,7 @@ class PRMP_Theme(Mixins):
     
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder', '_type']}
             
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -975,7 +975,7 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
         ttk.Combobox.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)
-
+        
         self.changeValues(values)
 
     
@@ -1903,6 +1903,8 @@ class PRMP_Window(PRMP_Widget):
         self.setTkIcon(tkIcon or PRMP_Window.TKICON)
 
         self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
+    
+    def topmost(self): self.attributes('-topmost', True)
 
     def addWindowToTaskBar(self, e=0):
         self.withdraw()

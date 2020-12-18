@@ -39,7 +39,7 @@ class TwoWidgets(PRMP_Frame):
         
         placeholder = bottomKwargs.get('placeholder', f'Enter {text}.')
         
-        if bottom in ['label', 'datebutton']:
+        if bottom in ['label', 'datebutton', 'button']:
             bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
             if self._ttk_: bottomKw['style'] = 'entry.Label'
         else:

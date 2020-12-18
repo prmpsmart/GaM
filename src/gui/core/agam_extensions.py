@@ -202,15 +202,15 @@ class SearchRecordDetails(LabelFrame):
         super().__init__(master, **kwargs)
 
         Label(self, text='Date', place=dict(relx=.02, rely=0, relh=.25, relw=.2))
-        self.date = PRMP_DateButton(self, text='06/12/2020', place=dict(relx=.24, rely=0, relh=.25, relw=.25))
+        self.date = PRMP_DateButton(self, text='06/12/2020', place=dict(relx=.24, rely=0, relh=.25, relw=.2))
 
         Label(self, text='Range', place=dict(relx=.02, rely=.27, relh=.25, relw=.2))
 
-        self.range1 = Entry(self, place=dict(relx=.24, rely=.27, relh=.25, relw=.25))
+        self.range1 = Entry(self, place=dict(relx=.24, rely=.27, relh=.25, relw=.25), _type='number')
 
         SLabel(self, config=dict(text='- to -', relief='flat', anchor='center'), place=dict(relx=.51, rely=.27, relh=.25, relw=.2))
 
-        self.range2 = Entry(self, place=dict(relx=.73, rely=.27, relh=.25, relw=.25))
+        self.range2 = Entry(self, place=dict(relx=.73, rely=.27, relh=.25, relw=.25), _type='number')
 
         Label(self, text='Note', place=dict(relx=.02, rely=.54, relh=.25, relw=.2 ))
         self.note = Text(self, wrap='word', place=dict(relx=.24, rely=.54, relh=.42, relw=.74), very=True)
@@ -221,7 +221,7 @@ class DateSearch(LabelFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.date = PRMP_DateButton(self, text='06/12/2020', place=dict(relx=.02, rely=0, relh=.2, relw=.3))
+        self.date = PRMP_DateButton(self, text='06/12/2020', place=dict(relx=.02, rely=0, relh=.2, relw=.22))
 
         self.season = tk.StringVar()
         self.season.set('sub')
@@ -240,14 +240,14 @@ class DateSearch(LabelFrame):
         self.seasonNames = tk.StringVar()
         self.seasonNames.set('sub')
 
-        self.dayName = RadioCombo(self, topKwargs=dict(config=dict(text='Day Name', style='Group.TRadiobutton', variable=self.seasonNames, value='dayName')), orient='h', place=dict(relx=.02, rely=.48, relh=.25 , relw=.45), bottomKwargs=dict(config=dict(values=DAYS_NAMES)))
+        self.dayName = RadioCombo(self, topKwargs=dict(config=dict(text='Day Name', style='Group.TRadiobutton', variable=self.seasonNames, value='dayName')), orient='h', place=dict(relx=.02, rely=.48, relh=.25 , relw=.45), bottomKwargs=dict(values=DAYS_NAMES))
 
-        self.weekNumber = RadioCombo(self, topKwargs=dict(config=dict(text='Week Number', style='Group.TRadiobutton', variable=self.seasonNames, value='weekNumber')), orient='h', place=dict(relx=.02, rely=.75, relh=.25 , relw=.45), longent=.65, bottomKwargs=dict(config=dict(values=list(range(1, 6)))))
+        self.weekNumber = RadioCombo(self, topKwargs=dict(config=dict(text='Week Number', style='Group.TRadiobutton', variable=self.seasonNames, value='weekNumber')), orient='h', place=dict(relx=.02, rely=.75, relh=.25 , relw=.45), longent=.65, bottomKwargs=dict(values=list(range(1, 6)), _type='number'))
 
 
-        self.monthName = RadioCombo(self, topKwargs=dict(config=dict(text='Month Name', style='Group.TRadiobutton', variable=self.seasonNames, value='monthName')), orient='h', place=dict(relx=.49, rely=.48, relh=.25 , relw=.48), bottomKwargs=dict(config=dict(values=MONTHS_NAMES)))
+        self.monthName = RadioCombo(self, topKwargs=dict(config=dict(text='Month Name', style='Group.TRadiobutton', variable=self.seasonNames, value='monthName')), orient='h', place=dict(relx=.49, rely=.48, relh=.25 , relw=.48), bottomKwargs=dict(values=MONTHS_NAMES[1:]))
 
-        self.yearNumber = RadioCombo(self, topKwargs=dict(config=dict(text='Year Number', style='Group.TRadiobutton', variable=self.seasonNames, value='yearNumber')), orient='h', place=dict(relx=.49, rely=.75, relh=.25 , relw=.48), bottomKwargs=dict(config=dict(values=list(range(2017, DateTime.now().year)))))
+        self.yearNumber = RadioCombo(self, topKwargs=dict(config=dict(text='Year Number', style='Group.TRadiobutton', variable=self.seasonNames, value='yearNumber')), orient='h', place=dict(relx=.49, rely=.75, relh=.25 , relw=.48), bottomKwargs=dict(values=list(range(2017, DateTime.now().year + 1)), _type='number'))
 
         self.setRadioGroups([self.dayName, self.weekNumber, self.monthName, self.yearNumber])
 
@@ -270,11 +270,15 @@ class SearchDetails(Notebook):
 
 
 class SortNSearch(PRMP_MainWindow):
-    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.28):
+    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.28, sup=None):
         super().__init__(master, title=title, geo=geo)
+
+        self.sup = sup
 
         self.details = SearchDetails(self.container, place=dict(relx=.005, rely=.005, relh=longent, relw=.99))
         
-        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent, relh=.99-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
+        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.005, relh=.99-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
+
+        self.paint()
 
 
