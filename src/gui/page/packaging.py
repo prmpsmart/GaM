@@ -11,7 +11,6 @@ for a in gg: setattr(t, a, gg[a])
 
 class DCSubs:
     def __init__(self, top=None):
-        
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -23,22 +22,20 @@ class DCSubs:
             "roman -underline 0 -overstrike 0"
         font9 = "-family {Times New Roman} -size 11 -weight bold "  \
             "-slant roman -underline 0 -overstrike 0"
-        # # self.style = ttk.Style()
-        # if sys.platform == "win32":
-            # self.style.theme_use('winnative')
-        # self.style.configure('.',background=_bgcolor)
-        # self.style.configure('.',foreground=_fgcolor)
-        # self.style.configure('.',font=font9)
-        # self.style.map('.',background=
-            # [('selected', _compcolor), ('active',_ana2color)])
+        self.style = ttk.Style()
+        if sys.platform == "win32":
+            self.style.theme_use('winnative')
+        self.style.configure('.',background=_bgcolor)
+        self.style.configure('.',foreground=_fgcolor)
+        self.style.configure('.',font=font9)
+        self.style.map('.',background=
+            [('selected', _compcolor), ('active',_ana2color)])
 
         top.geometry("760x541")
         top.title("DC Subs")
         top.configure(background="#d9d9d9")
         top.configure(highlightbackground="#d9d9d9")
         top.configure(highlightcolor="black")
-
-        top = top.container
 
         self.Labelframe1 = tk.LabelFrame(top)
         self.Labelframe1.place(relx=0.013, rely=0.176, relheight=0.811
@@ -48,8 +45,10 @@ class DCSubs:
         self.Labelframe1.configure(foreground="black")
         self.Labelframe1.configure(text='''DC Subs Details''')
         self.Labelframe1.configure(background="#d9d9d9")
+        self.Labelframe1.configure(highlightbackground="#d9d9d9")
+        self.Labelframe1.configure(highlightcolor="black")
 
-        # self.style.configure('Treeview.Heading',  font=font9)
+        self.style.configure('Treeview.Heading',  font=font9)
         self.Scrolledtreeview1 = ScrolledTreeView(self.Labelframe1)
         self.Scrolledtreeview1.place(relx=0.014, rely=0.046, relheight=0.932
                 , relwidth=0.973, bordermode='ignore')
@@ -96,10 +95,14 @@ class DCSubs:
         self.Label1 = tk.Label(self.Labelframe1_1)
         self.Label1.place(relx=0.035, rely=0.211, height=33, width=103
                 , bordermode='ignore')
+        self.Label1.configure(activebackground="#f9f9f9")
+        self.Label1.configure(activeforeground="black")
         self.Label1.configure(background="#d9d9d9")
         self.Label1.configure(disabledforeground="#a3a3a3")
         self.Label1.configure(font="-family {Times New Roman} -size 11 -weight bold")
         self.Label1.configure(foreground="#000000")
+        self.Label1.configure(highlightbackground="#d9d9d9")
+        self.Label1.configure(highlightcolor="black")
         self.Label1.configure(relief="groove")
         self.Label1.configure(text='''Total Subs''')
 
@@ -131,8 +134,8 @@ class DCSubs:
         self.Button1_4.configure(pady="0")
         self.Button1_4.configure(text='''Search and Sort''')
 
-        # self.menubar = tk.Menu(top,font=font12,bg='#004000',fg='#ffff00')
-        # top.configure(menu = self.menubar)
+        self.menubar = tk.Menu(top,font=font12,bg='#004000',fg='#ffff00')
+        top.configure(menu = self.menubar)
 
 
 
