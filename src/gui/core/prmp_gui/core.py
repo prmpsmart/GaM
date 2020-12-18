@@ -7,7 +7,7 @@ import tkinter.ttk as ttk
 from random import randint
 from tkinter.filedialog import askopenfilename
 from .pics import PRMP_Image
-from .miscs import Mixins, partial, copyClassMethods, DateTime
+from .miscs import Mixins, partial, copyClassMethods, DateTime, bound_to_mousewheel, Columns
 from ctypes import windll
 
 # superclasses
@@ -964,6 +964,14 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
     def PRMP_WIDGET(self): return 'Text'
 Text = PTx = PRMP_Text
 
+class PRMP_Listbox(PRMP_, tk.Listbox):
+    
+    def __init__(self, master=None, config={}, **kwargs):
+        tk.Listbox.__init__(self, master=master, **config)
+        PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
+Listbox = PLb = PRMP_Listbox
+
+
 # based on ttk only
 
 class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
@@ -1615,8 +1623,6 @@ class PRMP_Checkbutton(PRMP_InputButtons, PRMP_, tk.Checkbutton):
         
         self['fg'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
         self.state('disabled')
-    
-
 Checkbutton = PC = PRMP_Checkbutton
 
 class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
@@ -1628,8 +1634,6 @@ class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
     
     @property
     def PRMP_WIDGET(self): return 'Entry'
-        
-
 Entry = PE = PRMP_Entry
 
 class PRMP_Frame(PRMP_, tk.Frame):
@@ -1734,7 +1738,6 @@ class PRMP_Style_Checkbutton(PRMP_InputButtons, PRMP_Style_, ttk.Checkbutton):
         
         self.var.set('0')
         self.toggleSwitch()
-
 SCheckbutton = PSC = PRMP_Style_Checkbutton
 
 class PRMP_Style_Entry(PRMP_Input, PRMP_Style_, ttk.Entry):
@@ -1743,7 +1746,6 @@ class PRMP_Style_Entry(PRMP_Input, PRMP_Style_, ttk.Entry):
         ttk.Entry.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master, **config, **kwargs)
         PRMP_Input.__init__(self, **kwargs)
-        
 SEntry = PSE = PRMP_Style_Entry
 
 class PRMP_Style_Frame(PRMP_Style_, ttk.Frame):
@@ -2304,10 +2306,157 @@ class PRMP_MainWindow(Mixins):
 
     
     def __getattr__(self, name): return getattr(self.root, name)
-    
 MainWindow = PMW = PRMP_MainWindow
 
 
+#   scrollable widgets
 
+class PRMP_ListBox(PRMP_Frame):
+    
+    def __init__(self, master=None, columns=[], **kwargs):
+        super().__init__(master=master, **kwargs)
+
+        self.listbox = PRMP_Listbox(self)
+        self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.listbox.xview))
+        self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.listbox.yview))
+        self.listbox.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
+        
+        self.xscrollbar.pack(side="bottom", fill="x")
+        self.listbox.pack(side='left', fill='both', expand=1)
+        self.yscrollbar.pack(side="right", fill="y")
+        bound_to_mousewheel(0, self)
+ListBox = PLB = PRMP_ListBox
+
+class PRMP_TreeView(PRMP_Frame):
+    __shows = ['tree', 'headings']
+    __slots__ = ['tree']
+    
+    def __init__(self, master=None, columns=[], **kwargs):
+        super().__init__(master=master, **kwargs)
+        self.treeview = None
+        self.xscrollbar = None
+        self.yscrollbar = None
+
+        self.columns = Columns(columns)
+        # print(self.columns)
+        self.setColumns(columns)
+        self.create()
+        
+    def create(self):
+        if self.treeview:
+            self.treeview.destroy()
+            del self.treeview
+            
+            self.xscrollbar.destroy()
+            del self.xscrollbar
+
+            self.yscrollbar.destroy()
+            del self.yscrollbar
+
+
+        self.t = self.tree = self.treeview = PRMP_Treeview(self)
+        self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
+        self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
+        self.treeview.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
+        
+        self.xscrollbar.pack(side="bottom", fill="x")
+        self.treeview.pack(side='left', fill='both', expand=1)
+        self.yscrollbar.pack(side="right", fill="y")
+        bound_to_mousewheel(0, self)
+        
+        self.ivd = self.itemsValuesDict = {}
+        self.firstItem = None
+        self.current = None
+        self.attributes = []
+        
+        self.bindings()
+    
+    def bindings(self):
+        self.tree.bind('<<TreeviewSelect>>', self.selected)
+
+    def selected(self, e=0):
+        item = self.tree.focus()
+        self.current = self.ivd.get(item)
+        return self.current
+
+    def insert(self, item, position='end',  **kwargs): return self.treeview.insert(item, position, **kwargs)
+    
+    def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
+        font = Font(**font)
+        # return self.tree.tag_configure(tagName, font=font, **kwargs)
+        return self.tree.tag_configure(tagName, **kwargs)
+    
+    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
+    
+    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
+    
+    def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
+    
+    tvc = Config = treeviewConfig
+
+    def setColumns(self, columns=[]):
+        self.create()
+
+        if columns: self.columns.process(columns)
+            
+        if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
+        self.updateHeading()
+            
+    def updateHeading(self):
+        for column in self.columns:
+            self.heading(column.index, text=column.text, anchor='center')
+            # print(column.width, time.time.time())
+            self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
+    
+    def _set(self, obj=None, parent='', op=False):
+        
+        cols = self.columns.get(obj)
+        
+        name, *columns = self.columns.get(obj)
+        tag = 'prmp'
+        
+        # the fourth value of this [text, attr, width, value] can be used in sorting, it wont insert the region and its columns both into self.tree and self.ivd if not equal to value
+        
+        item = self.insert(parent, text=name, values=columns, tag=tag, open=op)
+        self.tag_config(tag)
+
+        self.ivd[item] = obj
+        
+        if self.firstItem == None:
+            self.firstItem = item
+            self.treeview.focus(self.firstItem)
+        
+        subs = obj.subs
+        if subs:
+            for sub in subs: self._set(sub, item, op)
+    
+    def set(self, obj, op=0):
+        self.setColumns()
+        if self.firstItem:
+            self.tree.delete(self.firstItem)
+            self.firstItem = None
+        if obj:
+            self.obj = obj
+            self._set(obj, op=op)
+    
+    def reload(self): self.set(self.obj)
+TreeView = PTV = PRMP_TreeView
+
+
+class PRMP_SText(PRMP_Frame):
+    
+    def __init__(self, master=None, columns=[], **kwargs):
+        super().__init__(master=master, **kwargs)
+
+        self.text = PRMP_Text(self)
+        self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.text.xview))
+        self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.text.yview))
+        self.text.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
+        
+        self.xscrollbar.pack(side="bottom", fill="x")
+        self.text.pack(side='left', fill='both', expand=1)
+        self.yscrollbar.pack(side="right", fill="y")
+        bound_to_mousewheel(0, self)
+SText = PSTx = PRMP_SText
 
 

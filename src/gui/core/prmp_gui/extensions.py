@@ -40,7 +40,6 @@ class AutoScroll:
 
     @staticmethod
     def _autoscroll(sbar):
-        '''Hide and show scrollbar as needed.'''
         def wrapped(first, last):
             first, last = float(first), float(last)
             if first <= 0 and last >= 1:
@@ -235,14 +234,6 @@ class PRMP_DateButton(PRMP_Button):
         self['text'] = self.date
 PDB = PRMP_DateButton
 
-class ScrolledTreeView(AutoScroll, ttk.Treeview):
-    '''A standard ttk Treeview widget with scrollbars that will
-    automatically show/hide as needed.'''
-    @create_container
-    def __init__(self, master, **kw):
-        ttk.Treeview.__init__(self, master, **kw)
-        AutoScroll.__init__(self, master)
-STV = ScrolledTreeView
 
 class ScrollableFrame(PRMP_Frame):
     
@@ -269,129 +260,11 @@ class ScrollableFrame(PRMP_Frame):
         self.scrollable_frame.bind("<Configure>", self.changeFrameBox)
 
         canvas.create_window((0, 0), window=self.scrollable_frame, anchor='nw')
-
-
-        
         
     def changeFrameBox(self, e=0):
         p = self.canvas.bbox("all")
         self.canvas.configure(scrollregion=p)
 SF = ScrollableFrame
-
-class PRMP_TreeView(PRMP_Frame):
-    __shows = ['tree', 'headings']
-    __slots__ = ['tree']
-    
-    def __init__(self, master=None, columns=[], **kwargs):
-        super().__init__(master=master, **kwargs)
-        self.treeview = None
-        self.xscrollbar = None
-        self.yscrollbar = None
-
-        self.columns = Columns(columns)
-        # print(self.columns)
-        self.setColumns(columns)
-        self.create()
-        
-    def create(self):
-        if self.treeview:
-            self.treeview.destroy()
-            del self.treeview
-            
-            self.xscrollbar.destroy()
-            del self.xscrollbar
-
-            self.yscrollbar.destroy()
-            del self.yscrollbar
-
-
-        self.t = self.tree = self.treeview = PRMP_Treeview(self)
-        self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
-        self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
-        self.treeview.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
-        
-        self.xscrollbar.pack(side="bottom", fill="x")
-        self.treeview.pack(side='left', fill='both', expand=1)
-        self.yscrollbar.pack(side="right", fill="y")
-        bound_to_mousewheel(0, self)
-        
-        self.ivd = self.itemsValuesDict = {}
-        self.firstItem = None
-        self.current = None
-        self.attributes = []
-        
-        self.bindings()
-    
-    def bindings(self):
-        self.tree.bind('<<TreeviewSelect>>', self.selected)
-
-    def selected(self, e=0):
-        item = self.tree.focus()
-        self.current = self.ivd.get(item)
-        return self.current
-
-    def insert(self, item, position='end',  **kwargs): return self.treeview.insert(item, position, **kwargs)
-    
-    def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
-        font = Font(**font)
-        # return self.tree.tag_configure(tagName, font=font, **kwargs)
-        return self.tree.tag_configure(tagName, **kwargs)
-    
-    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
-    
-    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
-    
-    def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
-    
-    tvc = Config = treeviewConfig
-
-    def setColumns(self, columns=[]):
-        self.create()
-
-        if columns: self.columns.process(columns)
-            
-        if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
-        self.updateHeading()
-            
-    def updateHeading(self):
-        for column in self.columns:
-            self.heading(column.index, text=column.text, anchor='center')
-            # print(column.width, time.time.time())
-            self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
-    
-    def _set(self, obj=None, parent='', op=False):
-        
-        cols = self.columns.get(obj)
-        
-        name, *columns = self.columns.get(obj)
-        tag = 'prmp'
-        
-        # the fourth value of this [text, attr, width, value] can be used in sorting, it wont insert the region and its columns both into self.tree and self.ivd if not equal to value
-        
-        item = self.insert(parent, text=name, values=columns, tag=tag, open=op)
-        self.tag_config(tag)
-
-        self.ivd[item] = obj
-        
-        if self.firstItem == None:
-            self.firstItem = item
-            self.treeview.focus(self.firstItem)
-        
-        subs = obj.subs
-        if subs:
-            for sub in subs: self._set(sub, item, op)
-    
-    def set(self, obj, op=0):
-        self.setColumns()
-        if self.firstItem:
-            self.tree.delete(self.firstItem)
-            self.firstItem = None
-        if obj:
-            self.obj = obj
-            self._set(obj, op=op)
-    
-    def reload(self): self.set(self.obj)
-PTV = PRMP_TreeView
 
 class ToolTip(PRMP_Toplevel):
     """
@@ -509,27 +382,14 @@ class SolidScreen(PRMP_MainWindow):
 SS = SolidScreen
 
 class ScrolledText(AutoScroll, tk.Text):
-    '''A standard Tkinter Text widget with scrollbars that will
-    automatically show/hide as needed.'''
+
     @create_container
     def __init__(self, master, **kw):
         tk.Text.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
-class ScrolledListBox(AutoScroll, tk.Listbox):
-    '''A standard Tkinter Listbox widget with scrollbars that will
-    automatically show/hide as needed.'''
-    @create_container
-    def __init__(self, master, **kw):
-        tk.Listbox.__init__(self, master, **kw)
-        AutoScroll.__init__(self, master)
-    def size_(self):
-        sz = tk.Listbox.size(self)
-        return sz
-
 class ScrolledEntry(AutoScroll, tk.Entry):
-    '''A standard Tkinter Entry widget with a horizontal scrollbar
-    that will automatically show/hide as needed.'''
+
     @create_container
     def __init__(self, master, **kw):
         tk.Entry.__init__(self, master, **kw)
