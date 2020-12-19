@@ -29,11 +29,6 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
     def getRegion(self, number=None, name=None, phone=None, email=None, image=None):
         ## provide mechanism to scan pictures.
         self.getSub(dict(number=number, name=name, phone=phone, email=email, image=image))
-        # for region in self.regions:
-        #     if number == region.number: return region
-        #     elif name == region.name: return region
-        #     elif phone == region.phone: return region
-        #     elif email == region.email: return region
             
     @classmethod
     def getFromAllRegions(cls, number):

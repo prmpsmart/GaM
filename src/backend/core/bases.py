@@ -132,6 +132,7 @@ class Mixins:
 
 class ObjectsMixins(Mixins, CompareByDate):
     
+    def __repr__(self): return f'<{self.name}>'
     
     def sumRecords(self, records): return sum(int(rec) for rec in records)
     
@@ -311,7 +312,6 @@ class Object(CompareByNumber, ObjectsMixins):
     def next(self, next_):
         if self._next == None: self._next = next_
         else: raise self.Error('A next is already set.')
-
 
 
 class ObjectsManager(ObjectsMixins):

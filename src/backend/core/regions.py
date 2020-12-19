@@ -197,12 +197,6 @@ class Region(Object):
         if month: self.accountsManager.balanceAccount(month)
         else: self.accountsManager.balanceAccounts()
     
-    def subRegionsActiveByMonth(self, month):
-        subRegions = []
-        for subRegion in self.subRegionsManager:
-            monthAccount = subRegion.accountsManager.getAccount(month)
-            if monthAccount != None: subRegions.append(subRegion)
-        return subRegions
     
     def sortAccountsByMonth(self, month): return self.accountsManager.sortSubsByMonth(month)
 
@@ -261,7 +255,6 @@ class Staff(Region):
     def salariesManager(self): return self.accountsManager
     def paySalary(self, salary, date=None): self.salariesManager.addSalary(salary, date=date)
 
-
 class ThirdPartySurety(ObjectsMixins):
     
     def __init__(self, loanBondDetails=None, name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
@@ -284,8 +277,6 @@ class ThirdPartySurety(ObjectsMixins):
         
         self.email = None
         if self.checkEmail(email): self.email = email
-
-
 
 class LoanBondDetails:
     _thirdPartySurety = ThirdPartySurety

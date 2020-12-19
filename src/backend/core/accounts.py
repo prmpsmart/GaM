@@ -187,15 +187,24 @@ class AccountsManager(ObjectsManager):
             accounts.extend(subRegionsAccounts)
         return accounts
     
+    def subRegionsActiveByMonth(self, month):
+        subRegions = []
+        for subRegion in self.region.subRegionsManager:
+            monthAccount = subRegion.accountsManager.getAccount(month)
+            if monthAccount != None: subRegions.append(subRegion)
+        # or Subs = [Sub for Sub in self.Subs if Sub.lastAccount.date.isSameMonth(month)]
+        
+        return subRegions
+    
     
    #Month Sorting
-    def sortClientsAccountsByMonth(self, month):
+    def sortSubsAccountsByMonth(self, month):
         DateTime.checkDateTime(month)
-        clients = [client for client in self.clients if client.lastAccount.date.isSameMonth(month)]
+        Subs = self.subRegionsActiveByMonth(month)
         accounts = []
-        for client in clients:
-            clientAccounts = client.accountsManager.sortAccountsByMonth(month)
-            accounts.extend(clientAccounts)
+        for Sub in Subs:
+            SubAccounts = Sub.accountsManager.sortSubsByMonth(month)
+            accounts.extend(SubAccounts)
         return accounts
     
 
