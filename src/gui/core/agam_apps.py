@@ -199,13 +199,14 @@ class ObjectDetails(PRMP_MainWindow):
     def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
-        self.sup = sup
+        self._sup = sup
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         
-        self.region = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Region'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup.name))
+        self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup.name if sup else 'Name'))
 
-        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']), orient='h', longent=.4)
+        self.subTypes = ['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']
+        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=self.subTypes), orient='h', longent=.4, func=self.changeSubs)
 
         self.dialog = Checkbutton(sups, place=dict(relx=.577, rely=.16, relh=.07, relw=.35), text='Dialog?')
         
@@ -215,5 +216,23 @@ class ObjectDetails(PRMP_MainWindow):
         
         self.paint()
     
+    def changeSubs(self, e=0):
+        subType = self.subType.get()
+        if self._sup:
+            subs = self._sup[subType]
+            print(subs)
+    
     def openSup(self):
         pass
+
+
+
+
+
+
+
+
+
+
+
+

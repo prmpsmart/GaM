@@ -10,8 +10,12 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
         
     def __len__(self): return len(self.regions)
     def __repr__(self): return f'<{self}>'
-    def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
+    def __str__(self): return f'{self.master} | {self.name}'
     
+    @property
+    def name(self): return f'{self.className}({self.master.name})'
+
+
     @property
     def firstRegion(self): return self.first
     @property

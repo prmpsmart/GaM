@@ -292,7 +292,7 @@ class RegionDetails(FillWidgets, LabelFrame):
 
         self.region = region
 
-        self.office = LabelLabel(self, topKwargs=dict(text='Office'), place=dict(relx=.02, rely=0, relh=.23, relw=.96), orient='h', longent=.3)
+        self.office = LabelLabel(self, topKwargs=dict(text='Office'), place=dict(relx=.02, rely=0, relh=.23, relw=.96), orient='h', longent=.3, bottomKwargs=dict(font='DEFAULT_FONT'))
         self.department = LabelLabel(self, topKwargs=dict(text='Department'), place=dict(relx=.02, rely=.24, relh=.23, relw=.96), orient='h', longent=.3)
         self.sup = LabelLabel(self, topKwargs=dict(text='Superscript'), place=dict(relx=.02, rely=.48, relh=.23, relw=.96), orient='h', longent=.3)
         self.sub = LabelLabel(self, topKwargs=dict(text='Subscript'), place=dict(relx=.02, rely=.72, relh=.23, relw=.96), orient='h', longent=.3)

@@ -181,7 +181,11 @@ class Region(Object):
     def subs(self): return self.accountsManager if self.accountsManager else []
     
     @property
-    def subRegions(self): return self.subRegionsManager if self.subRegionsManager else []
+    def subRegions(self): return self.subRegionsManager[:] if self.subRegionsManager else []
+    
+    
+    @property
+    def regions(self): return self.subRegions
     
     @property
     def subRegionsCount(self): return len(self.subRegions)
@@ -191,6 +195,10 @@ class Region(Object):
     
     @property
     def accountsManager(self): return self._accountsManager
+    
+    @property
+    def accounts(self): return self.accountsManager[:] if self.accountsManager else []
+    
     
     def balanceAccounts(self, month=None):
         if month: self.accountsManager.balanceAccount(month)

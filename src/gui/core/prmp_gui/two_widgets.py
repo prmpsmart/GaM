@@ -12,7 +12,7 @@ class TwoWidgets(PRMP_Frame):
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, top='', bottom='', func=None, orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, tttk=False, bttk=False, **kwargs):
+    def __init__(self, master, top='', bottom='',  orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, tttk=False, bttk=False, func=None, **kwargs):
         super().__init__(master, **kwargs)
 
         self.top = top.lower()
@@ -54,11 +54,14 @@ class TwoWidgets(PRMP_Frame):
         if bottom == 'datebutton': placeholder = 'Choose Date'
         
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
+        # print(bottomKw)
         
         
         events = self.events.get(bottom)
         if events:
-            for event in events: self.Bottom.bind(event, self.clicked)
+            for event in events:
+                self.Bottom.bind(event, self.clicked, '+')
+                if func: self.Bottom.bind(event, func, '+')
         
         self.B = self.Bottom
         self.T = self.Top

@@ -2295,9 +2295,8 @@ class PRMP_MainWindow(Mixins):
             if k.startswith('__') or k == 'root': continue
             if callable(v): self.root.__dict__[k] = partial(v, self)
 
-    def __repr__(self): return self.root
     
-    def __str__(self): return self.root
+    def __str__(self): return str(self.root)
     
     def __getitem__(self, name):
         attr = self.__dict__.get(name, '_prmp_')
