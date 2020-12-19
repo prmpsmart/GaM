@@ -167,11 +167,11 @@ class SupDCDetails(FillWidgets, LabelFrame):
     @property
     def derivedValues(self):
         values = dict(
-            persons=len(self.region.personsManager)
-            subs=len(self.region.subRegionsManager)
-            actSubs=len(self.region.)
-            accounts=len(self.region.accountsManager)
-            actSubsAccs=len(self.region.)
+            persons=len(self.region.personsManager),
+            subs=len(self.region.subRegionsManager),
+            actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
+            accounts=len(self.region.accountsManager),
+            actSubsAccs=self.region.lastAccount.ledgerNumbers
         )
     
     def openSNS(self):

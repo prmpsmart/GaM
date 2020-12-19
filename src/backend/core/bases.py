@@ -123,6 +123,7 @@ class Mixins:
         return d
     
     def propertize(self, name):
+        if name.startswith('_'): return name
         if name:
             name = str(name)
             nm = name.replace(' ', '')

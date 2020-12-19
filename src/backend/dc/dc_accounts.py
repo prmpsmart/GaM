@@ -164,7 +164,7 @@ class AreaAccount(DCAccount):
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date)
 
     @property
-    def clientsAccounts(self, month=None): return self.manager.sortClientsAccountsByMonth(month or self.date)
+    def clientsAccounts(self, month=None): return sorted(self.manager.sortClientsAccountsByMonth(month or self.date))
 
 
 class ClientAccountsManager(DCAccountsManager):
