@@ -175,6 +175,7 @@ class ClientAccountsManager(DCAccountsManager):
         lastAccount = self.lastAccount
         lastLedgerNumber = lastAccount.ledgerNumber if lastAccount else 0
         ledgerNumber = lastLedgerNumber + 1
+        print(ledgerNumber)
         return super().createAccount(rate=rate, ledgerNumber=ledgerNumber, **kwargs)
 
     def changeRate(self, rate):
