@@ -88,7 +88,6 @@ class DCOffice(SubOffice):
     
     @property
     def areasManager(self): return self.subRegionsManager
-    
 
 class CoopOffice(SubOffice):
     AccountsManager = CoopOfficeAccount

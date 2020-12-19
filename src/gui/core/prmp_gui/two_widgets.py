@@ -4,13 +4,15 @@ from .extensions import *
 #  These widgets doesn't need or can't be used with PRMP_Widget.addWidget()
 
 class TwoWidgets(PRMP_Frame):
-    top_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Style_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
-    bottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox, 'button': PRMP_Button}
+    top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
+    stop_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Style_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
+    bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox, 'button': PRMP_Button}
+    sbottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox, 'button': PRMP_Button}
     events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
     
-    def __init__(self, master, top='', bottom='', func=None, orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, **kwargs):
+    def __init__(self, master, top='', bottom='', func=None, orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, tttk=False, bttk=False, **kwargs):
         super().__init__(master, **kwargs)
 
         self.top = top.lower()
@@ -23,8 +25,11 @@ class TwoWidgets(PRMP_Frame):
         self.disableOnToggle = disableOnToggle
         
         
-        top_wid = self.top_widgets[top]
-        bottom_wid = self.bottom_widgets[bottom]
+        if tttk: top_wid = self.stop_widgets[top]
+        else: top_wid = self.top_widgets[top]
+
+        if bttk: bottom_wid = self.sbottom_widgets[bottom]
+        else: bottom_wid = self.bottom_widgets[bottom]
         
         top_defaults = {k:v for k, v in self.top_defaults.items()}
         
@@ -183,6 +188,10 @@ CC = CheckCombo
 class LabelButton(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='button',**kwargs)
 LB = LabelButton
+
+class LabelLabel(TwoWidgets):
+    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='label',**kwargs)
+LL = LabelLabel
 
 class LabelDateButton(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='datebutton', **kwargs)
