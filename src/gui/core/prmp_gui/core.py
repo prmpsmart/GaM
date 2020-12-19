@@ -969,6 +969,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     def __init__(self, master=None, config={}, **kwargs):
         tk.Listbox.__init__(self, master=master, **config)
         PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
+    
 Listbox = PLb = PRMP_Listbox
 
 
@@ -2324,6 +2325,10 @@ class PRMP_ListBox(PRMP_Frame):
         self.listbox.pack(side='left', fill='both', expand=1)
         self.yscrollbar.pack(side="right", fill="y")
         bound_to_mousewheel(0, self)
+    
+    def set(self, values):
+        pass
+
 ListBox = PLB = PRMP_ListBox
 
 class PRMP_TreeView(PRMP_Frame):
