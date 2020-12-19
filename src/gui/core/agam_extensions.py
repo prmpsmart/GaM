@@ -290,8 +290,8 @@ class SubsList(LabelFrame):
         subs = sup[subType] or []
         self.listbox.set(subs, 'name')
     
-    def clicked(self, e=0, selected):
-        print(e)
+    def clicked(self, e=0, selected=None):
+        print(e, selected)
 
 
 class RegionDetails(FillWidgets, LabelFrame):
