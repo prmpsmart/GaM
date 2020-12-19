@@ -14,10 +14,8 @@ class DCRecordsManager(RecordsManager):
     
     def balance(self): return self.account.balanceAccount()
 
-# class Transfers(DCRecordsManager): pass
-
-
 class Rates(DCRecordsManager):
+    ObjectType = Rate
     lowest = 50
     
     def __init__(self, accounts, rate):
@@ -43,19 +41,22 @@ class Rates(DCRecordsManager):
     def setRate(self, rate):
         if self.checkRate(rate): self.createRecord(rate)
 
-
 class Balances(DCRecordsManager):
+    ObjectType = Balance
     
     def __init__(self, account):
         super().__init__(account, True)
 
 class BroughtForwards(DCRecordsManager):
+    ObjectType = BroughtForward
     def __init__(self, account):
         super().__init__(account, True)
 
-class BroughtToOffices(DCRecordsManager): pass
+class BroughtToOffices(DCRecordsManager):
+    ObjectType = BroughtToOffice
 
 class CardDues(DCRecordsManager):
+    ObjectType = CardDue
     def __init__(self, client, cardDue=True):
         super().__init__(client)
         self.client = client
@@ -72,7 +73,8 @@ class CardDues(DCRecordsManager):
         if m: d += 1
         return paids == d * 100
 
-class Commissions(DCRecordsManager): pass
+class Commissions(DCRecordsManager):
+    ObjectType = Commission
 
 class Contributions(DCRecordsManager):
     ObjectType = Contribution
@@ -116,13 +118,15 @@ class Contributions(DCRecordsManager):
     @property
     def contributed(self): return sum(cont.savings for cont in self)
 
-class Paidouts(DCRecordsManager): pass
+class Paidouts(DCRecordsManager):
+    ObjectType = Paidout
 
-class Withdrawals(DCRecordsManager): pass
+class Withdrawals(DCRecordsManager):
+    ObjectType = Withdrawal
 
 class Debits(DCRecordsManager):
-    lowest = Rates.lowest
     ObjectType = Debit
+    lowest = Rates.lowest
 
     def addDebit(self, toDebit, _type='w', **kwargs):
         if self.checkMoney(toDebit):
@@ -134,13 +138,17 @@ class Debits(DCRecordsManager):
                 self.createRecord(toDebit, **kwargs)
             else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
    
-class Deficits(DCRecordsManager): pass
+class Deficits(DCRecordsManager):
+    ObjectType = Deficit
 
-class Excesses(DCRecordsManager): pass
+class Excesses(DCRecordsManager):
+    ObjectType = Excesse
 
-class NormalIncome(DCRecordsManager): pass
+class NormalIncome(DCRecordsManager):
+    ObjectType = NormalIncom
 
-class Transfers(DCRecordsManager): pass
+class Transfers(DCRecordsManager):
+    ObjectType = Transfer
 
 class Incomes(DCRecordsManager):
     ObjectType = Income
@@ -151,8 +159,8 @@ class Incomes(DCRecordsManager):
 
         self.createRecord(income, **kwargs)
 
-
 class Savings(DCRecordsManager):
+    ObjectType = Saving
 
     def __init__(self, account):
         super().__init__(account)
@@ -160,6 +168,7 @@ class Savings(DCRecordsManager):
     def addSaving(self, saving, **kwargs): self.createRecord(saving, **kwargs)
 
 class Upfronts(RepaymentsManager):
+    ObjectType = Upfront
     ObjectType = Upfront
     
     def __init__(self, accounts):

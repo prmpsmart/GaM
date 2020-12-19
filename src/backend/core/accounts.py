@@ -197,7 +197,7 @@ class AccountsManager(ObjectsManager):
             clientAccounts = client.accountsManager.sortAccountsByMonth(month)
             accounts.extend(clientAccounts)
         return accounts
-        
+    
 
 
 

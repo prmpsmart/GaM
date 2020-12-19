@@ -2,51 +2,35 @@ from src.backend.core.records_managers import Repayment, DateTime, RecordsManage
 from .dc_errors import DCErrors
 
 class DCRecord(Record):
-    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers')
+    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers', 'Withdrawals', 'Paidouts')
 
 class DCRepayment(Repayment):
     Managers = ('Upfronts', )
 
-class Contribution(DCRecord):
-    
-    def __init__(self, manager, contrib, **kwargs):
-        self.__contrib = contrib
-        
-        rate = manager.master.rate
-        money = rate * contrib
 
-        super().__init__(manager, money, **kwargs)
-    
-    def __int__(self): return self.contributed
-    
-    @property
-    def contributed(self): return self.__contrib
-    
-    @property
-    def savings(self): return super().__int__()
 
-class Debit(DCRecord):
+class Rate(DCRecord): pass
+class Balance(DCRecord): pass
+class BroughtForward(DCRecord): pass
+class BroughtToOffice(DCRecord): pass
+class CardDue(DCRecord): pass
+class Commission(DCRecord): pass
+class Contribution(DCRecord): pass
+class Paidout(DCRecord): pass
+class Withdrawal(DCRecord): pass
+class Debit(DCRecord): pass
+class Deficit(DCRecord): pass
+class Excesse(DCRecord): pass
+class NormalIncom(DCRecord): pass
+class Transfer(DCRecord): pass
+class Income(DCRecord): pass
+class Saving(DCRecord): pass
 
-     def __init__(self, manager, debit, _type='w', **kwargs):
-        if _type == 'w': self._type = 'withdrawal'
-        else: self._type = 'paidout'
-
-        super().__init__(manager, debit, **kwargs)
-
-class Income(DCRecord):
-
-     def __init__(self, manager, debit, _type='n', **kwargs):
-
-        super().__init__(manager, debit, **kwargs)
 
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1
     Manager = 'Upfronts'
-
-
-
-
 
 
 

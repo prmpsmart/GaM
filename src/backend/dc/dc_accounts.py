@@ -1,5 +1,5 @@
 
-from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings, Incomes#, Transfers
+from .dc_records_managers import *
 from ..core.accounts import DateTime, Account, AccountsManager
 
 
@@ -14,14 +14,13 @@ class DCAccount(Account):
         self.debits = Debits(self)
         self.upfronts = Upfronts(self)
         self.balances = Balances(self)
+
+        self.transfers = Transfers(self)
+        self.paidouts = Paidouts(self)
+        self.withdrawals = Withdrawals(self)
+
         
     def __int__(self): return int(self.balances)
-
-    @property
-    def _transfers(self): return self.incomes._transfers
-    @property
-    def transfers(self): return self.incomes.transfers
-
     
     @property
     def region(self):
@@ -79,14 +78,6 @@ class ClientAccount(DCAccount):
     
     @property
     def rate(self): return int(self.rates)
-    @property
-    def _withdrawals(self): return self.debits._withdrawals
-    @property
-    def withdrawals(self): return self.debits.withdrawals
-    @property
-    def _paidouts(self): return self.debits._paidouts
-    @property
-    def paidouts(self): return self.debits.paidouts
 
     def _balanceAccount(self, date=None):
         rate = int(self.rates)
@@ -104,9 +95,6 @@ class ClientAccount(DCAccount):
         # assert DateTime.now().isSameMonth(month)
         pass
 
-    # @property
-    # def savings(self): return self.contributions.savings
-
 
 class AreaAccount(DCAccount):
     Manager = 'AreaAccountsManager'
@@ -114,13 +102,9 @@ class AreaAccount(DCAccount):
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
         self.commissions = Commissions(self)
-        self.broughtToOffices = BroughtToOffices(self)#
+        self.broughtToOffices = BroughtToOffices(self)
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
-        # self.transfers = Transfers(self)
-        
-        self.paidouts = 0
-        self.withdrawals = 0
     
     @property
     def recordsManagers(self):
@@ -133,9 +117,6 @@ class AreaAccount(DCAccount):
     def _balanceAccount(self, date=None):
         clientsAccounts = self.clientsAccounts
         if clientsAccounts:
-            
-            self.paidouts = 0
-            self.withdrawals = 0
 
             self.incomes.updateWithOtherManagers([account.incomes for account in clientsAccounts])
             
@@ -148,10 +129,12 @@ class AreaAccount(DCAccount):
             self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
             
             self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
-
-            for account in clientsAccounts:
-                self.paidouts += account.paidouts
-                self.withdrawals += account.withdrawals
+            
+            self.paidouts.updateWithOtherManagers([account.paidouts for account in clientsAccounts])
+            
+            self.withdrawals.updateWithOtherManagers([account.withdrawals for account in clientsAccounts])
+            
+            self.transfers.updateWithOtherManagers([account.transfers for account in clientsAccounts])
         
         broughts = 0
         clients = self.region.clients
@@ -159,15 +142,15 @@ class AreaAccount(DCAccount):
         self.broughtForwards.updateWithOtherManagers(broughtForwards)
 
         # print(broughtForwards)
-        
-    
-    # def addTransfer(self, transfer, date=None): self.transfers.createRecord(transfer, date, notAdd=True)
     
     def addBto(self, bto, date=None):
         clientsAccounts = self.clientsAccounts
 
-        contributed = sum([acc.income(date) for acc in clientsAccounts])
-        transfers = sum([rec.money for rec in self._transfers if rec.date == date])
+        incomes = [self.sumRecords(acc.incomes.sortSubsByDate(date)) for acc in clientsAccounts]
+
+        contributed = sum(incomes)
+
+        transfers = self.sumRecords(self.transfers.sortRecordsByDate(date))
         
         self.btos.createRecord(bto, date)
         bto += transfers

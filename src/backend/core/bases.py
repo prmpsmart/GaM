@@ -133,6 +133,8 @@ class Mixins:
 class ObjectsMixins(Mixins, CompareByDate):
     
     
+    def sumRecords(self, records): return sum(int(rec) for rec in records)
+    
     @property
     def withCommas(self): return self.numWithCommas(self.money)
 
