@@ -13,7 +13,7 @@ class DC_Digits(FillWidgets, Frame):
         self._incomes = incomes = LabelFrame(self, text='Incomes')
         Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
         Label(incomes, text='Transfers', place=dict(relx=.03, rely=.51, relh=.21, relw=.48))
-        Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48))
+        self.comm = Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48))
 
         self.incomes = Entry_Label(incomes, text='₦ 3,000,000i', place=dict(relx=.03, rely=0, relh=.24, relw=.94), font=font)
         self.savings = Entry_Label(incomes, text='₦ 50,000s', place=dict(relx=.53, rely=.27, relh=.21, relw=.44))
@@ -51,7 +51,7 @@ class DC_Digits(FillWidgets, Frame):
         self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))
         self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.18, relw=.44))
 
-        self.addResultsWidgets(['incomes', 'savings', 'debits', 'withdrawals', 'paidouts', 'upfronts', 'repaid', 'overdue', 'balances', 'broughts', 'commissions', 'btos', 'transfers', 'deficits', 'excesses'])
+        self.addResultsWidgets(['incomes', 'savings', 'debits', 'withdrawals', 'paidouts', 'upfronts', 'repaid', 'overdue', 'balances', 'broughts', 'commissions', 'btos', 'transfers', 'deficits', 'excesses', 'comm'])
 
     def placeVertically(self):
         self._incomes.place(relx=.02, rely=.008, relh=.256, relw=.96)
@@ -94,12 +94,16 @@ class DC_Digits(FillWidgets, Frame):
                 deficits=int(account.deficits),
                 excesses=int(account.excesses))
             fillDict.update(not_client)
+        else:
+            client = dict(commissions=account.rate)
+            fillDict.update(client)
         
         for key in fillDict:
             val = fillDict[key]
             new_val = self.numWithSign_Commas(val)
             fillDict[key] = new_val
-            
+        
+        fillDict['comm'] = 'Commissions' if not isinstance(account.region, Client) else 'Rate'
 
         self.fill(fillDict)
 
@@ -109,10 +113,19 @@ class DC_Overview(Frame):
     def __init__(self, master, title='DC Overview', orient='v', region=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.region = region
+        self.account = region.lastAccount
 
-        self.dcDigits = DC_Digits(self, relief='groove')
+        self.month = LabelLabel(self, topKwargs=dict(text='Month'), orient='h', longent=.3)
+
+        self.ledgerNumber = LabelLabel(self, topKwargs=dict(text='Ledger Number'), orient='h', longent=.65)
+
+        self._prev = Button(self, text='Previous', command=self.prev)
+
+        self._next = Button(self, text='Next', command=self.next)
 
         self.plotDialog = Button(self, text='Plot Dialog')
+
+        self.dcDigits = DC_Digits(self)
 
         self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
@@ -121,26 +134,41 @@ class DC_Overview(Frame):
         if orient == 'v': self.placeVertically()
         else: self.placeHorizontally()
 
-        if region: self.updateDCDigits(region.lastAccount)
+        if region: self.updateDCDigits(self.account)
     
     def placeVertically(self):
         x, y = self.toplevel.geo
 
         self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
+        self._prev.place(relx=.375, y=0, relw=.15, relh=.04)
+        self._next.place(relx=.53, y=0, relw=.15, relh=.04)
         self.plotDialog.place(relx=.85, y=0, relw=.15, relh=.04)
         self.dcDigits.placeVertically()
         self.plotCanvas1.place(relx=.375, rely=.04, relh=.48, relw=.625)
         self.plotCanvas2.place(relx=.375, rely=.52, relh=.48, relw=.625)
 
-
     def placeHorizontally(self):
-        self.dcDigits.place(relx=0, rely=0, relh=.28, relw=1)
+        self.month.place(relx=.005, rely=.004, relh=.05, relw=.3)
+        self.ledgerNumber.place(relx=.31, rely=.004, relh=.05, relw=.2)
+        self._prev.place(relx=.694, rely=.007, relh=.04, relw=.12)
+        self._next.place(relx=.816, rely=.007, relh=.04, relw=.08)
+        self.plotDialog.place(relx=.898, rely=.007, relh=.04, relw=.1)
+        self.dcDigits.place(relx=0, rely=.05, relh=.28, relw=1)
         self.dcDigits.placeHorizontally()
-        self.plotDialog.place(relx=.425, rely=.285, relh=.04, relw=.15)
         self.plotCanvas1.place(relx=0, rely=.33, relh=.67, relw=.5)
         self.plotCanvas2.place(relx=.5, rely=.33, relh=.67, relw=.5)
     
-    def updateDCDigits(self, account): self.dcDigits.update(account)
+    def updateDCDigits(self, account):
+        self.account = account
+        self.dcDigits.update(account)
+
+    def next(self):
+        _next = self.account.next
+        if _next: self.updateDCDigits(_next)
+
+    def prev(self):
+        _prev = self.account.previous
+        if _prev: self.updateDCDigits(_prev)
 
 
 class SupDCDetails(FillWidgets, LabelFrame):

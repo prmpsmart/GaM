@@ -203,7 +203,7 @@ class ObjectDetails(PRMP_MainWindow):
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         
-        self.region = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Region'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup))
+        self.region = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Region'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup.name))
 
         self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']), orient='h', longent=.4)
 

@@ -327,15 +327,15 @@ class FurtherDetails(FillWidgets, LabelFrame):
         self.region = region
         FillWidgets.__init__(self)
         
-        self.persons = LabelButton(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.22, relw=.4), orient='h', longent=.5)
+        self.persons = LabelLabel(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.22, relw=.4), orient='h', longent=.5)
 
-        self.subs = LabelButton(self, topKwargs=dict(config=dict(text='Total Subs', anchor='center')), place=dict(relx=.02, rely=.24, relh=.22, relw=.4), orient='h', longent=.55)
+        self.subs = LabelLabel(self, topKwargs=dict(config=dict(text='Total Subs', anchor='center')), place=dict(relx=.02, rely=.24, relh=.22, relw=.4), orient='h', longent=.55)
 
-        self.accounts = LabelButton(self, topKwargs=dict(config=dict(text='Total Accounts', anchor='center')), place=dict(relx=.02, rely=.46, relh=.22, relw=.4), orient='h', longent=.65)
+        self.accounts = LabelLabel(self, topKwargs=dict(config=dict(text='Total Accounts', anchor='center')), place=dict(relx=.02, rely=.46, relh=.22, relw=.4), orient='h', longent=.65)
 
-        self.actSubs = LabelButton(self, topKwargs=dict(config=dict(text='Active Subs', anchor='center')), place=dict(relx=.02, rely=.68, relh=.22, relw=.4), orient='h')
+        self.actSubs = LabelLabel(self, topKwargs=dict(config=dict(text='Active Subs', anchor='center')), place=dict(relx=.02, rely=.68, relh=.22, relw=.4), orient='h')
 
-        self.actSubsAccs = LabelButton(self, topKwargs=dict(config=dict(text='Active Subs Accounts', anchor='center')), place=dict(relx=.48, rely=0, relh=.22, relw=.5), orient='h', longent=.7)
+        self.actSubsAccs = LabelLabel(self, topKwargs=dict(config=dict(text='Active Subs Accounts', anchor='center')), place=dict(relx=.48, rely=0, relh=.22, relw=.5), orient='h', longent=.7)
 
         Button(self, place=dict(relx=.73, rely=.44, relh=.22, relw=.25), text='Object Details', command=self.openObjDet)
 
