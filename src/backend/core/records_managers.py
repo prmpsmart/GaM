@@ -268,9 +268,6 @@ class RecordsManager(ObjectsManager):
         new = False
         record = None
         
-        # if money == 0: newRecord, notAdd = False, True
-        
-        # assert money != 0, 'Money must not be zero.'
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
         
@@ -318,7 +315,6 @@ class RecordsManager(ObjectsManager):
             else: years.append(rec.year)
         return years
     
-    
     @property
     def recordsAsList(self): return [int(record) for record in self]
     @property
@@ -338,48 +334,39 @@ class RecordsManager(ObjectsManager):
     #Date Sorting
     
     def sortRecordsByDate(self, date):
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
 
-        _rec = [rec for rec in self if str(rec.date) == str(date)]
+        _rec = self.sortSubsByDate(date)
         return _rec
     
     #Day Sorting
     def sortRecordsByDay(self, date):
-        recs = [record for record in self if record.date.dayName == date.dayName]
+        recs = self.sortSubsByDay(date)
         return RecordsWithSameSeasons(recs, date.dayName)
     
     def sortRecordsIntoDaysInWeek(self, week):
-        DateTime.checkDateTime(week)
-        days = [record for record in self if record.date.isSameWeek(week)]
+        days = self.sortSubsIntoDaysInWeek(week)
         return WeekRecord(days)
     
     def sortRecordsIntoDaysInMonth(self, month):
-        DateTime.checkDateTime(month)
-        days = [record for record in self if record.date.isSameMonth(month)]
+        days = self.sortSubsIntoDaysInMonth(month)
         return MonthRecord(days)
     
     #Week Sorting
     def sortRecordsByWeek(self, weekNum):
-        DateTime.checkDateTime(date)
-        records = []
-        for record in self:
-            if record.date.weekNum == int(weekNum): records.append(record)
+        records = self.sortSubsByWeek(weekNum)
         return WeekRecord(records)
 
     def sortRecordsIntoWeeksInMonth(self, month):
-        daysRec = self.sortRecordsIntoDaysInMonth(month)
-        weeksRec = daysRec.sortRecordsIntoWeeks()
+        weeksRec = self.sortSubsIntoWeeksInMonth(month)
         return weeksRec
     
     def sortRecordsIntoWeeksInYear(self): pass
     
     #Month Sorting
-    def sortRecordsByMonth(self, month): return self.sortRecordsIntoDaysInMonth(month)
+    def sortRecordsByMonth(self, month): return self.sortSubsByMonth(month)
     
     def sortRecordsIntoMonthsInYear(self, year):
-        DateTime.checkDateTime(year)
-        yearRecs = [record for record in self if record.date.isSameYear(year)]
+        yearRecs = self.sortSubsIntoMonthsInYear(year)
         year = YearRecord(yearRecs)
         year.sortRecordsIntoMonths()
         return year
@@ -391,14 +378,11 @@ class RecordsManager(ObjectsManager):
     
     #Year Sorting
     def sortRecordsByYear(self, year):
-        DateTime.checkDateTime(year)
-        recs = [rec for rec in self if rec.date.isSameYear(year)]
+        recs = self.sortSubsByYear(year)
         return YearRecord(recs)
 
     def sortRecordsIntoYears(self):
-        years = self.recordsYears
-        yearsRecs = [self.sortRecordsByYear(DateTime.creatDateTime(year=year)) for year in years]
-        
+        yearsRecs = self.sortSubsIntoYears()
         return SeasonRecord(yearsRecs)
 
 class RepaymentsManager(RecordsManager):

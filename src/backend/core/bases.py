@@ -353,7 +353,6 @@ class ObjectsManager(ObjectsMixins):
             assert last_.next == None, f'{self} is not the last.'
             return last_
     
-    
     def addSub(self, sub): self._subs.append(sub)
     
     def getSub(self, attrs_vals={}):
@@ -390,6 +389,64 @@ class ObjectsManager(ObjectsMixins):
         del self._subs
         self._subs = []
     
+    
+ ########## Sorting
+
+    def sortSubsByDate(self, date):
+        if date == None: date = DateTime.now()
+        DateTime.checkDateTime(date)
+
+        _rec = [rec for rec in self if str(rec.date) == str(date)]
+        return _rec
+    
+    #Day Sorting
+    def sortSubsByDay(self, date):
+        recs = [sub for sub in self if sub.date.dayName == date.dayName]
+        return recs
+    
+    def sortSubsIntoDaysInWeek(self, week):
+        DateTime.checkDateTime(week)
+        days = [sub for sub in self if sub.date.isSameWeek(week)]
+        return days
+    
+    def sortSubsIntoDaysInMonth(self, month):
+        DateTime.checkDateTime(month)
+        days = [sub for sub in self if sub.date.isSameMonth(month)]
+        return days
+    
+    #Week Sorting
+    def sortSubsByWeek(self, date):
+        DateTime.checkDateTime(date)
+        subs = []
+        for sub in self:
+            if sub.date.weekNum == int(date.weekNum): subs.append(sub)
+        return subs
+
+    def sortSubsIntoWeeksInMonth(self, month):
+        daysSub = self.sortSubsIntoDaysInMonth(month)
+        weeksSub = daysSub.sortSubsIntoWeeks()
+        return weeksSub
+    
+    def sortSubsIntoWeeksInYear(self): pass
+    
+    #Month Sorting
+    def sortSubsByMonth(self, month): return self.sortSubsIntoDaysInMonth(month)
+    
+    def sortSubsIntoMonthsInYear(self, year):
+        DateTime.checkDateTime(year)
+        yearSubs = [sub for sub in self if sub.date.isSameYear(year)]
+        return yearSubs
+    
+    #Year Sorting
+    def sortSubsByYear(self, year):
+        DateTime.checkDateTime(year)
+        recs = [rec for rec in self if rec.date.isSameYear(year)]
+        return recs
+
+    def sortSubsIntoYears(self):
+        years = self.subsYears
+        yearsSubs = [self.sortSubsByYear(DateTime.creatDateTime(year=year)) for year in years]
+        return yearsSubs
 
 
 

@@ -1,5 +1,5 @@
 
-from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings, Incomes, Transfers
+from .dc_records_managers import BroughtForwards, Rates, Contributions, Upfronts, Balances, BroughtToOffices, Excesses, Deficits, CardDues, DCErrors, Debits, Commissions, Savings, Incomes#, Transfers
 from ..core.accounts import DateTime, Account, AccountsManager
 
 
@@ -16,6 +16,12 @@ class DCAccount(Account):
         self.balances = Balances(self)
         
     def __int__(self): return int(self.balances)
+
+    @property
+    def _transfers(self): return self.incomes._transfers
+    @property
+    def transfers(self): return self.incomes.transfers
+
     
     @property
     def region(self):
@@ -74,9 +80,14 @@ class ClientAccount(DCAccount):
     @property
     def rate(self): return int(self.rates)
     @property
+    def _withdrawals(self): return self.debits._withdrawals
+    @property
     def withdrawals(self): return self.debits.withdrawals
     @property
+    def _paidouts(self): return self.debits._paidouts
+    @property
     def paidouts(self): return self.debits.paidouts
+
     def _balanceAccount(self, date=None):
         rate = int(self.rates)
         bal = int(self.broughtForwards) + int(self.savings) - int(self.upfronts.outstanding) - int(self.debits) - rate
@@ -106,7 +117,7 @@ class AreaAccount(DCAccount):
         self.broughtToOffices = BroughtToOffices(self)#
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
-        self.transfers = Transfers(self)
+        # self.transfers = Transfers(self)
         
         self.paidouts = 0
         self.withdrawals = 0
@@ -150,13 +161,13 @@ class AreaAccount(DCAccount):
         # print(broughtForwards)
         
     
-    def addTransfer(self, transfer, date=None): self.transfers.createRecord(transfer, date, notAdd=True)
+    # def addTransfer(self, transfer, date=None): self.transfers.createRecord(transfer, date, notAdd=True)
     
     def addBto(self, bto, date=None):
         clientsAccounts = self.clientsAccounts
 
         contributed = sum([acc.income(date) for acc in clientsAccounts])
-        transfers = sum([rec.money for rec in self.transfers.sortRecordsByDate(date)])
+        transfers = sum([rec.money for rec in self._transfers if rec.date == date])
         
         self.btos.createRecord(bto, date)
         bto += transfers

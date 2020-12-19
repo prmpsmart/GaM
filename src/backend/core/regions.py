@@ -204,7 +204,7 @@ class Region(Object):
             if monthAccount != None: subRegions.append(subRegion)
         return subRegions
     
-    def sortAccountsByMonth(self, month): return self.accountsManager.sortAccountsByMonth(month)
+    def sortAccountsByMonth(self, month): return self.accountsManager.sortSubsByMonth(month)
 
 
  ########## Sorting

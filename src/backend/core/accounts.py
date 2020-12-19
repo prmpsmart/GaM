@@ -105,42 +105,6 @@ class Account(Object):
     def _balanceAccount(self):
             pass
     def balanceAccount(self): self.notImp()
-    
-    
-   
-   ########## Sorting
-    #Date Sorting
-    def sortRecordManagersByDate(self, date): pass
-    
-    #Day Sorting
-    def sortRecordManagersByDay(self, day): pass
-    
-    def sortRecordManagersIntoDaysInWeek(self, week):
-        pass
-    def sortRecordManagersIntoDaysInMonth(self, month):
-        pass
-    
-    #Week Sorting
-    def sortRecordManagersByWeek(self):
-        pass
-    def sortRecordManagersIntoWeeksInMonth(self):
-        pass
-    def sortRecordManagersIntoWeeksInYear(self):
-        pass
-    
-    #Month Sorting
-    def sortRecordManagersByMonth(self, month): pass
-        
-    def sortRecordManagersIntoMonthsInYear(self):
-        pass
-    def sortRecordManagersIntoMonthsInYears(self):
-        pass
-    
-    #Year Sorting
-    def sortRecordManagersByYear(self):
-        pass
-    def sortRecordManagersIntoYears(self):
-        pass
 
 
 class AccountsManager(ObjectsManager):
@@ -219,72 +183,13 @@ class AccountsManager(ObjectsManager):
         subRegionsActiveByMonth = self.region.subRegionsActiveByMonth(month)
         accounts = []
         for subRegion in subRegionsActiveByMonth:
-            subRegionsAccounts = subRegion.sortAccountsByMonth(month)
+            subRegionsAccounts = subRegion.sortAccountsByMonth(month) or []
             accounts.extend(subRegionsAccounts)
         return accounts
     
     
- ########## Sorting
-  # SubRegions
-   #Date Sorting
-    def sortAccountsByDate(self, date):
-        DateTime.checkDateTime(date)
-        clientsByDate = [client for client in self.clients if client.regDate == date]
-        return clientsByDate
-   #Day Sorting
-    def sortAccountsByDay(self):
-        pass
-    def sortAccountsIntoDaysInWeek(self):
-        pass
-    def sortAccountsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortAccountsByWeek(self):
-        pass
-    def sortAccountsIntoWeeksInMonth(self):
-        pass
-    def sortAccountsIntoWeeksInYear(self):
-        pass
-    
    #Month Sorting
-    def sortAccountsByMonth(self, month):
-        accounts = [account for account in self.accounts if account.date.isSameMonth(month)]
-        return accounts
-    def sortAccountsIntoMonthsInYear(self):
-        pass
-    def sortAccountsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortAccountsByYear(self):
-        pass
-    def sortAccountsIntoYears(self):
-        pass
-
-  # Accounts Accounts
-   #Date Sorting
-    def sortAccountsAccountsByDate(self):
-        pass
-
-   #Day Sorting
-    def sortAccountsAccountsByDay(self):
-        pass
-    def sortAccountsAccountsIntoDaysInWeek(self):
-        pass
-    def sortAccountsAccountsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortAccountsAccountsByWeek(self):
-        pass
-    def sortAccountsAccountsIntoWeeksInMonth(self):
-        pass
-    def sortAccountsAccountsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortAccountsAccountsByMonth(self, month):
+    def sortClientsAccountsByMonth(self, month):
         DateTime.checkDateTime(month)
         clients = [client for client in self.clients if client.lastAccount.date.isSameMonth(month)]
         accounts = []
@@ -293,16 +198,6 @@ class AccountsManager(ObjectsManager):
             accounts.extend(clientAccounts)
         return accounts
         
-    def sortAccountsAccountsIntoMonthsInYear(self):
-        pass
-    def sortAccountsAccountsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortAccountsAccountsByYear(self):
-        pass
-    def sortAccountsAccountsIntoYears(self):
-        pass
 
 
 

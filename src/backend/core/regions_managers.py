@@ -48,42 +48,7 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
     
 
  ########## Sorting
-  # SubRegions
-   #Date Sorting
-    def sortRegionsByDate(self, date):
-        DateTime.checkDateTime(date)
-        clientsByDate = [client for client in self.clients if client.regDate == date]
-        return clientsByDate
-   #Day Sorting
-    def sortRegionsByDay(self):
-        pass
-    def sortRegionsIntoDaysInWeek(self):
-        pass
-    def sortRegionsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortRegionsByWeek(self):
-        pass
-    def sortRegionsIntoWeeksInMonth(self):
-        pass
-    def sortRegionsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortRegionsByMonth(self, month):
-        pass
-    def sortRegionsIntoMonthsInYear(self):
-        pass
-    def sortRegionsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortRegionsByYear(self):
-        pass
-    def sortRegionsIntoYears(self):
-        pass
-
+  
   # Regions Accounts
    #Date Sorting
     def sortRegionsAccountsByDate(self):

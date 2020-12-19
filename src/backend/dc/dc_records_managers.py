@@ -14,7 +14,7 @@ class DCRecordsManager(RecordsManager):
     
     def balance(self): return self.account.balanceAccount()
 
-class Transfers(DCRecordsManager): pass
+# class Transfers(DCRecordsManager): pass
 
 
 class Rates(DCRecordsManager):
@@ -116,28 +116,44 @@ class Contributions(DCRecordsManager):
     @property
     def contributed(self): return sum(cont.savings for cont in self)
 
+class Paidouts(DCRecordsManager): pass
+
+class Withdrawals(DCRecordsManager): pass
+
 class Debits(DCRecordsManager):
     lowest = Rates.lowest
     ObjectType = Debit
 
-    def addDebit(self, toDebit, **kwargs):
+    def addDebit(self, toDebit, _type='w', **kwargs):
         if self.checkMoney(toDebit):
             balance = int(self.account.balances)
-            if toDebit <= balance: self.createRecord(toDebit, **kwargs)
-            else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
-    @property
-    def withdrawals(self): return sum(int(rec) for rec in self if rec._type == 'withdrawal')
-    @property
-    def paidouts(self): return sum(int(rec) for rec in self if rec._type == 'paidout')
+            if toDebit <= balance:
+                if _type == 'w': self.account.withdrawals.createRecord(toDebit, **kwargs)
+                else: self._type = self.account.paidouts.createRecord(toDebit, **kwargs)
 
+                self.createRecord(toDebit, **kwargs)
+            else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
+   
 class Deficits(DCRecordsManager): pass
 
 class Excesses(DCRecordsManager): pass
 
-class Incomes(DCRecordsManager): pass
+class NormalIncome(DCRecordsManager): pass
+
+class Transfers(DCRecordsManager): pass
+
+class Incomes(DCRecordsManager):
+    ObjectType = Income
+
+    def addIncome(self, income, _type='n', **kwargs):
+        if _type == 'n': self.account.normals.createRecord(income, **kwargs)
+        else: self._type = self.account.transfers.createRecord(income, **kwargs)
+
+        self.createRecord(income, **kwargs)
+
 
 class Savings(DCRecordsManager):
-    
+
     def __init__(self, account):
         super().__init__(account)
     

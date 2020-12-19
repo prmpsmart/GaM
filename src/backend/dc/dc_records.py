@@ -28,8 +28,14 @@ class Contribution(DCRecord):
 class Debit(DCRecord):
 
      def __init__(self, manager, debit, _type='w', **kwargs):
-        if 'w' in _type: self._type = 'withdrawal'
+        if _type == 'w': self._type = 'withdrawal'
         else: self._type = 'paidout'
+
+        super().__init__(manager, debit, **kwargs)
+
+class Income(DCRecord):
+
+     def __init__(self, manager, debit, _type='n', **kwargs):
 
         super().__init__(manager, debit, **kwargs)
 
