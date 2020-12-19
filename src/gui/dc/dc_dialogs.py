@@ -63,7 +63,7 @@ class SupDCHome(PRMP_MainWindow):
 
         details = SupDCDetails(self.container, place=dict(relx=.02, rely=.005, relh=.18, relw=.96), region=region)
 
-        self.dc_overview = DC_Overview(self.container, place=dict(relx=.02, rely=.2, relh=.79, relw=.96), orient='h')
+        self.dc_overview = DC_Overview(self.container, place=dict(relx=.02, rely=.2, relh=.79, relw=.96), orient='h', region=region)
 
         self.paint()
 

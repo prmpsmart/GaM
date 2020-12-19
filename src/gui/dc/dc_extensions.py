@@ -106,9 +106,10 @@ class DC_Digits(FillWidgets, Frame):
 
 class DC_Overview(Frame):
     
-    def __init__(self, master, title='DC Overview', orient='v', **kwargs):
+    def __init__(self, master, title='DC Overview', orient='v', region=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
-        
+        self.region = region
+
         self.dcDigits = DC_Digits(self, relief='groove')
 
         self.plotDialog = Button(self, text='Plot Dialog')
@@ -119,6 +120,8 @@ class DC_Overview(Frame):
 
         if orient == 'v': self.placeVertically()
         else: self.placeHorizontally()
+
+        if region: self.updateDCDigits(region.lastAccount)
     
     def placeVertically(self):
         x, y = self.toplevel.geo
@@ -169,23 +172,25 @@ class SupDCDetails(FillWidgets, LabelFrame):
         self.set()
     
     def set(self):
-        values = dict(
-            persons=len(self.region.personsManager),
-            subs=len(self.region.subRegionsManager),
-            actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
-            accounts=len(self.region.accountsManager),
-            actSubsAccs=self.region.lastAccount.ledgerNumbers
-        )
+        if self.region:
+            values = dict(
+                persons=len(self.region.personsManager),
+                subs=len(self.region.subRegionsManager),
+                actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
+                accounts=len(self.region.accountsManager),
+                actSubsAccs=self.region.lastAccount.ledgerNumbers
+            )
 
-        super().set(values)
+            super().set(values)
     
     def openSNS(self):
-        if self.sns: self.sns.topmost()
+        if self.sns: self.sns.destroy()
         self.sns = SortNSearch(self, sup=self.region)
         self.sns.mainloop()
     
     def openObjDet(self):
-        if self.objdet: self.objdet.topmost()
+        if self.objdet:
+            self.objdet.destroy()
         self.objdet = ObjectDetails(self, sup=self.region)
         self.objdet.mainloop()
 

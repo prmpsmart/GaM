@@ -80,7 +80,6 @@ class FillWidgets:
     def resultsWidgets(self): return self.__resultsWidgets
     
     def set(self, values={}):
-        print(values)
         if values:
             for widgetName in self.resultsWidgets:
                 widget = self.getFromSelf(widgetName)
