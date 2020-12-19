@@ -115,7 +115,6 @@ class AccountsManager(ObjectsManager):
         ObjectsManager.__init__(self, region)
         
         self.addAccount = self.addSub
-        self.createAccount = self.createSub
         
         if autoAccount == True: self.createAccount(**kwargs)
         
@@ -126,6 +125,8 @@ class AccountsManager(ObjectsManager):
     def __str__(self):
         if self.region != None: return f'{self.region} | {self.className}'
         return f'{self.className}'
+    
+    def createAccount(self, **kwargs): return self.createSub(**kwargs)
     
     @property
     def firstAccount(self): return self.first

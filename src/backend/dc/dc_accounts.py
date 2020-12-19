@@ -57,9 +57,10 @@ class DCAccountsManager(AccountsManager):
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
     
-    def __init__(self, manager, ledgerNumber=0, rate=0, **kwargs):
+    def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, **kwargs):
         super().__init__(manager, **kwargs)
         rate = int(rate)
+        self.areaAccount = areaAccount
         self.ledgerNumber = ledgerNumber
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate)
@@ -106,6 +107,13 @@ class AreaAccount(DCAccount):
         self.broughtToOffices = BroughtToOffices(self)
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
+        self.ledgerNumbers = 0
+        self._clientsAccounts = []
+    
+    def addClientAccount(self, account):
+        self._clientsAccounts.append(account)
+        self.ledgerNumbers = len(self._clientsAccounts)
+
     
     @property
     def recordsManagers(self):
@@ -169,14 +177,20 @@ class ClientAccountsManager(DCAccountsManager):
     @property
     def areaAccountsManager(self): return self.master.accountsManager
     
-    def createAccount(self, rate=0, **kwargs):
+    def createAccount(self, rate=0, month=None, **kwargs):
         # prmp needs proper thinking
         # get total accounts for current month from the area account manager
-        lastAccount = self.lastAccount
-        lastLedgerNumber = lastAccount.ledgerNumber if lastAccount else 0
-        ledgerNumber = lastLedgerNumber + 1
-        print(ledgerNumber)
-        return super().createAccount(rate=rate, ledgerNumber=ledgerNumber, **kwargs)
+        area = self.region.sup
+        areaAcc = area.accountsManager.getAccount(month)
+        if areaAcc:
+            ledgerNumber = areaAcc.ledgerNumbers + 1 if areaAcc else 1
+
+            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, **kwargs)
+
+            areaAcc.addClientAccount(acc)
+            return acc
+
+        else: raise self.Error.AccountError(f'{area} does not have an account in {month} ')
 
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
