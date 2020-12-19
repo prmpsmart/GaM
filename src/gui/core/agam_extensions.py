@@ -1,6 +1,9 @@
 from .prmp_gui.extensions import *
 from .agam_dialogs import *
 from ...backend.core.date_time import MONTHS_NAMES, DAYS_NAMES, DateTime
+from ...backend.agam.agam import AGAM
+from ...backend.dc.dc_regions import Client
+
 
 class RegionRadioCombo(RadioCombo):
     
@@ -302,9 +305,19 @@ class RegionDetails(FillWidgets, LabelFrame):
         vs = ['office', 'department', 'sup', 'sub']
         values = {}
 
-        hie = region.hie
+        hie = region.hie[1:]
+        ln = len(hie)
+        co = 0
 
-        print(hie)
+        for h in hie:
+            if isinstance(h, AGAM):
+                co += 1
+                continue
+            ind = hie.index(h)
+            key = vs[ind-co]
+            values[key] = h.name
+        
+        super().set(values)
 
 
 class FurtherDetails(FillWidgets, LabelFrame):
@@ -341,9 +354,9 @@ class FurtherDetails(FillWidgets, LabelFrame):
         self.set()
     
     def set(self):
-        if self.region:
+        if self.region and not isinstance(self.region, Client):
             values = dict(
-                persons=len(self.region.personsManager),
+                persons=len(self.region.personsManager or []),
                 subs=len(self.region.subRegionsManager),
                 actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
                 accounts=len(self.region.accountsManager),
@@ -362,6 +375,12 @@ class FurtherDetails(FillWidgets, LabelFrame):
             self.objdet.destroy()
         self.objdet = self.OBJDET(self, sup=self.region)
         self.objdet.mainloop()
+
+
+
+
+
+
 
 
 

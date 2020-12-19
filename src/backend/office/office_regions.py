@@ -37,6 +37,10 @@ class Office(Region):
         self.__coopOffice = CoopOffice(manager=self, sup=self, number=1)
         self.__dcOffice = DCOffice(manager=self, sup=self, number=2)
     
+    def __str__(self):
+        master = self.manager if self.strManager else self.manager.master
+        return f'{master} | {self.name}'
+
     @property
     def dcOffice(self): return self.__dcOffice
     @property
@@ -69,8 +73,8 @@ class SubOffice(Region):
     Manager = 'Office'
 
     def __str__(self):
-        master = self.manager if self.strManager else self.manager.master
-        return f'{master} | {self.name} '
+        master = self.manager if self.strManager else self.manager
+        return f'{master} | {self.name}'
     @property
     def name(self):
         _name = self.manager if self.strManager else self.manager.name

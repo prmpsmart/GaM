@@ -115,7 +115,6 @@ class Region(Object):
     @property
     def level(self): return len(self.hierachy)
     
-    
     @property
     def idText(self):
         text = ''
