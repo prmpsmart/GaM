@@ -56,9 +56,10 @@ class Client(DCRegion):
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
     
-    def addContribution(self, contribution, month=None):
+    def addContribution(self, contribution, month=None, **kwargs):
         if month == None: month = DateTime.now()
-        pass
+        account = self.accountsManager.sortSubsByMonth(month)[0]
+        account.addContribution(contribution, **kwargs)
     
     def addPaid(self, paid, month):
         if month == None: month = DateTime.now()

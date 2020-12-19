@@ -16,6 +16,7 @@ class DCAccount(Account):
         self.balances = Balances(self)
 
         self.transfers = Transfers(self)
+        self.normalIncomes = NormalIncomes(self)
         self.paidouts = Paidouts(self)
         self.withdrawals = Withdrawals(self)
 
@@ -85,7 +86,7 @@ class ClientAccount(DCAccount):
         
         if bal: self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 
-    def addContribution(self, contribution): self.contributions.addContribution(contribution)
+    def addContribution(self, contribution, **kwargs): self.contributions.addContribution(contribution, **kwargs)
     
     def addDebit(self, debit, up=1, _type='w'):
         if up: self._balanceAccount()
@@ -135,6 +136,8 @@ class AreaAccount(DCAccount):
             self.withdrawals.updateWithOtherManagers([account.withdrawals for account in clientsAccounts])
             
             self.transfers.updateWithOtherManagers([account.transfers for account in clientsAccounts])
+
+            self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in clientsAccounts])
         
         broughts = 0
         clients = self.region.clients

@@ -84,7 +84,7 @@ class Contributions(DCRecordsManager):
         if payUpBal != -1:
             if payup == payUpBal: self.account.rates.changeRate(rate)
 
-    def addContribution(self, contribution, note=None, **kwargs):
+    def addContribution(self, contribution, note=None, _type='n', **kwargs):
         assert contribution != 0, 'Contributions can not be zero.'
         newContributions = int(self) + contribution
         if newContributions < 32:
@@ -105,7 +105,7 @@ class Contributions(DCRecordsManager):
             else: self.savings.addSaving(contribution * self.account.rate, **kwargs)
 
             self.createRecord(contribution, note=_note, **kwargs)
-            self.account.incomes.createRecord(contribution*self.account.rate, note=_note, **kwargs)
+            self.account.incomes.addIncome(contribution*self.account.rate, note=_note, _type=_type, **kwargs)
                 
             # self.balance()
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
@@ -144,8 +144,8 @@ class Deficits(DCRecordsManager):
 class Excesses(DCRecordsManager):
     ObjectType = Excesse
 
-class NormalIncome(DCRecordsManager):
-    ObjectType = NormalIncom
+class NormalIncomes(DCRecordsManager):
+    ObjectType = NormalIncome
 
 class Transfers(DCRecordsManager):
     ObjectType = Transfer
@@ -154,7 +154,7 @@ class Incomes(DCRecordsManager):
     ObjectType = Income
 
     def addIncome(self, income, _type='n', **kwargs):
-        if _type == 'n': self.account.normals.createRecord(income, **kwargs)
+        if _type == 'n': self.account.normalIncomes.createRecord(income, **kwargs)
         else: self._type = self.account.transfers.createRecord(income, **kwargs)
 
         self.createRecord(income, **kwargs)
