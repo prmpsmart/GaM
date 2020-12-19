@@ -44,8 +44,9 @@ class DC_Digits(FillWidgets, Frame):
         Label(balances, text='B-T-Os', place=dict(relx=.03, rely=.4, relh=.18, relw=.48))
         Label(balances, text='Deficits', place=dict(relx=.03, rely=.6, relh=.18, relw=.48))
         Label(balances, text='Excesses', place=dict(relx=.03, rely=.8, relh=.18, relw=.48))
-
-        self.balances = Entry_Label(balances, text='₦ 1,080,000', place=dict(relx=.03, rely=0, relh=.18, relw=.94), font=font)
+        fon = font.copy()
+        fon['size'] = 15
+        self.balances = Entry_Label(balances, text='₦ 1,080,000', place=dict(relx=.03, rely=0, relh=.18, relw=.94), font=fon)
         self.broughts = Entry_Label(balances, text='₦ 500,000br', place=dict(relx=.53, rely=.2, relh=.18, relw=.44))
         self.btos = Entry_Label(balances, text='₦ 30,000bto', place=dict(relx=.53, rely=.4, relh=.18, relw=.44))
         self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))
@@ -148,7 +149,7 @@ class DC_Overview(Frame):
         self.plotCanvas2.place(relx=.375, rely=.52, relh=.48, relw=.625)
 
     def placeHorizontally(self):
-        self.month.place(relx=.005, rely=.004, relh=.05, relw=.3)
+        self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
         self.ledgerNumber.place(relx=.31, rely=.004, relh=.05, relw=.2)
         self._prev.place(relx=.694, rely=.007, relh=.04, relw=.12)
         self._next.place(relx=.816, rely=.007, relh=.04, relw=.08)
@@ -160,7 +161,11 @@ class DC_Overview(Frame):
     
     def updateDCDigits(self, account):
         self.account = account
+        self.month.set(self.formatMonth(account.date))
+        if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
         self.dcDigits.update(account)
+    
+    def formatMonth(self, month): return f'{month.monthName} {month.year}'
 
     def next(self):
         _next = self.account.next
