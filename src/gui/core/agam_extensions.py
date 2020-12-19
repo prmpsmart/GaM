@@ -280,9 +280,18 @@ class SubsList(LabelFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
         
-        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=0, relh=.865, relw=1))
+        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=0, relh=.865, relw=1), callback=self.clicked)
 
         self.total = LabelLabel(self, place=dict(relx=0, rely=.87, relh=.12, relw=.8), topKwargs=dict(text='Total Subs'), orient='h')
+
+        self.listbox.bind('<Double-1>', self.clicked)
+
+    def set(self, sup, subType):
+        subs = sup[subType] or []
+        self.listbox.set(subs, 'name')
+    
+    def clicked(self, e=0, selected):
+        print(e)
 
 
 class RegionDetails(FillWidgets, LabelFrame):

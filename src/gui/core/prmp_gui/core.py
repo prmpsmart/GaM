@@ -2313,10 +2313,21 @@ MainWindow = PMW = PRMP_MainWindow
 
 class PRMP_ListBox(PRMP_Frame):
     
-    def __init__(self, master=None, columns=[], **kwargs):
+    def __getattr__(self, attr):
+        ret = self.getFromSelf(attr, self._unget)
+        if ret != self._unget: return ret
+        else: return getattr(self.listbox, attr)
+
+    def __init__(self, master=None, columns=[], callback=None, **kwargs):
         super().__init__(master=master, **kwargs)
 
+        self.values = {}
+        self.last = None
+        self.callback = callback
+
         self.listbox = PRMP_Listbox(self)
+        self.listbox.bind('<<ListboxSelect>>', self.clicked)
+
         self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.listbox.xview))
         self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.listbox.yview))
         self.listbox.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
@@ -2326,14 +2337,35 @@ class PRMP_ListBox(PRMP_Frame):
         self.yscrollbar.pack(side="right", fill="y")
         bound_to_mousewheel(0, self)
     
-    def set(self, values):
-        pass
+    def clear(self): self.delete(0, self.last)
+    
+    def set(self, values, showAttr=''):
+        self.clear()
+        self.last = len(values) or 1
+        for val in values:
+            st = getattr(val, showAttr, None) or str(val)
+            self.values[st] = val
+            self.listbox.insert(0, st)
+    
+    def clicked(self, e=0):
+        if self.callback: self.callback(e, self.selected)
+
+    @property
+    def selected(self):
+        sel = self.listbox.curselection()
+        return self.values[sel]
+
 
 ListBox = PLB = PRMP_ListBox
 
 class PRMP_TreeView(PRMP_Frame):
     __shows = ['tree', 'headings']
     __slots__ = ['tree']
+    
+    # def __getattr__(self, attr):
+        # ret = self.getFromSelf(attr, self._unget)
+        # if ret != self._unget: return ret
+        # else: return getattr(self.treeview, attr)
     
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, **kwargs)

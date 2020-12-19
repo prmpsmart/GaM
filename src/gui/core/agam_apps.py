@@ -196,6 +196,7 @@ class SortNSearch(PRMP_MainWindow):
 
 
 class ObjectDetails(PRMP_MainWindow):
+    
     def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
@@ -218,9 +219,7 @@ class ObjectDetails(PRMP_MainWindow):
     
     def changeSubs(self, e=0):
         subType = self.subType.get()
-        if self._sup:
-            subs = self._sup[subType]
-            print(subs)
+        if self._sup: self.subsList.set(self._sup, subType)
     
     def openSup(self):
         pass
