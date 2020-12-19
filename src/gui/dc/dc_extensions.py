@@ -76,12 +76,12 @@ class DC_Digits(FillWidgets, Frame):
         
             debits=int(debits),
 
-            withdrawals=account.withdrawals,
-            paidouts=account.paidouts,
+            withdrawals=int(account.withdrawals),
+            paidouts=int(account.paidouts),
         
             upfronts=int(upfronts),
-            repaid=upfronts.repaid,
-            overdue=upfronts.overdue,
+            repaid=int(upfronts.repaid),
+            overdue=int(upfronts.overdue),
 
             balances=int(account.balances),
             broughts=int(account.broughtForwards))

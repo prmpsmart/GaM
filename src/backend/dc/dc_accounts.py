@@ -139,12 +139,6 @@ class AreaAccount(DCAccount):
 
             self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in clientsAccounts])
         
-        broughts = 0
-        clients = self.region.clients
-        broughtForwards = [cl.lastAccount.broughtForwards for cl in clients]
-        self.broughtForwards.updateWithOtherManagers(broughtForwards)
-
-        # print(broughtForwards)
     
     def addBto(self, bto, date=None):
         clientsAccounts = self.clientsAccounts
