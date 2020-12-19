@@ -55,19 +55,6 @@ class ClientDialog(PersonDialog):
         print(result)
 
 
-class SupDCHome(PRMP_MainWindow):
-    def __init__(self, master=None, geo=(1000, 850), title='DC Home', region=None, **kwargs):
-        super().__init__(master, geo=geo, title=title, **kwargs)
-
-        self.region = region
-
-        details = SupDCDetails(self.container, place=dict(relx=.02, rely=.005, relh=.18, relw=.96), region=region)
-
-        self.dc_overview = DC_Overview(self.container, place=dict(relx=.02, rely=.2, relh=.79, relw=.96), orient='h', region=region)
-
-        self.paint()
-
-
 
 
 

@@ -104,6 +104,7 @@ class Hierachy(PRMP_TreeView):
                 else: self.RD(self, region=current)
 H = Hierachy
 
+
 class OfficeDetails(LabelFrame):
     def __init__(self, master=None, text='Office Details', office=None, **kwargs):
         super().__init__(master=master, text=text, **kwargs)
@@ -272,25 +273,6 @@ class SearchDetails(Notebook):
         self.tab(2, text='Date', compound='left', underline='-1')
 
 
-class SortNSearch(PRMP_MainWindow):
-    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.27, sup=None):
-        super().__init__(master, title=title, geo=geo)
-
-        self._sup = sup
-
-        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=sup), command=self.openSup)
-
-        
-        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.05, relh=.99-.04-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
-
-        self.details = SearchDetails(self.container, place=dict(relx=.005, rely=.05, relh=longent, relw=.99), results=self.results, sup=sup)
-
-        self.paint()
-    
-    def openSup(self):
-        pass
-    
-
 class SubsList(LabelFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
@@ -300,27 +282,91 @@ class SubsList(LabelFrame):
         self.total = LabelLabel(self, place=dict(relx=0, rely=.87, relh=.12, relw=.8), topKwargs=dict(text='Total Subs'), orient='h')
 
 
-class ObjectDetails(PRMP_MainWindow):
-    def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
-        super().__init__(master, geo=geo, title=title, **kwargs)
+class RegionDetails(FillWidgets, LabelFrame):
+    def __init__(self, master, region=None, **kwargs):
+        LabelFrame.__init__(self, master, **kwargs)
+        FillWidgets.__init__(self)
 
-        self.sup = sup
+        self.region = region
 
-        sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
-        
-        self.region = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Region'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup))
+        self.office = LabelLabel(self, topKwargs=dict(text='Office'), place=dict(relx=.02, rely=0, relh=.23, relw=.96), orient='h', longent=.3)
+        self.department = LabelLabel(self, topKwargs=dict(text='Department'), place=dict(relx=.02, rely=.24, relh=.23, relw=.96), orient='h', longent=.3)
+        self.sup = LabelLabel(self, topKwargs=dict(text='Superscript'), place=dict(relx=.02, rely=.48, relh=.23, relw=.96), orient='h', longent=.3)
+        self.sub = LabelLabel(self, topKwargs=dict(text='Subscript'), place=dict(relx=.02, rely=.72, relh=.23, relw=.96), orient='h', longent=.3)
 
-        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']), orient='h', longent=.4)
+        self.addResultsWidgets(['office', 'department', 'sup', 'sub'])
 
-        self.dialog = Checkbutton(sups, place=dict(relx=.577, rely=.16, relh=.07, relw=.35), text='Dialog?')
-        
-        self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs')
-
-        self.subs = TreeView(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
-        
-        self.paint()
+        self.set(region)
     
-    def openSup(self):
-        pass
+    def set(self, region):
+        vs = ['office', 'department', 'sup', 'sub']
+        values = {}
+
+        hie = region.hie
+
+        print(hie)
+
+
+class FurtherDetails(FillWidgets, LabelFrame):
+    def __init__(self, master, text='Details', region=None, **kwargs):
+        LabelFrame.__init__(self, master, text=text, **kwargs)
+
+        self.region = region
+        FillWidgets.__init__(self)
+        
+        self.persons = LabelButton(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.22, relw=.4), orient='h', longent=.5)
+
+        self.subs = LabelButton(self, topKwargs=dict(config=dict(text='Total Subs', anchor='center')), place=dict(relx=.02, rely=.24, relh=.22, relw=.4), orient='h', longent=.55)
+
+        self.accounts = LabelButton(self, topKwargs=dict(config=dict(text='Total Accounts', anchor='center')), place=dict(relx=.02, rely=.46, relh=.22, relw=.4), orient='h', longent=.65)
+
+        self.actSubs = LabelButton(self, topKwargs=dict(config=dict(text='Active Subs', anchor='center')), place=dict(relx=.02, rely=.68, relh=.22, relw=.4), orient='h')
+
+        self.actSubsAccs = LabelButton(self, topKwargs=dict(config=dict(text='Active Subs Accounts', anchor='center')), place=dict(relx=.48, rely=0, relh=.22, relw=.5), orient='h', longent=.7)
+
+        Button(self, place=dict(relx=.73, rely=.44, relh=.22, relw=.25), text='Object Details', command=self.openObjDet)
+
+        Button(self, place=dict(relx=.73, rely=.68, relh=.22, relw=.25), text='Sort and Search', command=self.openSNS)
+
+        self.sns = None
+        self.objdet = None
+
+        from .agam_apps import SortNSearch, ObjectDetails
+
+        self.SNS = SortNSearch
+        self.OBJDET = ObjectDetails
+
+        self.addResultsWidgets(['persons', 'subs', 'actSubs', 'accounts', 'actSubsAccs'])
+
+        self.set()
+    
+    def set(self):
+        if self.region:
+            values = dict(
+                persons=len(self.region.personsManager),
+                subs=len(self.region.subRegionsManager),
+                actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
+                accounts=len(self.region.accountsManager),
+                actSubsAccs=self.region.lastAccount.ledgerNumbers
+            )
+
+            super().set(values)
+    
+    def openSNS(self):
+        if self.sns: self.sns.destroy()
+        self.sns = self.SNS(self, sup=self.region)
+        self.sns.mainloop()
+    
+    def openObjDet(self):
+        if self.objdet:
+            self.objdet.destroy()
+        self.objdet = self.OBJDET(self, sup=self.region)
+        self.objdet.mainloop()
+
+
+
+
+
+
 
 

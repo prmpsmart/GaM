@@ -197,18 +197,3 @@ class SupDCDetails(FillWidgets, LabelFrame):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

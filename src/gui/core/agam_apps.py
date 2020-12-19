@@ -1,7 +1,7 @@
 from .agam_extensions import *
 
 
-class RegionDetails(PRMP_MainWindow, FillWidgets):
+class RegionLookUp(PRMP_MainWindow, FillWidgets):
     
     def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, tm=1, gaw=1, **kwargs):
         
@@ -36,7 +36,6 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         if person: self.set(dict(image=person.image))
 
         # self.loadAccounts(region)
-
     
     def _setupApp(self):
         # hierachy
@@ -47,15 +46,15 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('sub')
         
-        self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Office', style='Group.TRadiobutton', variable=self.hierachyVar, value='off')), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', relx=.02, rely=0, relh=.25, relw=.96, longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1)
+        self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Office', style='Group.TRadiobutton', variable=self.hierachyVar, value='off')), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', place=dict(relx=.02, rely=0, relh=.25, relw=.96), longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1, tttk=1)
         
-        self.department = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Department', style='Group.TRadiobutton', variable=self.hierachyVar, value='dep')), orient='h', relx=.02, rely=.25, relh=.25, relw=.96, longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1)
+        self.department = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Department', style='Group.TRadiobutton', variable=self.hierachyVar, value='dep')), orient='h', place=dict(relx=.02, rely=.25, relh=.25, relw=.96), longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1, tttk=1)
         self.office.addReceiver(self.department.receiver)
         
-        self.sup = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Superscript', style='Group.TRadiobutton', variable=self.hierachyVar, value='sup')), orient='h', relx=.02, rely=.5, relh=.25, relw=.96, longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1)
+        self.sup = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Superscript', style='Group.TRadiobutton', variable=self.hierachyVar, value='sup')), orient='h', place=dict(relx=.02, rely=.5, relh=.25, relw=.96), longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1, tttk=1)
         self.department.addReceiver(self.sup.receiver)
         
-        self.sub = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Subscript', value='sub', style='Group.TRadiobutton', variable= self.hierachyVar)), orient='h', relx=.02, rely=.75, relh=.25, relw=.96, longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1)
+        self.sub = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Subscript', value='sub', style='Group.TRadiobutton', variable= self.hierachyVar)), orient='h', place=dict(relx=.02, rely=.75, relh=.25, relw=.96), longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1, tttk=1)
         self.sup.addReceiver(self.sub.receiver)
         
         # workers in the region or the individual 
@@ -174,5 +173,47 @@ class RegionDetails(PRMP_MainWindow, FillWidgets):
         
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
         self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
-RD = RegionDetails
+RLU = RegionLookUp
 
+
+class SortNSearch(PRMP_MainWindow):
+    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.27, sup=None):
+        super().__init__(master, title=title, geo=geo)
+
+        self._sup = sup
+
+        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=sup), command=self.openSup)
+
+        
+        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.05, relh=.99-.04-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
+
+        self.details = SearchDetails(self.container, place=dict(relx=.005, rely=.05, relh=longent, relw=.99), results=self.results, sup=sup)
+
+        self.paint()
+    
+    def openSup(self):
+        pass
+
+
+class ObjectDetails(PRMP_MainWindow):
+    def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
+        super().__init__(master, geo=geo, title=title, **kwargs)
+
+        self.sup = sup
+
+        sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
+        
+        self.region = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Region'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup))
+
+        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']), orient='h', longent=.4)
+
+        self.dialog = Checkbutton(sups, place=dict(relx=.577, rely=.16, relh=.07, relw=.35), text='Dialog?')
+        
+        self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs')
+
+        self.subs = TreeView(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
+        
+        self.paint()
+    
+    def openSup(self):
+        pass

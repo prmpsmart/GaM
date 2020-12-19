@@ -98,7 +98,7 @@ class Member(CoopRegion):
         super().__init__(manager=manager, name=name, **kwargs)
         
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | M{self.number}'
+    def spacedID(self): return f'{super().spacedID} | M{self.number}'
     @property
     def unit(self): return self.manager.unit
     @property
@@ -143,7 +143,7 @@ class Unit(CoopRegion):
         super().__init__(manager, nameFromNumber=True, **kwargs)
         
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | U{self.number}'
+    def spacedID(self): return f'{super().spacedID} | U{self.number}'
     
     @property
     def office(self): return self.manager.office

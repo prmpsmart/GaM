@@ -47,7 +47,7 @@ class Office(Region):
     
     def setMoneySign(self, sign='$'): Mixins._moneySign = sign
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | {self.name}'
+    def spacedID(self): return f'{super().spacedID} | {self.name}'
 
 
 class OfficesManager(RegionsManager):
@@ -78,7 +78,7 @@ class SubOffice(Region):
     @property
     def office(self): return self.manager
     @property
-    def spacedID(self): return super().spacedID + f' | {self.DEPARTMENT} '
+    def spacedID(self): return f'{super().spacedID} | {self.DEPARTMENT} '
 
 class DCOffice(SubOffice):
     AccountsManager = DCOfficeAccountsManager

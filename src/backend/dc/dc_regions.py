@@ -43,7 +43,7 @@ class Client(DCRegion):
 
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | C{self.number}'
+    def spacedID(self): return f'{super().spacedID} | C{self.number}'
     @property
     def area(self): return self.manager.area
     
@@ -96,7 +96,7 @@ class Area(DCRegion):
     def __str__(self): return f'{self.manager.master} | {self.name}'
     
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | A{self.number}'
+    def spacedID(self): return f'{super().spacedID} | A{self.number}'
     @property
     def otherName(self): return self.__otherName
     @property
