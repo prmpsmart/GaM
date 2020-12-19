@@ -270,14 +270,17 @@ class SearchDetails(Notebook):
 
 
 class SortNSearch(PRMP_MainWindow):
-    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.28, sup=None):
+    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.27, sup=None):
         super().__init__(master, title=title, geo=geo)
 
-        self.sup = sup
+        self._sup = sup
 
-        self.details = SearchDetails(self.container, place=dict(relx=.005, rely=.005, relh=longent, relw=.99))
+        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'))
+        # longent -= .12
+
+        self.details = SearchDetails(self.container, place=dict(relx=.005, rely=.05, relh=longent, relw=.99))
         
-        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.005, relh=.99-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
+        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.05, relh=.99-.04-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
 
         self.paint()
 

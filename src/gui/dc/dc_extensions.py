@@ -168,7 +168,6 @@ class SupDCDetails(FillWidgets, LabelFrame):
 
         self.set()
     
-    @property
     def set(self):
         values = dict(
             persons=len(self.region.personsManager),
