@@ -145,7 +145,7 @@ class SupDCDetails(FillWidgets, LabelFrame):
         LabelFrame.__init__(self, master, text=text, **kwargs)
 
         self.region = region
-        FillWidgets.__init__(self, self.derivedValues)
+        FillWidgets.__init__(self)
         
         self.persons = LabelButton(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.35, relw=.2), orient='h', longent=.5)
 
@@ -163,9 +163,13 @@ class SupDCDetails(FillWidgets, LabelFrame):
 
         self.sns = None
         self.objdet = None
+
+        self.addResultsWidgets(['persons', 'subs', 'actSubs', 'accounts', 'actSubsAccs'])
+
+        self.set()
     
     @property
-    def derivedValues(self):
+    def set(self):
         values = dict(
             persons=len(self.region.personsManager),
             subs=len(self.region.subRegionsManager),
@@ -173,6 +177,8 @@ class SupDCDetails(FillWidgets, LabelFrame):
             accounts=len(self.region.accountsManager),
             actSubsAccs=self.region.lastAccount.ledgerNumbers
         )
+
+        super().set(values)
     
     def openSNS(self):
         if self.sns: self.sns.topmost()
