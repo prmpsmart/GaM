@@ -84,7 +84,6 @@ class RegionRadioCombo(RadioCombo):
         return keys
 RRC = RegionRadioCombo
 
-
 class Hierachy(PRMP_TreeView):
     __shows = ['tree', 'headings']
     __slots__ = ['tree']
@@ -277,21 +276,23 @@ class SearchDetails(Notebook):
 
 
 class SubsList(LabelFrame):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, listboxConfig={}, **kwargs):
         super().__init__(master, **kwargs)
         
-        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=0, relh=.865, relw=1), callback=self.clicked)
+        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=0, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=.87, relh=.12, relw=.8), topKwargs=dict(text='Total Subs'), orient='h')
+        self.total = LabelLabel(self, place=dict(relx=0, rely=.87, relh=.12, relw=.5), topKwargs=dict(text='Total Subs'), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
 
         self.listbox.bind('<Double-1>', self.clicked)
 
     def set(self, sup, subType):
         subs = sup[subType] or []
         self.listbox.set(subs, 'name')
+        self.total.set(self.listbox.last)
     
-    def clicked(self, e=0, selected=None):
-        print(e, selected)
+    def clicked(self, selected=None, event=None):
+        selected = selected[0]
+
 
 
 class RegionDetails(FillWidgets, LabelFrame):

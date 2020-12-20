@@ -410,7 +410,7 @@ class PRMP_Theme(Mixins):
 
             elif wt == 'Scale': _dict.update(dict(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR))
                 
-            elif wt in ['Entry', 'Text']:
+            elif wt in ['Entry', 'Text', 'Listbox']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
                 font = self.deriveFont(default='DEFAULT_FONT')
@@ -2312,20 +2312,21 @@ MainWindow = PMW = PRMP_MainWindow
 #   scrollable widgets
 
 class PRMP_ListBox(PRMP_Frame):
+    selection_modes = ['single', 'browse', 'multiple', 'extended']
     
     def __getattr__(self, attr):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
         else: return getattr(self.listbox, attr)
 
-    def __init__(self, master=None, columns=[], callback=None, **kwargs):
+    def __init__(self, master=None, columns=[], callback=None, listboxConfig={}, **kwargs):
         super().__init__(master=master, **kwargs)
 
-        self.values = {}
+        self.values = []
         self.last = None
         self.callback = callback
 
-        self.listbox = PRMP_Listbox(self)
+        self.listbox = PRMP_Listbox(self, config=listboxConfig)
         self.listbox.bind('<<ListboxSelect>>', self.clicked)
 
         self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.listbox.xview))
@@ -2335,25 +2336,31 @@ class PRMP_ListBox(PRMP_Frame):
         self.xscrollbar.pack(side="bottom", fill="x")
         self.listbox.pack(side='left', fill='both', expand=1)
         self.yscrollbar.pack(side="right", fill="y")
+
         bound_to_mousewheel(0, self)
     
     def clear(self): self.delete(0, self.last)
     
     def set(self, values, showAttr=''):
         self.clear()
-        self.last = len(values) or 1
+        self.last = len(values)
         for val in values:
             st = getattr(val, showAttr, None) or str(val)
-            self.values[st] = val
-            self.listbox.insert(0, st)
+            self.listbox.insert('end', st)
+        self.values = values
     
     def clicked(self, e=0):
-        if self.callback: self.callback(e, self.selected)
+        if self.callback:
+            selected = self.selected
+            if selected: self.callback(selected=self.selected, event=e)
 
     @property
     def selected(self):
-        sel = self.listbox.curselection()
-        return self.values[sel]
+        sels = self.listbox.curselection()
+        if sels:
+            select = []
+            for sel in sels: select.append(self.values[sel])
+            return select
 
 
 ListBox = PLB = PRMP_ListBox

@@ -211,17 +211,22 @@ class ObjectDetails(PRMP_MainWindow):
 
         self.dialog = Checkbutton(sups, place=dict(relx=.577, rely=.16, relh=.07, relw=.35), text='Dialog?')
         
-        self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs')
+        self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
-        self.subs = TreeView(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
+        self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
         
         self.paint()
     
+    @property
+    def selectedSubType(self): return self.subType.get()
+    
     def changeSubs(self, e=0):
-        subType = self.subType.get()
-        if self._sup: self.subsList.set(self._sup, subType)
+        if self._sup: self.subsList.set(self._sup, selectedSubType)
     
     def openSup(self):
+        pass
+
+    def selected(self, ):
         pass
 
 
