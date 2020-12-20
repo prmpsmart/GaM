@@ -1,5 +1,7 @@
 from .agam_extensions import *
-from ...backend.core.regions import Region
+from ...backend.core.regions_managers import Region, RegionsManager
+from ...backend.core.records_managers import Record, RecordsManager
+from ...backend.core.accounts import Account, AccountsManager
 
 
 class RegionLookUp(PRMP_MainWindow, FillWidgets):
@@ -207,8 +209,7 @@ class ObjectDetails(PRMP_MainWindow):
         
         self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup.name if sup else 'Name'))
 
-        self.subTypes = ['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']
-        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=self.subTypes), orient='h', longent=.4, func=self.changeSubs)
+        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=sup.subTypes if sup else []), orient='h', longent=.4, func=self.changeSubs)
 
         self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='datebutton', top='checkbutton', bottomKwargs=dict())
 
@@ -222,9 +223,9 @@ class ObjectDetails(PRMP_MainWindow):
     def selectedSubType(self): return self.subType.get()
 
     def getSubs(self):
-        subs = self._sup[self.selectedSubType] or []
-        if issubclass(self._sup.region.class_, Region): print(9)
-        else: print(self._sup.class_)
+        subType = self.selectedSubType
+        subs = self._sup[subType] or []
+        print(subType, subs)
         return subs
     
     def changeSubs(self, e=0):
@@ -237,9 +238,6 @@ class ObjectDetails(PRMP_MainWindow):
 
     def selected(self, obj):
         print(obj)
-
-
-
 
 
 

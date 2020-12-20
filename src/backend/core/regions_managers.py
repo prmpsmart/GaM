@@ -2,6 +2,7 @@ from .regions import *
 
 class RegionsManager(ObjectsManager, ObjectsMixins):
     ObjectType = Region
+    subTypes = ['Regions']
     
     def __init__(self, master):
         ObjectsManager.__init__(self, master)
@@ -93,9 +94,14 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
 
 class PersonsManager(ObjectsManager):
     ObjectType = Person
+    subTypes = ['Persons']
+
     @property
     def lastPerson(self): return self.last
     def createPerson(self, **kwargs): return self.createSub(**kwargs)
+
+
+
 
 
 

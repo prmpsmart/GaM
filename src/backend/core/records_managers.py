@@ -213,6 +213,7 @@ class RecordsWithSameSeasons(SeasonRecord):
 class RecordsManager(ObjectsManager):
     lowest = 50
     ObjectType = Record
+    subTypes = ['Records']
     
     def __init__(self, account=None): ObjectsManager.__init__(self, account)
     
@@ -287,7 +288,7 @@ class RecordsManager(ObjectsManager):
             self.records.sort()
         
         return record
-        
+    
     def updateWithOtherManagers(self, managers):
         self.deleteSubs()
         total = sum([int(manager) for manager in managers])

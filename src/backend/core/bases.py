@@ -132,6 +132,7 @@ class Mixins:
 
 
 class ObjectsMixins(Mixins, CompareByDate):
+    subTypes = ['subs']
     
     def __repr__(self): return f'<{self.name}>'
     

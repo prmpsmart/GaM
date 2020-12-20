@@ -38,6 +38,7 @@ class Repayment(Record):
     dueTime = 0
     duing =  True
     Manager = 'RepaymentsManager'
+    subTypes = ['Repayments']
     
     def __init__(self, manager, money, date=None, **kwargs):
         super().__init__(manager, money, date, **kwargs)
@@ -76,6 +77,9 @@ class Repayment(Record):
     
     @property
     def repayment(self): return self.repaid
+    
+    @property
+    def repayments(self): return self.repaymentsManager
     
     @property
     def repaymentsManager(self): return self.__repaymentsManager

@@ -44,6 +44,8 @@ class Region(Object):
     Person = None
     _type = 'reg'
     
+    subTypes = ['Regions', 'Accounts', 'Records Managers', 'Persons']
+
     
     def __init__(self, manager, name=None, date=None, location=None, phone=None, previous=None, number=None, **kwargs):
         
@@ -172,8 +174,13 @@ class Region(Object):
         
     @property
     def personsManager(self): return self._personsManager
+    
+    @property
+    def persons(self): return self.personsManager or [self.person]
+
     @property
     def location(self): return self._location
+
     @property
     def subRegionsManager(self): return self._subRegionsManager
     
@@ -181,8 +188,10 @@ class Region(Object):
     def subs(self): return self.accountsManager if self.accountsManager else []
     
     @property
-    def subRegions(self): return self.subRegionsManager[:] if self.subRegionsManager else []
-    
+    def subRegions(self): return self.subRegionsManager
+
+    @property
+    def regions(self): return self.subRegions
     
     @property
     def regions(self): return self.subRegions
@@ -197,7 +206,10 @@ class Region(Object):
     def accountsManager(self): return self._accountsManager
     
     @property
-    def accounts(self): return self.accountsManager[:] if self.accountsManager else []
+    def accounts(self): return self.accountsManager
+    
+    @property
+    def recordsManagers(self): return self.accountsManager.recordsManagers
     
     
     def balanceAccounts(self, month=None):
