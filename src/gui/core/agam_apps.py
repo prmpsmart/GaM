@@ -209,11 +209,7 @@ class ObjectDetails(PRMP_MainWindow):
         self.subTypes = ['Regions', 'Accounts', 'Records Managers', 'Records', 'Persons']
         self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=self.subTypes), orient='h', longent=.4, func=self.changeSubs)
 
-        # self.month = LabelDateButton(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.45), orient='h')
-        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='entry', top='checkbutton', bottomKwargs=dict())
-        # self.month.normal('b')
-
-        self.dialog = Checkbutton(sups, place=dict(relx=.577, rely=.16, relh=.07, relw=.35), text='Dialog?')
+        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='datebutton', top='checkbutton', bottomKwargs=dict())
 
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
@@ -226,8 +222,8 @@ class ObjectDetails(PRMP_MainWindow):
     
     def changeSubs(self, e=0):
         if self._sup:
-            subs = self._sup[subType] or []
-            self.subsList.set(self._sup, self.selectedSubType)
+            subs = self._sup[self.selectedSubType] or []
+            self.subsList.set([sub.name for sub in self._sup])
     
     def openSup(self):
         pass

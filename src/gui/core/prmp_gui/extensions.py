@@ -221,7 +221,6 @@ class PRMP_DateButton(PRMP_Button):
         else: return False
 
     def action(self):
-        print(990)
         self.date = self.CD(self, caller=self.toplevel, side=self.topest.side, _return=1, min_=self.min, max_=self.max).result
         self.set(str(self.date))
     

@@ -618,7 +618,6 @@ class PRMP_Widget(PRMP_Theme):
             self.onFg = False
     
     def checked(self, e=0):
-        print(e)
         if self.variable:
             if self.variable.get() == self.value: self.light()
             else: self.unlight()
@@ -1613,7 +1612,6 @@ class PRMP_Checkbutton(PRMP_InputButtons, PRMP_, tk.Checkbutton):
     def __init__(self, master=None, asLabel=False, config={}, **kwargs):
         self.var = tk.StringVar()
         tk.Checkbutton.__init__(self, master, variable=self.var, **config)
-        print(config, kwargs)
         PRMP_.__init__(self, prmp_master=master,variable=self.var, asLabel=asLabel, **config, **kwargs)
         
         self.var.set('0')
