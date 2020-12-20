@@ -35,8 +35,8 @@ class TwoWidgets(PRMP_Frame):
         
         if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
         else: topKw = dict(**topKwargs)
-        # print(topKwargs)
-        self.Top = top_wid(self, **topKwargs)
+        
+        self.Top = top_wid(self, **topKw)
         text = topKwargs.get('text')
         if not text:
             config = topKwargs.get('config')
@@ -84,14 +84,13 @@ class TwoWidgets(PRMP_Frame):
     def variable(self, v): return 
     
     def light(self):
-        print(self)
+        # print(self)
         self.normal('b')
         self.T.light()
         self.B.focus()
     
     def unlight(self):
         # self.readonly()
-        print(self.variable.get(), self.value)
         self.disabled('b')
         self.T.unlight()
     
