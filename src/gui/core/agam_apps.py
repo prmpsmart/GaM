@@ -1,4 +1,5 @@
 from .agam_extensions import *
+from ...backend.core.regions import Region
 
 
 class RegionLookUp(PRMP_MainWindow, FillWidgets):
@@ -219,11 +220,17 @@ class ObjectDetails(PRMP_MainWindow):
     
     @property
     def selectedSubType(self): return self.subType.get()
+
+    def getSubs(self):
+        subs = self._sup[self.selectedSubType] or []
+        if issubclass(self._sup.region.class_, Region): print(9)
+        else: print(self._sup.class_)
+        return subs
     
     def changeSubs(self, e=0):
-        if self._sup:
-            subs = self._sup[self.selectedSubType] or []
-            self.subsList.set([sub.name for sub in self._sup])
+        self.selectedSubType
+        subs = self.getSubs()
+        if self._sup: self.subsList.set(subs)
     
     def openSup(self):
         pass

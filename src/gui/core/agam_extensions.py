@@ -288,8 +288,8 @@ class SubsList(LabelFrame):
 
         self.listbox.bind('<Double-1>', self.clicked)
 
-    def set(self, values):
-        self.listbox.set(values)
+    def set(self, values, **kwargs):
+        self.listbox.set(values, **kwargs)
         self.total.set(self.listbox.last)
     
     def clicked(self, selected=None, event=None):

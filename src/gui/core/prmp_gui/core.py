@@ -2340,10 +2340,10 @@ class PRMP_ListBox(PRMP_Frame):
     
     def clear(self): self.delete(0, self.last)
     
-    def set(self, values):
+    def set(self, values, showAttr='name'):
         self.clear()
         self.last = len(values)
-        for val in values: self.listbox.insert('end', val)
+        for val in values: self.listbox.insert('end', getattr(val, showAttr, None) or str(val))
         self.values = values
     
     def clicked(self, e=0):
