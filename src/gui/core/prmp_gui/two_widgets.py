@@ -54,8 +54,6 @@ class TwoWidgets(PRMP_Frame):
         if bottom == 'datebutton': placeholder = 'Choose Date'
         
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
-        # print(bottomKw)
-        
         
         events = self.events.get(bottom)
         if events:
@@ -72,18 +70,28 @@ class TwoWidgets(PRMP_Frame):
         
         if self.value and self.variable: self.checked()
         
-        
         self.place_widgs()
         
     def clicked(self, e=0): return self.B.get()
+
+    @property
+    def value(self): return self.Top.value
+    @property
+    def variable(self): return self.Top.variable
+    @value.setter
+    def value(self, v): return
+    @variable.setter
+    def variable(self, v): return 
     
     def light(self):
+        print(self)
         self.normal('b')
         self.T.light()
         self.B.focus()
     
     def unlight(self):
         # self.readonly()
+        print(self.variable.get(), self.value)
         self.disabled('b')
         self.T.unlight()
     

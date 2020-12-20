@@ -519,7 +519,6 @@ class PRMP_Widget(PRMP_Theme):
         
         try:
             font = self.kwargs.get('font', 'DEFAULT_FONT')
-            # font = self.kwargs.get('font', 'PRMP_FONT')
             self.useFont(font)
         except: pass
         
@@ -2341,12 +2340,10 @@ class PRMP_ListBox(PRMP_Frame):
     
     def clear(self): self.delete(0, self.last)
     
-    def set(self, values, showAttr=''):
+    def set(self, values):
         self.clear()
         self.last = len(values)
-        for val in values:
-            st = getattr(val, showAttr, None) or str(val)
-            self.listbox.insert('end', st)
+        for val in values: self.listbox.insert('end', val)
         self.values = values
     
     def clicked(self, e=0):

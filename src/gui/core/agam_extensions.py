@@ -276,22 +276,23 @@ class SearchDetails(Notebook):
 
 
 class SubsList(LabelFrame):
-    def __init__(self, master, listboxConfig={}, **kwargs):
+    def __init__(self, master, listboxConfig={}, callback=None, **kwargs):
         super().__init__(master, **kwargs)
         
+        self.callback = callback
         self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=0, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
         self.total = LabelLabel(self, place=dict(relx=0, rely=.87, relh=.12, relw=.5), topKwargs=dict(text='Total Subs'), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
 
         self.listbox.bind('<Double-1>', self.clicked)
 
-    def set(self, sup, subType):
-        subs = sup[subType] or []
-        self.listbox.set(subs, 'name')
+    def set(self, values, subType):
+        self.listbox.set(values, 'name')
         self.total.set(self.listbox.last)
     
     def clicked(self, selected=None, event=None):
         selected = selected[0]
+        if self.callback: self.callback(selected)
 
 
 
