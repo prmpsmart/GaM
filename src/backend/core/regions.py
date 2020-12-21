@@ -284,7 +284,7 @@ class Staff(Region):
 class ThirdPartySurety(ObjectsMixins):
     
     def __init__(self, loanBondDetails=None, name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
-    
+        super().__init__()
         self.loanBondDetails = loanBondDetails
         self.name = None
         

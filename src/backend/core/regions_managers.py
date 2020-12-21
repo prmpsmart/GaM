@@ -1,6 +1,6 @@
 from .regions import *
 
-class RegionsManager(ObjectsManager, ObjectsMixins):
+class RegionsManager(ObjectsManager):
     ObjectType = Region
     subTypes = ['Regions']
     

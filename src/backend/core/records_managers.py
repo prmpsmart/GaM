@@ -17,6 +17,7 @@ from .records import *
 class SeasonRecord(ObjectsMixins):
     maximum = 0
     def __init__(self, records):
+        super().__init__(self)
         assert records, 'Records cannot be empty.'
         if self.maximum: assert len(records) <= self.maximum, f'Records may not be more than {self.maximum}'
         

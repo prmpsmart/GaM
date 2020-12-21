@@ -810,7 +810,7 @@ class PRMP_Input:
         self.set(self.placeholder)
     
     def normVery(self, e=0):
-        if not self.very: return
+        if not self.very: return True
         get = self._get()
         if self.values: 
             if get in self.values: return self.green()

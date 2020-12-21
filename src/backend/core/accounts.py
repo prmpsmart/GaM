@@ -21,6 +21,7 @@ class DailyAccounts(ObjectsMixins):
 class WeeklyAccounts(ObjectsMixins):
     
     def __init__(self, week, days_accounts, oneWeek=False):
+        super().__init__()
         self.week = week
         self.monday = [day for day in days_accounts if day.date.dayName == 'Monday']
         self.tuesday = [day for day in days_accounts if day.date.dayName == 'Tueday']
@@ -39,6 +40,7 @@ class WeeklyAccounts(ObjectsMixins):
 
 class MonthlyAccounts(ObjectsMixins):
     def __init__(self, monthName, accounts, day=False):
+        super().__init__()
         self.monthName = monthName
         if day == False:
             self.week1 = [record for record in accounts if record.date.week == 1]

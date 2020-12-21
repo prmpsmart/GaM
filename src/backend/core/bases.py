@@ -133,6 +133,32 @@ class Mixins:
 
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
+
+    def __init__(self):
+        self.__editableValues = []
+
+    @property
+    def editableValues(self): return self.__editableValues
+
+    def addEditableValues(self, child):
+        if child not in self.__resultsWidgets:
+            if isinstance(child, (list, tuple)):
+                for ch in child: self.addEditableValues(ch)
+            else: self.__editableValues.append(child)
+        
+    
+    def update(self,  values={}):
+        edit = self.editableValues
+        for key in edit:
+            val = values.get(key, None)
+            if val: setattr(self, key, val)
+    
+    @property
+    def values(self):
+        vals = {}
+        edit = self.editableValues
+        for key in edit: vals[key] = self[key]
+        return vals
     
     def __repr__(self): return f'<{self.name}>'
     
@@ -188,7 +214,9 @@ class ObjectsMixins(Mixins, CompareByDate):
     
     # def __setattr__(self, attr, value): return None
     
-    def __setitem__(self, key, value): pass
+    # def __setitem__(self, key, value):
+    #     var = self.getFromSelf(self.propertize(key))
+    #     var = value
     
     def __getitem__(self, item):
         if isinstance(item, self.containers):
@@ -253,6 +281,7 @@ class Object(CompareByNumber, ObjectsMixins):
         return self is other
     
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
+        ObjectsMixins.__init__(self)
         from .date_time import DateTime
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
@@ -321,7 +350,7 @@ class ObjectsManager(ObjectsMixins):
     
     def __init__(self, master=None):
         assert master != None, 'Master can not be None.'
-        
+        super().__init__()
         self._master = master
         self._subs = []
     
