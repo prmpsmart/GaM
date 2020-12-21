@@ -4,7 +4,9 @@ class PersonDialog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Person Dialog', person=None, geo=(550, 390), values={}, **kwargs):
         self.person = person
-        if person: valuss = person
+        if person: values = person
+
+        if person: title = f'{person.master.className} {title}'
         
         super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
     
