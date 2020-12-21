@@ -2,6 +2,13 @@ from .accounts import AccountsManager, DateTime, ObjectsMixins, Errors, Object, 
 from .records_managers import *
 import os
 
+'''
+DC Objects = Region, Person, Account, Records, Client, Area
+and Managers
+
+
+'''
+
 
 class Person(Object):
     Manager = 'PersonsManager'

@@ -236,7 +236,6 @@ class PRMP_DateButton(PRMP_Button):
         self['text'] = self.date
 PDB = PRMP_DateButton
 
-
 class ScrollableFrame(PRMP_Frame):
     
     def __init__(self, master, **kwargs):

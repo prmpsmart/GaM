@@ -1,7 +1,4 @@
-from .agam_extensions import *
-from ...backend.core.regions_managers import Region, RegionsManager
-from ...backend.core.records_managers import Record, RecordsManager
-from ...backend.core.accounts import Account, AccountsManager
+from .agam_dialogs import *
 
 
 class RegionLookUp(PRMP_MainWindow, FillWidgets):
@@ -218,26 +215,27 @@ class ObjectDetails(PRMP_MainWindow):
         self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
         
         self.paint()
-    
+
     @property
     def selectedSubType(self): return self.subType.get()
 
     def getSubs(self):
         subType = self.selectedSubType
         subs = self._sup[subType] or []
-        print(subType, subs)
         return subs
-    
+
     def changeSubs(self, e=0):
         self.selectedSubType
         subs = self.getSubs()
         if self._sup: self.subsList.set(subs)
-    
+
     def openSup(self):
         pass
 
-    def selected(self, obj):
-        print(obj)
+    def selected(self, sub):
+        pass
+
+
 
 
 

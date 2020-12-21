@@ -1,11 +1,10 @@
-
-from .prmp_gui.two_widgets import *
-from .prmp_gui.dialogs import *
+from .agam_extensions import *
 
 class PersonDialog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Person Dialog', person=None, geo=(550, 390), values={}, **kwargs):
         self.person = person
+        if person: valuss = person
         
         super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
     
@@ -36,13 +35,12 @@ PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Record Dialog', region=None, geo=(300, 300), record=None, **kwargs):
+    def __init__(self, master=None, title='Record Dialog', geo=(300, 300), record=None, **kwargs):
         
-        if region: title = f'{region.className} {title}'
         self.record = record
-        self.region = region
+        if record: title = f'{record.region.className} {title}'
 
-        super().__init__(master=master, _ttk_=0, title=title, geo=geo,  **kwargs)
+        super().__init__(master=master, title=title, geo=geo,  **kwargs)
     
     def _setupDialog(self):
         self.addEditButton()
@@ -55,6 +53,7 @@ class RecordDialog(PRMP_Dialog):
     def processInput(self):
         result = super().processInput()
         print(result)
+
 RecD = RecordDialog
  
 

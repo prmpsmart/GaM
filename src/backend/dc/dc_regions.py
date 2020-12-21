@@ -36,6 +36,8 @@ class Client(DCRegion):
     Manager = 'ClientsManager'
     SubRegionsManager = None
     Person = ClientDetail
+
+    subTypes = ['Accounts', 'Records Managers', 'Persons']
     
     def __init__(self, manager, name, date=None, rate=None, cardDue=False, **kwargs):
         super().__init__(manager=manager, name=name, date=date, rate=rate, **kwargs)

@@ -29,7 +29,7 @@ class DCAccount(Account):
         return None
     
     @property
-    def recordsManagers(self): return [self.broughtForwards, self.savings, self.debits, self.upfronts, self.balances]
+    def recordsManagers(self): return [self.broughtForwards, self.incomes, self.normalIncomes, self.transfers, self.savings, self.debits, self.withdrawals, self.paidouts, self.upfronts, self.balances]
 
     @property
     def pendingUpfronts(self): return self.upfronts.lastRecord.outstanding
@@ -68,7 +68,6 @@ class ClientAccount(DCAccount):
     def income(self, date=None):
         if date == None: date = DateTime.now()
         DateTime.checkDateTime(date)
-
         return sum([rec.savings for rec in self.contributions if rec.date.month == date.month])
     
     @property

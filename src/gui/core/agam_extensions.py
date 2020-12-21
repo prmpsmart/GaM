@@ -1,8 +1,14 @@
 from .prmp_gui.extensions import *
-from .agam_dialogs import *
+from .prmp_gui.two_widgets import *
+from .prmp_gui.dialogs import *
 from ...backend.core.date_time import MONTHS_NAMES, DAYS_NAMES, DateTime
 from ...backend.agam.agam import AGAM
 from ...backend.dc.dc_regions import Client
+
+
+from ...backend.core.regions_managers import Person, Region, RegionsManager
+from ...backend.core.records_managers import Record, RecordsManager
+from ...backend.core.accounts import Account, AccountsManager
 
 
 class RegionRadioCombo(RadioCombo):
@@ -294,7 +300,13 @@ class SubsList(LabelFrame):
     
     def clicked(self, selected=None, event=None):
         selected = selected[0]
-        if self.dialog.get(): print(self.dialog.get())
+        from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
+
+        if self.dialog.get():
+            if isinstance(selected, Record): RecordDialog(record=selected)
+            elif isinstance(selected, Person): PersonDialog(person=selected)
+            elif isinstance(selected, RecordsManager): ObjectDetails(self, geo=(1000, 600), title=f'{selected.name} Subscripts Details', sup=selected)
+            else: ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
         elif self.callback: self.callback(selected)
 
 
