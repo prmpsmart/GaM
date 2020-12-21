@@ -35,7 +35,8 @@ class DCAccount(Account):
     def pendingUpfronts(self): return self.upfronts.lastRecord.outstanding
     
     @property
-    def repaidUpfronts(self): return self.upfronts.lastRecord.repaid
+    def repaidUpfront(self):
+        if len(self.upfronts): return self.upfronts.lastRecord.repaid
 
     def addBroughtForward(self, bf, date=None): return self.broughtForwards.createRecord(bf, date=date)
     

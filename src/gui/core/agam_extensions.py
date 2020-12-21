@@ -305,7 +305,7 @@ class SubsList(LabelFrame):
         if self.dialog.get():
             if isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Person): PersonDialog(self, person=selected)
-            elif isinstance(selected, RecordsManager): ObjectDetails(self, geo=(1000, 600), title=f'{selected.name} Subscripts Details', sup=selected)
+            elif isinstance(selected, RecordsManager): ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
             else: ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
         elif self.callback: self.callback(selected)
 

@@ -8,22 +8,26 @@ from functools import partial
 def on_mousewheel(event, widget):
     what = 'units'
     what = 'pages'
-    if platform.system() == 'Windows': widget.yview_scroll(-1*int(event.delta/120),what)
-    elif platform.system() == 'Darwin': widget.yview_scroll(-1*int(event.delta),what)
-    else:
-        if event.num == 4:
-            widget.yview_scroll(-1, what)
-        elif event.num == 5:
-            widget.yview_scroll(1, what)
+    try:
+        if platform.system() == 'Windows': widget.yview_scroll(-1*int(event.delta/120), what)
+        elif platform.system() == 'Darwin': widget.yview_scroll(-1*int(event.delta),what)
+        else:
+            if event.num == 4:
+                widget.yview_scroll(-1, what)
+            elif event.num == 5:
+                widget.yview_scroll(1, what)
+    except: pass
 
 def on_shiftmouse(event, widget):
     what = 'units'
     what = 'pages'
-    if platform.system() == 'Windows': widget.xview_scroll(-1*int(event.delta/120), what)
-    elif platform.system() == 'Darwin': widget.xview_scroll(-1*int(event.delta), what)
-    else:
-        if event.num == 4: widget.xview_scroll(-1, what)
-        elif event.num == 5: widget.xview_scroll(1, what)
+    try:
+        if platform.system() == 'Windows': widget.xview_scroll(-1*int(event.delta/120), what)
+        elif platform.system() == 'Darwin': widget.xview_scroll(-1*int(event.delta), what)
+        else:
+            if event.num == 4: widget.xview_scroll(-1, what)
+            elif event.num == 5: widget.xview_scroll(1, what)
+    except: pass
 
 def bound_to_mousewheel(event, widget):
     child = widget.winfo_children()[0]

@@ -183,7 +183,7 @@ class Upfronts(RepaymentsManager):
         else: self.createRecord(upfront)
     
     @property
-    def repaidUpfronts(self): return self.repaid
+    def repaidUpfront(self): return self.repaid
     
     @property
     def overdue(self): return self.outstanding

@@ -9,6 +9,7 @@ from tkinter.filedialog import askopenfilename
 from .pics import PRMP_Image
 from .miscs import Mixins, partial, copyClassMethods, DateTime, bound_to_mousewheel, Columns
 from ctypes import windll
+import _tkinter
 
 # superclasses
 
@@ -953,7 +954,7 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
         PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
         PRMP_Input.__init__(self, **kwargs)
         
-    def _get(self): return tk.Text.get(self, '1.0', 'end').strip('\n')
+    def _get(self): return tk.Text.get(self, '0.0', 'end').strip('\n')
     
     def set(self, values): self.clear(); self.insert('0.0', values)
     
@@ -2176,7 +2177,7 @@ class PRMP_Window(PRMP_Widget):
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), tip='Maximize', font='DEFAULT_SMALL_BUTTON_FONT')
 
         self.imgExit = PRMP_Image('red', resize=(20, 20))
-        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroy, image=self.imgExit, style='exit.TButton'), tip='Exit', font='DEFAULT_SMALL_BUTTON_FONT')
+        self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), tip='Exit', font='DEFAULT_SMALL_BUTTON_FONT')
 
         self._icon = L(fr)
 
@@ -2185,6 +2186,9 @@ class PRMP_Window(PRMP_Widget):
         self.titleBar._moveroot()
 
         self.placeTitlebar()
+    
+    def destroySelf(self):
+        self.destroy()
     
     def setTkIcon(self, icon): self.iconbitmap(icon)
 

@@ -24,10 +24,10 @@ class Person(Object):
 
         gender = gender.lower()
         
-        if gender in self._male:  self._gender = self._male[0].title()
-        elif gender in self._female:  self._gender = self._female[0].title()
+        if gender in self._male:  self.gender = self._male[0].title()
+        elif gender in self._female:  self.gender = self._female[0].title()
         
-        else: self._gender = 'Neutral'
+        else: self.gender = 'Neutral'
         
         self.phone = phone
         

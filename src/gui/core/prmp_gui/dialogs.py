@@ -66,23 +66,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def processInput(self, e=0):
         result = self.get()
-
-        # self.resultsWidgets.sort()
-        # for widgetName in self.resultsWidgets:
-        #     wid = self.__dict__.get(widgetName)
-        #     if wid:
-        #         get = wid.get()
-        #         verify = getattr(wid, 'verify', None)
-        #         if verify:
-        #             if verify(): result[widgetName] = get
-        #             else:
-        #                 PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()} is required to proceed!', _type='error', okText='Understood')
-        #                 return
-        #         else: result[widgetName] = get
         self._setResult(result)
         
-        # self.destroy()
-        # print(result)
         return self.result
         
     def editInput(self, e=0):

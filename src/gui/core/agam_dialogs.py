@@ -3,12 +3,11 @@ from .agam_extensions import *
 class PersonDialog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Person Dialog', person=None, geo=(550, 390), values={}, **kwargs):
-        self.person = person
-        if person: values = person
 
+        self.person = person
         if person: title = f'{person.master.className} {title}'
         
-        super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
+        super().__init__(master=master, title=title, geo=geo, values=person if person else values, **kwargs)
     
     def _setupDialog(self):
         name = self.values.get('name')
@@ -37,19 +36,19 @@ PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Record Dialog', geo=(300, 300), record=None, **kwargs):
+    def __init__(self, master=None, title='Record Dialog', geo=(300, 300), record=None, values={}, **kwargs):
         
         self.record = record
         if record: title = f'{record.region.className} {title}'
 
-        super().__init__(master=master, title=title, geo=geo,  **kwargs)
+        super().__init__(master=master, title=title, geo=geo, values=record if record else values **kwargs)
     
     def _setupDialog(self):
         self.addEditButton()
 
-        self.money = LabelEntry(self.container, relx=.02, rely=.01, relh=.15, relw=.96, longent=.35, topKwargs=dict(config=dict(text='Money')), orient='h', bottomKwargs=dict(_type='money'))
-        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), relx=.02, rely=.16, relh=.15, relw=.96, longent=.35, orient='h')
-        self.note = LabelText(self.container, topKwargs=dict(config=dict(text='Note')), relx=.02, rely=.32, relh=.5, relw=.96, longent=.35, orient='h')
+        self.money = LabelEntry(self.container, place=dict(relx=.02, rely=.01, relh=.15, relw=.96), longent=.35, topKwargs=dict(config=dict(text='Money')), orient='h', bottomKwargs=dict(_type='money'))
+        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.02, rely=.16, relh=.15, relw=.96), longent=.35, orient='h')
+        self.note = LabelText(self.container, topKwargs=dict(config=dict(text='Note')), place=dict(relx=.02, rely=.32, relh=.5, relw=.96), longent=.35, orient='h')
         self.addResultsWidgets(['note', 'money', 'date'])
     
     def processInput(self):
