@@ -7,20 +7,18 @@ from datetime import timedelta
 class Record(Object):
     Manager = 'RecordsManager'
     _type = 'rec'
+    subTypes = ['CO Records']
     
     def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
         Object.__init__(self, manager, name=note, **kwargs)
         self.money = money
+        self.note = note
         self.__prevCoRecord = coRecord
         self.__nextCoRecord = None
         if coRecord: coRecord.setNextCoRecord(self)
 
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
 
-    @property
-    def note(self): return self.name
-    @note.setter
-    def note(self, n): self.name = n
     @property
     def prevCoRecord(self): return self.__prevCoRecord
     @property
@@ -67,7 +65,7 @@ class Record(Object):
     def __repr__(self): return f'<{self.name}>'
 
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self._name})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'
 
     @property
     def region(self): return self.manager.region
