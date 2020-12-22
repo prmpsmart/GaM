@@ -157,7 +157,7 @@ class AreaAccount(DCAccount):
 
         transfers = self.sumRecords(self.transfers.sortRecordsByDate(date))
         
-        self.btos.createRecord(bto, date)
+        btoRec = self.btos.createRecord(bto, date)
         bto += transfers
 
         if bto > contributed: self.excesses.createRecord(bto - contributed, date)

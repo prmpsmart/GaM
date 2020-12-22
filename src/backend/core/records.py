@@ -12,22 +12,45 @@ class Record(Object):
         Object.__init__(self, manager, **kwargs)
         self.money = money
         self.note = note
-        self.__coRecord = coRecord
+        self.__prevCoRecord = coRecord
+        self.__nextCoRecord = None
+        if coRecord: coRecord.setNextCoRecord(self)
 
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
 
     @property
-    def coRecord(self): return self.__coRecord
+    def prevCoRecord(self): return self.__prevCoRecord
+    @property
+    def nextCoRecord(self): return self.____nextCoRecord
+    def setNextCoRecord(self, coRecord):
+        if self.__nextCoRecord: raise ValueError('Next Co Record is already set.')
+        else: self.__nextCoRecord = coRecord
+    
+     @property
+    def prevCoRecords(self):
+        prevRecs = []
+        co = self.__prevCoRecord
+        while True:
+            prevRecs.append(co)
+            co = co.prevCoRecord
+            if co == None: break
+        return prevRecs
+
+    @property
+    def nextCoRecords(self):
+        nextRecs = []
+        co = self.__nextCoRecord
+        while True:
+            nextRecs.append(co)
+            co = co.nextCoRecord
+            if co == None: break
+        return nextRecs
     
     @property
-    def coRecords(self):
-        recs = []
-        co = self.__coRecord
-        while True:
-            recs.append(co)
-            co = co.coRecord
-            if co == None: break
-        return recs
+    def coRecords(self): return [*self.prevCoRecords, *self.nextCoRecords]
+    
+    @property
+    def linkedRecords(self): return [*self.prevCoRecords, self, *self.nextCoRecords]
     
     
     def update(self, values={}):
