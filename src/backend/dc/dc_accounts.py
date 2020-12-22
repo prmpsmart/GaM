@@ -38,7 +38,7 @@ class DCAccount(Account):
     def repaidUpfront(self):
         if len(self.upfronts): return self.upfronts.lastRecord.repaid
 
-    def addBroughtForward(self, bf, date=None): return self.broughtForwards.createRecord(bf, date=date)
+    def addBroughtForward(self, bf, date=None, **kwargs): return self.broughtForwards.createRecord(bf, date=date, **kwargs)
     
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
@@ -160,8 +160,8 @@ class AreaAccount(DCAccount):
         btoRec = self.btos.createRecord(bto, date)
         bto += transfers
 
-        if bto > contributed: self.excesses.createRecord(bto - contributed, date)
-        elif contributed > bto: self.deficits.createRecord(contributed - bto, date)
+        if bto > contributed: self.excesses.createRecord(bto - contributed, date, coRecord=btoRec)
+        elif contributed > bto: self.deficits.createRecord(contributed - bto, date, coRecord=btoRec)
 
     @property
     def clientsAccounts(self, month=None): return sorted(self.manager.sortClientsAccountsByMonth(month or self.date))
@@ -178,8 +178,6 @@ class ClientAccountsManager(DCAccountsManager):
     def areaAccountsManager(self): return self.master.accountsManager
     
     def createAccount(self, rate=0, month=None, **kwargs):
-        # prmp needs proper thinking
-        # get total accounts for current month from the area account manager
         area = self.region.sup
         areaAcc = area.accountsManager.getAccount(month)
         if areaAcc:
