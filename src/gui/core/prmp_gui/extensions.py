@@ -104,6 +104,7 @@ class FillWidgets:
             wid = self.__dict__.get(widgetName)
             if wid:
                 get = wid.get()
+                print(get, wid)
                 verify = getattr(wid, 'verify', None)
                 if verify:
                     if verify(): result[widgetName] = get
@@ -222,10 +223,13 @@ class PRMP_DateButton(PRMP_Button):
 
     def action(self):
         self.date = self.CD(self, caller=self.toplevel, side=self.topest.side, _return=1, min_=self.min, max_=self.max).result
-        self.set(str(self.date))
+        if self.date: self.set(str(self.date))
     
-    def get(self): return self.date
-    
+    def get(self):
+        if self.date: return self.date
+        text = self['text']
+        if text: return DateTime.getDMYFromDate(text)
+
     def set(self, date):
         if isinstance(date, str):
             if '-' in date: d, m, y = date.split('-')

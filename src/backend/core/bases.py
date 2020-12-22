@@ -84,7 +84,6 @@ class Mixins:
         else:
             for cl in self.mro:
                 ret = cl.__dict__.get(name, unget)
-                print(ret, name)
                 if ret != unget:
                     if isinstance(ret, property): return ret.fget(self)
                     return ret
@@ -170,15 +169,21 @@ class ObjectsMixins(Mixins, CompareByDate):
     
     def update(self,  values={}):
         edit = self.editableValues
+
         for key in edit:
+            _type = str
+            if isinstance(key, dict): key, _type = key['value'], key['type']
             val = values.get(key, None)
+            val = _type(val)
             if val: setattr(self, key, val)
     
     @property
     def values(self):
         vals = {}
         edit = self.editableValues
-        for key in edit: vals[key] = self[key]
+        for key in edit:
+            if isinstance(key, dict): key = key['value']
+            vals[key] = self[key]
         return vals
     
     def __repr__(self): return f'<{self.name}>'
@@ -332,9 +337,10 @@ class Object(CompareByNumber, ObjectsMixins):
     
     @property
     def date(self): return self._date
+
     @date.setter
     def date(self, _date):
-        assert isinstance(_date, DateTime)
+        assert isinstance(_date, DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of DateTime'
         self._date = _date
     
     @property

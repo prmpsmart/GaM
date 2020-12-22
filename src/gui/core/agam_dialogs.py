@@ -53,9 +53,9 @@ class RecordDialog(PRMP_Dialog):
     
     def processInput(self):
         result = super().processInput()
-        print('Before', self.record.values)
+        # print('Before', self.record.values)
         if self.record: self.record.update(result)
-        print('After', self.record.values)
+        # print('After', self.record.values)
         return result
 
 RecD = RecordDialog

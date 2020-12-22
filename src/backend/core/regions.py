@@ -21,7 +21,6 @@ class Person(Object):
         if isinstance(manager, Region): date = manager.date
         
         super().__init__(manager, date=date, name=name)
-        # Object.__init__(self, manager, date=date, name=name)
 
         gender = gender.lower()
         
@@ -39,7 +38,7 @@ class Person(Object):
         
         self.address = address
 
-        self.addEditablesValues(['gender', 'phone', 'image', 'email', 'address'])
+        self.addEditableValues(['gender', 'phone', 'image', 'email', 'address'])
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     

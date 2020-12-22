@@ -13,7 +13,7 @@ class Record(Object):
         self.money = money
         self.note = note
 
-        self.addEditableValues(['money', 'note', 'date'])
+        self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
     
     def update(self, values={}):
         super().update(values)
