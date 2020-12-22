@@ -8,12 +8,27 @@ class Record(Object):
     Manager = 'RecordsManager'
     _type = 'rec'
     
-    def __init__(self, manager, money, date=None, note='Note', **kwargs):
+    def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
         Object.__init__(self, manager, **kwargs)
         self.money = money
         self.note = note
+        self.__coRecord = coRecord
 
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
+
+    @property
+    def coRecord(self): return self.__coRecord
+    
+    @property
+    def coRecords(self):
+        recs = []
+        co = self.__coRecord
+        while True:
+            recs.append(co)
+            co = co.coRecord
+            if co == None: break
+        return recs
+    
     
     def update(self, values={}):
         super().update(values)

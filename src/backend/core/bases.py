@@ -171,10 +171,10 @@ class ObjectsMixins(Mixins, CompareByDate):
         edit = self.editableValues
 
         for key in edit:
-            _type = str
+            _type = None
             if isinstance(key, dict): key, _type = key['value'], key['type']
             val = values.get(key, None)
-            val = _type(val)
+            if _type: val = _type(val)
             if val: setattr(self, key, val)
     
     @property

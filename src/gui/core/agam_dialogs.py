@@ -36,8 +36,9 @@ PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Record Dialog', geo=(300, 300), record=None, values={}, **kwargs):
+    def __init__(self, master=None, title='Record Dialog', geo=(300, 300), manager=None,  record=None, values={}, **kwargs):
         
+        self.manager = manager
         self.record = record
         if record: title = f'{record.region.className} {title}'
 
@@ -53,10 +54,13 @@ class RecordDialog(PRMP_Dialog):
     
     def processInput(self):
         result = super().processInput()
-        # print('Before', self.record.values)
-        if self.record: self.record.update(result)
-        # print('After', self.record.values)
-        return result
+
+        if self.record and PRMP_MsgBox(self, title='Edit Record Details', message='Are you sure to edit the details of this record?', _type='question').result == True: self.record.update(result)
+        
+        elif self.manager and PRMP_MsgBox(self, title='Record Creation', message='Are you sure to create a new record?', _type='question').result == True: record = self.manager.createRecord(**result)
+
+        if self._return: self.destroy()
+
 
 RecD = RecordDialog
  

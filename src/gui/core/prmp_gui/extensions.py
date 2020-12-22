@@ -104,7 +104,6 @@ class FillWidgets:
             wid = self.__dict__.get(widgetName)
             if wid:
                 get = wid.get()
-                print(get, wid)
                 verify = getattr(wid, 'verify', None)
                 if verify:
                     if verify(): result[widgetName] = get
