@@ -4,6 +4,7 @@ from .coop_errors import CoopErrors
 
 class MemberDetail(Person):
     Manager = 'Member'
+    # def __init__(self, **kwargs): super().__init__(**kwargs)
     @property
     def member(self): return self.manager
 

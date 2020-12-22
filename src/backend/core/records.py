@@ -12,6 +12,12 @@ class Record(Object):
         Object.__init__(self, manager, **kwargs)
         self.money = money
         self.note = note
+
+        self.addEditableValues(['money', 'note', 'date'])
+    
+    def update(self, values={}):
+        super().update(values)
+        self.manager.update()
     
     def __int__(self): return self.money
     

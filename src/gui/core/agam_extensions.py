@@ -286,11 +286,12 @@ class SubsList(LabelFrame):
         super().__init__(master, **kwargs)
         
         self.callback = callback
-        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=0, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=.87, relh=.12, relw=.5), topKwargs=dict(text='Total Subs'), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
+        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.12, relw=.5), topKwargs=dict(text='Total Subs'), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
 
-        self.dialog = Checkbutton(self, place=dict(relx=.74, rely=.88, relh=.1, relw=.25), text='Dialog?')
+        self.dialog = Checkbutton(self, place=dict(relx=.74, rely=0, relh=.1, relw=.25), text='Dialog?')
+        
+        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.125, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
         self.listbox.bind('<Double-1>', self.clicked)
 

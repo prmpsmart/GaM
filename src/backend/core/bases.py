@@ -3,6 +3,27 @@ from .date_time import CompareByDate, DateTime
 from hashlib import sha224
 import re
 
+class CompareByNumber:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.number < other.number
+    def __le__(self, other):
+        if other == None: return False
+        return self.number <= other.number
+    def __eq__(self, other):
+        if other == None: return False
+        return self.number == other.number
+    def __ne__(self, other):
+        if other == None: return True
+        return self.number != other.number
+    def __gt__(self, other):
+        if other == None: return True
+        return self.number > other.number
+    def __ge__(self, other):
+        if other == None: return True
+        return self.number >= other.number
+
+
 class Mixins:
     _unget = '_prmp_'
     
@@ -63,6 +84,7 @@ class Mixins:
         else:
             for cl in self.mro:
                 ret = cl.__dict__.get(name, unget)
+                print(ret, name)
                 if ret != unget:
                     if isinstance(ret, property): return ret.fget(self)
                     return ret
@@ -134,14 +156,13 @@ class Mixins:
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
 
-    def __init__(self):
-        self.__editableValues = []
+    def __init__(self): self.__editableValues = []
 
     @property
     def editableValues(self): return self.__editableValues
 
     def addEditableValues(self, child):
-        if child not in self.__resultsWidgets:
+        if child not in self.__editableValues:
             if isinstance(child, (list, tuple)):
                 for ch in child: self.addEditableValues(ch)
             else: self.__editableValues.append(child)
@@ -251,27 +272,6 @@ class ObjectsMixins(Mixins, CompareByDate):
         return self.subs[item]
 
 
-class CompareByNumber:
-    def __lt__(self, other):
-        if other == None: return False
-        return self.number < other.number
-    def __le__(self, other):
-        if other == None: return False
-        return self.number <= other.number
-    def __eq__(self, other):
-        if other == None: return False
-        return self.number == other.number
-    def __ne__(self, other):
-        if other == None: return True
-        return self.number != other.number
-    def __gt__(self, other):
-        if other == None: return True
-        return self.number > other.number
-    def __ge__(self, other):
-        if other == None: return True
-        return self.number >= other.number
-
-
 class Object(CompareByNumber, ObjectsMixins):
     Manager = 'ObjectsManager'
     Managers = ()
@@ -332,6 +332,10 @@ class Object(CompareByNumber, ObjectsMixins):
     
     @property
     def date(self): return self._date
+    @date.setter
+    def date(self, _date):
+        assert isinstance(_date, DateTime)
+        self._date = _date
     
     @property
     def previous(self): return self._previous

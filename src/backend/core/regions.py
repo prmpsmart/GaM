@@ -20,7 +20,8 @@ class Person(Object):
         
         if isinstance(manager, Region): date = manager.date
         
-        Object.__init__(self, manager, date=date, name=name)
+        super().__init__(manager, date=date, name=name)
+        # Object.__init__(self, manager, date=date, name=name)
 
         gender = gender.lower()
         
@@ -37,11 +38,16 @@ class Person(Object):
         if self.checkEmail(email): self.email = email
         
         self.address = address
+
+        self.addEditablesValues(['gender', 'phone', 'image', 'email', 'address'])
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     
     @property
-    def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
+    def values(self):
+        vals = super().values
+        vals.update({'manager': self.manager})
+        return vals
 
 class Region(Object):
     AccountsManager = AccountsManager
