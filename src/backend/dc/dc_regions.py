@@ -60,8 +60,7 @@ class Client(DCRegion):
     
     def addContribution(self, contribution, month=None, **kwargs):
         if month == None: month = DateTime.now()
-        account = self.accountsManager.sortSubsByMonth(month)[0]
-        account.addContribution(contribution, **kwargs)
+        return self.accountsManager.addContribution(contribution, **kwargs)
     
     def addPaid(self, paid, month):
         if month == None: month = DateTime.now()

@@ -87,7 +87,7 @@ class ClientAccount(DCAccount):
         
         if bal: self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 
-    def addContribution(self, contribution, **kwargs): self.contributions.addContribution(contribution, **kwargs)
+    def addContribution(self, contribution, **kwargs): return self.contributions.addContribution(contribution, **kwargs)
     
     def addDebit(self, debit, up=1, _type='w'):
         if up: self._balanceAccount()
@@ -193,9 +193,10 @@ class ClientAccountsManager(DCAccountsManager):
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
     
-    def addContribution(self, contribution, month=None):
+    def addContribution(self, contribution, month=None, **kwargs):
         if month == None: month = DateTime.now()
-        pass
+        account = self.sortSubsByMonth(month)[0]
+        return account.addContribution(contribution, **kwargs)
     
     def addDebit(self, debit, month):
         if month == None: month = DateTime.now()

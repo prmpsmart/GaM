@@ -32,9 +32,10 @@ class Record(Object):
         prevRecs = []
         co = self.__prevCoRecord
         while True:
-            prevRecs.append(co)
-            co = co.prevCoRecord
-            if co == None: break
+            if co:
+                prevRecs.append(co)
+                co = co.prevCoRecord
+            else: break
         return prevRecs
 
     @property
@@ -42,9 +43,10 @@ class Record(Object):
         nextRecs = []
         co = self.__nextCoRecord
         while True:
-            nextRecs.append(co)
-            co = co.nextCoRecord
-            if co == None: break
+            if co:
+                nextRecs.append(co)
+                co = co.nextCoRecord
+            else: break
         return nextRecs
     
     @property

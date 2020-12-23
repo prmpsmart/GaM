@@ -109,6 +109,7 @@ class Contributions(DCRecordsManager):
             self.account.incomes.addIncome(contribution*self.account.rate, note=_note, _type=_type, coRecord=savRec,**kwargs)
                 
             # self.balance()
+            return conRec
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
     
     @property
