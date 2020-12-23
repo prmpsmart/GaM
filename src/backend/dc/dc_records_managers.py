@@ -11,7 +11,7 @@ class DCRecordsManager(RecordsManager):
     def __int__(self):
         if self._lastRecord: return self.lastMoney
         else: return super().__int__()
-    
+
     def balance(self): return self.account.balanceAccount()
 
 class Rates(DCRecordsManager):

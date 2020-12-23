@@ -3,39 +3,53 @@ from datetime import timedelta
 
 # Record is the {money, date} recieved daily a.k.a DayRecord
 
+class CoRecords(list):
+    def __bool__(self): return True
+    def addCoRecord(self, coRecord): self.append(coRecord)
+
+
 
 class Record(Object):
     Manager = 'RecordsManager'
     _type = 'rec'
     subTypes = ['CO Records']
-    
+
     def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
         Object.__init__(self, manager, name=note, **kwargs)
+
         self.money = money
         self.note = note
-        self.__coRecords = []
-        if coRecord:
-            # print(coRecord)
-            self.addCoRecord(coRecord)
-            # coRecord.addCoRecord(self)
+        self.__coRecord = coRecord
+        self.__coRecords = None
+
+        if coRecord: coRecord.addCoRecord(coRecord)
+        else:
+            self.__coRecords = CoRecords()
+            self.addCoRecord(self)
 
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
 
     def addCoRecord(self, coRecord):
-        if coRecord is self: return
-        if coRecord not in self.__coRecords: self.__coRecords.append(coRecord)
-        # coRecord.addCoRecord(self)
-        # coos = coRecord.coRecords
-        # for rec in coos: self.addCoRecord(rec)
-    
-    def updateCoRecords(self):
-            for rec in self.__coRecords: self.addCoRecord(rec)
-    
+        if coRecord in self.coRecords: return
+        self.coRecords.addCoRecord(coRecord)
+
+    def updateOtherCoRecord(self, other):
+        for rec in self.__coRecords: rec.addCoRecord(self)
+
+    def updateCoRecord(self):
+        for rec in self.__coRecords: rec.updateOtherCoRecord(self)
+
+    @property
+    def subs(self): return self.coRecords
+
+    @property
+    def coRecord(self): return self.__coRecord
+
     @property
     def coRecords(self):
-        # self.updateCoRecords()
-        return self.__coRecords
-    
+        if self.__coRecords: return self.__coRecords
+        elif self.__coRecord: return self.__coRecord.coRecords
+
     @property
     def linkedRecords(self): return [self, *self.coRecords]
     
