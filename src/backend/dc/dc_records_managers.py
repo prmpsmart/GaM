@@ -84,15 +84,14 @@ class Contributions(DCRecordsManager):
         if payUpBal != -1:
             if payup == payUpBal: self.account.rates.changeRate(rate)
 
-    def addContribution(self, contribution, note=None, _type='n',  **kwargs):
+    def addContribution(self, contribution, note='Note', _type='n',  **kwargs):
         assert contribution != 0, 'Contributions can not be zero.'
         newContributions = int(self) + contribution
         if newContributions < 32:
-            _note = ''
-            conRec = self.createRecord(contribution, note=_note, **kwargs)
+            conRec = self.createRecord(contribution, note=note, **kwargs)
             
             contr = contribution * self.rate
-            incRec = self.account.incomes.addIncome(contr, note=_note, _type=_type, coRecord=conRec,**kwargs)
+            incRec = self.account.incomes.addIncome(contr, note=note, _type=_type, coRecord=conRec,**kwargs)
 
             if not self.upfronts.paid:
 
@@ -103,9 +102,9 @@ class Contributions(DCRecordsManager):
 
                 repRec = self.upfronts.repayUpfront(repay, note=note, coRecord=incRec, **kwargs)
                 
-                _note = f'Repay of Upfront Loan. {note}'
+                note = f'Repay of Upfront Loan. {note}'
                 
-                if remain > 0: savRec = self.savings.addSaving(remain, note=_note, coRecord=repRec, **kwargs)
+                if remain > 0: savRec = self.savings.addSaving(remain, note=note, coRecord=repRec, **kwargs)
 
             else: savRec = self.savings.addSaving(contr, coRecord=incRec, **kwargs)
 
@@ -167,7 +166,6 @@ class Incomes(DCRecordsManager):
 
         if _type == 'n': incRec.type = self.account.normalIncomes.createRecord(income, coRecord=incRec, **kwargs)
         else: incRec.type = self.account.transfers.createRecord(income, coRecord=incRec, **kwargs)
-        print(incRec.type.coRecords)
         return incRec
 
 class Savings(DCRecordsManager):

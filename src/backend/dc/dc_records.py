@@ -4,8 +4,8 @@ from .dc_errors import DCErrors
 class DCRecord(Record):
     Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers', 'Withdrawals', 'Paidouts', 'NormalIncomes')
 
-class DCRepayment(Repayment):
-    Managers = ('Upfronts', )
+class DCRepayment(Repayment): pass
+    # Managers = ('Upfronts', )
 
 
 
