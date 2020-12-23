@@ -47,8 +47,8 @@ class Record(Object):
 
     @property
     def coRecords(self):
-        if self.__coRecords: return self.__coRecords
-        elif self.__coRecord: return self.__coRecord.coRecords
+        if self.__coRecords != None: return self.__coRecords
+        elif self.__coRecord != None: return self.__coRecord.coRecords
 
     @property
     def linkedRecords(self): return [self, *self.coRecords]

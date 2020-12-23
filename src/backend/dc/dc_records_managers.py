@@ -92,24 +92,27 @@ class Contributions(DCRecordsManager):
             conRec = self.createRecord(contribution, note=_note, **kwargs)
 
             if not self.upfronts.paid:
-                
+
                 out = self.upfronts.outstanding
-                
+
                 sav = int(self.savings)
-                
+
                 money = sav if out > sav else out
                 repay, remain = money, 0 - money
-                
+
                 repRec = self.upfronts.repayUpfront(repay, note=note, coRecord=conRec, **kwargs)
+                print(repRec, 'Upf')
                 _note = f'Repay of Upfront Loan. {note}'
-                savRec = self.savings.addSaving(remain, note=_note, coRecord=repRec, **kwargs)
-            
+                
+                if remain > 0: savRec = self.savings.addSaving(remain, note=_note, coRecord=repRec, **kwargs)
+
             else: savRec = self.savings.addSaving(contribution * self.account.rate, coRecord=conRec, **kwargs)
 
             self.account.incomes.addIncome(contribution*self.account.rate, note=_note, _type=_type, coRecord=savRec,**kwargs)
-                
+
             # self.balance()
             return conRec
+
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
     
     @property
@@ -136,8 +139,9 @@ class Debits(DCRecordsManager):
             if toDebit <= balance:
                 debRec = self.createRecord(toDebit, **kwargs)
 
-                if _type == 'w': self.account.withdrawals.createRecord(toDebit, coRecord=debRec, **kwargs)
-                else: self._type = self.account.paidouts.createRecord(toDebit, coRecord=debRec, **kwargs)
+                if _type == 'w': debRec.type = self.account.withdrawals.createRecord(toDebit, coRecord=debRec, **kwargs)
+                else: debRec.type = self.account.paidouts.createRecord(toDebit, coRecord=debRec, **kwargs)
+                return debRec 
 
             else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
    
@@ -159,8 +163,9 @@ class Incomes(DCRecordsManager):
     def addIncome(self, income, _type='n', coRecord=None, **kwargs):
         incRec = self.createRecord(income, coRecord=coRecord, **kwargs)
 
-        if _type == 'n': self.account.normalIncomes.createRecord(income, coRecord=incRec, **kwargs)
-        else: self._type = self.account.transfers.createRecord(income, coRecord=incRec, **kwargs)
+        if _type == 'n': incRec.type = self.account.normalIncomes.createRecord(income, coRecord=incRec, **kwargs)
+        else: incRec.type = self.account.transfers.createRecord(income, coRecord=incRec, **kwargs)
+        return incRec
 
 class Savings(DCRecordsManager):
     ObjectType = Saving
@@ -168,7 +173,7 @@ class Savings(DCRecordsManager):
     def __init__(self, account):
         super().__init__(account)
     
-    def addSaving(self, saving, **kwargs): self.createRecord(saving, **kwargs)
+    def addSaving(self, saving, **kwargs): return self.createRecord(saving, **kwargs)
 
 class Upfronts(RepaymentsManager):
     ObjectType = Upfront
