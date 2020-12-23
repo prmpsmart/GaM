@@ -90,31 +90,33 @@ class Contributions(DCRecordsManager):
         if newContributions < 32:
             _note = ''
             conRec = self.createRecord(contribution, note=_note, **kwargs)
+            
+            contr = contribution * self.rate
+            incRec = self.account.incomes.addIncome(contr, note=_note, _type=_type, coRecord=conRec,**kwargs)
 
             if not self.upfronts.paid:
 
                 out = self.upfronts.outstanding
 
-                sav = int(self.savings)
+                money = contr if out > contr else out
+                repay, remain = money, contr - money
 
-                money = sav if out > sav else out
-                repay, remain = money, 0 - money
-
-                repRec = self.upfronts.repayUpfront(repay, note=note, coRecord=conRec, **kwargs)
-                print(repRec, 'Upf')
+                repRec = self.upfronts.repayUpfront(repay, note=note, coRecord=incRec, **kwargs)
+                
                 _note = f'Repay of Upfront Loan. {note}'
                 
                 if remain > 0: savRec = self.savings.addSaving(remain, note=_note, coRecord=repRec, **kwargs)
 
-            else: savRec = self.savings.addSaving(contribution * self.account.rate, coRecord=conRec, **kwargs)
+            else: savRec = self.savings.addSaving(contr, coRecord=incRec, **kwargs)
 
-            self.account.incomes.addIncome(contribution*self.account.rate, note=_note, _type=_type, coRecord=savRec,**kwargs)
 
             # self.balance()
             return conRec
 
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
     
+    @property
+    def rate(self): return self.account.rate
     @property
     def savings(self): return self.account.savings
     @property
@@ -165,6 +167,7 @@ class Incomes(DCRecordsManager):
 
         if _type == 'n': incRec.type = self.account.normalIncomes.createRecord(income, coRecord=incRec, **kwargs)
         else: incRec.type = self.account.transfers.createRecord(income, coRecord=incRec, **kwargs)
+        print(incRec.type.coRecords)
         return incRec
 
 class Savings(DCRecordsManager):
