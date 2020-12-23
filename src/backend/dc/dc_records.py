@@ -10,21 +10,37 @@ class DCRepayment(Repayment):
 
 
 class Rate(DCRecord): pass
+
 class Balance(DCRecord): pass
+
 class BroughtForward(DCRecord): pass
+
 class BroughtToOffice(DCRecord): pass
+
 class CardDue(DCRecord): pass
+
 class Commission(DCRecord): pass
+
 class Contribution(DCRecord): pass
+
 class Paidout(DCRecord): pass
+
 class Withdrawal(DCRecord): pass
+
 class Debit(DCRecord): pass
+
 class Deficit(DCRecord): pass
+
 class Excesse(DCRecord): pass
+
 class NormalIncome(DCRecord): pass
+
 class Transfer(DCRecord): pass
+
 class Income(DCRecord): pass
+
 class Saving(DCRecord): pass
+
 
 
 class Upfront(DCRepayment):

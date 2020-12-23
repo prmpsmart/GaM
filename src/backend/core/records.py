@@ -13,48 +13,29 @@ class Record(Object):
         Object.__init__(self, manager, name=note, **kwargs)
         self.money = money
         self.note = note
-        self.__prevCoRecord = coRecord
-        self.__nextCoRecord = None
-        if coRecord: coRecord.setNextCoRecord(self)
+        self.__coRecords = []
+        if coRecord:
+            self.addCoRecord(self)
+            coRecord.addCoRecord(self)
 
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
 
-    @property
-    def prevCoRecord(self): return self.__prevCoRecord
-    @property
-    def nextCoRecord(self): return self.__nextCoRecord
-    def setNextCoRecord(self, coRecord):
-        if self.__nextCoRecord: raise ValueError('Next Co Record is already set.')
-        else: self.__nextCoRecord = coRecord
+    def addCoRecord(self, coRecord):
+        if coRecord not in self.__coRecords:
+            self.__coRecords.append(coRecord)
+            coRecord.addCoRecord(self)
+            for rec in coRecord.coRecords: self.ddCoRecord(rec)
+    
+    def updateCoRecords(self):
+            for rec in self.__coRecords: self.addCoRecord(rec)
     
     @property
-    def prevCoRecords(self):
-        prevRecs = []
-        co = self.__prevCoRecord
-        while True:
-            if co:
-                prevRecs.append(co)
-                co = co.prevCoRecord
-            else: break
-        return prevRecs
-
-    @property
-    def nextCoRecords(self):
-        nextRecs = []
-        co = self.__nextCoRecord
-        while True:
-            if co:
-                nextRecs.append(co)
-                co = co.nextCoRecord
-            else: break
-        return nextRecs
+    def coRecords(self):
+        self.updateCoRecords()
+        return self.__coRecords
     
     @property
-    def coRecords(self): return [*self.prevCoRecords, *self.nextCoRecords]
-    
-    @property
-    def linkedRecords(self): return [*self.prevCoRecords, self, *self.nextCoRecords]
-    
+    def linkedRecords(self): return [self, *self.coRecords]
     
     def update(self, values={}):
         super().update(values)

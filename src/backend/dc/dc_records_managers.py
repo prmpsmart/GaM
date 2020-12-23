@@ -104,7 +104,7 @@ class Contributions(DCRecordsManager):
                 _note = f'Repay of Upfront Loan. {note}'
                 savRec = self.savings.addSaving(remain, note=_note, coRecord=repRec, **kwargs)
             
-            else: savRec = self.savings.addSaving(contribution * self.account.rate, **kwargs)
+            else: savRec = self.savings.addSaving(contribution * self.account.rate, coRecord=conRec, **kwargs)
 
             self.account.incomes.addIncome(contribution*self.account.rate, note=_note, _type=_type, coRecord=savRec,**kwargs)
                 
@@ -171,7 +171,6 @@ class Savings(DCRecordsManager):
     def addSaving(self, saving, **kwargs): self.createRecord(saving, **kwargs)
 
 class Upfronts(RepaymentsManager):
-    ObjectType = Upfront
     ObjectType = Upfront
     
     def __init__(self, accounts):
