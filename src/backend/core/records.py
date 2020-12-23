@@ -15,23 +15,25 @@ class Record(Object):
         self.note = note
         self.__coRecords = []
         if coRecord:
-            self.addCoRecord(self)
-            coRecord.addCoRecord(self)
+            # print(coRecord)
+            self.addCoRecord(coRecord)
+            # coRecord.addCoRecord(self)
 
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
 
     def addCoRecord(self, coRecord):
-        if coRecord not in self.__coRecords:
-            self.__coRecords.append(coRecord)
-            coRecord.addCoRecord(self)
-            for rec in coRecord.coRecords: self.ddCoRecord(rec)
+        if coRecord is self: return
+        if coRecord not in self.__coRecords: self.__coRecords.append(coRecord)
+        # coRecord.addCoRecord(self)
+        # coos = coRecord.coRecords
+        # for rec in coos: self.addCoRecord(rec)
     
     def updateCoRecords(self):
             for rec in self.__coRecords: self.addCoRecord(rec)
     
     @property
     def coRecords(self):
-        self.updateCoRecords()
+        # self.updateCoRecords()
         return self.__coRecords
     
     @property
