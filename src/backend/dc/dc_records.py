@@ -21,7 +21,15 @@ class CardDue(DCRecord): pass
 
 class Commission(DCRecord): pass
 
-class Contribution(DCRecord): pass
+class Contribution(DCRecord):
+    
+    def update(self, values={}, first=1):
+        super().update(values)
+        values['money'] = self.money * self.manager.rate
+        if first:
+            h = self.linkedRecords
+            for rec in h: rec.update(values, 0)
+        self.manager.update()
 
 class Paidout(DCRecord): pass
 
