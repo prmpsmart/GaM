@@ -177,7 +177,7 @@ RLU = RegionLookUp
 
 
 class SortNSearch(PRMP_MainWindow):
-    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.27, sup=None):
+    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.31, sup=None):
         super().__init__(master, title=title, geo=geo)
 
         self._sup = sup
@@ -187,7 +187,17 @@ class SortNSearch(PRMP_MainWindow):
         
         self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.05, relh=.99-.04-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
 
-        self.details = SearchDetails(self.container, place=dict(relx=.005, rely=.05, relh=longent, relw=.99), results=self.results, sup=sup)
+        note = Notebook(self.container, place=dict(relx=.005, rely=.05, relh=longent, relw=.99))
+        
+        self.search = SearchDetails(note, results=self.results, sup=sup)
+        note.add(self.search, padding=3)
+        note.tab(0, text='Search', compound='left', underline='-1')
+
+        self.sort = SortDetails(note)
+        note.add(self.sort, padding=3)
+        note.tab(1, text='Sort', compound='left', underline='-1')
+
+
 
         self.paint()
     
@@ -201,6 +211,7 @@ class ObjectDetails(PRMP_MainWindow):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self._sup = sup
+        if sup: self.addTitleBar(f'{sup} Subscripts Details')
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         
@@ -208,7 +219,7 @@ class ObjectDetails(PRMP_MainWindow):
 
         self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=sup.subTypes if sup else []), orient='h', longent=.4, func=self.changeSubs)
 
-        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='datebutton', top='checkbutton', bottomKwargs=dict())
+        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='datebutton', top='checkbutton', bottomKwargs=dict(font='DEFAULT_MENU_FONT'))
 
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 

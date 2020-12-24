@@ -19,6 +19,7 @@ class SupDCHome2(PRMP_MainWindow):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self.region = region
+        self.addTitleBar(region)
 
         self.regionDetails = RegionDetails(self.container, config=dict(text='Region Details'), place=dict(relx=.005, rely=.005, relh=.22, relw=.45), region=region)
 

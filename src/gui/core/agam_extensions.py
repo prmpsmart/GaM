@@ -271,14 +271,22 @@ class SearchDetails(Notebook):
         self.personalDetails = SearchPersonalDetails(self, text='Personal Details')
         self.add(self.personalDetails, padding=3)
         self.tab(0, text='Regions', compound='left', underline='-1')
+        
         self.recordDetails = SearchRecordDetails(self, text='Record Details')
         self.add(self.recordDetails, padding=3)
         self.tab(1, text='Records', compound='left', underline='-1')
 
         self.dateSearch = DateSearch(self, text='Record Details')
-        
         self.add(self.dateSearch, padding=3)
         self.tab(2, text='Date', compound='left', underline='-1')
+
+
+class SortDetails(Notebook):
+    def __init__(self, master, sup=None, results=None, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self._sup = sup
+        self.results = results
 
 
 class SubsList(LabelFrame):
@@ -303,9 +311,11 @@ class SubsList(LabelFrame):
     def clicked(self, selected=None, event=None):
         selected = selected[0]
         from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
+        from ..dc.dc_apps import SupDCHome2, DCRegion
 
         if self.dialog.get():
-            if isinstance(selected, Record): RecordDialog(self, record=selected)
+            if isinstance(selected, DCRegion): SupDCHome2(self.topest, region=selected)
+            elif isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Person): PersonDialog(self, person=selected)
             elif isinstance(selected, RecordsManager): ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
             else: ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
@@ -329,6 +339,7 @@ class RegionDetails(FillWidgets, LabelFrame):
         self.set(region)
     
     def set(self, region):
+        if not region: return
         vs = ['office', 'department', 'sup', 'sub']
         values = {}
 
@@ -364,9 +375,9 @@ class FurtherDetails(FillWidgets, LabelFrame):
 
         self.actSubsAccs = LabelLabel(self, topKwargs=dict(config=dict(text='Active Subs Accounts', anchor='center')), place=dict(relx=.48, rely=0, relh=.22, relw=.5), orient='h', longent=.7)
 
-        Button(self, place=dict(relx=.73, rely=.44, relh=.22, relw=.25), text='Object Details', command=self.openObjDet)
+        Button(self, place=dict(relx=.7, rely=.44, relh=.22, relw=.28), text='Object Details', command=self.openObjDet)
 
-        Button(self, place=dict(relx=.73, rely=.68, relh=.22, relw=.25), text='Sort and Search', command=self.openSNS)
+        Button(self, place=dict(relx=.7, rely=.68, relh=.22, relw=.28), text='Sort and Search', command=self.openSNS)
 
         self.sns = None
         self.objdet = None
@@ -381,16 +392,26 @@ class FurtherDetails(FillWidgets, LabelFrame):
         self.set()
     
     def set(self):
-        if self.region and not isinstance(self.region, Client):
+        if self.region:
             values = dict(
-                persons=len(self.region.personsManager or []),
-                subs=len(self.region.subRegionsManager),
-                actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
-                accounts=len(self.region.accountsManager),
-                actSubsAccs=self.region.lastAccount.ledgerNumbers
-            )
+                    persons=len(self.region.persons or []),
+                    subs=len(self.region.subRegions or []),
+                    accounts=len(self.region.accounts or [])
+                    )
+            if not isinstance(self.region, Client):
+                values.update(dict(
+                    actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
+                    actSubsAccs=self.region.lastAccount.get('ledgerNumbers', 0)
+                    ))
+            else:
+                self.actSubsAccs.T.config(text='Active Accounts')
+                values.update(dict(
+                    actSubsAccs=len(self.region.accounts.sortSubsByDate(DateTime.now()))
+                ))
+            
+            print(values)
 
-            super().set(values)
+            if values: super().set(values)
     
     def openSNS(self):
         if self.sns: self.sns.destroy()

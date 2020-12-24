@@ -1,13 +1,14 @@
 from ..core.agam_extensions import *
 from ..core.prmp_gui.two_widgets import *
-from ...backend.dc.dc_regions import Client
+from ...backend.dc.dc_regions import *
+
 
 class DC_Digits(FillWidgets, Frame):
     
     def __init__(self, master, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         FillWidgets.__init__(self, values)
-        font = self.DEFAULT_FONT
+        font = self.DEFAULT_FONT.copy()
         font['size'] = 20
      # Incomes
         self._incomes = incomes = LabelFrame(self, text='Incomes')
@@ -114,7 +115,7 @@ class DC_Overview(Frame):
     def __init__(self, master, title='DC Overview', orient='v', region=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.region = region
-        self.account = region.lastAccount
+        self.account = region.lastAccount if region else None
 
         self.month = LabelLabel(self, topKwargs=dict(text='Month'), orient='h', longent=.3)
 
@@ -175,57 +176,6 @@ class DC_Overview(Frame):
         _prev = self.account.previous
         if _prev: self.updateDCDigits(_prev)
 
-
-class SupDCDetails(FillWidgets, LabelFrame):
-    def __init__(self, master, text='Details', region=None, **kwargs):
-        LabelFrame.__init__(self, master, text=text, **kwargs)
-
-        self.region = region
-        FillWidgets.__init__(self)
-        
-        self.persons = LabelButton(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.35, relw=.2), orient='h', longent=.5)
-
-        self.subs = LabelButton(self, topKwargs=dict(config=dict(text='Total Subs', anchor='center')), place=dict(relx=.02, rely=.4, relh=.35, relw=.25), orient='h', longent=.55)
-
-        self.actSubs = LabelButton(self, topKwargs=dict(config=dict(text='Active Subs', anchor='center')), place=dict(relx=.3, rely=0, relh=.35, relw=.3), orient='h')
-
-        self.accounts = LabelButton(self, topKwargs=dict(config=dict(text='Total Accounts', anchor='center')), place=dict(relx=.3, rely=.4, relh=.35, relw=.3), orient='h', longent=.65)
-        
-        self.actSubsAccs = LabelButton(self, topKwargs=dict(config=dict(text='Active Subs Accounts', anchor='center')), place=dict(relx=.62, rely=0, relh=.35, relw=.32), orient='h', longent=.65)
-
-        Button(self, place=dict(relx=.65, rely=.632, h=28, w=119), text='Object Details', command=self.openObjDet)
-
-        Button(self, place=dict(relx=.795, rely=.632, h=28, w=119), text='Search', command=self.openSNS)
-
-        self.sns = None
-        self.objdet = None
-
-        self.addResultsWidgets(['persons', 'subs', 'actSubs', 'accounts', 'actSubsAccs'])
-
-        self.set()
-    
-    def set(self):
-        if self.region:
-            values = dict(
-                persons=len(self.region.personsManager),
-                subs=len(self.region.subRegionsManager),
-                actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
-                accounts=len(self.region.accountsManager),
-                actSubsAccs=self.region.lastAccount.ledgerNumbers
-            )
-
-            super().set(values)
-    
-    def openSNS(self):
-        if self.sns: self.sns.destroy()
-        self.sns = SortNSearch(self, sup=self.region)
-        self.sns.mainloop()
-    
-    def openObjDet(self):
-        if self.objdet:
-            self.objdet.destroy()
-        self.objdet = ObjectDetails(self, sup=self.region)
-        self.objdet.mainloop()
 
 
 

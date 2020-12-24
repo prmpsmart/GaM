@@ -233,10 +233,10 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def week(self): return self.date.week
     
-    def __getattr__(self, attr):
+    def __getattr__(self, attr, dontRaise=False):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
-        else: self.attrError(attr)
+        elif not dontRaise: self.attrError(attr)
     
     # def __setattr__(self, attr, value): return None
     
