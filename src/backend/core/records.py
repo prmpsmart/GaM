@@ -139,6 +139,9 @@ class Repayment(Record):
                 if self.paid: self.completed()
                 return repayment
     
+    @property
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'
+    
     def completed(self): pass
 
 class Salary(Record):

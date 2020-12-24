@@ -188,7 +188,7 @@ class Upfronts(RepaymentsManager):
         maxDebit = rate * 30
         
         if (int(self.account.debits) + int(self) + upfront) > maxDebit: raise DCErrors.UpfrontsError(f'Client\'s debit can\'t be more than {maxDebit}')
-        else: self.createRecord(upfront)
+        else: return self.createRecord(upfront)
     
     @property
     def repaidUpfront(self): return self.repaid
