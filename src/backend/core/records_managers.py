@@ -214,6 +214,7 @@ class RecordsWithSameSeasons(SeasonRecord):
 class RecordsManager(ObjectsManager):
     lowest = 50
     ObjectType = Record
+    MultipleSubsPerMonth = True
     subTypes = ['Records']
     
     def __init__(self, account=None): ObjectsManager.__init__(self, account)

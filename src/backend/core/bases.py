@@ -357,6 +357,7 @@ class Object(CompareByNumber, ObjectsMixins):
 
 class ObjectsManager(ObjectsMixins):
     ObjectType = Object
+    MultipleSubsPerMonth = False
     
     def __init__(self, master=None):
         assert master != None, 'Master can not be None.'
@@ -418,10 +419,12 @@ class ObjectsManager(ObjectsMixins):
 
                 if count.count(True) == len(count): return sub
     
-    def createSub(self, *args, **kwargs):
+    def createSub(self, *args, date=None, **kwargs):
         last = self.last
+        exist = self.sortSubsByDate(date)
+        if len(exist) and not self.MultipleSubsPerMonth: raise self.Error(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         
-        sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, **kwargs)
+        sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)
         if last: last.next = sub
         
         self.addSub(sub)

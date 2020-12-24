@@ -11,7 +11,8 @@ class DCOfficeAccount(AreaAccount):
     Manager = 'DCOfficeAccountsManager'
 
     def _balanceAccount(self, date=None):
-        areasAccounts = self.clientsAccounts
+        areasAccounts = self.manager.sortSubRegionsAccountsByMonth(self.date)
+        for a in areasAccounts: a.balanceAccount()
         if areasAccounts:
             self.incomes.updateWithOtherManagers([account.incomes for account in areasAccounts])
             

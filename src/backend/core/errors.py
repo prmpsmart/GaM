@@ -1,6 +1,6 @@
 
 
-class Errors:
+class Errors(Exception):
     class RegionsManagerError(Exception): pass
     class DateTimeError(Exception): pass
     class AccountError(Exception): pass

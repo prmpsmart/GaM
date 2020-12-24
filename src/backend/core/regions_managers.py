@@ -3,6 +3,7 @@ from .regions import *
 class RegionsManager(ObjectsManager):
     ObjectType = Region
     subTypes = ['Regions']
+    MultipleSubsPerMonth = True
     
     def __init__(self, master):
         ObjectsManager.__init__(self, master)

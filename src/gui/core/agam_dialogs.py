@@ -2,8 +2,9 @@ from .agam_extensions import *
 
 class PersonDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Person Dialog', person=None, geo=(550, 390), values={}, **kwargs):
+    def __init__(self, master=None, title='Person Dialog', person=None, manager=None, geo=(550, 390), values={}, **kwargs):
 
+        self.manager = manager
         self.person = person
         if person: title = f'{person.master.className} {title}'
         
@@ -32,6 +33,21 @@ class PersonDialog(PRMP_Dialog):
         self.regDate = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
+
+    
+    def processInput(self):
+        result = super().processInput()
+
+        if self.person and PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question').result == True: self.person.update(result)
+        
+        elif self.manager and PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question').result == True:
+            person = self.manager.createPerson(**result)
+            self._setResult(person)
+
+        if self._return: self.destroy()
+
+
+
 PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
@@ -79,7 +95,9 @@ class RecordDialog(PRMP_Dialog):
 
         if self.record and PRMP_MsgBox(self, title='Edit Record Details', message='Are you sure to edit the details of this record?', _type='question').result == True: self.record.update(result)
         
-        elif self.manager and PRMP_MsgBox(self, title='Record Creation', message='Are you sure to create a new record?', _type='question').result == True: record = self.manager.createRecord(**result)
+        elif self.manager and PRMP_MsgBox(self, title='Record Creation', message='Are you sure to create a new record?', _type='question').result == True:
+            record = self.manager.createRecord(**result)
+            self._setResult(record)
 
         if self._return: self.destroy()
 

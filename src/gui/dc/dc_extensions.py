@@ -86,13 +86,14 @@ class DC_Digits(FillWidgets, Frame):
             overdue=int(upfronts.overdue),
 
             balances=int(account.balances),
-            broughts=int(account.broughtForwards))
+            broughts=int(account.broughtForwards),
+            transfers=int(account.transfers)
+            )
         
         if not isinstance(account.region, Client):
             not_client = dict(
                 commissions=int(account.commissions),
                 btos=int(account.btos),
-                transfers=int(account.transfers),
                 deficits=int(account.deficits),
                 excesses=int(account.excesses))
             fillDict.update(not_client)

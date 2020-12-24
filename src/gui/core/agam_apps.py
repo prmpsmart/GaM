@@ -210,6 +210,8 @@ class ObjectDetails(PRMP_MainWindow):
     def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
+        self.creations = {'Accounts': None, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
+
         self._sup = sup
         if sup: self.addTitleBar(f'{sup} Subscripts Details')
 
@@ -218,6 +220,8 @@ class ObjectDetails(PRMP_MainWindow):
         self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup.name if sup else 'Name'))
 
         self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=sup.subTypes if sup else []), orient='h', longent=.4, func=self.changeSubs)
+
+        self.new = Checkbutton(sups, text='New?', place=dict(relx=.77, rely=.09, relh=.05, relw=.22))
 
         self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='datebutton', top='checkbutton', bottomKwargs=dict(font='DEFAULT_MENU_FONT'))
 
@@ -236,9 +240,17 @@ class ObjectDetails(PRMP_MainWindow):
         return subs
 
     def changeSubs(self, e=0):
-        self.selectedSubType
-        subs = self.getSubs()
-        if self._sup: self.subsList.set(subs)
+        if self.new.get():
+            st = self.selectedSubType
+            if self._sup.className in ('Client', 'Member') and st == 'Persons':
+                PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className} ', _type='error')
+                return
+            if st in self.creations:
+                dialog = self.creations[st]
+                if dialog: dialog(self, manager=self._sup)
+        else:
+            subs = self.getSubs()
+            if self._sup: self.subsList.set(subs)
 
     def openSup(self):
         pass

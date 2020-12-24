@@ -100,7 +100,7 @@ class ClientAccount(DCAccount):
 
 class AreaAccount(DCAccount):
     Manager = 'AreaAccountsManager'
-    
+
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
         self.commissions = Commissions(self)
@@ -124,7 +124,8 @@ class AreaAccount(DCAccount):
     def btos(self): return self.broughtToOffices
     
     def _balanceAccount(self, date=None):
-        clientsAccounts = self.clientsAccounts
+        clientsAccounts = self._clientsAccounts
+        for a in self._clientsAccounts: a.balanceAccount()
         if clientsAccounts:
 
             self.incomes.updateWithOtherManagers([account.incomes for account in clientsAccounts])
@@ -169,6 +170,7 @@ class AreaAccount(DCAccount):
 
 class ClientAccountsManager(DCAccountsManager):
     ObjectType = ClientAccount
+    MultipleSubsPerMonth = True
     
     def __init__(self, region, **kwargs):
         self.startRate = kwargs.get('rate', 0)

@@ -399,6 +399,7 @@ class FurtherDetails(FillWidgets, LabelFrame):
                     accounts=len(self.region.accounts or [])
                     )
             if not isinstance(self.region, Client):
+                self.actSubsAccs.T.config(text='Active Subs Accounts')
                 values.update(dict(
                     actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
                     actSubsAccs=self.region.lastAccount.get('ledgerNumbers', 0)
