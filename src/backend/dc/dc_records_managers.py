@@ -106,9 +106,7 @@ class Contributions(DCRecordsManager):
                 
                 if remain > 0: savRec = self.savings.addSaving(remain, note=note, coRecord=repRec, **kwargs)
 
-            else: savRec = self.savings.addSaving(contr, coRecord=incRec, **kwargs)
-
-
+            else: savRec = self.savings.addSaving(contr, coRecord=incRec, note=note, **kwargs)
             # self.balance()
             return conRec
 

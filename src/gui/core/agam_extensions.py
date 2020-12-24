@@ -296,6 +296,7 @@ class SubsList(LabelFrame):
         self.listbox.bind('<Double-1>', self.clicked)
 
     def set(self, values, **kwargs):
+        if not values: return
         self.listbox.set(values, **kwargs)
         self.total.set(self.listbox.last)
     

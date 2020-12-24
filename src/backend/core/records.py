@@ -12,7 +12,7 @@ class CoRecords(list):
 class Record(Object):
     Manager = 'RecordsManager'
     _type = 'rec'
-    subTypes = ['CO Records']
+    subTypes = ['Co Records', 'Linked Records']
 
     def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
         Object.__init__(self, manager, name=note, **kwargs)
@@ -31,7 +31,7 @@ class Record(Object):
         self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
 
     def addCoRecord(self, coRecord):
-        if coRecord in self.coRecords: print(self.name, coRecord.name, 990); return
+        if coRecord in self.coRecords: return
         self.coRecords.addCoRecord(coRecord)
 
     def updateOtherCoRecord(self, other):
@@ -52,10 +52,13 @@ class Record(Object):
         elif self.__coRecord != None: return self.__coRecord.coRecords
 
     @property
-    def linkedRecords(self): return [self, *self.coRecords]
+    def linkedRecords(self): return [c for c in self.coRecords if c is not self]
     
-    def update(self, values={}):
+    def update(self, values={}, first=1):
         super().update(values)
+        if first:
+            h = self.linkedRecords
+            for rec in h: rec.update(values, 0)
         self.manager.update()
     
     def __int__(self): return self.money

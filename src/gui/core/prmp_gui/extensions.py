@@ -217,7 +217,7 @@ class PRMP_DateButton(PRMP_Button):
         self['text'] = placeholder
     
     def verify(self):
-        if self.DT.checkDateTime(self.date): return True
+        if self.DT.checkDateTime(self.date, 1): return True
         else: return False
 
     def action(self):

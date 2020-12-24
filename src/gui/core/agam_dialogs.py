@@ -36,23 +36,44 @@ PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Record Dialog', geo=(300, 300), manager=None,  record=None, values={}, **kwargs):
+    def __init__(self, master=None, title='Record Dialog', geo=(350, 350), manager=None,  record=None, values={}, **kwargs):
         
         self.manager = manager
         self.record = record
-        if record: title = f'{record.region.className} {title}'
+        if record: title = f'{record.className} Record'
 
-        super().__init__(master=master, title=title, geo=geo, values=record if record else values **kwargs)
+        super().__init__(master=master, title=title, geo=geo, values=record if record else values, **kwargs)
     
     def _setupDialog(self):
         self.addEditButton()
 
-        self.money = LabelEntry(self.container, place=dict(relx=.02, rely=.01, relh=.15, relw=.96), longent=.35, topKwargs=dict(config=dict(text='Money')), orient='h', bottomKwargs=dict(_type='money'))
-        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.02, rely=.16, relh=.15, relw=.96), longent=.35, orient='h')
-        self.note = LabelText(self.container, topKwargs=dict(config=dict(text='Note')), place=dict(relx=.02, rely=.32, relh=.5, relw=.96), longent=.35, orient='h')
-        Button(self, place=dict(relx=.02, rely=.32, relh=.5, relw=.96))
+        bothcont = Frame(self.container, place=dict(relx=.005, rely=.005, relh=.85, relw=.989))
+        self.cont = Frame(bothcont, place=dict(relx=0, rely=0, relh=1, relw=1), relief='groove')
+
+        self.money = LabelEntry(self.cont, place=dict(relx=.02, rely=.01, relh=.15, relw=.96), longent=.35, topKwargs=dict(config=dict(text='Money')), orient='h', bottomKwargs=dict(_type='money'))
+        self.date = LabelDateButton(self.cont, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.02, rely=.16, relh=.15, relw=.96), longent=.35, orient='h')
+        self.note = LabelText(self.cont, topKwargs=dict(config=dict(text='Note')), place=dict(relx=.02, rely=.32, relh=.5, relw=.96), longent=.35, orient='h')
+        self.chee = Checkbutton(self.cont, place=dict(relx=.63, rely=.84, relh=.14, relw=.34), text='Co Records', command=self.openCoRecords)
+
+        self.coRecords = SubsList(bothcont, text='Co Records', highlightable=0)
+        self.coRecords.total.T.config(text='Total')
+
         self.addResultsWidgets(['note', 'money', 'date'])
     
+    def openCoRecords(self):
+        self.changeGeo()
+
+    def changeGeo(self):
+        if self.chee.get():
+            geo, relw = (600, 350), .5
+            self.coRecords.set(self.record.linkedRecords)
+            self.coRecords.place(relx=relw, rely=0, relh=1, relw=relw)
+        else:
+            geo, relw = (350, 350), 1
+            self.coRecords.place_forget()
+        self.changeGeometry(geo=geo)
+        self.cont.place(relx=0, rely=0, relh=1, relw=relw)
+
     def processInput(self):
         result = super().processInput()
 
