@@ -252,15 +252,7 @@ PDB = PRMP_DateButton
 class PRMP_MonthButton(PRMP_DateButton): attr = 'monthName'
 PMoB = PRMP_MonthButton
 
-class PRMP_MonthYearButton(PRMP_DateButton):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, **kwargs):
-        
-        PRMP_Button.__init__(self, master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
-        PRMP_DateWidget.__init__(self, min_=min_, max_=max_)
-        self['text'] = placeholder
-
-    def show(self):
-        if self.date: self.config(text=self.date.monthName)
+class PRMP_MonthYearButton(PRMP_DateButton): attr = 'monthYear'
 
 
 class ScrollableFrame(PRMP_Frame):

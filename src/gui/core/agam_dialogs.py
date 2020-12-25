@@ -116,7 +116,7 @@ class AccountDialog(PRMP_Dialog):
         
         # self.addEditButton()
         
-        self.date = LabelMonthButton(self.container, topKwargs=dict(config=dict(text='Month')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4)
+        self.date = LabelMonthYearButton(self.container, topKwargs=dict(config=dict(text='Month')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4)
 
         # self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
 

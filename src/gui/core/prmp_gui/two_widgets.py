@@ -6,7 +6,7 @@ from .extensions import *
 class TwoWidgets(PRMP_Frame):
     top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
     stop_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Style_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
-    bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox, 'button': PRMP_Button, 'monthbutton': PRMP_MonthButton}
+    bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox, 'button': PRMP_Button, 'monthbutton': PRMP_MonthButton, 'monthyearbutton': PRMP_MonthYearButton}
     sbottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': ttk.Spinbox, 'button': PRMP_Button}
     events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}
@@ -210,5 +210,9 @@ LDB = LabelDateButton
 class LabelMonthButton(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='monthbutton', **kwargs)
 LMB = LabelMonthButton
+
+class LabelMonthYearButton(TwoWidgets):
+    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='monthyearbutton', **kwargs)
+LMYB = LabelMonthYearButton
 
 
