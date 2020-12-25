@@ -2,8 +2,8 @@ from .dc_dialogs import *
 
 
 class DCHome(PRMP_MainWindow):
-    def __init__(self, master=None, geo=(1000, 850), title='DC Home', region=None, **kwargs):
-        super().__init__(master, geo=geo, title=title, **kwargs)
+    def __init__(self, master=None, geo=(1000, 850), title='DC Home', region=None, resize=(1, 1), **kwargs):
+        super().__init__(master, geo=geo, title=title, resize=resize, **kwargs)
 
         self.region = region
         self.addTitleBar(region)

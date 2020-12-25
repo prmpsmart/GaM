@@ -67,9 +67,7 @@ class Mixins:
                     if isinstance(ret, property): return ret.fget(self)
                     return ret
         return unget
-    
-    get = getFromSelf
-    
+        
     def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False

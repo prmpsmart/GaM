@@ -237,7 +237,7 @@ class PRMP_DateWidget:
         self.show()
         
     def show(self):
-        if self.date: self.config(text=self.date.get(self.attr))
+        if self.date: self.config(text=self.date.getFromSelf(self.attr))
 
 
 class PRMP_DateButton(PRMP_DateWidget, PRMP_Button):

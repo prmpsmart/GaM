@@ -1830,7 +1830,7 @@ class PRMP_Window(PRMP_Widget):
     TKICON = ''
     PRMPICON = ''
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=True, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
         
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
@@ -1882,7 +1882,6 @@ class PRMP_Window(PRMP_Widget):
     
     def windowAttributes(self, topMost=0, toolWindow=0, alpha=1, noTitleBar=1,  addTitleBar=1, addStatusBar=1, tkIcon='', prmpIcon='', resize=(1, 1)):
         self.resize = resize
-        
         self.resizable(*self.resize)
         
         self.noTitleBar = noTitleBar
@@ -2307,7 +2306,6 @@ class PRMP_MainWindow(Mixins):
         if attr != '_prmp_': return attr
         else: return getattr(self.root, name)
 
-    
     def __getattr__(self, name): return getattr(self.root, name)
 MainWindow = PMW = PRMP_MainWindow
 
