@@ -206,9 +206,6 @@ class Region(Object):
     def regions(self): return self.subRegions
     
     @property
-    def regions(self): return self.subRegions
-    
-    @property
     def subRegionsCount(self): return len(self.subRegions)
         
     @property

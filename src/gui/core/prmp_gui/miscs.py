@@ -95,7 +95,7 @@ class Column(Col_Mixins):
     
     def __init__(self, index, column):
         self.index = '#%d'%index
-        self._type = None
+        self.type = None
         value, width = '', 20
         if isinstance(column, (list, tuple)):
             l = len(column)
@@ -109,7 +109,7 @@ class Column(Col_Mixins):
             self.attr = column.get('attr', self.propertize(self.text))
             self.value = column.get('value', value)
             self.width = column.get('width', width)
-            self._type = column.get('type')
+            self.type = column.get('type')
         
         else:
             self.text = column
@@ -124,8 +124,8 @@ class Column(Col_Mixins):
     
     def get(self, obj):
         if obj:
-            if self._type:
-                try: return self._type(obj)
+            if self.type:
+                try: return self.type(obj)
                 except: pass
             return getattr(obj, self.attr, '') or ''
 

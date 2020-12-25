@@ -59,7 +59,7 @@ class ClientAccountDialog(AccountDialog):
         super()._setupDialog()
         self.addEditButton()
         
-        self.rate = LabelEntry(self.container, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number'),orient='h', place=dict(relx=.005, y=52, h=40, relw=.8), longent=.4)
+        self.rate = LabelEntry(self.container, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='money'),orient='h', place=dict(relx=.005, y=52, h=40, relw=.8), longent=.4)
         
         self.addResultsWidgets('rate')
 

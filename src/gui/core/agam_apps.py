@@ -228,6 +228,7 @@ class ObjectDetails(PRMP_MainWindow):
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
         self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
+        # PRMP_TreeView
         
         self.paint()
 
@@ -240,8 +241,8 @@ class ObjectDetails(PRMP_MainWindow):
         return subs
 
     def changeSubs(self, e=0):
+        st = self.selectedSubType
         if self.new.get():
-            st = self.selectedSubType
             if self._sup.className in ('Client', 'Member') and st == 'Persons':
                 PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className} ', _type='error')
                 return
@@ -250,7 +251,11 @@ class ObjectDetails(PRMP_MainWindow):
                 if dialog: dialog(self, manager=self._sup)
         else:
             subs = self.getSubs()
-            if self._sup: self.subsList.set(subs)
+            if subs:
+                self.subs.setColumns(['Name'])
+                self.subsList.set(subs)
+                print(st)
+                self.subs._set(obj=subs, op=1)
 
     def openSup(self):
         pass

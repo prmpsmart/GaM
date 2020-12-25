@@ -91,8 +91,6 @@ class RegionRadioCombo(RadioCombo):
 RRC = RegionRadioCombo
 
 class Hierachy(PRMP_TreeView):
-    __shows = ['tree', 'headings']
-    __slots__ = ['tree']
     
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, columns=columns, **kwargs)

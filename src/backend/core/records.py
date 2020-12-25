@@ -40,8 +40,8 @@ class Record(Object):
     def updateCoRecord(self):
         for rec in self.__coRecords: rec.updateOtherCoRecord(self)
 
-    @property
-    def subs(self): return self.coRecords
+    # @property
+    # def subs(self): return self.coRecords
 
     @property
     def coRecord(self): return self.__coRecord

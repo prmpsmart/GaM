@@ -515,7 +515,7 @@ class PRMP_Widget(PRMP_Theme):
         self.nonText = nonText
 
         self.toggleGroup = []
-        
+
         self.val = self.value = self.kwargs.get('value', '1')
         self.var = self.variable = self.kwargs.get('variable')
     
@@ -2379,9 +2379,10 @@ class PRMP_TreeView(PRMP_Frame):
         self.treeview = None
         self.xscrollbar = None
         self.yscrollbar = None
+        self.obj = None
 
         self.columns = Columns(columns)
-        # print(self.columns)
+        
         self.setColumns(columns)
         self.create()
         
@@ -2448,10 +2449,9 @@ class PRMP_TreeView(PRMP_Frame):
     def updateHeading(self):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
-            # print(column.width, time.time.time())
             self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
-    def _set(self, obj=None, parent='', op=False):
+    def _set(self, obj=None, parent='', subs='subs', op=False):
         
         cols = self.columns.get(obj)
         
@@ -2469,20 +2469,22 @@ class PRMP_TreeView(PRMP_Frame):
             self.firstItem = item
             self.treeview.focus(self.firstItem)
         
-        subs = obj.subs
-        if subs:
-            for sub in subs: self._set(sub, item, op)
+        _subs = obj.getFromSelf(subs)
+        if _subs:
+            for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
     
     def set(self, obj, op=0):
         self.setColumns()
         if self.firstItem:
             self.tree.delete(self.firstItem)
             self.firstItem = None
+        
         if obj:
             self.obj = obj
             self._set(obj, op=op)
     
     def reload(self): self.set(self.obj)
+
 TreeView = PTV = PRMP_TreeView
 
 
