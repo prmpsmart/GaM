@@ -37,7 +37,7 @@ class Person(Object):
         
         self.address = address
 
-        self.addEditableValues(['gender', 'phone', 'image', 'email', 'address'])
+        self.addEditableValues(['gender', 'phone', 'image', 'email', 'address', 'name'])
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     

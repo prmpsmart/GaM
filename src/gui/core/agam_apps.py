@@ -207,13 +207,13 @@ class SortNSearch(PRMP_MainWindow):
 
 class ObjectDetails(PRMP_MainWindow):
     
-    def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
+    def __init__(self, master=None, geo=(1500, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self.creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
 
         self._sup = sup
-        if sup: self.addTitleBar(f'{sup} Subscripts Details')
+        if sup: self.addTitleBar(sup)
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         
@@ -239,6 +239,11 @@ class ObjectDetails(PRMP_MainWindow):
         subType = self.selectedSubType
         subs = self._sup[subType] or []
         return subs
+    
+    @property
+    def columns(self):
+        if isinstance(self._sup, RecordsManager): return [{'text': 'Type', 'attr': 'className'}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        return ['Name']
 
     def changeSubs(self, e=0):
         st = self.selectedSubType
@@ -252,9 +257,8 @@ class ObjectDetails(PRMP_MainWindow):
         else:
             subs = self.getSubs()
             if subs:
-                self.subs.setColumns(['Name'])
+                self.subs.setColumns(self.columns)
                 self.subsList.set(subs)
-                print(st)
                 self.subs._set(obj=subs, op=1)
 
     def openSup(self):

@@ -195,6 +195,8 @@ class Object(CompareByNumber, ObjectsMixins):
         
     @property
     def name(self): return self._name
+    @name.setter
+    def name(self, n): self._name = n
     
     @property
     def manager(self): return self._manager
