@@ -2,7 +2,7 @@ __author__ = 'PRMPSmart@gmail.com'
 
 from datetime import datetime, timedelta, date
 from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
-from .errors import Errors
+from .mixins import Mixins, Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
 
@@ -26,8 +26,6 @@ class OldCompareByDate:
     def __ge__(self, other):
         if other == None: return True
         return self.date >= other.date
-
-
 
 class CompareByDate:
     def __lt__(self, other):
@@ -108,8 +106,6 @@ class CompareByYear:
     def __ge__(self, other):
         if other == None: return True
         return self.date.year >= other.date.year
-
-
 
 
 _DAYS_IN_MONTH = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -230,7 +226,7 @@ def _ord2ymd(n):
     return year, month, n+1
 
 
-class DateTime(datetime):
+class DateTime(datetime, Mixins):
     date_fmt = "%d/%m/%Y"
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
     Error = Errors.DateTimeError

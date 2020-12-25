@@ -71,6 +71,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         return self.result
         
     def editInput(self, e=0):
+        if self.editBtn == None: return
         if e: self.editBtn.var.set('1')
         if self.editBtn.var.get() == '1':self.placeSubmitBtn(1)
         else: self.placeSubmitBtn()

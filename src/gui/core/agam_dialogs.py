@@ -1,7 +1,7 @@
 from .agam_extensions import *
 
 class PersonDialog(PRMP_Dialog):
-    
+
     def __init__(self, master=None, title='Person Dialog', person=None, manager=None, geo=(550, 390), values={}, **kwargs):
 
         self.manager = manager
@@ -34,7 +34,6 @@ class PersonDialog(PRMP_Dialog):
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
 
-    
     def processInput(self):
         result = super().processInput()
 
@@ -45,9 +44,6 @@ class PersonDialog(PRMP_Dialog):
             self._setResult(person)
 
         if self._return: self.destroy()
-
-
-
 PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
@@ -100,11 +96,32 @@ class RecordDialog(PRMP_Dialog):
             self._setResult(record)
 
         if self._return: self.destroy()
-
-
 RecD = RecordDialog
- 
 
+
+class AccountDialog(PRMP_Dialog):
+
+    
+    def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(300, 300), values={}, **kwargs):
+
+        self.manager = manager
+        self.account = account
+        if account: title = f'{account.master.className} {title}'
+        
+        super().__init__(master=master, title=title, geo=geo, values=account if account else values, **kwargs)
+    
+    def _setupDialog(self):
+        name = self.values.get('name')
+        if name: self.addTitleBar(name)
+        
+        # self.addEditButton()
+        
+        self.date = LabelMonthButton(self.container, topKwargs=dict(config=dict(text='Month')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4)
+
+        # self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
+
+
+AccD = AccountDialog
 
 
 
