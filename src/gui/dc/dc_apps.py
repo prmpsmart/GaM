@@ -12,7 +12,7 @@ class DCHome(PRMP_MainWindow):
 
         self.furtherDetails = FurtherDetails(self.container, place=dict(relx=.46, rely=.005, relh=.22, relw=.535), region=region)
 
-        self.dc_overview = DC_Overview(self.container, place=dict(relx=.005, rely=.23, relh=.765, relw=.99), orient='h', region=region, relief='groove')
+        self.dc_overview = DC_Overview(self.container, place=dict(relx=.005, rely=.23, relh=.765, relw=.99), orient='v', region=region, relief='groove')
 
         self.paint()
 

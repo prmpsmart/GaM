@@ -311,10 +311,10 @@ class SubsList(LabelFrame):
     def clicked(self, selected=None, event=None):
         selected = selected[0]
         from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
-        from ..dc.dc_apps import SupDCHome2, DCRegion
+        from ..dc.dc_apps import DCHome, DCRegion
 
         if self.dialog.get():
-            if isinstance(selected, DCRegion): SupDCHome2(self.topest, region=selected)
+            if isinstance(selected, DCRegion): DCHome(self.topest, region=selected)
             elif isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Person): PersonDialog(self, person=selected)
             elif isinstance(selected, RecordsManager): ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)

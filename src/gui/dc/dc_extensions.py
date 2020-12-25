@@ -140,15 +140,15 @@ class DC_Overview(Frame):
         if region: self.updateDCDigits(self.account)
     
     def placeVertically(self):
-        x, y = self.toplevel.geo
-
-        self.dcDigits.place(relx=0, rely=0, relh=1, relw=.369)
-        self._prev.place(relx=.375, y=0, relw=.15, relh=.04)
-        self._next.place(relx=.53, y=0, relw=.15, relh=.04)
-        self.plotDialog.place(relx=.85, y=0, relw=.15, relh=.04)
+        self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
+        self.ledgerNumber.place(relx=.31, rely=.004, relh=.05, relw=.2)
+        self.dcDigits.place(relx=0, rely=.051, relh=.949, relw=.369)
+        self._prev.place(relx=.52, rely=.005, relw=.15, relh=.04)
+        self._next.place(relx=.68, rely=.005, relw=.15, relh=.04)
+        self.plotDialog.place(relx=.85, rely=.005, relw=.15, relh=.04)
         self.dcDigits.placeVertically()
-        self.plotCanvas1.place(relx=.375, rely=.04, relh=.48, relw=.625)
-        self.plotCanvas2.place(relx=.375, rely=.52, relh=.48, relw=.625)
+        self.plotCanvas1.place(relx=.375, rely=.051, relh=.4745, relw=.625)
+        self.plotCanvas2.place(relx=.375, rely=.5255, relh=.4745, relw=.625)
 
     def placeHorizontally(self):
         self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
