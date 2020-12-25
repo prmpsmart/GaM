@@ -410,8 +410,6 @@ class FurtherDetails(FillWidgets, LabelFrame):
                     actSubsAccs=len(self.region.accounts.sortSubsByDate(DateTime.now()))
                 ))
             
-            print(values)
-
             if values: super().set(values)
     
     def openSNS(self):

@@ -109,7 +109,7 @@ class FillWidgets:
                     if verify(): result[widgetName] = get
                     else:
                         from .dialogs import PRMP_MsgBox
-                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()} is required to proceed!', _type='error', okText='Understood')
+                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()}* is required to proceed!', _type='error', okText='Understood')
                         return
                 else: result[widgetName] = get
         return result

@@ -293,7 +293,7 @@ class ObjectsManager(ObjectsMixins):
     
     def createSub(self, *args, date=None, **kwargs):
         last = self.last
-        exist = self.sortSubsByDate(date)
+        exist = self.sortSubsByMonth(date or DateTime.now())
         if len(exist) and not self.MultipleSubsPerMonth: raise self.Error(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)

@@ -102,20 +102,21 @@ CD = CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(338, 169), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', **kwargs):
+    def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', msgFont='DEFAULT_FONT', **kwargs):
         
         self.message = message
+        self.msgFont = msgFont
         self._type = _type
         self.okText = okText
         self.ask = ask
         self._cancel = cancel
         if okText: self.ask = 0
-        # print(kwargs)
+        
         super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, editable=False, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
-        self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250))
+        self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250), font=self.msgFont)
         
         self.label.place(x=0, y=0, relh=1, relw=.85)
         

@@ -190,7 +190,7 @@ class ClientAccountsManager(DCAccountsManager):
             areaAcc.addClientAccount(acc)
             return acc
 
-        else: raise self.Error.AccountError(f'{area} does not have an account in {month} ')
+        else: raise self.Error.AccountError(f'{area} does not have an account in {month.monthYear} ')
 
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)

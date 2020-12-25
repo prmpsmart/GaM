@@ -210,7 +210,7 @@ class ObjectDetails(PRMP_MainWindow):
     def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
-        self.creations = {'Accounts': None, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
+        self.creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
 
         self._sup = sup
         if sup: self.addTitleBar(f'{sup} Subscripts Details')

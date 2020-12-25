@@ -495,9 +495,12 @@ class PRMP_Widget(PRMP_Theme):
 
 
 
-    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, **kwargs):
+    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', **kwargs):
 
         self.kwargs = kwargs.copy()
+        self.kwargs['font'] = font or 'PRMP_FONT'
+
+
         if asEntry:
             relief = 'sunken'
             self.kwargs['asEntry'] = asEntry
@@ -518,9 +521,7 @@ class PRMP_Widget(PRMP_Theme):
     
         self._ttk_ = _ttk_
         
-        try:
-            font = self.kwargs.get('font', 'DEFAULT_FONT')
-            self.useFont(font)
+        try: self.useFont(font)
         except: pass
         
         if tip: self.addTip(tip)
