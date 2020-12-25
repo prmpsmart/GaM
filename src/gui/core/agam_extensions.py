@@ -95,8 +95,9 @@ class Hierachy(PRMP_TreeView):
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, columns=columns, **kwargs)
         
-        from .agam_apps import RegionDetails
+        from .agam_apps import RegionDetails, PersonDialog
         self.RD = RegionDetails
+        self.PD = PersonDialog
     
     def bindings(self):
         super().bindings()
@@ -105,9 +106,8 @@ class Hierachy(PRMP_TreeView):
     def viewRegion(self, e=0):
         current = self.selected()
         if current:
-            if current._type == 'reg':
-                if current.level == 5: PersonDialog(self, title=current.name, values=current.person.values)
-                else: self.RD(self, region=current)
+            if isinstance(current, Person): self.PD(self, title=current, values=current)
+            else: self.RD(self, region=current)
 H = Hierachy
 
 

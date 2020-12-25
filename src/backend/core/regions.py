@@ -6,7 +6,6 @@ import os
 DC Objects = Region, Person, Account, Records, Client, Area
 and Managers
 
-
 '''
 
 

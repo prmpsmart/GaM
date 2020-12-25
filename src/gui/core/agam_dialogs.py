@@ -36,8 +36,12 @@ class PersonDialog(PRMP_Dialog):
 
     def processInput(self):
         result = super().processInput()
+        print(result)
         if result: 
-            if self.person and PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question').result == True: self.person.update(result)
+            if self.person and PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question').result == True: 
+                print(self.person.name)
+                self.person.update(result)
+                print(self.person.name)
             
             elif self.manager and PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question').result == True:
                 person = self.manager.createPerson(**result)

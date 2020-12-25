@@ -204,7 +204,7 @@ class ImageLabel(ImageWidget, PRMP_Style_Label):
 IL = ImageLabel
 
 class PRMP_DateWidget:
-    attr = 'date'
+    attr = 'strDate'
     def __init__(self, min_=None, max_=None):
         
         self.date = None

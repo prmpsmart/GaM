@@ -2469,7 +2469,7 @@ class PRMP_TreeView(PRMP_Frame):
             self.firstItem = item
             self.treeview.focus(self.firstItem)
         
-        _subs = obj.getFromSelf(subs)
+        _subs = obj.getFromSelf(subs) if not isinstance(obj, self.containers) else obj
         if _subs:
             for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
     

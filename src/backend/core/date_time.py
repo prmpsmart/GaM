@@ -287,6 +287,8 @@ class DateTime(datetime, Mixins):
     
     def __str__(self): return self.strftime(self.date_fmt)
     
+    @property
+    def strDate(self): return str(self)
     
     @property
     def totalDays(self): # also equal to _days_in_month
