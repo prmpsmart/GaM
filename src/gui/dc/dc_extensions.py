@@ -1,6 +1,9 @@
 from ..core.agam_apps import *
 from ..core.prmp_gui.two_widgets import *
 from ...backend.dc.dc_regions import *
+from ..core.prmp_gui.plotCanvas import PlotCanvas
+
+FramedCanvas = PlotCanvas
 
 
 class DC_Digits(FillWidgets, Frame):
@@ -130,6 +133,10 @@ class DC_Overview(Frame):
 
         self.dcDigits = DC_Digits(self)
 
+        # self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+
+        # self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+
         self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
         self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
@@ -138,6 +145,13 @@ class DC_Overview(Frame):
         else: self.placeHorizontally()
 
         if region: self.updateDCDigits(self.account)
+
+        self.topest.addAfters(self.afterload)
+    
+    def afterload(self):
+        print('asd')
+        self.plotCanvas1.draw()
+        self.plotCanvas2.draw()
     
     def placeVertically(self):
         self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)

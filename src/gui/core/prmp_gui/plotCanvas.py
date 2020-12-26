@@ -1,5 +1,6 @@
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot
+from .core import Frame
 
 
 class Bar:
@@ -172,16 +173,16 @@ class Render:
 
 
 
-class Chart(Frame):
+class PlotCanvas(Frame):
     charts = ["plot", "bar", "barh", "hist", "pie"]
+    bkcol = 'white'
 
 
-    def __init__(self, master=None, relx=0, rely=0, relh=.5, relw=.5):
-        super().__init__(master, relief="solid")
-        self.relx, self.rely, self.relh, self.relw = relx, rely, relh, relw
+    def __init__(self, master=None, relief="solid", **kwargs):
+        super().__init__(master, relief=relief, **kwargs)
         
-        if isinstance(Styles.chart, str): self.bkcol = Styles.chart
-        elif Styles.chart == True: self.bkcol = Styles.background
+        # if isinstance(Styles.chart, str): self.bkcol = Styles.chart
+        # elif Styles.chart == True: self.bkcol = Styles.background
         
         self.figure = pyplot.figure(facecolor=self.bkcol)
         self.canvas = FigureCanvasTkAgg(self.figure, master=self).get_tk_widget()
@@ -392,9 +393,7 @@ class Chart(Frame):
         if a: func(**a)
         else: render()
         
-    def place_widgs(self):
-        self.place(relx=self.relx, rely=self.rely, relh=self.relh, relw=self.relw)
-        self.canvas.place(relx=0, rely=-.03, relh=1.5, relw=1)
+    def place_widgs(self): self.canvas.place(relx=0, rely=-.03, relh=1.5, relw=1)
 
 
 

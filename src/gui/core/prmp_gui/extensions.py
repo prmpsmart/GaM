@@ -53,7 +53,7 @@ class AutoScroll:
         return str(self.master)
 AS = AutoScroll
 
-class FillWidgets:
+class FillWidgets(Mixins):
     
     def __init__(self, values={}):
         self.__resultsWidgets = []
@@ -64,13 +64,13 @@ class FillWidgets:
         
     def addResultsWidgets(self, child):
         if child not in self.__resultsWidgets:
-            if isinstance(child, (list, tuple)):
+            if isinstance(child, self.containers):
                 for ch in child: self.addResultsWidgets(ch)
             else: self.__resultsWidgets.append(child)
         
     def addNotEditables(self, child):
         if child not in self.__notEditables:
-            if isinstance(child, (list, tuple)):
+            if isinstance(child, self.containers):
                 for ch in child: self.addNotEditables(ch)
             else: self.__notEditables.append(child)
     
