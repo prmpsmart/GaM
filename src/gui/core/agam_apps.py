@@ -183,7 +183,7 @@ RLU = RegionLookUp
 
 class SortNSearch(PRMP_MainWindow):
     def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.31, sup=None):
-        super().__init__(master, title=title, geo=geo)
+        super().__init__(master, title=title, geo=geo, tw=1)
 
         self._sup = sup
 

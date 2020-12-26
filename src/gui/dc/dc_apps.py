@@ -25,7 +25,7 @@ class DC_Home1(TreeColumns, Home1):
 
         self.overview = DC_Overview(self.note, region=self.region)
         self.note.add(self.overview, padding=3)
-        self.note.tab(0, text='Regions', compound='left', underline='-1')
+        self.note.tab(0, text='Overview', compound='left', underline='-1')
         
         self.tree = Hierachy(self.note)
         self.note.add(self.tree, padding=3)
