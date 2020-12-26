@@ -6,7 +6,7 @@ from ...backend.agam.agam import AGAM
 from ...backend.dc.dc_regions import Client
 
 
-from ...backend.core.regions_managers import Person, Region, RegionsManager
+from ...backend.core.regions_managers import Person, Region, RegionsManager, ObjectsMixins
 from ...backend.core.records_managers import Record, RecordsManager
 from ...backend.core.accounts import Account, AccountsManager
 
@@ -110,7 +110,7 @@ class Hierachy(PRMP_TreeView):
         if current:
             if isinstance(current, Person): self.PD(self, title=current, person=current)
             elif isinstance(current, Record): self.RecD(self, title=current, record=current)
-            elif isinstance(current, RecordsManager): self.OD(self, title=current, sup=current)
+            else: self.OD(self, title=current, sup=current)
 
     def viewAll(self, obj, parent=''):
         if not obj: return
@@ -118,8 +118,9 @@ class Hierachy(PRMP_TreeView):
         item = self.insert(parent, text=first, values=columns)
         
         self.ivd[item] = obj
+        subs = []
 
-        if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts]
+        if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts, obj.persons]
         elif isinstance(obj, Record):
             # insert
             for a in obj:
@@ -129,10 +130,11 @@ class Hierachy(PRMP_TreeView):
        
                 self.ivd[item_] = a
             return
-        else: subs = obj.subs
+        elif isinstance(obj, ObjectsMixins): subs = obj.subs
         
         if isinstance(subs, list):
-            for sub in subs: self.viewAll(sub, item)
+            for sub in subs:
+                if sub: self.viewAll(sub, item)
 
 H = Hierachy
 

@@ -11,6 +11,7 @@ class MemberDetail(Person):
 
 class CoopCO(Person):
     'Cooperative Cash Officer.'
+    Manager = 'CoopCOsManager'
 
 
 class CoopCOsManager(PersonsManager):

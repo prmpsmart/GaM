@@ -1,5 +1,6 @@
 from .regions import *
 
+
 class RegionsManager(ObjectsManager):
     ObjectType = Region
     subTypes = ['Regions']
@@ -11,13 +12,10 @@ class RegionsManager(ObjectsManager):
         self.__master = master
         self.addRegion = self.addSub
         
-    def __len__(self): return len(self.regions)
-    def __repr__(self): return f'<{self}>'
     def __str__(self): return f'{self.master} | {self.name}'
     
     @property
     def name(self): return f'{self.className}({self.master.name})'
-
 
     @property
     def firstRegion(self): return self.first
@@ -98,9 +96,31 @@ class PersonsManager(ObjectsManager):
     ObjectType = Person
     subTypes = ['Persons']
 
+    
+    def __init__(self, master, **kwargs):
+        super().__init__(master)
+        self.createPerson(**kwargs)
+
+    @property
+    def firstPerson(self): return self.first
+    
     @property
     def lastPerson(self): return self.last
+
     def createPerson(self, **kwargs): return self.createSub(**kwargs)
+
+    @property
+    def name(self): return f'{self.className}({self.master.name})'
+
+    @property
+    def region(self): return self.master
+    
+    @property
+    def date(self): return self.master.date
+    
+    @property
+    def persons(self): return self.subs
+
 
 
 

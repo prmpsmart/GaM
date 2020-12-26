@@ -47,12 +47,12 @@ class Person(Object):
         vals.update({'manager': self.manager})
         return vals
 
+
 class Region(Object):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
     PersonsManager = None
-    Person = None
     _type = 'reg'
     
     subTypes = ['Regions', 'Accounts', 'Records Managers', 'Persons']
@@ -63,7 +63,6 @@ class Region(Object):
         Object.__init__(self, manager, previous=previous, date=date, name=name, number=number, **kwargs)
         
         
-        self._person = None
         self._personsManager = None
         self._subRegionsManager = None
         
@@ -75,10 +74,8 @@ class Region(Object):
         if self.SubRegionsManager:
             self._subRegionsManager = self.SubRegionsManager(self)
             
-            if self.PersonsManager: self._personsManager = self.PersonsManager(self)
+        if self.PersonsManager: self._personsManager = self.PersonsManager(self, name=name, date=date, phone=phone, **kwargs)
 
-        else:
-            if self.Person: self._person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
     
     def __getattr__(self, name):
         ret = self.getFromSelf(name, self._unget)
@@ -181,13 +178,12 @@ class Region(Object):
     @property
     def person(self):
         if self.personsManager: return self.personsManager.lastPerson
-        return self._person
         
     @property
     def personsManager(self): return self._personsManager
     
     @property
-    def persons(self): return self.personsManager or [self.person]
+    def persons(self): return self.personsManager
 
     @property
     def location(self): return self._location

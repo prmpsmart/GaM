@@ -4,11 +4,18 @@ from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsM
 class ClientDetail(Person):
     Manager = 'Client'
     @property
-    def client(self): return self.manager
+    def client(self): return self.manager.master
+
+class ClientDetailsManager(PersonsManager):
+    ObjectType = ClientDetail
+    MultipleSubsPerMonth = False
+
+
 
 
 class DC_CO(Person):
     'Daily Contribution Cash Officer.'
+    Manager = 'DC_COsManager'
 
 
 class DC_COsManager(PersonsManager):
@@ -35,7 +42,7 @@ class Client(DCRegion):
     AccountsManager = ClientAccountsManager
     Manager = 'ClientsManager'
     SubRegionsManager = None
-    Person = ClientDetail
+    # PersonsManager = ClientDetailsManager
 
     subTypes = ['Accounts', 'Records Managers', 'Persons']
     

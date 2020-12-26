@@ -86,7 +86,7 @@ class FillWidgets:
                 if widget:
                     try:
                         val = values.get(widgetName, '')
-                        widget.set(val)
+                        if val: widget.set(val)
                     except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
             if isinstance(values, dict): self.values.update(values)

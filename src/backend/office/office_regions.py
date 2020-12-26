@@ -8,23 +8,23 @@ from ..coop.coop_regions import UnitsManager
 from .office_accounts import *
 
 class DCManagerDetail(Person):
-    pass
+    Manager = 'DCManagerDetailsManager'
 
 class CoopManagerDetail(Person):
-    pass
+    Manager = 'CoopManagerDetailsManager'
 
 class OfficeManagerDetail(Person):
-    pass
+    Manager = 'OfficeManagerDetailsManager'
 
 
 class DCManagerDetailsManager(PersonsManager):
-    detailClass = DCManagerDetail
+    ObjectType = DCManagerDetail
     
 class CoopManagerDetailsManager(PersonsManager):
-    detailClass = CoopManagerDetail
+    ObjectType = CoopManagerDetail
     
 class OfficeManagerDetailsManager(PersonsManager):
-    detailClass = OfficeManagerDetail
+    ObjectType = OfficeManagerDetail
 
 
 class Office(Region):

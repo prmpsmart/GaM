@@ -2,8 +2,7 @@ from ..office.office_regions import OfficesManager, Region
 from .agam_accounts import AGAMAccountsManager
 from ..core.regions_managers import Person, PersonsManager
 
-class CEO(Person):
-    pass
+class CEO(Person): Manager = 'CEOsManager'
 
 class CEOsManager(PersonsManager):
     ObjectType = CEO
