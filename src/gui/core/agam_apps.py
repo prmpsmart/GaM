@@ -1,5 +1,10 @@
 from .agam_dialogs import *
 
+class TreeColumns:
+    def columns(self, sup):
+        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className'}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        return ['Name']
+
 
 class RegionLookUp(PRMP_MainWindow, FillWidgets):
     
@@ -205,7 +210,7 @@ class SortNSearch(PRMP_MainWindow):
         pass
 
 
-class ObjectDetails(PRMP_MainWindow):
+class ObjectDetails(TreeColumns, PRMP_MainWindow):
     
     def __init__(self, master=None, geo=(1500, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
@@ -239,11 +244,6 @@ class ObjectDetails(PRMP_MainWindow):
         subType = self.selectedSubType
         subs = self._sup[subType] or []
         return subs
-    
-    @property
-    def columns(self):
-        if isinstance(self._sup, RecordsManager): return [{'text': 'Type', 'attr': 'className'}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-        return ['Name']
 
     def changeSubs(self, e=0):
         st = self.selectedSubType
@@ -257,7 +257,7 @@ class ObjectDetails(PRMP_MainWindow):
         else:
             subs = self.getSubs()
             if subs:
-                self.subs.setColumns(self.columns)
+                self.subs.setColumns(self.columns(self._sup))
                 self.subsList.set(subs)
                 self.subs._set(obj=subs, op=1)
 
@@ -265,10 +265,38 @@ class ObjectDetails(PRMP_MainWindow):
         pass
 
     def selected(self, sub):
-        pass
+        subs = sub[:]
+        if subs:
+            self.subs.setColumns(self.columns(sub))
+            self.subs._set(obj=subs, op=1)
 
 
+class Home1(PRMP_MainWindow):
 
+    def __init__(self, master=None, geo=(1500, 800), title='Home 1', region=None, **kwargs):
+        super().__init__(master, geo=geo, title=title, **kwargs)
+
+        self.region = region
+
+        self._setupApp()
+        self.paint()
+
+
+    def _setupApp(self):
+        region = self.region
+        self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
+
+        subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
+        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
+        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.56, relh=.3, relw=.24))
+
+        if region:
+            self.subRegions.set(region.subRegions)
+            self.accounts.set(region.accounts)
+        
+        self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
+
+    
 
 
 

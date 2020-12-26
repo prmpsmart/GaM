@@ -111,6 +111,24 @@ class Hierachy(PRMP_TreeView):
             if isinstance(current, Person): self.PD(self, title=current, person=current)
             elif isinstance(current, Record): self.RecD(self, title=current, record=current)
             elif isinstance(current, RecordsManager): self.OD(self, title=current, sup=current)
+
+    def viewAll(self, obj, parent=''):
+        if not obj: return
+        first, *columns = self.columns.get(obj)
+        item = self.insert(parent, text=first, values=columns)
+        
+        self.ivd[item] = obj
+        
+        if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts]
+        elif isinstance(obj, Record):
+            # insert
+            for a in obj: self.insert(item, text=a.name)
+            return
+        else: subs = obj.subs
+        
+        if isinstance(subs, list):
+            for sub in subs: self.viewAll(sub, item)
+
 H = Hierachy
 
 
@@ -291,12 +309,12 @@ class SortDetails(Notebook):
 
 
 class SubsList(LabelFrame):
-    def __init__(self, master, listboxConfig={}, callback=None, **kwargs):
+    def __init__(self, master, listboxConfig={}, callback=None, totalConfig=dict(text='Total'), **kwargs):
         super().__init__(master, **kwargs)
         
         self.callback = callback
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.12, relw=.5), topKwargs=dict(text='Total Subs'), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
+        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.12, relw=.5), topKwargs=totalConfig, orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
 
         self.dialog = Checkbutton(self, place=dict(relx=.74, rely=0, relh=.1, relw=.25), text='Dialog?')
         
@@ -311,11 +329,11 @@ class SubsList(LabelFrame):
     
     def clicked(self, selected=None, event=None):
         selected = selected[0]
-        from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
-        from ..dc.dc_apps import DCHome, DCRegion
 
         if self.dialog.get():
-            if isinstance(selected, DCRegion): DCHome(self.topest, region=selected)
+            from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
+            from ..dc.dc_apps import DC_Home, DCRegion
+            if isinstance(selected, DCRegion): DC_Home(self.topest, region=selected)
             elif isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Person): PersonDialog(self, person=selected)
             elif isinstance(selected, RecordsManager): ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)

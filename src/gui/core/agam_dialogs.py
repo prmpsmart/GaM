@@ -68,7 +68,6 @@ class RecordDialog(PRMP_Dialog):
         self.chee = Checkbutton(self.cont, place=dict(relx=.63, rely=.84, relh=.14, relw=.34), text='Co Records', command=self.openCoRecords)
 
         self.coRecords = SubsList(bothcont, text='Co Records', highlightable=0)
-        self.coRecords.total.T.config(text='Total')
 
         self.addResultsWidgets(['note', 'money', 'date'])
     

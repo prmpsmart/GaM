@@ -74,6 +74,7 @@ class Client(DCRegion):
 
 class ClientsManager(DCRegionsManager):
     ObjectType = Client
+    subsName = 'Clients'
     
     @property
     def area(self): return self.master
@@ -112,6 +113,7 @@ class Area(DCRegion):
 
 class AreasManager(DCRegionsManager):
     ObjectType = Area
+    subsName = 'Areas'
     
     @property
     def areas(self): return self.regions

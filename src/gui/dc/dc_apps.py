@@ -1,7 +1,7 @@
 from .dc_dialogs import *
 
 
-class DCHome(PRMP_MainWindow):
+class DC_Home(PRMP_MainWindow):
     def __init__(self, master=None, geo=(1000, 850), title='DC Home', region=None, resize=(1, 1), **kwargs):
         super().__init__(master, geo=geo, title=title, resize=resize, **kwargs)
 
@@ -16,6 +16,32 @@ class DCHome(PRMP_MainWindow):
 
         self.paint()
 
+
+class DC_Home1(TreeColumns, Home1):
+    def _setupApp(self):
+        super()._setupApp()
+        self.subRegions.callback = self.selectedSubRegion
+        self.accounts.callback = self.selectedAccount
+
+        self.overview = DC_Overview(self.note, region=self.region)
+        self.note.add(self.overview, padding=3)
+        self.note.tab(0, text='Regions', compound='left', underline='-1')
+        
+        self.tree = Hierachy(self.note)
+        self.note.add(self.tree, padding=3)
+        self.note.tab(1, text='Tree', compound='left', underline='-1')
+    
+    def selectedSubRegion(self, region):
+        self.selected(region)
+
+    def selectedAccount(self, account):
+        self.selected(account)
+        self.overview.updateDCDigits(account)
+
+    def selected(self, sub):
+        self.tree.setColumns(self.columns(sub))
+        # self.tree._set(sub)
+        self.tree.viewAll(sub)
 
 
 

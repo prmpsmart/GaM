@@ -1,4 +1,4 @@
-from ..core.agam_extensions import *
+from ..core.agam_apps import *
 from ..core.prmp_gui.two_widgets import *
 from ...backend.dc.dc_regions import *
 
@@ -141,7 +141,7 @@ class DC_Overview(Frame):
     
     def placeVertically(self):
         self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
-        self.ledgerNumber.place(relx=.31, rely=.004, relh=.05, relw=.2)
+        self.ledgerNumber.place(relx=.31, rely=.002, relh=.05, relw=.2)
         self.dcDigits.place(relx=0, rely=.051, relh=.949, relw=.369)
         self._prev.place(relx=.52, rely=.005, relw=.15, relh=.04)
         self._next.place(relx=.68, rely=.005, relw=.15, relh=.04)
@@ -170,10 +170,12 @@ class DC_Overview(Frame):
     def formatMonth(self, month): return f'{month.monthName} {month.year}'
 
     def next(self):
+        if not self.account: return
         _next = self.account.next
         if _next: self.updateDCDigits(_next)
 
     def prev(self):
+        if not self.account: return
         _prev = self.account.previous
         if _prev: self.updateDCDigits(_prev)
 

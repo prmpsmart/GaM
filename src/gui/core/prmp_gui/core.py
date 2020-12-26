@@ -2453,8 +2453,6 @@ class PRMP_TreeView(PRMP_Frame):
     
     def _set(self, obj=None, parent='', subs='subs', op=False):
         
-        cols = self.columns.get(obj)
-        
         name, *columns = self.columns.get(obj)
         tag = 'prmp'
         
@@ -2472,13 +2470,16 @@ class PRMP_TreeView(PRMP_Frame):
         _subs = obj.getFromSelf(subs) if not isinstance(obj, self.containers) else obj
         if _subs:
             for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
-    
-    def set(self, obj, op=0):
-        self.setColumns()
+
+    def clear(self):
         if self.firstItem:
             self.tree.delete(self.firstItem)
             self.firstItem = None
         
+    
+    def set(self, obj, op=0):
+        self.setColumns()
+        self.clear()
         if obj:
             self.obj = obj
             self._set(obj, op=op)

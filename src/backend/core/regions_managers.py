@@ -4,6 +4,7 @@ class RegionsManager(ObjectsManager):
     ObjectType = Region
     subTypes = ['Regions']
     MultipleSubsPerMonth = True
+    subsName = 'Regions'
     
     def __init__(self, master):
         ObjectsManager.__init__(self, master)
