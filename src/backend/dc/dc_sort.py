@@ -2,6 +2,7 @@
 class Chart_Sort:
     records = ["clnt", "brf", "com", "sav", "deb", "not_paid", "upf", "pupf", "rupf", "bal", "def", "exc", "bto"]
     class_xticks = ["Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paids", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
+    
     def __init__(self, region, yaxis, month=None, area=None, week=None, day=None, spec=None, sole="", header=None):
         self.go = 0
         self.plot_data_sort(region, yaxis, area=area, sole=sole, month=month, header=header, week=week, day=day)
@@ -185,3 +186,7 @@ class Chart_Sort:
             
             self.labels = labels
             self.go = 1
+
+
+
+

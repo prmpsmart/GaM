@@ -55,19 +55,16 @@ class Bar:
         else: print(51, "d_1_point = 1", file=__file__)
 
 
-
-class Render:
-    bkcol = ""
-    def __call__(self): self.show()
-    def __init__(self, bkcol="white"):
-        self.plt = pyplot
+class Plots:
+    def __init__(self, bkcol='white'):
         self.big = 1
-        self.figure = self.plt.figure(facecolor=bkcol)
+        self.figure = pyplot.figure(facecolor=bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
-        self.figure.canvas.set_window_title('Goodness and Mercy')
+        self._chart = 'plot'
         self.annotation = {}
-
-    def plot(self, xticks="", ys="", labels="", grid={}, markers=[], lss=[], lw=0, alpha=0):
+        self.chart_datas = {}
+    
+    def plot(self, xticks=[], ys=[], labels=[], grid={}, markers=[], lss=[], lw=0, alpha=0):
         
         self.clear()
         
@@ -76,7 +73,6 @@ class Render:
             assert len(xticks) == len(ys[0])
             indexes = range(len(labels))
             for index in indexes:
-                
                 y = ys[index]
                 label = labels[index]
                 
@@ -87,26 +83,48 @@ class Render:
                     marker = None
                     markersize = None
                 if lss: ls = lss[index]
-                else:
-                    ls = None
+                else: ls = None
 
                 self.subplot.plot(xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
 
         except Exception as e:
+
             if markers:
                 markers = markers[0]
                 markersize = 10
             else:
                 markers = None
                 markersize = None
+            
+            if isinstance(lss, self.containers): lss = lss[0]
+            else: lss = None
 
-            self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
+        self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
         
         self.legend()
 
         if self.annotation: self.annotate(**self.annotation)
         
         if grid: self.set_grid(grid)
+
+        self._chart = "plot"
+    
+    def bar(self, xticks=[], ys=[], labels=[], which="bar", grid={}, xlabel="", title="", switch="", ylabel="", expand=None):
+
+        self.clear()
+
+
+class Render(Plots):
+    bkcol = ""
+    def __call__(self): self.show()
+
+    def __init__(self, bkcol="white"):
+        super().__init__(bkcol)
+        self.figure.canvas.set_window_title('Goodness and Mercy')
+        self.annotation = {}
+
+    def plot(self, **kwargs):
+        super().plot(**kwargs)
         
         self()
 
@@ -173,23 +191,21 @@ class Render:
 
 
 
-class PlotCanvas(Frame):
+class PlotCanvas(Plots, Frame):
     charts = ["plot", "bar", "barh", "hist", "pie"]
     bkcol = 'white'
 
 
     def __init__(self, master=None, relief="solid", **kwargs):
-        super().__init__(master, relief=relief, **kwargs)
-        
-        self.figure = pyplot.figure(facecolor=self.bkcol)
+        Frame.__init__(self, master, relief=relief, **kwargs)
+        Plots.__init__(self)
+
         self.canvas = FigureCanvasTkAgg(self.figure, master=self).get_tk_widget()
         self.canvas.bind("<1>", self.show)
         
         self.canvas.place(relx=-.05, rely=-.03, relh=1.7, relw=1.05)
         
         self._chart = self.charts[0]
-        
-        self.subplot = self.figure.add_subplot(1,1,1)
         
         self.render_chart = ""
         self.render_chart_datas = {}
@@ -214,7 +230,7 @@ class PlotCanvas(Frame):
             else: markers_give.append(mark)
         return markers_give
 
-    def plot(self, xticks=[], ys=[], labels=[], grid={}, xlabel="", ylabel="", title="", marker=None, lss=None, lw=0, alpha=0, expand=None):
+    def plot(self, xticks=[], ys=[], labels=[], grid={}, xlabel="", ylabel="", title="", marker=None, lss=None, lw=0, alpha=0, expand=None, annot={}):
         
         self.clear()
         
@@ -224,54 +240,18 @@ class PlotCanvas(Frame):
             markersize = 10
         else: markers = markersize = None
         
-        if lss:
-            lss = self.ls_choser(len(labels))
+        if lss: lss = self.ls_choser(len(labels))
         
-        if lw: pass
-        else: lw = 2
-        if alpha: pass
-        else: alpha = 1
+        if not lw: lw = 2
+        if not alpha:  alpha = 1
 
-        try:
-            assert len(labels) == len(ys)
-            assert len(xticks) == len(ys[0])
-            indexes = range(len(labels))
-            for index in indexes:
-                
-                y = ys[index]
-                label = labels[index]
-                if markers: marker = markers[index]
+        self.annotation.update(dict(xticks=xticks, axisrotate=(50,0), xlabel=xlabel, title=title, ylabel=ylabel, **annot))
 
-                if lss: ls = lss[index]
-                else:
-                    ls = None
-                    
-                # print(xticks, ys, end="\n")
 
-                self.subplot.plot(xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
-
-        except Exception as e:
-            
-            if markers:
-                markers = markers[0]
-                markersize = 10
-            else:
-                markers = None
-                markersize = None
-            if lss: lss = lss[0]
-            else: lss = None
-            
-            self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
+        self.chart_datas = dict(xticks=xticks, ys=ys, labels=labels, grid=grid, markers=markers, lss=lss, lw=lw, alpha=alpha)
         
-        self.legend()
+        super().plot(**self.chart_datas)
 
-        self.annotate(xticks=xticks, axisrotate=(50,0), xlabel=xlabel, title=title, ylabel=ylabel)
-
-        if grid: self.set_grid(grid)
-
-        self.render_chart = "plot"
-        self.render_chart_datas = {"xticks": xticks, "ys": ys, "labels": labels, "markers": markers, "lss":lss, "lw": lw, "alpha": alpha, "grid": grid}
-        
         if expand: self.show(0)
         else: self.draw()
 
