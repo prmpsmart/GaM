@@ -57,8 +57,7 @@ class Record(Object):
     def update(self, values={}, first=1):
         super().update(values)
         if first:
-            h = self.linkedRecords
-            for rec in h: rec.update(values, 0)
+            for rec in self: rec.update(values, 0)
         self.manager.update()
     
     def __int__(self): return self.money

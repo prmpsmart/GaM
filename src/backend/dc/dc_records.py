@@ -3,6 +3,9 @@ from .dc_errors import DCErrors
 
 class DCRecord(Record):
     Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers', 'Withdrawals', 'Paidouts', 'NormalIncomes')
+    def update(self, values={}, first=1):
+        if not first: super().update(values, first)
+
 
 class DCRepayment(Repayment): pass
     # Managers = ('Upfronts', )
@@ -24,18 +27,18 @@ class Commission(DCRecord): pass
 class Contribution(DCRecord):
     
     def update(self, values={}, first=1):
-        super().update(values)
+        super().update(values, 0)
         values['money'] = self.money * self.manager.rate
         if first:
-            h = self.linkedRecords
-            for rec in h: rec.update(values, 0)
+            for rec in self: rec.update(values, 0)
         self.manager.update()
 
 class Paidout(DCRecord): pass
 
 class Withdrawal(DCRecord): pass
 
-class Debit(DCRecord): pass
+class Debit(DCRecord):
+    def update(self, values={}, first=1): super().update(values, first)
 
 class Deficit(DCRecord): pass
 
@@ -49,12 +52,13 @@ class Income(DCRecord): pass
 
 class Saving(DCRecord): pass
 
-
-
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1
     Manager = 'Upfronts'
+
+    def update(self, values={}, first=1): super().update(values, first)
+
 
 
 

@@ -1831,7 +1831,7 @@ class PRMP_Window(PRMP_Widget):
     TKICON = ''
     PRMPICON = ''
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=True, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(0, 0), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', **kwargs):
         
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
@@ -1900,12 +1900,14 @@ class PRMP_Window(PRMP_Widget):
         if addStatusBar: self.addStatusBar()
         
         self.toolWindow = toolWindow
-        self.topMost = topMost
+        # self.topMost = topMost
         self.alpha = alpha
 
         self.setTkIcon(tkIcon or PRMP_Window.TKICON)
 
-        self.attributes('-topmost', topMost, '-toolwindow', toolWindow, '-alpha', alpha)
+        self.attributes('-toolwindow', toolWindow, '-alpha', alpha)
+
+        if topMost: self.topmost()
     
     def topmost(self): self.attributes('-topmost', True)
 

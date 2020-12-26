@@ -3,7 +3,7 @@ from .agam_dialogs import *
 class TreeColumns:
     def columns(self, sup):
         if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className'}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-        return ['Name']
+        return ['Name', 'Date']
 
 
 class RegionLookUp(PRMP_MainWindow, FillWidgets):
@@ -256,19 +256,16 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
                 if dialog: dialog(self, manager=self._sup)
         else:
             subs = self.getSubs()
-            if subs:
-                self.subs.setColumns(self.columns(self._sup))
-                self.subsList.set(subs)
-                self.subs._set(obj=subs, op=1)
+            if subs: self.subsList.set(subs)
+            self.subs.setColumns(self.columns(self._sup))
+            self.subs.viewAll(self._sup)
 
     def openSup(self):
         pass
 
     def selected(self, sub):
-        subs = sub[:]
-        if subs:
-            self.subs.setColumns(self.columns(sub))
-            self.subs._set(obj=subs, op=1)
+        self.subs.setColumns(self.columns(sub))
+        self.subs.viewAll(obj=sub)
 
 
 class Home1(PRMP_MainWindow):

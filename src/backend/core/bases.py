@@ -214,7 +214,8 @@ class Object(CompareByNumber, ObjectsMixins):
 
     @date.setter
     def date(self, _date):
-        assert isinstance(_date, DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of DateTime'
+        # assert isinstance(_date, DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of DateTime'
+        if isinstance(_date, str): _date = DateTime.getDMYFromDate(_date)
         self._date = _date
     
     @property

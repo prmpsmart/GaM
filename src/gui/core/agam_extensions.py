@@ -118,11 +118,16 @@ class Hierachy(PRMP_TreeView):
         item = self.insert(parent, text=first, values=columns)
         
         self.ivd[item] = obj
-        
+
         if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts]
         elif isinstance(obj, Record):
             # insert
-            for a in obj: self.insert(item, text=a.name)
+            for a in obj:
+                item_ = self.insert(item, text=a.name)
+                # f, *g = self.columns.get(a)
+                # item_ = self.insert(item, text=f, values=g)
+       
+                self.ivd[item_] = a
             return
         else: subs = obj.subs
         
