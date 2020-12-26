@@ -1883,7 +1883,7 @@ class PRMP_Window(PRMP_Widget):
 
         if noTitleBar: self.after(10, self.addWindowToTaskBar)
 
-        self.after(5000, self.loadAfters)
+        self.after(50, self.loadAfters)
     
     def loadAfters(self):
         for al in self.__afters: al()
@@ -2205,6 +2205,7 @@ class PRMP_Window(PRMP_Widget):
         self.placeTitlebar()
     
     def destroySelf(self):
+        if self == self.topest: exit()
         self.destroy()
     
     def setTkIcon(self, icon): self.iconbitmap(icon)

@@ -3,7 +3,6 @@ from ..core.prmp_gui.two_widgets import *
 from ...backend.dc.dc_regions import *
 from ..core.prmp_gui.plotCanvas import PlotCanvas
 
-FramedCanvas = PlotCanvas
 
 
 class DC_Digits(FillWidgets, Frame):
@@ -116,10 +115,10 @@ class DC_Digits(FillWidgets, Frame):
 
 class DC_Overview(Frame):
     
-    def __init__(self, master, title='DC Overview', orient='v', region=None, **kwargs):
+    def __init__(self, master, title='DC Overview', orient='v', region=None, account=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.region = region
-        self.account = region.lastAccount if region else None
+        self.account = region.lastAccount if region else account
 
         self.month = LabelLabel(self, topKwargs=dict(text='Month'), orient='h', longent=.3)
 
@@ -133,25 +132,25 @@ class DC_Overview(Frame):
 
         self.dcDigits = DC_Digits(self)
 
-        # self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+        self.plotCanvas1 = PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
-        # self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
-
-        self.plotCanvas1 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
-
-        self.plotCanvas2 = FramedCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+        self.plotCanvas2 = PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
         if orient == 'v': self.placeVertically()
         else: self.placeHorizontally()
 
-        if region: self.updateDCDigits(self.account)
+        if self.account: self.updateDCDigits(self.account)
 
         self.topest.addAfters(self.afterload)
     
     def afterload(self):
-        print('asd')
         self.plotCanvas1.draw()
         self.plotCanvas2.draw()
+        self.testDraw()
+    
+    def testDraw(self):
+        pass
+
     
     def placeVertically(self):
         self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
@@ -185,6 +184,7 @@ class DC_Overview(Frame):
 
     def next(self):
         if not self.account: return
+        print(self.account)
         _next = self.account.next
         if _next: self.updateDCDigits(_next)
 

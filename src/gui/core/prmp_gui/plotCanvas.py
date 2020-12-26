@@ -64,7 +64,7 @@ class Render:
         self.big = 1
         self.figure = self.plt.figure(facecolor=bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
-        self.figure.canvas.set_window_title("AKURE GOODNESS AND MERCY") 
+        self.figure.canvas.set_window_title('Goodness and Mercy')
         self.annotation = {}
 
     def plot(self, xticks="", ys="", labels="", grid={}, markers=[], lss=[], lw=0, alpha=0):
@@ -181,13 +181,11 @@ class PlotCanvas(Frame):
     def __init__(self, master=None, relief="solid", **kwargs):
         super().__init__(master, relief=relief, **kwargs)
         
-        # if isinstance(Styles.chart, str): self.bkcol = Styles.chart
-        # elif Styles.chart == True: self.bkcol = Styles.background
-        
         self.figure = pyplot.figure(facecolor=self.bkcol)
         self.canvas = FigureCanvasTkAgg(self.figure, master=self).get_tk_widget()
-        self.canvas.config(relief="solid")
         self.canvas.bind("<1>", self.show)
+        
+        self.canvas.place(relx=-.05, rely=-.03, relh=1.7, relw=1.05)
         
         self._chart = self.charts[0]
         
@@ -392,8 +390,6 @@ class PlotCanvas(Frame):
 
         if a: func(**a)
         else: render()
-        
-    def place_widgs(self): self.canvas.place(relx=0, rely=-.03, relh=1.5, relw=1)
 
 
 

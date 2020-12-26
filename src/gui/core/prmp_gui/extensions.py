@@ -415,8 +415,7 @@ class ScrolledEntry(AutoScroll, tk.Entry):
 class FramedCanvas(Frame):
     def __init__(self, master, canvasConfig={}, **kwargs):
         super().__init__(master, **kwargs)
-        self.canvas = Canvas(self, **canvasConfig)
-        self.canvas.place(relx=.005, rely=.005, relh=.99, relw=.99)
+        self.canvas = Canvas(self, **canvasConfig, place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
 
 class DateTimeView(LabelFrame):
 
