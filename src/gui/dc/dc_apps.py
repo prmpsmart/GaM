@@ -30,6 +30,7 @@ class DC_Home1(TreeColumns, Home1):
         self.tree = Hierachy(self.note)
         self.note.add(self.tree, padding=3)
         self.note.tab(1, text='Tree', compound='left', underline='-1')
+        self.selected(self.region)
     
     def selectedSubRegion(self, region):
         self.selected(region)

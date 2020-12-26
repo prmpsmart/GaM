@@ -27,7 +27,9 @@ class CompareByNumber:
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
 
-    def __init__(self): self.__editableValues = []
+    def __init__(self):
+        self.__editableValues = []
+        self._date = None
 
     @property
     def editableValues(self): return self.__editableValues
@@ -105,6 +107,15 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def week(self): return self.date.week
     
+    @property
+    def date(self): return self._date
+
+    @date.setter
+    def date(self, _date):
+        # assert isinstance(_date, DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of DateTime'
+        if isinstance(_date, str): _date = DateTime.getDMYFromDate(_date)
+        self._date = _date
+
     def __getattr__(self, attr, dontRaise=False):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
@@ -210,15 +221,6 @@ class Object(CompareByNumber, ObjectsMixins):
     def number(self): return self._number
     
     @property
-    def date(self): return self._date
-
-    @date.setter
-    def date(self, _date):
-        # assert isinstance(_date, DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of DateTime'
-        if isinstance(_date, str): _date = DateTime.getDMYFromDate(_date)
-        self._date = _date
-    
-    @property
     def previous(self): return self._previous
     
     @property
@@ -239,6 +241,7 @@ class ObjectsManager(ObjectsMixins):
         super().__init__()
         self._master = master
         self._subs = []
+        self._date = master.date
     
     def __len__(self): return len(self.subs)
 
@@ -246,7 +249,7 @@ class ObjectsManager(ObjectsMixins):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
         else: return getattr(self.last, attr)
-
+    
     @property
     def master(self): return self._master
     

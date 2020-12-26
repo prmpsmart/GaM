@@ -228,7 +228,7 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
 
         self.new = Checkbutton(sups, text='New?', place=dict(relx=.77, rely=.09, relh=.05, relw=.22))
 
-        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.5), orient='h', bottom='datebutton', top='checkbutton', bottomKwargs=dict(font='DEFAULT_MENU_FONT'))
+        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.65), orient='h', bottom='monthyearbutton', top='checkbutton', bottomKwargs=dict(font='PRMP_FONT'))
 
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
@@ -249,7 +249,7 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
         st = self.selectedSubType
         if self.new.get():
             if self._sup.className in ('Client', 'Member') and st == 'Persons':
-                PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className} ', _type='error')
+                PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className} ', _type='error', ask=0)
                 return
             if st in self.creations:
                 dialog = self.creations[st]

@@ -226,9 +226,6 @@ class RecordsManager(ObjectsManager):
     def __len__(self): return len(self.records)
 
     def __repr__(self): return f'<{self.name}>'
-
-    @property
-    def date(self): return self.account.date
     
     @property
     def name(self): return f'{self.className}({self.moneyWithSign}, {self.date})'
