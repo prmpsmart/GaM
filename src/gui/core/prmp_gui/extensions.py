@@ -252,7 +252,6 @@ PMoB = PRMP_MonthButton
 
 class PRMP_MonthYearButton(PRMP_DateButton): attr = 'monthYear'
 
-
 class ScrollableFrame(PRMP_Frame):
     
     def __init__(self, master, **kwargs):

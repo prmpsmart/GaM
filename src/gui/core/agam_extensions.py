@@ -323,7 +323,7 @@ class SubsList(LabelFrame):
 
         self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.12, relw=.5), topKwargs=totalConfig, orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
 
-        self.dialog = Checkbutton(self, place=dict(relx=.74, rely=0, relh=.1, relw=.25), text='Dialog?')
+        self.dialog = Checkbutton(self, place=dict(relx=.68, rely=0, relh=.1, relw=.3), text='Dialog?')
         
         self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.125, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 

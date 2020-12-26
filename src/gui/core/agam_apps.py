@@ -212,7 +212,7 @@ class SortNSearch(PRMP_MainWindow):
 
 class ObjectDetails(TreeColumns, PRMP_MainWindow):
     
-    def __init__(self, master=None, geo=(1500, 600), title='DC Object Details', sup=None, **kwargs):
+    def __init__(self, master=None, geo=(1000, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self.creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
@@ -233,7 +233,6 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
         self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
-        # PRMP_TreeView
         
         self.paint()
 
@@ -284,8 +283,8 @@ class Home1(PRMP_MainWindow):
         self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
 
         subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
-        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
-        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.56, relh=.3, relw=.24))
+        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.35, relw=.24))
+        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.62, relh=.35, relw=.24))
 
         if region:
             self.subRegions.set(region.subRegions)
@@ -293,7 +292,6 @@ class Home1(PRMP_MainWindow):
         
         self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
 
-    
 
 
 
