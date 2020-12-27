@@ -12,7 +12,7 @@ class Bar:
         self._x_axis()
     
     def float_it(self, num):
-        re = float("%.2f" % num)
+        re = float('%.2f' % num)
         return re
 
     def _x_axis(self):
@@ -53,13 +53,14 @@ class Bar:
             self.ys = [[b[self.ys[0].index(bar)] for b in self.ys] for bar in self.ys[0]]
             self._x_axis()
             return 1
-        else: print(51, "d_1_point = 1", file=__file__)
+        else: print(51, 'd_1_point = 1', file=__file__)
 
 
 class Plots(Mixins):
-    def __init__(self, bkcol='white'):
+    bkcol = 'white'
+    def __init__(self, bkcol=''):
         self.big = 1
-        self.figure = pyplot.figure(facecolor=bkcol)
+        self.figure = pyplot.figure(facecolor=bkcol or self.bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
         
         self.pie = None
@@ -68,7 +69,7 @@ class Plots(Mixins):
         self.annotation = {}
         self.chart_datas = {}
     
-    def annotate(self, xlabel="", ylabel="", title="", xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)):
+    def annotate(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)):
 
         if xlabel: self.subplot.set_xlabel(xlabel, rotation=lblrotate[0])
         if ylabel: self.subplot.set_ylabel(ylabel, rotation=lblrotate[1])
@@ -80,9 +81,12 @@ class Plots(Mixins):
         if yticks: self.subplot.set_yticklabels(yticks, rotation=axisrotate[1])
         
         if title: self.subplot.set_title(title)
-        # if self.chart != "pie": self.subplot.set_title(title)
+        # if self.chart != 'pie': self.subplot.set_title(title)
     
-    def genAnnot(self, xlabel="", ylabel="", title="", xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)): return dict(xlabel=xlabel, ylabel=ylabel, title=title, xticks=xticks, yticks=yticks, set_xticks=set_xticks, set_yticks=set_yticks, axisrotate=axisrotate, lblrotate=lblrotate)
+    def genAnnot(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)): return dict(xlabel=xlabel, ylabel=ylabel, title=title, xticks=xticks, yticks=yticks, set_xticks=set_xticks, set_yticks=set_yticks, axisrotate=axisrotate, lblrotate=lblrotate)
+    
+    def doAnnotation(self):
+        if self.annotation: self.annotate(**self.genAnnot(**self.annotation))
     
     def doPloting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
         self.clear()
@@ -113,19 +117,13 @@ class Plots(Mixins):
     
     def set_grid(self, grid):
         if not grid: return
-        print(grid)
-        lw, ls, c = grid["lw"], grid["ls"], grid["c"]
+        lw, ls, c = grid['lw'], grid['ls'], grid['c']
         self.subplot.grid(lw=lw, ls=ls, c=c)
 
     def clear(self):
         self.subplot.cla()
         self.draw()
         self.chart_datas = []
-    
-    def doAnnotation(self):
-        if self.annotation:
-            annot = self.genAnnot(self.annotation)
-            self.annotate(annot)
     
     def plot(self, xticks=[], ys=[], labels=[], grid={}, markers=[], lss=[], lw=0, alpha=0):
         if not lw: lw = 2
@@ -164,41 +162,41 @@ class Plots(Mixins):
 
         self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
         
-    def bar(self, xticks=[], ys=[], labels=[], grid={}, xlabel="", title="", switch="", ylabel=""):
+    def bar(self, xticks=[], ys=[], labels=[], grid={}, xlabel='', title='', switch='', ylabel=''):
 
-        bar = Bar(xticks, ys, labels)
-        if switch == "1": bar.switch()
-        if self.chart == "bar": bar_h = self.subplot.bar
+        barObj = Bar(xticks, ys, labels)
+        if switch == '1': barObj.switch()
+        if self.chart == 'bar': bar_h = self.subplot.bar
         else: bar_h = self.subplot.barh
-        
-        if bar.d_1_point != 1:
-            for ind in bar.d_ranges:
-                x = bar.plot_points[ind]
-                y = bar.ys[ind]
-                label = bar.labels[ind]
-                
-                bar_h(x, y, bar.width,  label=label)
 
-        else: bar_h(bar.plot_points, bar.ys, label=bar.labels)
+        if self.chart == 'bar': self.annotation.update(dict(set_xticks=barObj.ranges, xticks=barObj.xticks))
+        else: self.annotation.update(dict(set_yticks=barObj.ranges, yticks=barObj.xticks))
+
+        if barObj.d_1_point != 1:
+            for ind in barObj.d_ranges:
+                x = barObj.plot_points[ind]
+                y = barObj.ys[ind]
+                label = barObj.labels[ind]
+                
+                bar_h(x, y, barObj.width,  label=label)
+
+        else: bar_h(barObj.plot_points, barObj.ys, label=barObj.labels)
     
     barh = bar
     
     def hist(self, *args): pass
 
-    def pie(self,  ys=[], labels=[], explode=[], shadow=None, title=""):
+    def pie(self,  ys=[], labels=[], explode=[], shadow=None, title=''):
         self.annotation = dict(title=title)
         
         if not self.pie: return
 
-        self.pie(ys, labels=labels, explode=explode, autopct="%1.1f%%", shadow=shadow, labeldistance=1.1)
+        self.pie(ys, labels=labels, explode=explode, autopct='%1.1f%%', shadow=shadow, labeldistance=1.1)
         self.adjust(left=0, bottom=.3, right=1, top=.88, wspace=.2, hspace=0)
 
 
-
 class Render(Plots):
-    bkcol = ""
-
-    def __init__(self, bkcol="white", annotation={}):
+    def __init__(self, bkcol='white', annotation={}):
         super().__init__(bkcol)
         self.figure.canvas.set_window_title('Goodness and Mercy')
         self.pie = pyplot.pie
@@ -210,11 +208,9 @@ class Render(Plots):
 
 
 class PlotCanvas(Plots, Frame):
-    charts = ["plot", "bar", "barh", "hist", "pie"]
-    bkcol = 'white'
-
-
-    def __init__(self, master=None, relief="solid", **kwargs):
+    charts = ['plot', 'bar', 'barh', 'hist', 'pie']
+    lss = ['dashed', 'dashdot', 'solid', 'dotted']
+    def __init__(self, master=None, relief='solid', **kwargs):
         Frame.__init__(self, master, relief=relief, **kwargs)
         Plots.__init__(self)
         self.expand = False
@@ -222,23 +218,22 @@ class PlotCanvas(Plots, Frame):
         self.pie = self.subplot.pie
 
         self.canvas = FigureCanvasTkAgg(self.figure, master=self).get_tk_widget()
-        self.canvas.bind("<1>", self.show)
+        self.canvas.bind('<1>', self.show)
         
         self.canvas.place(relx=-.05, rely=-.03, relh=1.7, relw=1.05)
 
         self.adjust()
 
-    def ls_choser(self, num):
-        lss = ["dashed", "dashdot", "solid", "dotted"]
+    def ls_choser(self, num=1):
         ls = []
         while len(ls) <= num:
-            l = random.choice(lss)
+            l = random.choice(self.lss)
             ls.append(l)
         if num == 1: return ls[0]
         else: return ls
     
     def marker_choser(self, num):
-        markers = {"point":".", "circle":"o", "triangle_down ":"v", "triangle_up":"^", "triangle_left":"<", "triangle_right":">", "octagon":"8", "square":"s", "pentagon":"p", "plus": "P", "star" :"*", "hexagon1":"h", "hexagon2":"H", "cancel":"X", "diamond":"D", "thin_diamond":"d", "underscore":"_"}
+        markers = {'point':'.', 'circle':'o', 'triangle_down ':'v', 'triangle_up':'^', 'triangle_left':'<', 'triangle_right':'>', 'octagon':'8', 'square':'s', 'pentagon':'p', 'plus': 'P', 'star' :'*', 'hexagon1':'h', 'hexagon2':'H', 'cancel':'X', 'diamond':'D', 'thin_diamond':'d', 'underscore':'_'}
         markers = list(markers.values())
         markers_give = [] 
         while len(markers_give) <= num:
@@ -263,7 +258,7 @@ class PlotCanvas(Plots, Frame):
         super().doPloting(**dic)
         if expand: self.show()
 
-    def plot(self, xticks=[], ys=[], labels=[], grid={}, xlabel="", ylabel="", title="", marker=None, lss=None, lw=0, alpha=0, expand=None, annot={}):
+    def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, **kwargs):
         
         if marker: markers, markersize = (self.marker_choser(len(labels)), 10)
         else: markers = markersize = None
@@ -272,37 +267,32 @@ class PlotCanvas(Plots, Frame):
 
         self.annotation = dict(xticks=xticks, axisrotate=(50,0), xlabel=xlabel, title=title, ylabel=ylabel, **annot)
 
-        self.chart_datas = dict(xticks=xticks, ys=ys, labels=labels, grid=grid, markers=markers, lss=lss, lw=lw, alpha=alpha)
+        self.chart_datas = dict(xticks=xticks, labels=labels, markers=markers, lss=lss, **kwargs)
         
         super().plot(**self.chart_datas)
 
-    def drawIt(self):
-        if self.expand: self.show(0)
-        else: self.draw()
-
-
-    def bar(self, xticks=[], ys=[], labels=[], grid={}, xlabel="", title="", switch="", ylabel="", expand=None, annot={}):
+    def bar(self, xlabel='', title='', switch='', ylabel='', annot={}, **kwargs):
         
-        if switch == "1": xlabel, ylabel = ylabel, xlabel
+        if switch == '1': xlabel, ylabel = ylabel, xlabel
 
         self.annotation = dict(xlabel=xlabel, axisrotate=(50,0), title=title, ylabel=ylabel, **annot)
-        
-        if self.chart == "bar": self.annotation.update(dict(set_xticks=bar.ranges, xticks=bar.xticks))
-        else: self.annotation.update(dict(set_yticks=bar.ranges, yticks=bar.xticks))
 
-        self.chart_datas = {"xticks": xticks, "ys": ys, "labels": labels, "grid":grid, "switch":switch}
+        self.chart_datas = dict(switch=switch, title=title, **kwargs)
+        super().bar(**self.chart_datas)
 
-    def pie(self, ys=[], labels=[], explode=None, shadow=None, title="", inapp="", expand=None):
+    def pie(self, labels=[], explode=None, **kwargs):
         
         if explode: explode = [.1 for _ in labels]
         else: explode = [0 for _ in labels]
 
-        self.chart_datas = {"explode": explode, "ys": ys, "labels": labels, "shadow":shadow, "title":title}
+        self.chart_datas = dict(explode=explode, labels=labels, **kwargs)
         
         super().pie(**self.chart_datas)
-
-    
-    def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, **self.chart_datas)
+    def set_grid(self, grid):
+        self.grid = grid
+        super().set_grid(grid)
+        
+    def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self.grid, **self.chart_datas)
         
 
 

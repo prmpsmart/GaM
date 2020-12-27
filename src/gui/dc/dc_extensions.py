@@ -1,7 +1,7 @@
 from ..core.agam_apps import *
 from ..core.prmp_gui.two_widgets import *
 from ...backend.dc.dc_regions import *
-from ..core.prmp_gui.plotCanvas import PlotCanvas
+from ..core.prmp_gui.plotCanvas import PlotCanvas, random
 
 
 
@@ -149,7 +149,13 @@ class DC_Overview(Frame):
         self.testDraw()
     
     def testDraw(self):
-        pass
+        # xs = list(range(1, 10))
+        xs = [chr(64+a) for a in range(1, 10)]
+        ys = [random.randint(2, 9) for a in xs]
+        lbls = 'Test'
+        ls = self.plotCanvas1.ls_choser()
+        self.plotCanvas1.doPloting(chart='plot', ys=ys, xticks=xs, labels=lbls, grid=dict(lw=1, ls=ls, c='red'), marker=1)
+        self.plotCanvas2.doPloting(chart='bar', xticks=ys, ys=xs, labels=lbls)
 
     
     def placeVertically(self):
