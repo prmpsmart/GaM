@@ -53,7 +53,7 @@ class Bar:
             self.ys = [[b[self.ys[0].index(bar)] for b in self.ys] for bar in self.ys[0]]
             self._x_axis()
             return 1
-        else: print(51, 'd_1_point = 1', file=__file__)
+        else: print('d_1_point=1', __file__)
 
 
 class Plots(Mixins):
@@ -63,11 +63,10 @@ class Plots(Mixins):
         self.figure = pyplot.figure(facecolor=bkcol or self.bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
         
-        self.pie = None
+        self._pie = None
 
         self.chart = 'plot'
         self.annotation = {}
-        self.chart_datas = {}
     
     def annotate(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)):
 
@@ -95,18 +94,15 @@ class Plots(Mixins):
         func = self.getFromSelf(chart)
         func(self, **kwargs)
         
-        self.legend()
-
         self.doAnnotation()
+        # self.legend()
         self.set_grid(grid)
 
         if autoAdjust:
             adjust = {}
             self.adjust()
-        
-        if adjust: self.adjust(**adjust)
+        elif adjust: self.adjust(**adjust)
 
-        # if chart != 'pie': self.adjust(**adjust)
         if draw: self.draw()
     
     def adjust(self, left=.2, bottom=.5, right=.94, top=.88, wspace=.2, hspace=0): self.figure.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
@@ -129,7 +125,7 @@ class Plots(Mixins):
         self.draw()
         self.chart_datas = {}
     
-    def plot(self, xticks=[], ys=[], labels=[], grid={}, markers=[], lss=[], lw=0, alpha=0):
+    def plot(self, xticks=[], ys=[], labels=[], markers=[], lss=[], lw=0, alpha=0):
         if not lw: lw = 2
         if not alpha:  alpha = 1
 
@@ -166,15 +162,21 @@ class Plots(Mixins):
 
         self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
         
-    def bar(self, xticks=[], ys=[], labels=[], grid={}, xlabel='', title='', switch='', ylabel=''):
+    def bar(self, xticks=[], ys=[], labels=[], xlabel='', title='', switch='', ylabel=''):
 
         barObj = Bar(xticks, ys, labels)
-        if switch == '1': barObj.switch()
-        if self.chart == 'bar': bar_h = self.subplot.bar
-        else: bar_h = self.subplot.barh
+        if switch:
+            barObj.switch()
+            xlabel, ylabel = ylabel, xlabel
 
-        if self.chart == 'bar': self.annotation.update(dict(set_xticks=barObj.ranges, xticks=barObj.xticks))
-        else: self.annotation.update(dict(set_yticks=barObj.ranges, yticks=barObj.xticks))
+        
+        self.annotation = dict(xlabel=xlabel, axisrotate=(50,0), title=title, ylabel=ylabel)
+        if self.chart == 'bar':
+            bar_h = self.subplot.bar
+            self.annotation.update(dict(set_xticks=barObj.ranges, xticks=barObj.xticks))
+        else:
+            bar_h = self.subplot.barh
+            self.annotation.update(dict(set_yticks=barObj.ranges, yticks=barObj.xticks))
 
         if barObj.d_1_point != 1:
             for ind in barObj.d_ranges:
@@ -195,20 +197,22 @@ class Plots(Mixins):
         
         if not self.pie: return
 
-        self.pie(ys, labels=labels, explode=explode, autopct='%1.1f%%', shadow=shadow, labeldistance=1.1)
-        self.adjust(left=0, bottom=.3, right=1, top=.88, wspace=.2, hspace=0)
+        self._pie(ys, labels=labels, explode=explode, autopct='%1.1f%%', shadow=shadow, labeldistance=1.1)
+        self.adjust(left=0, bottom=.4, right=1, top=.88, wspace=.2, hspace=0)
 
 
 class Render(Plots):
     def __init__(self, bkcol='white', annotation={}):
         super().__init__(bkcol)
         self.figure.canvas.set_window_title('Goodness and Mercy')
-        self.pie = pyplot.pie
+        self._pie = pyplot.pie
         self.annotation = annotation
     
-    def drawIt(self): self.show()
-
     def draw(self): self.figure.show()
+
+    def pie(self,  **kwargs):
+        super().pie(**kwargs)
+        self.adjust(left=0, bottom=.1, right=1, top=.88, wspace=.2, hspace=0)
 
 
 class PlotCanvas(Plots, Frame):
@@ -218,8 +222,9 @@ class PlotCanvas(Plots, Frame):
         Frame.__init__(self, master, relief=relief, **kwargs)
         Plots.__init__(self)
         self.expand = False
-
-        self.pie = self.subplot.pie
+        
+        self.chart_datas = {}
+        self._pie = self.subplot.pie
 
         self.canvas = FigureCanvasTkAgg(self.figure, master=self).get_tk_widget()
         self.canvas.bind('<1>', self.show)
@@ -246,8 +251,7 @@ class PlotCanvas(Plots, Frame):
             else: markers_give.append(mark)
         return markers_give
 
-    def doPloting(self, expand=False, adjust={}, **kwargs):
-        inApp = kwargs.get('inApp', False)
+    def doPloting(self, expand=False, inApp=1, adjust={}, **kwargs):
         pie = kwargs.get('pie', False)
         draw = True
 
@@ -274,14 +278,9 @@ class PlotCanvas(Plots, Frame):
         self.chart_datas = dict(xticks=xticks, labels=labels, markers=markers, lss=lss, **kwargs)
         
         super().plot(**self.chart_datas)
-
-    def bar(self, xlabel='', title='', switch='', ylabel='', annot={}, **kwargs):
-        
-        if switch == '1': xlabel, ylabel = ylabel, xlabel
-
-        self.annotation = dict(xlabel=xlabel, axisrotate=(50,0), title=title, ylabel=ylabel, **annot)
-
-        self.chart_datas = dict(switch=switch, title=title, **kwargs)
+    
+    def bar(self, **kwargs):
+        self.chart_datas = kwargs
         super().bar(**self.chart_datas)
 
     def pie(self, labels=[], explode=None, **kwargs):
@@ -290,20 +289,13 @@ class PlotCanvas(Plots, Frame):
         else: explode = [0 for _ in labels]
 
         self.chart_datas = dict(explode=explode, labels=labels, **kwargs)
-        
         super().pie(**self.chart_datas)
+
     def set_grid(self, grid):
         self.grid = grid
         super().set_grid(grid)
 
     def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self.grid, **self.chart_datas)
-        
-
-
-
-
-
-
 
 
 
