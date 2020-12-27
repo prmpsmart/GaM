@@ -113,7 +113,11 @@ class Plots(Mixins):
     
     def draw(self): self.figure.canvas.draw()
 
-    def legend(self): self.subplot.legend()
+    def legend(self):
+        self.subplot.legend()
+        return
+        try: self.subplot.legend()
+        except Exception as e: print(e)
     
     def set_grid(self, grid):
         if not grid: return
@@ -123,7 +127,7 @@ class Plots(Mixins):
     def clear(self):
         self.subplot.cla()
         self.draw()
-        self.chart_datas = []
+        self.chart_datas = {}
     
     def plot(self, xticks=[], ys=[], labels=[], grid={}, markers=[], lss=[], lw=0, alpha=0):
         if not lw: lw = 2
@@ -291,7 +295,7 @@ class PlotCanvas(Plots, Frame):
     def set_grid(self, grid):
         self.grid = grid
         super().set_grid(grid)
-        
+
     def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self.grid, **self.chart_datas)
         
 
