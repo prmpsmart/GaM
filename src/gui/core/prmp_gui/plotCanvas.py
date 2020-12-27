@@ -86,7 +86,7 @@ class Plots(Mixins):
     
     def genAnnot(self, xlabel="", ylabel="", title="", xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)): return dict(xlabel=xlabel, ylabel=ylabel, title=title, xticks=xticks, yticks=yticks, set_xticks=set_xticks, set_yticks=set_yticks, axisrotate=axisrotate, lblrotate=lblrotate)
     
-    def doPloting(self, chart='plot', grid=None, adjust=dict(left=.2, bottom=.5, right=.94, top=.88, wspace=.2, hspace=0), draw=True, **kwargs):
+    def doPloting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=True, **kwargs):
         self.clear()
         self.chart = chart
 
@@ -98,9 +98,11 @@ class Plots(Mixins):
         self.doAnnotation()
         self.set_grid(grid)
 
-        self.adjust(**adjust)
-        # if chart != 'pie': self.adjust(**adjust)
+        if autoAdjust: adjust=dict(left=.2, bottom=.5, right=.94, top=.88, wspace=.2, hspace=0)
         
+        if adjust: self.adjust(**adjust)
+
+        # if chart != 'pie': self.adjust(**adjust)
         if draw: self.draw()
     
     def draw(self): self.figure.canvas.draw()
