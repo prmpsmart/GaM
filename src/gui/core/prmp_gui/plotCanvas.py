@@ -62,8 +62,6 @@ class Plots(Mixins):
         self.figure = pyplot.figure(facecolor=bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
         
-        self.adjust = self.figure.subplots_adjust # (left=.2, bottom=.5, right=.94, top=.88, wspace=.2, hspace=0)
-
         self.pie = None
 
         self.chart = 'plot'
@@ -86,7 +84,7 @@ class Plots(Mixins):
     
     def genAnnot(self, xlabel="", ylabel="", title="", xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)): return dict(xlabel=xlabel, ylabel=ylabel, title=title, xticks=xticks, yticks=yticks, set_xticks=set_xticks, set_yticks=set_yticks, axisrotate=axisrotate, lblrotate=lblrotate)
     
-    def doPloting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=True, **kwargs):
+    def doPloting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
         self.clear()
         self.chart = chart
 
@@ -98,12 +96,16 @@ class Plots(Mixins):
         self.doAnnotation()
         self.set_grid(grid)
 
-        if autoAdjust: adjust=dict(left=.2, bottom=.5, right=.94, top=.88, wspace=.2, hspace=0)
+        if autoAdjust:
+            adjust = {}
+            self.adjust()
         
         if adjust: self.adjust(**adjust)
 
         # if chart != 'pie': self.adjust(**adjust)
         if draw: self.draw()
+    
+    def adjust(self, left=.2, bottom=.5, right=.94, top=.88, wspace=.2, hspace=0): self.figure.subplots_adjust(left=left, bottom=bottom, right=right, top=top, wspace=wspace, hspace=hspace)
     
     def draw(self): self.figure.canvas.draw()
 
@@ -223,6 +225,8 @@ class PlotCanvas(Plots, Frame):
         self.canvas.bind("<1>", self.show)
         
         self.canvas.place(relx=-.05, rely=-.03, relh=1.7, relw=1.05)
+
+        self.adjust()
 
     def ls_choser(self, num):
         lss = ["dashed", "dashdot", "solid", "dotted"]
