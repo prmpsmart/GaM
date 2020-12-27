@@ -373,4 +373,21 @@ class ObjectsManager(ObjectsMixins):
         return yearsSubs
 
 
+class ObjectSort:
+
+    def __init__(self, _object):
+        self.object = _object
+    
+    def sort(self, attrs=[], _type=None, **kwargs):
+        values = [self.object[attr] for attr in attrs]
+
+        typeValues = []
+        if _type: typeValues = [_type(v) for v in values]
+
+
+        print(typeValues)
+
+
+
+
 

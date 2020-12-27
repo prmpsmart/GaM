@@ -1,8 +1,10 @@
 from ..core.agam_apps import *
 from ..core.prmp_gui.two_widgets import *
 from ...backend.dc.dc_regions import *
-from ..core.prmp_gui.plotCanvas import PlotCanvas, random
+from ..core.prmp_gui.plotCanvas import PlotCanvas, random, ChartSort
 
+
+class DC_ChartSort(ChartSort): pass
 
 
 class DC_Digits(FillWidgets, Frame):
