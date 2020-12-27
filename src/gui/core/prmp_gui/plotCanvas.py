@@ -298,16 +298,11 @@ class PlotCanvas(Plots, Frame):
     def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self.grid, **self.chart_datas)
 
 
-
-
-class ChartSort:
-    records = ["clnt", "brf", "com", "sav", "deb", "not_paid", "upf", "pupf", "rupf", "bal", "def", "exc", "bto"]
-    class_xticks = ["Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paids", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
+class _ChartSort:
     
     def __init__(self, region, yaxis, month=None, area=None, week=None, day=None, spec=None, sole="", header=None):
         self.go = 0
         self.plot_data_sort(region, yaxis, area=area, sole=sole, month=month, header=header, week=week, day=day)
-
 
     def get_labels(self, yaxis):
         labels = []
@@ -489,6 +484,12 @@ class ChartSort:
             self.go = 1
 
 
-
+class ChartSort:
+    
+    def __init__(self, _object):
+        self.object = _object
+    
+    def sort(self, labels=[], _type=None, attr='', **kwargs):
+        
 
 
