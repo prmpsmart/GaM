@@ -378,7 +378,7 @@ class ObjectSort:
     def __init__(self, _object):
         self.object = _object
     
-    def sort(self, attrs=[], _type=None, **kwargs):
+    def sort(self, attrs=[], _type=None, validations={}):
         values = [self.object[attr] for attr in attrs]
 
         typeValues = []

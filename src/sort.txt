@@ -1,0 +1,50 @@
+Sorting outputs.
+
+Weeks = [Week 1 ... 5]
+Weekly = each in Weeks
+
+Days = [Sunday ... Saturday]
+Daily = each in Days
+
+1. All months accounts in a year.
+2. All areas accounts in year.
+
+3. All areas accounts in month.
+4. All weekly accounts in a month.
+    a. each week accounts in a month by areas, days, self
+5. All daily accounts in month.
+    a. each day(weekly) accounts in a month by areas, self
+
+6. All clients accounts in an area.
+7. All weekly accounts in an area.
+    a. each week accounts in an area by clients, days, self
+8. All daily accounts in an area.
+    a. each day(weekly) accounts in an area by clients, self
+
+9. All weekly accounts in a client.
+    a. each week accounts in a client by self
+10. All daily accounts in a client.
+    a. each day(weekly) accounts in a client by self
+
+11. All years in years.
+12. All months in years.
+13. All areas in years.
+
+Specially
+
+1. Same months in years.
+2. Same weeks in months.
+3. Same days in weeks.
+4. Same areas in years.
+5. Same areas in months
+
+
+
+
+
+
+
+
+
+
+

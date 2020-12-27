@@ -111,7 +111,7 @@ class Weeks:
     def month_weekdays(cls, year, month, which):
         "getting the weeks in a month as according to (which)"
         year = int(year)
-        month = MONTHS_NAMES[:].index(month)
+        month = MONTHS_NAMES[:].index(month) + 1
         ca = Calendar()
         date_fmt = "%d/%m/%Y"
         month_wks = ca.monthdatescalendar(year, month)

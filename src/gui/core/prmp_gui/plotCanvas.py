@@ -490,6 +490,7 @@ class ChartSort:
         self.object = _object
     
     def sort(self, labels=[], _type=None, attr='', **kwargs):
-        
+        values = []
+        # for lbl in labels:
 
 
