@@ -381,7 +381,7 @@ class ObjectSort:
     def sort(self, attrs=[], _type=None, validations=[]):
         '''
         validations = [
-            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': []}
+            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int}
         ]
         '''
         objects = []
@@ -400,8 +400,9 @@ class ObjectSort:
                     attr = validation.get('attr')
                     attrMethod = validation.get('attrMethod')
                     attrMethodParams = validation.get('attrMethodParams')
+                    valueType = validation.get('valueType')
 
-                    val = None
+                    val = obj
                     if method:
                         meth = getattr(self.object, method, None)
                         if not meth: break
@@ -416,6 +417,7 @@ class ObjectSort:
                             else: val = attrMeth()
                         else: val = attr_
                     if val:
+                        if valueType: val = valueType(val)
                         if val == value: validated.append(obj)
                         else: break
             objects = validated
