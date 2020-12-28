@@ -375,8 +375,24 @@ class ObjectsManager(ObjectsMixins):
 
 class ObjectSort:
 
+    __lt = ('lt', '<')
+    __le = ('le', '<=')
+    __eq = ('eq', '==')
+    __ne = ('eq', '!=')
+    __gt = ('gt', '>')
+    __ge = ('ge', '>=')
+    
+
     def __init__(self, _object):
         self.object = _object
+    
+    def compare(self, a, b, _type='=='):
+        if _type in self.__lt: return a < b
+        elif _type in self.__le: return a <= b
+        elif _type in self.__eq: return a == b
+        elif _type in self.__ne: return a != b
+        elif _type in self.__gt: return a > b
+        elif _type in self.__ge: return a >= b
     
     def sort(self, attrs=[], _type=None, validations=[]):
         '''
@@ -428,7 +444,8 @@ class ObjectSort:
 
         print(objects)
 
-
+    def search(self, _type=None, className='ObjectsMixins', value=None, attr='', ):
+        pass
 
 
 
