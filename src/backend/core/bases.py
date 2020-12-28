@@ -381,17 +381,54 @@ class ObjectSort:
     def sort(self, attrs=[], _type=None, validations=[]):
         '''
         validations = [
-            {value: 20/12/2020, method: isSameMonth, attr: date, attrmethod: isSameMonth}
+            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': []}
         ]
         '''
-        values = [self.object[attr] for attr in attrs]
-        /
+        objects = []
+        if attrs: objects = [self.object[attr] for attr in attrs]
+        # print(objects)
+        
+        if validations:
+            validated = []
+            for obj in objects:
+                for validation in validations:
+                    value = validation.get('value')
+
+                    method = validation.get('method')
+                    methodParams = validation.get('methodParams')
+
+                    attr = validation.get('attr')
+                    attrMethod = validation.get('attrMethod')
+                    attrMethodParams = validation.get('attrMethodParams')
+
+                    val = None
+                    if method:
+                        meth = getattr(self.object, method, None)
+                        if not meth: break
+                        if methodParams: val = meth(*methodParams)
+                        else: val = meth()
+                    elif attr:
+                        attr_ = getattr(self.object, attr, None)
+                        if not attr_: break
+                        if attrMethod:
+                            attrMeth = getattr(attr_, attrMethod, None)
+                            if attrMethodParams: val = attrMeth(*attrMethodParams)
+                            else: val = attrMeth()
+                        else: val = attr_
+                    if val:
+                        if val == value: validated.append(obj)
+                        else: break
+            objects = validated
 
         # last one
         
-        if _type: values = [_type(v) for v in values]
+        if _type: objects = [_type(v) for v in objects]
 
-        # print(typeValues)
+        print(objects)
+
+
+
+
 
 
 
