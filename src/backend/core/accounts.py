@@ -149,21 +149,18 @@ class AccountsManager(ObjectsManager):
 
     @property
     def overAllAccounts(self):
-        listOfTuple = []
+        # total accounts in this manager
         lengthOfAccounts = len(self)
-        if len(self):
-            gone = False
+        if lengthOfAccounts:
+            # total records manager in an account
             lengthOfRecordManagers = len(self[0])
-            listOfTuple = [['', 0] for _ in (range(lengthOfRecordManagers))]
+            containerDict = {}
             for account in self:
                 for recordManager in account:
-                    index = account[:].index(recordManager)
-                    if gone: assert listOfTuple[index][0] == recordManager.className
-                    else: listOfTuple[index][0] = recordManager.className
-                    listOfTuple[index][1] += int(recordManager)
-                gone = True
-                
-            return listOfTuple
+                    name = recordManager.className
+                    if name not in containerDict: containerDict[name] = 0
+                    containerDict[name] += int(recordManager)
+            return containerDict
         
     def getAccount(self, month): return self.getSub({'date-m': month})
     

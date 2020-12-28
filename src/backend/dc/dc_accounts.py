@@ -53,6 +53,17 @@ class DCAccountsManager(AccountsManager):
     
     def __init__(self, region, **kwargs):
         super().__init__(region, **kwargs)
+    
+    @property
+    def overAllAccounts(self):
+        # total accounts in this manager
+        containerDict = {}
+        for recordManager in self.lastAccount:
+            name = recordManager.className
+            if name not in containerDict: containerDict[name] = 0
+            containerDict[name] += int(recordManager)
+        return containerDict
+
 
 
 class ClientAccount(DCAccount):

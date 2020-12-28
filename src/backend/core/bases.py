@@ -378,14 +378,20 @@ class ObjectSort:
     def __init__(self, _object):
         self.object = _object
     
-    def sort(self, attrs=[], _type=None, validations={}):
+    def sort(self, attrs=[], _type=None, validations=[]):
+        '''
+        validations = [
+            {value: 20/12/2020, method: isSameMonth, attr: date, attrmethod: isSameMonth}
+        ]
+        '''
         values = [self.object[attr] for attr in attrs]
+        /
 
-        typeValues = []
-        if _type: typeValues = [_type(v) for v in values]
+        # last one
+        
+        if _type: values = [_type(v) for v in values]
 
-
-        print(typeValues)
+        # print(typeValues)
 
 
 
