@@ -378,7 +378,7 @@ class ObjectSort:
     __lt = ('lt', '<')
     __le = ('le', '<=')
     __eq = ('eq', '==')
-    __ne = ('eq', '!=')
+    __ne = ('ne', '!=')
     __gt = ('gt', '>')
     __ge = ('ge', '>=')
     
@@ -397,7 +397,7 @@ class ObjectSort:
     def sort(self, attrs=[], _type=None, validations=[]):
         '''
         validations = [
-            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int}
+            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'valueComp': [('lt', '<'), ('le', '<='), ('eq', '=='), ('eq', '!='), ('gt', '>'), ('ge', '>=')]}
         ]
         '''
         objects = []
@@ -407,7 +407,11 @@ class ObjectSort:
         if validations:
             validated = []
             for obj in objects:
+                valid = True
+                val = obj
+
                 for validation in validations:
+                    if not valid: break
                     value = validation.get('value')
 
                     method = validation.get('method')
@@ -417,25 +421,37 @@ class ObjectSort:
                     attrMethod = validation.get('attrMethod')
                     attrMethodParams = validation.get('attrMethodParams')
                     valueType = validation.get('valueType')
+                    valueComp = validation.get('valueComp', 'eq')
 
-                    val = obj
                     if method:
                         meth = getattr(self.object, method, None)
-                        if not meth: break
+                        if not meth:
+                            valid = False
+                            break
                         if methodParams: val = meth(*methodParams)
                         else: val = meth()
                     elif attr:
                         attr_ = getattr(self.object, attr, None)
-                        if not attr_: break
+                        if not attr_:
+                            valid = False
+                            break
                         if attrMethod:
                             attrMeth = getattr(attr_, attrMethod, None)
+                            if not attrMeth:
+                                valid = False
+                                break
                             if attrMethodParams: val = attrMeth(*attrMethodParams)
                             else: val = attrMeth()
                         else: val = attr_
                     if val:
+                        
                         if valueType: val = valueType(val)
-                        if val == value: validated.append(obj)
-                        else: break
+                        if self.compare(val, value, valueComp):
+                            valid = True
+                            print(56, obj.className)
+                
+                if valid: validated.append(obj)
+            
             objects = validated
 
         # last one

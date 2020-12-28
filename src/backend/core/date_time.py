@@ -411,6 +411,12 @@ class DateTime(datetime, Mixins):
     @property
     def weekInYear(self): return int(self.isocalendar()[1])
     
+    def isSameDate(self, date):
+        self.checkDateTime(date)
+        return str(self) == str(date)
+    
+    def isSameDay(self, date): return self.day == date.day
+    
     def isSameYear(self, date): return self.year == date.year
     
     def isSameMonth(self, date): return self.monthYearTuple == date.monthYearTuple
@@ -512,10 +518,6 @@ class DateTime(datetime, Mixins):
                 dt = cls(year, month, day)
                 return dt
             elif isinstance(date, cls): return date
-    
-    def isSameDate(self, date):
-        self.checkDateTime(date)
-        return str(self) == str(date)
     
     def diffInMonth(self, date):
         self.checkDateTime(date)
