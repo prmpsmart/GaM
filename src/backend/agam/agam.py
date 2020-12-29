@@ -17,8 +17,8 @@ class AGAM(Region):
     
     def __init__(self, manager='AGAM',  name='AGAM'):
         super().__init__(manager, name=name)
-        
-    def __str__(self): return f'{self.name}'
+    
+    def __str__(self): return self.name
     
     @property
     def master(self): return self

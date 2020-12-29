@@ -373,7 +373,7 @@ class ObjectsManager(ObjectsMixins):
         return yearsSubs
 
 
-class ObjectSort:
+class ObjectSort(Mixins):
 
     __lt = ('lt', '<')
     __le = ('le', '<=')
@@ -382,11 +382,9 @@ class ObjectSort:
     __gt = ('gt', '>')
     __ge = ('ge', '>=')
     __Comparisons = (*__lt, *__le, *__eq, *__ne, *__gt, *__ge)
-    
 
-    def __init__(self, _object=None):
-        self.object = _object
-    
+    def __init__(self, object_=None): self.object = object_
+
     def compare(self, a, b, _type='=='):
         if _type in self.__lt: return a < b
         elif _type in self.__le: return a <= b
@@ -395,17 +393,22 @@ class ObjectSort:
         elif _type in self.__gt: return a > b
         elif _type in self.__ge: return a >= b
     
-    def getSubs(self, object_):
+    def getAllSubs(self, object_):
         subs = []
-        if getattr(object_, 'subRegions'):
-            subRegions = object_.subRegions
-            subs.extend(subRegions[:])
-            subsOfSubRegions = self.get(subRegions)
-            subs.extend(subsOfSubRegions)
-        if getattr(object_, 'subs'): subs.extend(object_.subs[:])
+        __subs = []
+        if 'Record' in object_.mroStr: return subs
 
+        if getattr(object_, 'subRegions', None): __subs.append(object_.subRegions)
+        if getattr(object_, 'subs', None): __subs.append(object_.subs)
 
-        return subs
+        for s in __subs: subs.extend(s[:])
+        
+        allSubs = []
+        allSubs.extend(subs)
+
+        for sub in subs: allSubs.extend(self.getAllSubs(sub))
+
+        return allSubs
     
     def sort(self, subs=[], attrs=[], _type=None, validations=[], object_=None):
         '''
@@ -422,12 +425,9 @@ class ObjectSort:
         if object_ and not objects:
             if getattr(object_, 'subRegions'): objects.extend(object_.subRegions[:])
             objects.extend(object_.subs[:])
-        
         if not objects: return
-
         if attrs and not subs: objects = [object_[attr] for attr in attrs]
-        # print(objects)
-        
+
         if validations:
             validated = []
             for obj in objects:
@@ -487,18 +487,10 @@ class ObjectSort:
         subs = []
         object_ = object_ or self.object
         if not object_: return
-        hasSubs = True
 
+        subs = self.getAllSubs(object_)
 
-        # while hasSubs:
-
-
-        # if getattr(self.object, 'subRegions'): subs.extend(self.object.subRegions[:])
-        # subs.extend(self.object.subs[:])
-
-        subs = self.getSubs(object_)
-
-        print(subs)
+        return subs
 
 
 

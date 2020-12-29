@@ -47,7 +47,6 @@ class Person(Object):
         vals.update({'manager': self.manager})
         return vals
 
-
 class Region(Object):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
@@ -75,7 +74,6 @@ class Region(Object):
             self._subRegionsManager = self.SubRegionsManager(self)
             
         if self.PersonsManager: self._personsManager = self.PersonsManager(self, name=name, date=date, phone=phone, **kwargs)
-
     
     def __getattr__(self, name):
         ret = self.getFromSelf(name, self._unget)
@@ -89,12 +87,11 @@ class Region(Object):
 
         self.attrError(name)
     
-    def __len__(self): return len(self.accountsManager)
-    
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
-    def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
+    # def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
+    def subs(self): return self.accountsManager
     
     @property
     def totalSubs(self): return len(self.subs)
@@ -215,14 +212,11 @@ class Region(Object):
     @property
     def recordsManagers(self): return self.accountsManager.recordsManagers
     
-    
     def balanceAccounts(self, month=None):
         if month: self.accountsManager.balanceAccount(month)
         else: self.accountsManager.balanceAccounts()
     
-    
     def sortAccountsByMonth(self, month): return self.accountsManager.sortSubsByMonth(month)
-
 
  ########## Sorting
   # SubRegions
@@ -323,5 +317,13 @@ class LoanBondDetails:
     
     def setThirdPartySurety(self, **kwargs): 
         self.thirdPartySurety = self._thirdPartySurety(self, **kwargs)
+
+
+
+
+
+
+
+
 
 

@@ -14,6 +14,9 @@ class Mixins:
     _moneySign = naira + chr(32)
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+
+    @property
+    def mroStr(self): return [s.__name__ for s in self.mro]
     
     def numWithCommas(self, num=None):
         if num == None: num = int(self)
