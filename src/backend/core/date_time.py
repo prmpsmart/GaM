@@ -16,7 +16,7 @@ class OldCompareByDate:
         return self.date <= other.date
     def __eq__(self, other):
         if other == None: return False
-        return self.date == other.date
+        return self.date is other.date
     def __ne__(self, other):
         if other == None: return True
         return self.date != other.date
@@ -36,7 +36,7 @@ class CompareByDate:
         return self.date.ymdToOrd <= other.date.ymdToOrd
     def __eq__(self, other):
         if other == None: return False
-        return self.date.ymdToOrd == other.date.ymdToOrd
+        return self.date.ymdToOrd is other.date.ymdToOrd
     def __ne__(self, other):
         if other == None: return True
         return self.date.ymdToOrd != other.date.ymdToOrd

@@ -2,6 +2,7 @@ from .errors import Errors
 from .date_time import CompareByDate, DateTime
 from .mixins import Mixins
 from hashlib import sha224
+import time
 
 class CompareByNumber:
     def __lt__(self, other):
@@ -248,7 +249,8 @@ class ObjectsManager(ObjectsMixins):
     def __getattr__(self, attr):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
-        else: return getattr(self.last, attr)
+        else:
+            if self.last: return getattr(self.last, attr)
     
     @property
     def master(self): return self._master
@@ -388,19 +390,19 @@ class ObjectSort(Mixins):
     __lt_gt = (__lt, __gt)
     __lt_ge = (__lt, __ge)
 
-    __le_lt = (__lt, __le)
+    __le_lt = (__le, __lt)
     __le_le = (__le, __le)
     __le_gt = (__le, __gt)
     __le_ge = (__le, __ge)
 
-    __gt_lt = (__lt, __gt)
-    __gt_le = (__le, __gt)
+    __gt_lt = (__gt, __lt)
+    __gt_le = (__gt, __le)
     __gt_gt = (__gt, __gt)
     __gt_ge = (__gt, __ge)
     
-    __ge_lt = (__lt, __ge)
-    __ge_le = (__le, __ge)
-    __ge_gt = (__gt, __ge)
+    __ge_lt = (__ge, __lt)
+    __ge_le = (__ge, __le)
+    __ge_gt = (__ge, __gt)
     __ge_ge = (__ge, __ge)
     
     __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
@@ -420,8 +422,6 @@ class ObjectSort(Mixins):
     
     def getRangeType(self, _type):
         t1, t2 = _type
-        rang = None
-
         for r in self.__ranges:
             ind = self.__ranges.index(r)
             a, b = r
@@ -432,7 +432,6 @@ class ObjectSort(Mixins):
         if rang:
             r1, r2 = rang
             equation = f'{a} {r1} {b} {r2} {c}'
-            print(equation)
             return eval(equation)
     
     def getAllObjects(self, object_=None):
@@ -450,7 +449,10 @@ class ObjectSort(Mixins):
         allSubs = []
         allSubs.extend(subs)
 
-        for sub in subs: allSubs.extend(self.getAllObjects(sub))
+        for sub in subs:
+            new = self.getAllObjects(sub)
+            new_  = [b for b in new if b not in allSubs]
+            allSubs.extend(new_)
 
         return allSubs
     
@@ -476,7 +478,7 @@ class ObjectSort(Mixins):
     def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
         '''
         validations = [
-            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges}
+            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
         objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
@@ -490,6 +492,16 @@ class ObjectSort(Mixins):
 
                 for validation in validations:
                     if not valid: break
+
+                    className = validation.get('className')
+                    if className and (obj.className != className):
+                        valid = False
+                        break
+                    mroStr = validation.get('mroStr')
+                    if mroStr and (mroStr not in obj.mroStr):
+                        valid = False
+                        break
+
                     value = validation.get('value')
 
                     method = validation.get('method')
@@ -498,7 +510,9 @@ class ObjectSort(Mixins):
                     attr = validation.get('attr')
                     attrMethod = validation.get('attrMethod')
                     attrMethodParams = validation.get('attrMethodParams')
+                    
                     valueType = validation.get('valueType')
+
                     comp = validation.get('comp', 'eq')
                     compType = validation.get('compType', 'comp')
                     minValue = validation.get('minValue')
@@ -531,14 +545,12 @@ class ObjectSort(Mixins):
                                 valid = False
                                 break
                         if compType == 'comp':
-                            if self.compare(val, value, comp):
-                                valid = True
+                            if self.compare(val, value, comp): valid = True
                             else: valid = False
                         elif compType == 'range':
                             assert minValue, f'minValue must be given if compType is range.'
                             assert isinstance(range_, tuple), f'range must be a tuple of two comp'
-                            if self.rangeComp(val, value, minValue, range_):
-                                valid = True
+                            if self.rangeComp(minValue, val, value, range_): valid = True
                             else: valid = False
                         else: raise SyntaxError(f'{compType} is not valid, valid options are [range, comp].')
 
