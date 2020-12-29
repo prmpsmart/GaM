@@ -90,7 +90,6 @@ class Region(Object):
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
-    # def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
     def subs(self): return self.accountsManager
     
     @property

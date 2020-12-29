@@ -6,8 +6,9 @@ class AGAMAccount(Account):
     @property
     def subs(self): return []
 
-class AGAMAccountsManager(AccountsManager):
-    ObjectType = AGAMAccount
-    
+class AGAMAccountsManager(AccountsManager): ObjectType = AGAMAccount
+
+
+
 
 

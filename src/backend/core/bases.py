@@ -381,19 +381,63 @@ class ObjectSort(Mixins):
     __ne = ('ne', '!=')
     __gt = ('gt', '>')
     __ge = ('ge', '>=')
-    __Comparisons = (*__lt, *__le, *__eq, *__ne, *__gt, *__ge)
+    __comparisons = (__lt, __le, __eq, __ne, __gt, __ge)
+
+    __lt_lt = (__lt, __lt)
+    __lt_le = (__lt, __le)
+    __lt_gt = (__lt, __gt)
+    __lt_ge = (__lt, __ge)
+
+    __le_lt = (__lt, __le)
+    __le_le = (__le, __le)
+    __le_gt = (__le, __gt)
+    __le_ge = (__le, __ge)
+
+    __gt_lt = (__lt, __gt)
+    __gt_le = (__le, __gt)
+    __gt_gt = (__gt, __gt)
+    __gt_ge = (__gt, __ge)
+    
+    __ge_lt = (__lt, __ge)
+    __ge_le = (__le, __ge)
+    __ge_gt = (__gt, __ge)
+    __ge_ge = (__ge, __ge)
+    
+    __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
 
     def __init__(self, object_=None): self.object = object_
 
+    def getCompType(self, _type):
+        for c in self.__comparisons:
+            ind = self.__comparisons.index(c)
+            if _type in c: return c[1]
+
     def compare(self, a, b, _type='=='):
-        if _type in self.__lt: return a < b
-        elif _type in self.__le: return a <= b
-        elif _type in self.__eq: return a == b
-        elif _type in self.__ne: return a != b
-        elif _type in self.__gt: return a > b
-        elif _type in self.__ge: return a >= b
+        comp = self.getCompType(_type)
+        if comp:
+            equation = f'{a} {comp} {b}'
+            return eval(equation)
     
-    def getAllSubs(self, object_):
+    def getRangeType(self, _type):
+        t1, t2 = _type
+        rang = None
+
+        for r in self.__ranges:
+            ind = self.__ranges.index(r)
+            a, b = r
+            if t1 in a and t2 in b: return a[1], b[1]
+
+    def rangeComp(self, a, b, c, _type=('>', '>')):
+        rang = self.getRangeType(_type)
+        if rang:
+            r1, r2 = rang
+            equation = f'{a} {r1} {b} {r2} {c}'
+            print(equation)
+            return eval(equation)
+    
+    def getAllObjects(self, object_=None):
+        object_ = object_ or self.object
+
         subs = []
         __subs = []
         if 'Record' in object_.mroStr: return subs
@@ -406,27 +450,37 @@ class ObjectSort(Mixins):
         allSubs = []
         allSubs.extend(subs)
 
-        for sub in subs: allSubs.extend(self.getAllSubs(sub))
+        for sub in subs: allSubs.extend(self.getAllObjects(sub))
 
         return allSubs
     
-    def sort(self, subs=[], attrs=[], _type=None, validations=[], object_=None):
-        '''
-        validations = [
-            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'valueComp': [('lt', '<'), ('le', '<='), ('eq', '=='), ('eq', '!='), ('gt', '>'), ('ge', '>=')]}
-        ]
-        '''
-        if subs and (self.object or object_): raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
-        if attrs and not (self.object or object_): raise ValueError('This ObjectSort instance has no attributed object.')
+    def getObjects(self, object_=None, subs=[], attrs=[]):
+        object_ = object_ or self.object
+        
+        if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
+
+        if attrs and not object_: raise ValueError('This ObjectSort instance has no attributed object.')
+
         if subs and attrs: raise SyntaxError('Only one of [subs, attrs] is required.')
 
         object_ = object_ or self.object
         objects = subs
         if object_ and not objects:
-            if getattr(object_, 'subRegions'): objects.extend(object_.subRegions[:])
+            if getattr(object_, 'subRegions', None): objects.extend(object_.subRegions[:])
             objects.extend(object_.subs[:])
-        if not objects: return
+        
         if attrs and not subs: objects = [object_[attr] for attr in attrs]
+
+        return objects
+
+    def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
+        '''
+        validations = [
+            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges}
+        ]
+        '''
+        objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
+        if not objects: return
 
         if validations:
             validated = []
@@ -445,7 +499,10 @@ class ObjectSort(Mixins):
                     attrMethod = validation.get('attrMethod')
                     attrMethodParams = validation.get('attrMethodParams')
                     valueType = validation.get('valueType')
-                    valueComp = validation.get('valueComp', 'eq')
+                    comp = validation.get('comp', 'eq')
+                    compType = validation.get('compType', 'comp')
+                    minValue = validation.get('minValue')
+                    range_ = validation.get('range', self.__lt_lt)
 
                     if method:
                         meth = getattr(obj, method, None)
@@ -468,11 +525,23 @@ class ObjectSort(Mixins):
                             else: val = attrMeth()
                         else: val = attr_
                     if val:
-                        if valueType: val = valueType(val)
-                        if self.compare(val, value, valueComp):
-                            valid = True
-                        else: valid = False
-                
+                        if valueType:
+                            try: val = valueType(val)
+                            except:
+                                valid = False
+                                break
+                        if compType == 'comp':
+                            if self.compare(val, value, comp):
+                                valid = True
+                            else: valid = False
+                        elif compType == 'range':
+                            assert minValue, f'minValue must be given if compType is range.'
+                            assert isinstance(range_, tuple), f'range must be a tuple of two comp'
+                            if self.rangeComp(val, value, minValue, range_):
+                                valid = True
+                            else: valid = False
+                        else: raise SyntaxError(f'{compType} is not valid, valid options are [range, comp].')
+
                 if valid: validated.append(obj)
             
             objects = validated
@@ -485,12 +554,18 @@ class ObjectSort(Mixins):
     def search(self, _type=None, className='ObjectsMixins', value=None, attr='', searchType='', allSubs=False, object_=None, validations=[]):
         results = []
         subs = []
+
         object_ = object_ or self.object
         if not object_: return
 
-        subs = self.getAllSubs(object_)
+        subs = self.getAllObjects(object_)
+
+        if validations: return self.sort(subs=subs, validations=validations)
 
         return subs
+
+
+
 
 
 
