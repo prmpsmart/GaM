@@ -47,14 +47,11 @@ class Pics:
             try: return files[bitmap]
             except: filesL[0]
 
-class Xbms(Pics):
-    subDir = 'xbms'
+class Xbms(Pics): subDir = 'xbms'
     
-class Pngs(Pics):
-    subDir = 'pngs'
+class Pngs(Pics): subDir = 'pngs'
     
-class Gifs(Pics):
-    subDir = 'gifs'
+class Gifs(Pics): subDir = 'gifs'
 
 class ImageFile(BytesIO):
     
