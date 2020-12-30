@@ -1,9 +1,10 @@
 from .errors import Errors
-import re
+import re, os
 
 
 
 class Mixins:
+    tempFile = 'prmpsmartTempFile'
     _unget = '_prmp_'
     
     containers = list, set, tuple
@@ -14,6 +15,17 @@ class Mixins:
     _moneySign = naira + chr(32)
     Error = Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    
+    def getImageData(self, image):
+        image.save(self.tempFile, 'png')
+        temp = open(self.tempFile, 'rb')
+        data = temp.read()
+        temp.close()
+
+        os.remove(self.tempFile)
+
+        return data
+
 
     @property
     def mroStr(self): return [s.__name__ for s in self.mro]

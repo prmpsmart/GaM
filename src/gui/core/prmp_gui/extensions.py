@@ -84,10 +84,10 @@ class FillWidgets(Mixins):
             for widgetName in self.resultsWidgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
-                    try:
+                    # try:
                         val = values.get(widgetName, '')
                         if val: widget.set(val)
-                    except Exception as er: print(f'ERROR {er}.')
+                    # except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
             if isinstance(values, dict): self.values.update(values)
             return True
@@ -141,24 +141,28 @@ class ImageWidget:
         self.bindMenu()
         super().normal()
     
-    def loadImage(self, image=None,  imageFile=None):
+    def loadImage(self, imageFile=None):
         if imageFile:
-            if isinstance(imageFile, PRMP_Image): pass
+            if isinstance(imageFile, PRMP_Image):
+                self._image = imageFile
+                self.image = imageFile.image
             else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)
             
-            self.image = self.__image = imageFile
+            self.image =  imageFile
 
-            if imageFile.ext == 'xbm': self.image = imageFile.resizeTk(self.resize)
+            if imageFile.ext == 'xbm': self._image = imageFile.resizeTk(self.resize)
+        else: 
+            self._image = self.default_dp
+            self.image = self.default_dp.image
             
-            self.configure(image=self.image)
+        self.configure(image=self._image)
     
     def removeImage(self):
         if self.rt: self.rt.destroy()
         if not self.PMB(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
         else: self.loadImage(imageFile=self.default_dp)
     
-    def set(self, imageFile):
-        if imageFile: self.loadImage(imageFile=imageFile)
+    def set(self, imageFile): self.loadImage(imageFile=imageFile)
     
     def changeImage(self, e=0):
         file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])

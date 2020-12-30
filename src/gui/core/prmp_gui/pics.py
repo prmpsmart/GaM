@@ -2,6 +2,7 @@
 from os import path, walk
 from io import BytesIO
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
+import tkinter
 
 
 class Pics:
@@ -54,19 +55,30 @@ class Pngs(Pics): subDir = 'pngs'
 class Gifs(Pics): subDir = 'gifs'
 
 class ImageFile(BytesIO):
-    
-    def __init__(self, fileName):
-        self.name = fileName
-        self.basename = path.basename(fileName)
-        self.ext = path.splitext(self.name)[1]
-        self.data = open(fileName, 'rb').read()
+    count = 0
+    def __init__(self, fileName='', data=b''):
+        self.name = None
+        self.basename = None
+        self.ext = None
+        self.data = None
+
+        if fileName:
+            self.name = fileName
+            self.basename = path.basename(fileName)
+            self.ext = path.splitext(self.name)[1]
+            self.data = open(fileName, 'rb').read()
+        elif data:
+            self.data = data
         super().__init__(self.data)
+        ImageFile.count += 1
     
-    def __str__(self): return f'ImageFile({self.name})'
+    def __str__(self):
+        if self.name:return f'ImageFile({self.name})'
+        else: return f'ImageFile({ImageFile.count})'
 
 class PRMP_Image:
-
-    def __init__(self, picName=None, ext='png', resize=(), thumb=(), image=None, db=0):
+    count = 0
+    def __init__(self, picName=None, ext='png', resize=(), thumb=(), db=0):
         
         pic = None
         self.ext = 'jpg'
@@ -84,7 +96,7 @@ class PRMP_Image:
                 if e in ['.png', '.xbm', '.gif', '.jpg', '.jpeg']: self.ext = e[1:]
                 else: self.ext = ext
                 if db:
-                    if self.ext == 'png': pic = Pngs.get(picName);print(pic, picName)
+                    if self.ext == 'png': pic = Pngs.get(picName)
                     elif self.ext == 'gif': pic = Gifs.get(picName)
                 else: pic = picName
                 
@@ -92,35 +104,34 @@ class PRMP_Image:
                 pic = self.imageFile = picName
                 self.name = picName.name
                 self.ext = picName.ext
+            
+            elif isinstance(picName, bytes): pic = self.imageFile = ImageFile(data=picName)
                 
             if self.ext == 'xbm': self.imgClass = BitmapImage
 
-            # if self.imageFile: self.imageFile = ImageFile(pic)
-
-            img = self.image = Image.open(pic)
+            if pic:
+                if isinstance(picName, bytes): print('pic - data')
+                img = self.image = Image.open(pic)
 
             if resize and len(resize) == 2:
                 self.resizedImage = self.image.resize(resize)
                 img = self.resizedImage
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
+            print(img)
             self.tkImage = self.imgClass(img, name=self.basename)
+            PRMP_Image.count += 1
 
-        elif image:
-            self.image = image
-            self.tkImage = self.imgClass(image=image)
 
-    def __str__(self):
-        try: return str(self.tkImage)
-        except:
-            try: return str(self.image)
-            except: raise ValueError
+    def __str__(self): return str(self.tkImage)
 
     @property
     def basename(self):
-        base = path.basename(self.name)
-        extsplit = path.splitext(base)[0]
-        return extsplit
+        if self.name:
+            base = path.basename(self.name)
+            extsplit = path.splitext(base)[0]
+            return extsplit
+        return f'PRMP_Image({PRMP_Image.count})'
 
     def resize(self, rz): return self.image.resize(rz)
 

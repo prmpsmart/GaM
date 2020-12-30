@@ -1,9 +1,11 @@
 from .dialogs import *
 import cv2
-from .pics import PRMP_Image, PhotoImage
+from .pics import *
 from PIL.Image import fromarray
 
 class Camera(PRMP_Dialog):
+    
+
     def __init__(self, source=0, frameUpdateRate=10, title='Camera', **kwargs):
         self.cam = None
         self.source = source
@@ -25,7 +27,7 @@ class Camera(PRMP_Dialog):
 
         self.save = Button(self.container, config=dict(text='Save', command=self.saveImage))
 
-        # self.openCam()
+        self.openCam()
     
     def placeSave(self): self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
 
@@ -40,7 +42,8 @@ class Camera(PRMP_Dialog):
             self.placeSave()
     
     def saveImage(self):
-        self._setResult(self._image)
+        data = self.getImageData(self._image)
+        self._setResult(data)
         if self._return: self.destroy()
 
     def openCam(self):
