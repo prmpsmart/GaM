@@ -124,7 +124,7 @@ class ImageWidget:
         from .dialogs import PMB
         self.PMB = PMB
         
-        self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb)
+        self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb, db=1)
         
         self.bindMenu()
         self.loadImage(imageFile=imageFile or self.default_dp)
@@ -141,7 +141,7 @@ class ImageWidget:
         self.bindMenu()
         super().normal()
     
-    def loadImage(self, imageFile=None):
+    def loadImage(self, image=None,  imageFile=None):
         if imageFile:
             if isinstance(imageFile, PRMP_Image): pass
             else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)

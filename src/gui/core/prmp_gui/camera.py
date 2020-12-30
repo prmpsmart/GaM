@@ -16,7 +16,7 @@ class Camera(PRMP_Dialog):
         super().__init__(title=title, **kwargs)
     
     def isMaximized(self): return self.getWid_H_W(self)
-    
+
     def _setupDialog(self):
         self.x, self.y = self.geo
 
@@ -25,24 +25,23 @@ class Camera(PRMP_Dialog):
 
         self.save = Button(self.container, config=dict(text='Save', command=self.saveImage))
 
-        self.openCam()
+        # self.openCam()
     
     def placeSave(self): self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
 
     def screenPause(self, e=0):
         if self.pause:
             self.pause = False
-            self.updateScreen()
+            self.openCam()
             self.save.place_forget()
         else:
             self.pause = True
+            self.closeCam()
             self.placeSave()
     
     def saveImage(self):
-        img = PRMP_Image(image=self._image)
-        self._setResult(img)
+        self._setResult(self._image)
         if self._return: self.destroy()
-
 
     def openCam(self):
         self.cam = cv2.VideoCapture(self.source)

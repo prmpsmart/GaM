@@ -66,80 +66,61 @@ class ImageFile(BytesIO):
 
 class PRMP_Image:
 
-    def __init__(self, picName=None, ext='png', resize=(), thumb=(), image=None):
+    def __init__(self, picName=None, ext='png', resize=(), thumb=(), image=None, db=0):
         
         pic = None
-        self.__ext = 'jpg'
+        self.ext = 'jpg'
         self.imageFile = None
         self.imgClass = PhotoImage
+        self.resizedImage = None
+        self.image = None
+        self.tkImage = None
+        self.name = picName
 
-        if isinstance(picName, str):
-            self.__resizedImage = None
-            self.__image = None
-            self.__tkImage = None
-            self.__name = picName
-            
-            e = path.splitext(picName)[-1]
-            if e in ['.png', '.xbm', '.gif', '.jpg', '.jpeg']: self.__ext = e[1:]
-            else: self.__ext = ext
+        if picName:
+            if isinstance(picName, str):
+                e = path.splitext(picName)[-1]
 
-            if self.ext == 'png': pic = Pngs.get(picName)
-            elif self.ext == 'xbm': self.imgClass = BitmapImage
-            elif self.ext == 'gif': pic = Gifs.get(picName)
-            
-            else: pic = picName
-            
-        elif isinstance(picName, ImageFile):
-            self.imageFile = picName
-            self.__name = picName.name
-            self.__ext = picName.ext
-            
-        if pic == None: pic = picName
-        if self.ext == 'xbm': self.imgClass = BitmapImage
+                if e in ['.png', '.xbm', '.gif', '.jpg', '.jpeg']: self.ext = e[1:]
+                else: self.ext = ext
+                if db:
+                    if self.ext == 'png': pic = Pngs.get(picName);print(pic, picName)
+                    elif self.ext == 'gif': pic = Gifs.get(picName)
+                else: pic = picName
+                
+            elif isinstance(picName, ImageFile):
+                pic = self.imageFile = picName
+                self.name = picName.name
+                self.ext = picName.ext
+                
+            if self.ext == 'xbm': self.imgClass = BitmapImage
 
-        if image: self.__image = image
+            # if self.imageFile: self.imageFile = ImageFile(pic)
 
-        elif not self.imageFile: self.imageFile = ImageFile(pic)
-
-        if self.imageFile:
-            img = self.__image = Image.open(pic)
+            img = self.image = Image.open(pic)
 
             if resize and len(resize) == 2:
-                self.__resizedImage = self.__image.resize(resize)
-                img = self.__resizedImage
+                self.resizedImage = self.image.resize(resize)
+                img = self.resizedImage
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
+            self.tkImage = self.imgClass(img, name=self.basename)
 
-            # print(img, 'iio')
-            self.__tkImage = self.imgClass(img, name=self.basename)
-            # print(self.__tkImage)
-    
+        elif image:
+            self.image = image
+            self.tkImage = self.imgClass(image=image)
+
     def __str__(self):
-        try: return str(self.__tkImage)
+        try: return str(self.tkImage)
         except:
             try: return str(self.image)
             except: raise ValueError
-
-    @property
-    def name(self): return self.__name
 
     @property
     def basename(self):
         base = path.basename(self.name)
         extsplit = path.splitext(base)[0]
         return extsplit
-
-    @property
-    def ext(self): return self.__ext
-
-    @property
-    def image(self): return self.__image
-    
-    @property
-    def tkImage(self): return self.__tkImage
-    
-    @property
-    def resizedImage(self): return self.____resizedImage
 
     def resize(self, rz): return self.image.resize(rz)
 
