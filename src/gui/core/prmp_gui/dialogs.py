@@ -38,7 +38,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     def default(self): pass
     
     def _setResult(self, result):
-        if not self.resultObj: raise ValueError('No PRMP_Result object is given.')
+        if not isinstance(self.resultObj, PRMP_Result): raise ValueError('No PRMP_Result object is given.')
         self.resultObj.setResult(result)
     
     def addSubmitButton(self, command=None):
@@ -70,7 +70,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19)}
         self._setResult(result)
         
-        return self.result
+        return self.resultObj.result
         
     def editInput(self, e=0):
         if self.editBtn == None: return
@@ -105,7 +105,6 @@ CD = CalendarDialog
 class PRMP_MsgBox(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
     def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', msgFont='DEFAULT_FONT', **kwargs):
-        
         self.message = message
         self.msgFont = msgFont
         self._type = _type
@@ -147,7 +146,7 @@ class PRMP_MsgBox(PRMP_Dialog):
     def _xbms(self): return Xbms.filesDict()
 
     def yesCom(self):
-        self._setResult(True)
+        if self.ask: self._setResult(True)
         self.destroy()
     def cancelCom(self):
         self._setResult(None)

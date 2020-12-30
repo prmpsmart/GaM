@@ -181,19 +181,21 @@ class ImageWidget:
             self.rt.destroy()
             del self.rt
             self.rt = None
+        
+    def camera(self):
+        print('camera')
     
     def showMenu(self, e=0):
         self.delMenu()
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PRMP_Toplevel(self, geo=(50, 50, x, y), tm=1)
+        self.rt = rt = PRMP_Toplevel(self, geo=(50, 75, x, y), tm=1)
         rt.overrideredirect(1)
-        PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.5, relw=1))
-        btn1 = PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.5, relw=1))
-        
-        btn2 = PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.5, relh=.5, relw=1))
-        rt.attributes('-topmost', 1)
+        PRMP_Button(rt, text='Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.33, relw=1))
+        PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.33, relh=.33, relw=1))
+        PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.66, relh=.33, relw=1))
         rt.paint()
+
 IW = ImageWidget
 
 class ImageLabel(ImageWidget, PRMP_Style_Label):
@@ -218,7 +220,9 @@ class PRMP_DateWidget:
         else: return False
 
     def action(self):
-        self.date = self.CD(self, caller=self.topest, side=self.topest.side, _return=1, min_=self.min, max_=self.max).result
+        res = PRMP_Result()
+        self.CD(self, caller=self.topest, side=self.topest.side, _return=1, min_=self.min, max_=self.max, resultObj=res)
+        self.date = res.result
         if self.date: self.set(str(self.date))
     
     def get(self):
