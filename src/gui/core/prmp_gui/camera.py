@@ -9,8 +9,9 @@ class Camera(PRMP_Dialog):
         self.source = source
         self.image = None
         self._image = None
-        self.frameUpdateRate = frameUpdateRate
+        self.pause = False
 
+        self.frameUpdateRate = frameUpdateRate
 
         super().__init__(title=title, **kwargs)
     
@@ -20,24 +21,29 @@ class Camera(PRMP_Dialog):
         self.x, self.y = self.geo
 
         self.screen = Label(self.container, place=dict(relx=.006, rely=.01, relh=.85, relw=.985))
-        # self.screen = Label(self.container, place=dict(relx=.02, rely=.02, relh=.8, relw=.96))
-        self.pause = SCheckbutton(self.container, place=dict(relx=.1, rely=.87, relh=.1, relw=.2), config=dict(text='Pause', command=self.pauseCam))
-        self.pause.set('0')
-        self.save = Button(self.container, config=dict(text='Save'))
-        self.screen.bind('<Double-1>', self.pauseCam)
+        self.screen.bind('<Double-1>', self.screenPause)
 
-        # self.openCam()
+        self.save = Button(self.container, config=dict(text='Save', command=self.saveImage))
+
+        self.openCam()
     
-    def placeSave(self): self.save.place(relx=.5, rely=.87, relh=.1, relw=.2)
-    
-    def pauseCam(self, o=0):
-        if self.pause.get():
-            self.pause.set('0')
-            # self.updateScreen()
+    def placeSave(self): self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
+
+    def screenPause(self, e=0):
+        if self.pause:
+            self.pause = False
+            self.updateScreen()
+            self.save.place_forget()
         else:
-            self.pause.set('1')
+            self.pause = True
             self.placeSave()
     
+    def saveImage(self):
+        img = PRMP_Image(image=self._image)
+        self._setResult(img)
+        if self._return: self.destroy()
+
+
     def openCam(self):
         self.cam = cv2.VideoCapture(self.source)
         self.updateScreen()
@@ -56,7 +62,7 @@ class Camera(PRMP_Dialog):
         del self.image
         self.image = None
         self.setImage()
-        if not self.pause.get(): self.after(self.frameUpdateRate, self.updateScreen)
+        if not self.pause: self.after(self.frameUpdateRate, self.updateScreen)
 
     def setImage(self):
         success, frame = self.getFrame()
@@ -68,7 +74,8 @@ class Camera(PRMP_Dialog):
             # image.resize(self.isMaximized())
             image.thumbnail((self.x-30, self.y-60))
             self.image = PhotoImage(image=image)
-        else: print('Read Error')
+        
+        # else: print('Read Error')
 
     def getFrame(self):
         if self.cam and self.cam.isOpened():

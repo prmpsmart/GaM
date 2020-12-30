@@ -56,18 +56,20 @@ class Gifs(Pics): subDir = 'gifs'
 class ImageFile(BytesIO):
     
     def __init__(self, fileName):
-        super().__init__(open(fileName, 'rb').read())
         self.name = fileName
         self.basename = path.basename(fileName)
         self.ext = path.splitext(self.name)[1]
+        self.data = open(fileName, 'rb').read()
+        super().__init__(self.data)
     
     def __str__(self): return f'ImageFile({self.name})'
 
 class PRMP_Image:
 
-    def __init__(self, picName, ext='png', resize=(), thumb=()):
+    def __init__(self, picName=None, ext='png', resize=(), thumb=(), image=None):
         
         pic = None
+        self.__ext = 'jpg'
         self.imageFile = None
         self.imgClass = PhotoImage
 
@@ -95,7 +97,9 @@ class PRMP_Image:
         if pic == None: pic = picName
         if self.ext == 'xbm': self.imgClass = BitmapImage
 
-        if not self.imageFile: self.imageFile = ImageFile(pic)
+        if image: self.__image = image
+
+        elif not self.imageFile: self.imageFile = ImageFile(pic)
 
         if self.imageFile:
             img = self.__image = Image.open(pic)
@@ -110,7 +114,11 @@ class PRMP_Image:
             self.__tkImage = self.imgClass(img, name=self.basename)
             # print(self.__tkImage)
     
-    def __str__(self): return str(self.__tkImage)
+    def __str__(self):
+        try: return str(self.__tkImage)
+        except:
+            try: return str(self.image)
+            except: raise ValueError
 
     @property
     def name(self): return self.__name
