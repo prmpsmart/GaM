@@ -34,16 +34,17 @@ class PersonDialog(PRMP_Dialog):
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
 
-    def processInput(self):
+    def processInput(self, e=0):
         result = super().processInput()
         if result: 
-            if self.person and PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question').result == True:  self.person.update(result)
+            if self.person and PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question').result == True: self.person.update(result)
             
             elif self.manager and PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question').result == True:
                 person = self.manager.createPerson(**result)
                 self._setResult(person)
 
         if self._return: self.destroy()
+
 PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):

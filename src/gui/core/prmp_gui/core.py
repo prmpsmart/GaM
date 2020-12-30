@@ -11,6 +11,14 @@ from .miscs import Mixins, partial, copyClassMethods, DateTime, bound_to_mousewh
 from ctypes import windll
 import _tkinter
 
+class PRMP_Result:
+    def __init__(self): self.__result = None
+
+    @property
+    def result(self): return self.__result
+    def setResult(self, result=None): self.__result = result
+PRes = PRMP_Result
+
 # superclasses
 
 'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'

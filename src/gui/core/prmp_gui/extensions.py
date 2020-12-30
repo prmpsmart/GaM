@@ -154,7 +154,7 @@ class ImageWidget:
     
     def removeImage(self):
         if self.rt: self.rt.destroy()
-        if not self.PMB(title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
+        if not self.PMB(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
         else: self.loadImage(imageFile=self.default_dp)
     
     def set(self, imageFile):
@@ -186,13 +186,12 @@ class ImageWidget:
         self.delMenu()
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PRMP_Toplevel(self, geo=(50, 50, x, y))
+        self.rt = rt = PRMP_Toplevel(self, geo=(50, 50, x, y), tm=1)
         rt.overrideredirect(1)
-        btn1 = PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT)
-        btn1.place(relx=0, rely=0, relh=.5, relw=1)
+        PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.5, relw=1))
+        btn1 = PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.5, relw=1))
         
-        btn2 = PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT)
-        btn2.place(relx=0, rely=.5, relh=.5, relw=1)
+        btn2 = PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.5, relh=.5, relw=1))
         rt.attributes('-topmost', 1)
         rt.paint()
 IW = ImageWidget

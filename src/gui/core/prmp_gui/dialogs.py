@@ -6,12 +6,11 @@ from .pics import Xbms
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True,  resultObj=None, **kwargs):
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
         FillWidgets.__init__(self, values=values)
         
-        self.__result = None
-        
+        self.resultObj = resultObj
         self._return = _return
         self.command = None
         self.submitBtn = None
@@ -27,18 +26,20 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
             else: self.editInput(1)
         
         self.paint()
-        if master: self._isDialog(_return)
-        else: self.mainloop()
+        # if master: self._isDialog(_return)
+        # else: self.mainloop()
+        
+        # self.wait_window()
+        self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
-    
-    @property
-    def result(self): return self.__result
-    
+
     def default(self): pass
     
-    def _setResult(self, result): self.__result = result
+    def _setResult(self, result):
+        if not self.resultObj: raise ValueError('No PRMP_Result object is given.')
+        self.resultObj.setResult(result)
     
     def addSubmitButton(self, command=None):
         self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=command or self.processInput))
@@ -66,6 +67,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def processInput(self, e=0):
         result = self.get()
+        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19)}
         self._setResult(result)
         
         return self.result
