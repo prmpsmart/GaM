@@ -1935,8 +1935,6 @@ class PRMP_Window(PRMP_Widget):
 
         else: self.attributes('-toolwindow', self.toolWindow, '-alpha', self.alpha, '-topmost', self.topMost)
 
-
-
         self.setTkIcon(tkIcon or PRMP_Window.TKICON)
         self.topmost()
     
@@ -1949,9 +1947,7 @@ class PRMP_Window(PRMP_Widget):
         res = windll.user32.SetWindowLongW(parent, -20, 0)
         self.deiconify()
         if not res: self.after(10, self.addWindowToTaskBar)
-        if res:
-            self.attributes('-alpha', self.alpha, '-topmost', self.topMost)
-            # self.resizable(*self.resize)
+        if res: self.attributes('-alpha', self.alpha, '-topmost', self.topMost)
  
     def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'

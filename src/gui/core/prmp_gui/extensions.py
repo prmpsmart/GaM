@@ -187,15 +187,16 @@ class ImageWidget:
         
     def camera(self):
         res = PRMP_Result()
-        a = self.CD(self, title='Profile Photo', resultObj=res, tw=1, tm=1)
+        # cm = PRMP_Toplevel(self, tm=1, tw=1)
+        # cam = cm.addWidget(Camera, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), konfig=dict(hook=hook))
+        self.CD(self, title='Profile Photo', resultObj=res, tw=1, tm=1, alpha=.8)
         self.loadImage(res.result)
     
     def showMenu(self, e=0):
         self.delMenu()
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
-        self.rt = rt = PRMP_Toplevel(self, geo=(50, 75, x, y), tm=1)
-        rt.overrideredirect(1)
+        self.rt = rt = PRMP_Toplevel(self, geo=(50, 75, x, y), tm=1, asb=0, atb=0)
         PRMP_Button(rt, text='Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.33, relw=1))
         PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.33, relh=.33, relw=1))
         PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.66, relh=.33, relw=1))

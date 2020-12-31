@@ -7,9 +7,10 @@ from .pics import PRMP_Image
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True,  resultObj=None, **kwargs):
+
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
         FillWidgets.__init__(self, values=values)
-        
+
         self.resultObj = resultObj
         self._return = _return
         self.command = None
@@ -27,8 +28,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         
         self.paint()
         
-        # if master: self.wait_window()
-        # else: self.mainloop()
+        if master: self.wait_window()
+        else: self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
