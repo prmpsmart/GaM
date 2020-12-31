@@ -49,7 +49,6 @@ class PersonDialog(PRMP_Dialog):
                     self._setResult(person)
 
         if self._return: self.destroy()
-
 PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
@@ -103,7 +102,6 @@ class RecordDialog(PRMP_Dialog):
         if self._return: self.destroy()
 RecD = RecordDialog
 
-
 class AccountDialog(PRMP_Dialog):
 
     def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(300, 300), values={}, **kwargs):
@@ -143,8 +141,6 @@ class AccountDialog(PRMP_Dialog):
                     PRMP_MsgBox(self, title='Account Creation Error', message=error, _type='error', ask=0, msgFont=font)
 
         if self._return: self.destroy()
-
-
 AccD = AccountDialog
 
 

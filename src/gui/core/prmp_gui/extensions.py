@@ -185,10 +185,7 @@ class ImageWidget:
             del self.rt
             self.rt = None
         
-    def camera(self):
-        res = PRMP_Result()
-        self.CD(self, title='Profile Photo', resultObj=res, tw=1, tm=1)
-        self.loadImage(res.result)
+    def camera(self): self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.loadImage)
     
     def saveImage(self):
         if self.imageFile:
@@ -566,7 +563,7 @@ class Calendar(Frame):
                 self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
                 self.returnMethod(self.day)
     
-    def __init__(self, master=None, month=None, dest='', hook=None, min_=None, max_=None, **kwargs):
+    def __init__(self, master=None, month=None, dest='', callback=None, min_=None, max_=None, **kwargs):
         super().__init__(master, **kwargs)
         
         if month == None: month = DateTime.now()
@@ -576,9 +573,8 @@ class Calendar(Frame):
         self.max = DateTime.getDMYFromDate(max_)
         self.__date = None
         self.month = month
-        self.hook = hook
+        self.callback = callback
         self.dest = dest
-        if self.dest: self.__dict__[self.dest] = None
         self.daysButtons = []
         
         self._back = PRMP_Button(self, text=self._backward, command=self.previousYear, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], font=PRMP_Theme.DEFAULT_MINUTE_FONT)
@@ -690,10 +686,10 @@ class Calendar(Frame):
     @property
     def date(self): return self.__date
     
-    def choosenDay(self, day):
-        self.__date = day
-        if self.dest: self.__dict__[self.dest] = day
-        if self.hook: self.hook()
+    def choosenDay(self, date):
+        self.__date = date
+        if self.callback: self.callback(date)
+
 
 class Entry_Label(Label):
 
@@ -701,14 +697,14 @@ class Entry_Label(Label):
 
 class Camera(PRMP_Frame):
 
-    def __init__(self, master, source=0, frameUpdateRate=10, hook=None, **kwargs):
+    def __init__(self, master, source=0, frameUpdateRate=10, callback=None, **kwargs):
         import cv2
         self.cv2 = cv2
         self.cam = None
         self.source = source
         self.image = None
         self._image = None
-        self.hook = hook
+        # self.callback = callback
         self.pause = False
 
         self.frameUpdateRate = frameUpdateRate
@@ -738,7 +734,7 @@ class Camera(PRMP_Frame):
     
     def saveImage(self):
         self.imageFile = ImageFile(image=self._image)
-        if self.hook: return self.hook(self.imageFile)
+        # if self.callback: return self.callback(self.imageFile)
         return self.imageFile
     
     def get(self): return self.saveImage()

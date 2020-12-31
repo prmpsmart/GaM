@@ -6,13 +6,15 @@ from .pics import PRMP_Image
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True,  resultObj=None, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, **kwargs):
 
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
         FillWidgets.__init__(self, values=values)
 
-        self.resultObj = resultObj
+        self.__result = None
+        self.callback = callback
         self._return = _return
+
         self.command = None
         self.submitBtn = None
         self.editBtn = None
@@ -28,8 +30,9 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         
         self.paint()
         
-        if master: self.wait_window()
-        else: self.mainloop()
+        # if master: self.wait_window()
+        # else: self.mainloop()
+        self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
@@ -37,8 +40,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     def default(self): pass
     
     def _setResult(self, result):
-        if not isinstance(self.resultObj, PRMP_Result): raise ValueError('No PRMP_Result object is given.')
-        self.resultObj.setResult(result)
+        self.__result = result
+        if self.callback: self.callback(result)
     
     def addSubmitButton(self, command=None):
         self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=command or self.processInput))
@@ -90,12 +93,12 @@ class CalendarDialog(PRMP_Dialog):
         self.max = max_
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
-    def _setupDialog(self): self.calendar = self.addWidget(Calendar, config=dict(hook=self.hook, max_=self.max, min_=self.min), place=dict(relx=0, rely=0, relh=1, relw=1))
+    def _setupDialog(self): self.calendar = self.addWidget(Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min), place=dict(relx=0, rely=0, relh=1, relw=1))
     
     def afterPaint(self): self.calendar.afterPaint()
 
-    def hook(self):
-        self._setResult(self.calendar.date)
+    def getDate(self, date):
+        self._setResult(date)
         if self._return:
             Calendar.choosen = None
             self.destroy()
@@ -112,11 +115,11 @@ class PRMP_MsgBox(PRMP_Dialog):
         self._cancel = cancel
         
         from .pics import Xbms
-
         self.XBM = Xbms
         if okText: self.ask = 0
         
         super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, **kwargs)
+
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
@@ -151,7 +154,6 @@ class PRMP_MsgBox(PRMP_Dialog):
     def yesCom(self):
         if self.ask: self._setResult(True)
         self.destroy()
-        print(34)
     def cancelCom(self):
         self._setResult(None)
         self.destroy()
@@ -170,9 +172,9 @@ class CameraDialog(PRMP_Dialog):
     def isMaximized(self): return self.getWid_H_W(self)
 
     def _setupDialog(self):
-        self.camera = Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), hook=self.hook)
+        self.camera = Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.callback)
     
-    def hook(self, imageFile):
+    def callback(self, imageFile):
         self._setResult(imageFile)
         if self._return: self.destroy()
     
