@@ -38,15 +38,19 @@ class PersonDialog(PRMP_Dialog):
     def processInput(self, e=0):
         result = super().processInput()
         if result:
-            if self.person:
-                if PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question').result: self.person.update(result)
+            if self.person: PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question', grab=1, callback=self.updatePerson)
             
-            elif self.manager:
-                if PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question').result:
-                    person = self.manager.createPerson(**result)
-                    self._setResult(person)
+            elif self.manager: PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', callback=newPerson)
 
         if self._return: self.destroy()
+
+    def updatePerson(self, w):
+        if w: self.person.update(self.result); print(99)
+
+    def newPerson(self, w):
+        if w:
+            person = self.manager.createPerson(**result)
+            self._setResult(person)
 PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
