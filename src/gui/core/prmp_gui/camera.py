@@ -42,8 +42,8 @@ class Camera(PRMP_Dialog):
             self.placeSave()
     
     def saveImage(self):
-        data = self.getImageData(self._image)
-        self._setResult(data)
+        imageFile = ImageFile(image=self._image)
+        self._setResult(imageFile)
         if self._return: self.destroy()
 
     def openCam(self):

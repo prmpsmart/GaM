@@ -1,5 +1,5 @@
 from .errors import Errors
-import re, os
+import re, io
 
 
 
@@ -17,13 +17,9 @@ class Mixins:
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
     def getImageData(self, image):
-        image.save(self.tempFile, 'png')
-        temp = open(self.tempFile, 'rb')
-        data = temp.read()
-        temp.close()
-
-        os.remove(self.tempFile)
-
+        temp = io.BytesIO()
+        image.save(temp, 'png')
+        data = temp.getvalue()
         return data
 
 

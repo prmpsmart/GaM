@@ -116,7 +116,7 @@ class FillWidgets(Mixins):
 FW = FillWidgets
 
 class ImageWidget:
-    def __init__(self, imageFile=None, thumb=None, resize=None):
+    def __init__(self, prmpImage=None, thumb=None, resize=None):
         self.rt = None
         self.__image = None
         self.thumb = thumb or (200, 170)
@@ -127,7 +127,7 @@ class ImageWidget:
         self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb, db=1)
         
         self.bindMenu()
-        self.loadImage(imageFile=imageFile or self.default_dp)
+        self.loadImage(prmpImage)
         self.bindEntryHighlight()
         
         # self.set = partial(ImageWidget.set, self)
@@ -141,32 +141,33 @@ class ImageWidget:
         self.bindMenu()
         super().normal()
     
-    def loadImage(self, imageFile=None):
-        if imageFile:
-            if isinstance(imageFile, PRMP_Image):
-                self._image = imageFile
-                self.image = imageFile.image
-            else: imageFile = PRMP_Image(imageFile, thumb=self.thumb)
+    def loadImage(self, prmpImage=None):
+        if prmpImage:
+            if not isinstance(prmpImage, PRMP_Image):
+                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb)
+            if isinstance(prmpImage, PRMP_Image):
+                self._image = prmpImage
+                self.imageFile = prmpImage.imageFile
             
-            self.image =  imageFile
+            self.image =  prmpImage
 
-            if imageFile.ext == 'xbm': self._image = imageFile.resizeTk(self.resize)
-        else: 
-            self._image = self.default_dp
-            self.image = self.default_dp.image
+            if prmpImage.ext == 'xbm': self._image = prmpImage.resizeTk(self.resize)
+            print('ll')
+            self.configure(image=self._image)
+        else: self.loadImage(self.default_dp)
             
-        self.configure(image=self._image)
+        
     
     def removeImage(self):
         if self.rt: self.rt.destroy()
         if not self.PMB(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
-        else: self.loadImage(imageFile=self.default_dp)
+        else: self.loadImage(self.default_dp)
     
-    def set(self, imageFile): self.loadImage(imageFile=imageFile)
+    def set(self, imageFile): self.loadImage(imageFile)
     
     def changeImage(self, e=0):
         file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
-        if file: self.loadImage(imageFile=file)
+        if file: self.loadImage(file)
     
     def bindMenu(self):
         self.bind('<1>', self.delMenu, '+')
@@ -203,9 +204,9 @@ class ImageWidget:
 IW = ImageWidget
 
 class ImageLabel(ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, imageFile=None, resize=(), thumb=(), **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), **kwargs):
         PRMP_Style_Label.__init__(self, master, **kwargs)
-        ImageWidget.__init__(self, imageFile=imageFile, thumb=thumb, resize=resize)
+        ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize)
 IL = ImageLabel
 
 class PRMP_DateWidget:
