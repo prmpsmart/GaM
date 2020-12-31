@@ -560,6 +560,15 @@ class PRMP_Widget(PRMP_Theme):
         return (wid.winfo_width(), wid.winfo_height())
     
     @property
+    def width(self):
+        self.update()
+        return int(self.winfo_width())
+    @property
+    def height(self):
+        self.update()
+        return int(self.winfo_height())
+    
+    @property
     def winfos(self):
         geo_infos = [self.winfo_geometry, self.winfo_height, self.winfo_pointerx, self.winfo_pointerxy, self.winfo_pointery, self.winfo_rootx, self.winfo_rooty, self.winfo_screendepth, self.winfo_screenheight, self.winfo_width, self.winfo_x, self.winfo_y]
         
@@ -1889,8 +1898,6 @@ class PRMP_Window(PRMP_Widget):
         
         self.placeOnScreen(side, geometry)
 
-        if noTitleBar: self.after(10, self.addWindowToTaskBar)
-
         self.after(50, self.loadAfters)
     
     def loadAfters(self):
@@ -1909,8 +1916,6 @@ class PRMP_Window(PRMP_Widget):
         self.noTitleBar = noTitleBar
         self._addStatusBar = addStatusBar
         self._addTitleBar = addTitleBar
-
-        if noTitleBar: self.overrideredirect(True)
         
         if addTitleBar:
             if toolWindow: self.__r = 1
@@ -1923,6 +1928,14 @@ class PRMP_Window(PRMP_Widget):
         self.toolWindow = toolWindow
         self.topMost = topMost
         self.alpha = alpha
+
+        if noTitleBar:
+            self.overrideredirect(True)
+            self.after(10, self.addWindowToTaskBar)
+
+        else: self.attributes('-toolwindow', self.toolWindow, '-alpha', self.alpha, '-topmost', self.topMost)
+
+
 
         self.setTkIcon(tkIcon or PRMP_Window.TKICON)
         self.topmost()
@@ -1937,8 +1950,8 @@ class PRMP_Window(PRMP_Widget):
         self.deiconify()
         if not res: self.after(10, self.addWindowToTaskBar)
         if res:
-            self.attributes('-toolwindow', self.toolWindow, '-alpha', self.alpha, '-topmost', self.topMost)
-            self.resizable(*self.resize)
+            self.attributes('-alpha', self.alpha, '-topmost', self.topMost)
+            # self.resizable(*self.resize)
  
     def placeOnScreen(self, side='', geometry=(400, 300)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'

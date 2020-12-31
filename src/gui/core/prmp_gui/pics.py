@@ -4,7 +4,6 @@ from io import BytesIO
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
 import zlib, pickle
 
-
 class Pics:
     _dir = 'pics'
     subDir = ''

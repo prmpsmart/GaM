@@ -1,7 +1,7 @@
 
 from ....backend.core.date_time import DateTime
 from .extensions import *
-from .pics import Xbms
+from .pics import PRMP_Image
 
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
@@ -26,11 +26,9 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
             else: self.editInput(1)
         
         self.paint()
-        # if master: self._isDialog(_return)
-        # else: self.mainloop()
         
-        # self.wait_window()
-        self.mainloop()
+        # if master: self.wait_window()
+        # else: self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
@@ -111,6 +109,10 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.okText = okText
         self.ask = ask
         self._cancel = cancel
+        
+        from .pics import Xbms
+
+        self.XBM = Xbms
         if okText: self.ask = 0
         
         super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, editable=False, **kwargs)
@@ -143,7 +145,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         elif _type in self._xbms: return f'@{self._xbms[_type]}'
     
     @property
-    def _xbms(self): return Xbms.filesDict()
+    def _xbms(self): return self.XBM.filesDict()
 
     def yesCom(self):
         if self.ask: self._setResult(True)
@@ -156,5 +158,25 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.destroy()
 PMB = PRMP_MsgBox
 
+class CameraDialog(PRMP_Dialog):
+    
+
+    def __init__(self, source=0, frameUpdateRate=10, title='Camera', **kwargs):
+        self.source = source
+        self.frameUpdateRate = frameUpdateRate
+        print(99, kwargs)
+        super().__init__(title=title, **kwargs)
+        print(88)
+    
+    def isMaximized(self): return self.getWid_H_W(self)
+
+    def _setupDialog(self):
+        self.camera = Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), hook=self.hook)
+    
+    def hook(self, imageFile):
+        self._setResult(imageFile)
+        if self._return: self.destroy()
+    
+    # def __del__(self): del self.camera
 
 

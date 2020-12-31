@@ -1,5 +1,6 @@
 from .core import *
 from .miscs import create_container, bound_to_mousewheel, Columns
+from .pics import *
 
 # Extensions
 
@@ -121,8 +122,9 @@ class ImageWidget:
         self.__image = None
         self.thumb = thumb or (200, 170)
         self.resize = resize or (100, 100)
-        from .dialogs import PMB
-        self.PMB = PMB
+        from .dialogs import PRMP_MsgBox, CameraDialog
+        self.PMB = PRMP_MsgBox
+        self.CD = CameraDialog
         
         self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb, db=1)
         
@@ -131,7 +133,6 @@ class ImageWidget:
         self.bindEntryHighlight()
         
         # self.set = partial(ImageWidget.set, self)
-    
     
     def disabled(self):
         self.unBindMenu()
@@ -152,11 +153,8 @@ class ImageWidget:
             self.image =  prmpImage
 
             if prmpImage.ext == 'xbm': self._image = prmpImage.resizeTk(self.resize)
-            print('ll')
             self.configure(image=self._image)
         else: self.loadImage(self.default_dp)
-            
-        
     
     def removeImage(self):
         if self.rt: self.rt.destroy()
@@ -179,7 +177,7 @@ class ImageWidget:
         self.unbind('<3>')
         # self.unbind('<Double-1>')
     
-    def get(self): return self.__image.imageFile
+    def get(self): return self.imageFile
     
     def delMenu(self, e=0):
         if self.rt:
@@ -188,7 +186,9 @@ class ImageWidget:
             self.rt = None
         
     def camera(self):
-        print('camera')
+        res = PRMP_Result()
+        a = self.CD(self, title='Profile Photo', resultObj=res, tw=1, tm=1)
+        self.loadImage(res.result)
     
     def showMenu(self, e=0):
         self.delMenu()
@@ -694,7 +694,91 @@ class Entry_Label(Label):
 
     def __init__(self, master, font='DEFAULT_FONT', **kwargs): super().__init__(master, asEntry=True, font=font, **kwargs)
 
+class Camera(PRMP_Frame):
 
+    def __init__(self, master, source=0, frameUpdateRate=10, hook=None, **kwargs):
+        import cv2
+        self.cv2 = cv2
+        self.cam = None
+        self.source = source
+        self.image = None
+        self._image = None
+        self.hook = hook
+        self.pause = False
+
+        self.frameUpdateRate = frameUpdateRate
+
+        super().__init__(master, **kwargs)
+
+        self.screen = Label(self, place=dict(relx=.006, rely=.01, relh=.85, relw=.985))
+        self.screen.bind('<Double-1>', self.screenPause)
+
+        self.save = Button(self, config=dict(text='Save', command=self.saveImage))
+
+        self.openCam()
+    
+    def y(self): return 
+    
+    def placeSave(self): self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
+
+    def screenPause(self, e=0):
+        if self.pause:
+            self.pause = False
+            self.openCam()
+            self.save.place_forget()
+        else:
+            self.pause = True
+            self.closeCam()
+            self.placeSave()
+    
+    def saveImage(self):
+        self.imageFile = ImageFile(image=self._image)
+        if self.hook: return self.hook(self.imageFile)
+        return self.imageFile
+    
+    def get(self): return self.saveImage()
+
+    def openCam(self):
+        self.cam = self.cv2.VideoCapture(self.source)
+        self.updateScreen()
+    
+    def closeCam(self):
+        if self.cam and self.cam.isOpened(): self.cam.release()
+
+    def snapshot(self):
+        # Get a frame from the video source
+        success, frame = self.getFrame()
+        # if frame: self.cv2.imwrite("frame-" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".jpg", self.cv2.cvtColor(frame, self.cv2.COLOR_RGB2BGR))
+    
+    def updateScreen(self):
+        if self.image: self.screen.config(image=self.image)
+        # if self.image: self.screen['image'] = self.image
+        del self.image
+        self.image = None
+        self.setImage()
+        if not self.pause: self.after(self.frameUpdateRate, self.updateScreen)
+
+    def setImage(self):
+        success, frame = self.getFrame()
+        if success:
+            self._image = Image.fromarray(frame)
+            # res = self.cv2.resize(img,(2*self.width, 2*self.height), interpolation = self.cv2.INTER_CUBIC)
+            # self._image
+            image = self._image.copy()
+            # image.resize(self.isMaximized())
+            image.thumbnail((self.width-30, self.height-60))
+            self.image = PhotoImage(image=image)
+        
+        # else: print('Read Error')
+
+    def getFrame(self):
+        if self.cam and self.cam.isOpened():
+            success, frame = self.cam.read()
+            if success: return (success, self.cv2.cvtColor(frame, self.cv2.COLOR_BGR2RGB))
+            else: return (success, None)
+        else: return (False, None)
+
+    def __del__(self): self.closeCam()
 
 
 
