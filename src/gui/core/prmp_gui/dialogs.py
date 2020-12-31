@@ -160,14 +160,11 @@ class PRMP_MsgBox(PRMP_Dialog):
 PMB = PRMP_MsgBox
 
 class CameraDialog(PRMP_Dialog):
-    
 
-    def __init__(self, source=0, frameUpdateRate=10, title='Camera', **kwargs):
+    def __init__(self, master=None, source=0, frameUpdateRate=10, title='Camera', **kwargs):
         self.source = source
         self.frameUpdateRate = frameUpdateRate
-        print(99, kwargs)
-        super().__init__(title=title, **kwargs)
-        print(88)
+        super().__init__(master, title=title, **kwargs)
     
     def isMaximized(self): return self.getWid_H_W(self)
 
@@ -178,6 +175,6 @@ class CameraDialog(PRMP_Dialog):
         self._setResult(imageFile)
         if self._return: self.destroy()
     
-    # def __del__(self): del self.camera
+    def __del__(self): del self.camera
 
 

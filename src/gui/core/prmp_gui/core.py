@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from random import randint
-from tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 from .pics import PRMP_Image
 from .miscs import Mixins, partial, copyClassMethods, DateTime, bound_to_mousewheel, Columns
 from ctypes import windll
@@ -2323,10 +2323,10 @@ Toplevel = PTl = PRMP_Toplevel
 
 class PRMP_MainWindow(Mixins):
     
-    def __init__(self, master=None, _ttk_=False, atb=1, asb=1, **kwargs):
-        if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
-        else: self.root = PRMP_Tk(_ttk_=_ttk_, atb=atb, asb=asb, **kwargs)
-        self.root.root = self.root
+    def __init__(self, master=None, _ttk_=False, **kwargs):
+        if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, **kwargs)
+        else: self.root = PRMP_Tk(_ttk_=_ttk_, **kwargs)
+        # self.root.root = self.root
 
         for k, v in self.class_.__dict__.items():
             if k.startswith('__') or k == 'root': continue
