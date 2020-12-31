@@ -66,7 +66,7 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
     def processInput(self, e=0):
         result = self.get()
-        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19)}
+        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19), 'image':self.image.get()}
         self._setResult(result)
         
         return self.resultObj.result
@@ -116,7 +116,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.XBM = Xbms
         if okText: self.ask = 0
         
-        super().__init__(master, title=title, geo=geo, ntb=1, tm=1, asb=0, editable=False, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
