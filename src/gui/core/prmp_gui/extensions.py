@@ -2,6 +2,7 @@ from .core import *
 from .miscs import create_container, bound_to_mousewheel, Columns
 from .pics import *
 
+picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
 # Extensions
 
 class AutoScroll:
@@ -141,6 +142,7 @@ class ImageWidget:
         super().normal()
     
     def loadImage(self, prmpImage=None):
+        self.delMenu()
         if prmpImage:
             if not isinstance(prmpImage, PRMP_Image):
                 prmpImage = PRMP_Image(prmpImage, thumb=self.thumb)
@@ -155,14 +157,17 @@ class ImageWidget:
         else: self.loadImage(self.default_dp)
     
     def removeImage(self):
-        if self.rt: self.rt.destroy()
-        if not self.PMB(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ').result: return
-        else: self.loadImage(self.default_dp)
+        self.delMenu()
+        self.PMB(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ', callback=self._removeImage)
+    
+    def _removeImage(self, val):
+        if val: self.loadImage()
     
     def set(self, imageFile): self.loadImage(imageFile)
     
     def changeImage(self, e=0):
-        file = askopenfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
+        self.delMenu()
+        file = askopenfilename(filetypes=picTypes)
         if file: self.loadImage(file)
     
     def bindMenu(self):
@@ -183,11 +188,13 @@ class ImageWidget:
             del self.rt
             self.rt = None
         
-    def camera(self): self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set, grab=1)
+    def camera(self):
+        self.delMenu()
+        self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set, grab=1)
     
     def saveImage(self):
         if self.imageFile:
-            file = asksaveasfilename(filetypes=['Pictures {.jpg .png .jpeg .gif .xbm}'])
+            file = asksaveasfilename(filetypes=picTypes)
             if file: self.imageFile.save(file)
     
     def showMenu(self, e=0):
@@ -205,7 +212,7 @@ IW = ImageWidget
 
 class ImageLabel(ImageWidget, PRMP_Style_Label):
     def __init__(self, master, prmpImage=None, resize=(), thumb=(), **kwargs):
-        PRMP_Style_Label.__init__(self, master, **kwargs)
+        PRMP_Style_Label.__init__(self, master, config=dict(anchor='center'), **kwargs)
         ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize)
 IL = ImageLabel
 
@@ -728,8 +735,10 @@ class Camera(PRMP_Frame):
     
     def saveImage(self):
         self.imageFile = ImageFile(image=self._image)
-        if self.callback: self.callback(self.imageFile)
-        return self.imageFile
+        if self.callback: return self.callback(self.imageFile)
+        file = asksaveasfilename(filetypes=picTypes)
+        print(file)
+        if file: self.imageFile.save(file)
     
     def get(self): return self.saveImage()
 

@@ -180,9 +180,9 @@ class CameraDialog(PRMP_Dialog):
     
     def isMaximized(self): return self.getWid_H_W(self)
 
-    def _setupDialog(self): Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.callback)
+    def _setupDialog(self): Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage)
 
-    def callback(self, imageFile):
+    def getImage(self, imageFile):
         self._setResult(imageFile)
         if self._return: self.destroy()
     
