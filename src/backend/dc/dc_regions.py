@@ -2,7 +2,7 @@ from ..core.regions_managers import Region, RegionsManager, Person, PersonsManag
 from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, DateTime, CardDues, DCErrors, Rates
 
 class ClientDetail(Person):
-    Manager = 'Client'
+    Manager = 'ClientDetailsManager'
     @property
     def client(self): return self.manager.master
 
@@ -42,7 +42,7 @@ class Client(DCRegion):
     AccountsManager = ClientAccountsManager
     Manager = 'ClientsManager'
     SubRegionsManager = None
-    # PersonsManager = ClientDetailsManager
+    PersonsManager = ClientDetailsManager
 
     subTypes = ['Accounts', 'Records Managers', 'Persons']
     

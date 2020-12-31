@@ -131,9 +131,7 @@ class ImageWidget:
         self.bindMenu()
         self.loadImage(prmpImage)
         self.bindEntryHighlight()
-        
-        # self.set = partial(ImageWidget.set, self)
-    
+            
     def disabled(self):
         self.unBindMenu()
         super().disabled()
@@ -185,7 +183,7 @@ class ImageWidget:
             del self.rt
             self.rt = None
         
-    def camera(self): self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.loadImage)
+    def camera(self): self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
     
     def saveImage(self):
         if self.imageFile:
@@ -226,7 +224,7 @@ class PRMP_DateWidget:
         if self.DT.checkDateTime(self.date, 1): return True
         else: return False
 
-    def action(self): self.CD(self, caller=self.topest, side=self.topest.side, _return=1, min_=self.min, max_=self.max, callback=self.set)
+    def action(self): self.CD(self, side=self.topest.side, _return=1, min_=self.min, max_=self.max, callback=self.set)
     
     def get(self):
         if self.date: return self.date

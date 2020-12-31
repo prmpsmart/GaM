@@ -172,9 +172,8 @@ class Region(Object):
         return manager.region
     
     @property
-    def person(self):
-        if self.personsManager: return self.personsManager.lastPerson
-        
+    def person(self): return self.personsManager.lastPerson
+    
     @property
     def personsManager(self): return self._personsManager
     

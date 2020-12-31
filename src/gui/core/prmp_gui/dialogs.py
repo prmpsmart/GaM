@@ -33,6 +33,10 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         # if master: self.wait_window()
         # else: self.mainloop()
         if show: self.mainloop()
+        else:
+            self.grab_set()
+            self.wait_window()
+        
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
@@ -74,8 +78,8 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         xbtn.place(x=10 , y=y-40, h=30, w=60)
     
     def processInput(self, e=0):
-        # result = self.get()
-        result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
+        result = self.get()
+        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
         self._setResult(result)
         
         return self.result
@@ -97,7 +101,7 @@ class CalendarDialog(PRMP_Dialog):
         
         self.min = min_
         self.max = max_
-        super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
+        super().__init__(master, title=title, geo=geo, editable=False, show=0, **kwargs)
 
     def _setupDialog(self): self.calendar = self.addWidget(Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min), place=dict(relx=0, rely=0, relh=1, relw=1))
     
@@ -126,7 +130,6 @@ class PRMP_MsgBox(PRMP_Dialog):
         
         super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, show=0, **kwargs)
 
-
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
         self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250), font=self.msgFont)
@@ -151,7 +154,7 @@ class PRMP_MsgBox(PRMP_Dialog):
             self.cancel.place(relx=.33, rely=.83, height=28, relw=.2)
     
     def default(self):
-        # self.grab_set()
+        self.grab_set()
         self.wait_window()
         
     def getType(self, _type):
@@ -172,7 +175,6 @@ class PRMP_MsgBox(PRMP_Dialog):
     def noCom(self):
         self._setResult(False)
         self.destroy()
-
 PMB = PRMP_MsgBox
 
 class CameraDialog(PRMP_Dialog):
@@ -184,13 +186,12 @@ class CameraDialog(PRMP_Dialog):
     
     def isMaximized(self): return self.getWid_H_W(self)
 
-    def _setupDialog(self):
-        self.camera = Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.callback)
-    
+    def _setupDialog(self): Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.callback)
+
     def callback(self, imageFile):
         self._setResult(imageFile)
         if self._return: self.destroy()
     
     def __del__(self): del self.camera
-
+CamD = CameraDialog
 
