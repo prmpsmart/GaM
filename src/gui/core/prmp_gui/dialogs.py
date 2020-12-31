@@ -151,6 +151,7 @@ class PRMP_MsgBox(PRMP_Dialog):
     def yesCom(self):
         if self.ask: self._setResult(True)
         self.destroy()
+        print(34)
     def cancelCom(self):
         self._setResult(None)
         self.destroy()
