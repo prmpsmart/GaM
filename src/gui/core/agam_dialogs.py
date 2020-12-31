@@ -42,15 +42,16 @@ class PersonDialog(PRMP_Dialog):
             
             elif self.manager: PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', callback=newPerson)
 
-        if self._return: self.destroy()
 
     def updatePerson(self, w):
         if w: self.person.update(self.result)
+        self.destroyDialog()
 
     def newPerson(self, w):
         if w:
             person = self.manager.createPerson(**result)
             self._setResult(person)
+        self.destroyDialog()
 PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
@@ -95,13 +96,21 @@ class RecordDialog(PRMP_Dialog):
     def processInput(self):
         result = super().processInput()
         if result: 
-            if self.record and PRMP_MsgBox(self, title='Edit Record Details', message='Are you sure to edit the details of this record?', _type='question').result == True: self.record.update(result)
+            if self.record: PRMP_MsgBox(self, title='Edit Record Details', message='Are you sure to edit the details of this record?', _type='question', callback=self.updateRecord)
         
-            elif self.manager and PRMP_MsgBox(self, title='Record Creation', message='Are you sure to create a new record?', _type='question').result == True:
-                record = self.manager.createRecord(**result)
-                self._setResult(record)
+            elif self.manager: PRMP_MsgBox(self, title='Record Creation', message='Are you sure to create a new record?', _type='question', callback=self.newRecord)
 
         if self._return: self.destroy()
+
+    def updateRecord(self, w):
+        if w: self.record.update(self.result)
+        self.destroyDialog()
+
+    def newRecord(self, w):
+        if w:
+            record = self.manager.createRecord(**result)
+            self._setResult(record)
+        self.destroyDialog()
 RecD = RecordDialog
 
 class AccountDialog(PRMP_Dialog):
@@ -128,21 +137,35 @@ class AccountDialog(PRMP_Dialog):
         result = super().processInput()
         if result:
 
-            if self.account and PRMP_MsgBox(self, title='Edit Account Details', message='Are you sure to edit the details of this account?', _type='question').result == True: self.account.update(result)
+            if self.account: PRMP_MsgBox(self, title='Edit Account Details', message='Are you sure to edit the details of this account?', _type='question', callback=self.updateAccount)
         
-            elif self.manager and PRMP_MsgBox(self, title='Account Creation', message='Are you sure to create a new account?', _type='question').result == True:
-                try:
-                    account = self.manager.createAccount(**result)
-                    self._setResult(account)
-                    print(account)
-                    print(self.manager[:])
-                    print()
-                except Exception as error:
-                    font = self.DEFAULT_FONT.copy()
-                    font['size'] = 15
-                    PRMP_MsgBox(self, title='Account Creation Error', message=error, _type='error', ask=0, msgFont=font)
+            elif self.manager: PRMP_MsgBox(self, title='Account Creation', message='Are you sure to create a new account?', _type='question', callback=self.newAccount)
+    @property
+    def result(self):
+        res = super().result
+        if 'month' in res:
+            res['date'] = res['month']
+            del res['month']
+        return res
+        
+    def updateAccount(self, w):
+        if w: self.account.update(self.result)
+        self.destroyDialog()
 
-        if self._return: self.destroy()
+    def newAccount(self, w):
+        if w:
+            # try:
+            account = self.manager.createAccount(**self.result)
+            self._setResult(account)
+            print(account)
+            print(self.manager[:])
+            print()
+            # except Exception as error:
+            #     print(error)
+            #     font = self.DEFAULT_FONT.copy()
+            #     font['size'] = 15
+            #     PRMP_MsgBox(self, title='Account Creation Error', message=error, _type='error', ask=0, msgFont=font)
+        self.destroyDialog()
 AccD = AccountDialog
 
 

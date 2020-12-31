@@ -215,8 +215,6 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
     def __init__(self, master=None, geo=(1000, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
-        self.creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
-
         self._sup = sup
         if sup: self.addTitleBar(sup)
 
@@ -228,13 +226,23 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
 
         self.new = Checkbutton(sups, text='New?', place=dict(relx=.77, rely=.09, relh=.05, relw=.22))
 
-        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.85), orient='h', bottom='monthyearbutton', top='checkbutton', bottomKwargs=dict(font='PRMP_FONT'))
+        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.85), orient='h', bottom='monthyearbutton', top='checkbutton', bottomKwargs=dict(font='PRMP_FONT'), longent=.4)
 
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
         self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
         
         self.paint()
+    
+    def getNewObjectDialog(self, st):
+        creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
+        
+        if self.c_or_m and st == 'Accounts':
+            from ..dc.dc_dialogs import ClientAccountDialog
+            return ClientAccountDialog
+    
+        return creations[st]
+
 
     @property
     def selectedSubType(self): return self.subType.get()
@@ -243,16 +251,18 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
         subType = self.selectedSubType
         subs = self._sup[subType] or []
         return subs
+    
+    @property
+    def c_or_m(self): return self._sup.className in ('Client', 'Member')
 
     def changeSubs(self, e=0):
         st = self.selectedSubType
         if self.new.get():
-            if self._sup.className in ('Client', 'Member') and st == 'Persons':
+            if self.c_or_m and st == 'Persons':
                 PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className} ', _type='error', ask=0)
                 return
-            if st in self.creations:
-                dialog = self.creations[st]
-                if dialog: dialog(self, manager=self._sup)
+            dialog = self.getNewObjectDialog(st)
+            if dialog: dialog(self, manager=self._sup)
         else:
             subs = self.getSubs()
             if subs: self.subsList.set(subs)

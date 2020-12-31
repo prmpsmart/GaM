@@ -53,8 +53,6 @@ class ClientDialog(PersonDialog):
 
 class ClientAccountDialog(AccountDialog):
 
-    def __init__(self, **kwargs): super().__init__(**kwargs)
-
     def _setupDialog(self):
         super()._setupDialog()
         self.addEditButton()

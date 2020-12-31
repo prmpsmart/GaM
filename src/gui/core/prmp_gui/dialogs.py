@@ -44,6 +44,9 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         # self.wait_window()
         pass
 
+    def destroyDialog(self):
+        if self._return: self.destroy()
+
     @property
     def result(self): return self.__result
     
