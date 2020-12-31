@@ -190,7 +190,7 @@ class ImageWidget:
         
     def camera(self):
         self.delMenu()
-        self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set, grab=1)
+        self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
     
     def saveImage(self):
         if self.imageFile:

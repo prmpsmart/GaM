@@ -6,7 +6,7 @@ from .pics import PRMP_Image
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=0, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, **kwargs):
 
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
         FillWidgets.__init__(self, values=values)
@@ -126,7 +126,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.XBM = Xbms
         if okText: self.ask = 0
         
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
