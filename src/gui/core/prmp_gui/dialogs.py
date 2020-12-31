@@ -6,7 +6,7 @@ from .pics import PRMP_Image
 
 class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, **kwargs):
 
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
         FillWidgets.__init__(self, values=values)
@@ -22,22 +22,28 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         self._setupDialog()
         self.set()
 
+        self.paint()
         self.default()
         
         if editable:
             if values: self.editInput(0)
             else: self.editInput(1)
         
-        self.paint()
         
         # if master: self.wait_window()
         # else: self.mainloop()
-        self.mainloop()
+        if show: self.mainloop()
     
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
 
-    def default(self): pass
+    def default(self):
+        # self.grab_set()
+        # self.wait_window()
+        pass
+
+    @property
+    def result(self): return self.__result
     
     def _setResult(self, result):
         self.__result = result
@@ -68,11 +74,11 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         xbtn.place(x=10 , y=y-40, h=30, w=60)
     
     def processInput(self, e=0):
-        result = self.get()
-        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19), 'image':self.image.get()}
+        # result = self.get()
+        result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
         self._setResult(result)
         
-        return self.resultObj.result
+        return self.result
         
     def editInput(self, e=0):
         if self.editBtn == None: return
@@ -118,7 +124,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.XBM = Xbms
         if okText: self.ask = 0
         
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, show=0, **kwargs)
 
 
     def _setupDialog(self):
@@ -143,6 +149,10 @@ class PRMP_MsgBox(PRMP_Dialog):
         if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.33, rely=.83, height=28, relw=.2)
+    
+    def default(self):
+        # self.grab_set()
+        self.wait_window()
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type
@@ -154,12 +164,15 @@ class PRMP_MsgBox(PRMP_Dialog):
     def yesCom(self):
         if self.ask: self._setResult(True)
         self.destroy()
+
     def cancelCom(self):
         self._setResult(None)
         self.destroy()
+
     def noCom(self):
         self._setResult(False)
         self.destroy()
+
 PMB = PRMP_MsgBox
 
 class CameraDialog(PRMP_Dialog):

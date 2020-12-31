@@ -213,8 +213,8 @@ IL = ImageLabel
 
 class PRMP_DateWidget:
     attr = 'strDate'
-    def __init__(self, min_=None, max_=None):
-        
+    def __init__(self, min_=None, max_=None, callback=None):
+        self.callback = callback
         self.date = None
         from .dialogs import CalendarDialog, DateTime
         self.CD = CalendarDialog
@@ -226,11 +226,7 @@ class PRMP_DateWidget:
         if self.DT.checkDateTime(self.date, 1): return True
         else: return False
 
-    def action(self):
-        res = PRMP_Result()
-        self.CD(self, caller=self.topest, side=self.topest.side, _return=1, min_=self.min, max_=self.max, resultObj=res)
-        self.date = res.result
-        if self.date: self.set(str(self.date))
+    def action(self): self.CD(self, caller=self.topest, side=self.topest.side, _return=1, min_=self.min, max_=self.max, callback=self.set)
     
     def get(self):
         if self.date: return self.date

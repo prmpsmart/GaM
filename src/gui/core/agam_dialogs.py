@@ -6,6 +6,7 @@ class PersonDialog(PRMP_Dialog):
 
         self.manager = manager
         self.person = person
+        print(self.person)
         if person: title = f'{person.master.className} {title}'
         
         super().__init__(master=master, title=title, geo=geo, values=person if person else values, **kwargs)
@@ -36,17 +37,19 @@ class PersonDialog(PRMP_Dialog):
 
     def processInput(self, e=0):
         result = super().processInput()
-        if result: 
-            res = PRMP_Result()
+        if result:
             if self.person:
-                PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question', resultObj=res)
+                print(result)
+                PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question')
                 if res.result: self.person.update(result)
             
             elif self.manager:
-                PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', resultObj=res)
-                if res.reult:
+                print(result, 2)
+                PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question')
+                if res.result:
                     person = self.manager.createPerson(**result)
                     self._setResult(person)
+            print('MMM')
 
         if self._return: self.destroy()
 PerD = PersonDialog
