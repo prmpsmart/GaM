@@ -31,10 +31,9 @@ class PRMP_Dialog(PRMP_MainWindow, FillWidgets):
         
         if grab: self.grab_set()
         
-        # if master: self.wait_window()
-        # else: self.mainloop()
-        if show: self.mainloop()
-        else: self.wait_window()
+        self.mainloop()
+        # if show: self.mainloop()
+        # else: self.wait_window()
         
     
     def _setupDialog(self):
@@ -127,7 +126,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.XBM = Xbms
         if okText: self.ask = 0
         
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, show=9, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
@@ -151,11 +150,6 @@ class PRMP_MsgBox(PRMP_Dialog):
         if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.33, rely=.83, height=28, relw=.2)
-    
-    def default(self):
-        # self.grab_set()
-        # self.wait_window()
-        pass
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type
