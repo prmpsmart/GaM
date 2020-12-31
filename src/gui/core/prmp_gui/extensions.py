@@ -183,7 +183,7 @@ class ImageWidget:
             del self.rt
             self.rt = None
         
-    def camera(self): self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
+    def camera(self): self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set, grab=1)
     
     def saveImage(self):
         if self.imageFile:
@@ -698,7 +698,7 @@ class Camera(PRMP_Frame):
         self.source = source
         self.image = None
         self._image = None
-        # self.callback = callback
+        self.callback = callback
         self.pause = False
 
         self.frameUpdateRate = frameUpdateRate
@@ -728,7 +728,7 @@ class Camera(PRMP_Frame):
     
     def saveImage(self):
         self.imageFile = ImageFile(image=self._image)
-        # if self.callback: return self.callback(self.imageFile)
+        if self.callback: self.callback(self.imageFile)
         return self.imageFile
     
     def get(self): return self.saveImage()
