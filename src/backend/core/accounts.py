@@ -1,4 +1,4 @@
-from .date_time import PRMP_DateTime, CompareByDate
+from prmp_miscs.prmp_datetime import PRMP_DateTime, CompareByDate
 from .bases import ObjectsMixins, Object, ObjectsManager
 from .errors import Errors
 

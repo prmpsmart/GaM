@@ -1,6 +1,6 @@
 from .errors import Errors
 import re, io
-from prmp_miscs import PRMP_Mixins
+from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
 
 
 
@@ -12,7 +12,7 @@ class Mixins(PRMP_Mixins):
     
     numberToMoney = addSignToMoney
 
-    def stripSignFromNum(self, money): return self.stripSignFromNum(money)
+    def stripSignFromMoney(self, money): return self.stripSignFromNum(money)
 
     moneyToNumber = stripSignFromMoney
    
