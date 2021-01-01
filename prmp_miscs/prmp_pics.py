@@ -33,6 +33,7 @@ class PRMP_Pics:
     def filesDict(cls):
         files = cls.files()
         _filesDict = {cls.picName(file): file for file in files}
+        print(_filesDict)
         return _filesDict
     
     @classmethod

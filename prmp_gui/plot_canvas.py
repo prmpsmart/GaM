@@ -215,7 +215,7 @@ class Render(Plots):
         self.adjust(left=0, bottom=.1, right=1, top=.88, wspace=.2, hspace=0)
 
 
-class PlotCanvas(Plots, PRMP_Frame):
+class PRMP_PlotCanvas(Plots, PRMP_Frame):
     charts = ['plot', 'bar', 'barh', 'hist', 'pie']
     lss = ['dashed', 'dashdot', 'solid', 'dotted']
     def __init__(self, master=None, relief='solid', **kwargs):
