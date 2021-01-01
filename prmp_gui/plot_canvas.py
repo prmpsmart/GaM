@@ -1,6 +1,6 @@
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot
-from .core import Frame, Mixins
+from .core import PRMP_Frame, PRMP_Mixins
 import random
 
 
@@ -56,7 +56,7 @@ class Bar:
         else: print('d_1_point=1', __file__)
 
 
-class Plots(Mixins):
+class Plots(PRMP_Mixins):
     bkcol = 'white'
     def __init__(self, bkcol=''):
         self.big = 1
@@ -215,11 +215,11 @@ class Render(Plots):
         self.adjust(left=0, bottom=.1, right=1, top=.88, wspace=.2, hspace=0)
 
 
-class PlotCanvas(Plots, Frame):
+class PlotCanvas(Plots, PRMP_Frame):
     charts = ['plot', 'bar', 'barh', 'hist', 'pie']
     lss = ['dashed', 'dashdot', 'solid', 'dotted']
     def __init__(self, master=None, relief='solid', **kwargs):
-        Frame.__init__(self, master, relief=relief, **kwargs)
+        PRMP_Frame.__init__(self, master, relief=relief, **kwargs)
         Plots.__init__(self)
         self.expand = False
         
