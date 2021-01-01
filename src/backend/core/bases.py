@@ -171,7 +171,6 @@ class Object(CompareByNumber, ObjectsMixins):
     
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
         ObjectsMixins.__init__(self)
-        from .date_time import PRMP_DateTime
         if date == None: date = PRMP_DateTime.now()
         PRMP_DateTime.checkDateTime(date)
 

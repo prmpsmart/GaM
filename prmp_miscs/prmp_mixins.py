@@ -1,4 +1,5 @@
 from .prmp_errors import PRMP_Errors
+import re
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
