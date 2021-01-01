@@ -5,7 +5,7 @@ from PIL.ImageTk import Image, PhotoImage, BitmapImage
 import zlib, pickle
 
 class Pics:
-    _dir = 'pics'
+    _dir = 'prmp_pics'
     subDir = ''
     
     @classmethod
@@ -47,11 +47,11 @@ class Pics:
             try: return files[bitmap]
             except: filesL[0]
 
-class Xbms(Pics): subDir = 'xbms'
+class Xbms(Pics): subDir = 'prmp_xbms'
     
-class Pngs(Pics): subDir = 'pngs'
+class Pngs(Pics): subDir = 'prmp_pngs'
     
-class Gifs(Pics): subDir = 'gifs'
+class Gifs(Pics): subDir = 'prmp_gifs'
 
 class ImageFile(BytesIO):
     count = 0
