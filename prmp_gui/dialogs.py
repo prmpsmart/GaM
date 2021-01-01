@@ -1,6 +1,41 @@
 
 from prmp_miscs.prmp_datetime import PRMP_DateTime
 from .extensions import *
+import tkinter.messagebox as messagebox
+import tkinter.filedialog as filedialog
+
+
+def showDialog(title=None, msg=None, which=None):
+    if which == 'error': messagebox.showerror(title, msg)
+    elif which == 'info': messagebox.showinfo('Information', msg)
+    elif which == 'warn': messagebox.showwarning('Warning', msg)
+
+def confirmDialog(title=None, msg=None, which=None):
+    if which == 1: return messagebox.askyesno(title, msg)
+    if which == 2: return messagebox.askquestion(title, msg)
+    if which == 3: return messagebox.askokcancel(title, msg)
+    if which == 4: return messagebox.askretrycancel(title, msg)
+    if which == 5: return messagebox.askyesnocancel(title, msg)
+
+def askPath(opened=False, folder=False, many=False, save=False):
+    if folder == False:
+        if opened == False:
+            if many == False:
+                if save == False: return filedialog.askopenfilename()
+                else: return filedialog.asksaveasfilename()
+            else: return filedialog.askopenfilenames()
+        else:
+            if many == False:
+                if save == False: return filedialog.askopenfile()
+                else: return filedialog.asksaveasfile()
+            else: return filedialog.askopenfiles()
+    else: return filedialog.askdirectory()
+
+def dialogFunc(ask=0, path=0, **kwargs):
+    if path: askPath(**kwargs)
+    elif ask: confirmDialog(**kwargs)
+    else: showDialog(**kwargs)
+
 
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):

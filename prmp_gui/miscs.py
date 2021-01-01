@@ -1,5 +1,4 @@
 import platform
-import tkinter.messagebox as msgbox
 
 from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime
 from functools import partial
@@ -60,18 +59,6 @@ def create_container(func):
         container.bind('<Leave>', lambda e: unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)
     return wrapped
-
-def show(title=None, msg=None, which=None):
-    if which == 'error': msgbox.showerror(title, msg)
-    elif which == 'info': msgbox.showinfo('Information', msg)
-    elif which == 'warn': msgbox.showwarning('Warning', msg)
-
-def confirm(title=None, msg=None, num=None):
-    if num == 1: return msgbox.askyesno(title, msg)
-    if num == 2: return msgbox.askquestion(title, msg)
-    if num == 3: return msgbox.askokcancel(title, msg)
-    if num == 4: return msgbox.askretrycancel(title, msg)
-    if num == 5: return msgbox.askyesnocancel(title, msg)
 
 def copyClassMethods(obj, copyClass, *args):
     

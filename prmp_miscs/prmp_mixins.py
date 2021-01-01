@@ -99,14 +99,38 @@ class PRMP_Mixins:
         print()
     
     def __bool__(self): return True
-        
-    
+
     def getImageData(self, image):
         temp = io.BytesIO()
         image.save(temp, 'png')
         data = temp.getvalue()
         return data
 
+    def decimalPlace(self, num, place=1):
+        num = float(num)
+        numStr = str(num) + '0'
+        endIndex = numStr.index('.') + place + 1
+        return numStr[:endIndex]
+
+    def approximate(self, num, size=1):
+        assert size > 0
+        strNum = str(num)
+        listNum = list(strNum)
+        if len(listNum) <= 3: return num
+        app = listNum[size]
+        
+        listNum[size:] = ['0' for _ in range(size, len(listNum))]
+        add = 0 if int(app) < 5 else 1
+        adx = int(listNum[size - 1]) + add
+        listNum[size - 1] = str(adx)
+        retur = ''.join(listNum)
+        return int(retur)
+    
+    def stripZeros(self, num, app=1):
+        num = self.approximate(num, app)
+        strNum = str(num)
+        listNum = list(strNum)
+        return strNum.strip('0')
 
 
 
