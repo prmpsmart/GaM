@@ -214,7 +214,7 @@ class PathStat(PRMP_Mixins):
     def fullName(self):
         if python_version() == 2:
             if os.path.isabs(self.path): fn = os.path.abspath(self.path)
-            else: fn = os.path.join(getcwd(), self.givenPath)
+            else: fn = os.path.join(os.getcwd(), self.givenPath)
         
         else:
             if self.path.is_absolute(): fn = self.path.resolve()
@@ -758,6 +758,7 @@ try: from socketserver import BaseRequestHandler, TCPServer
 except ImportError:
     TranxFerLogger.debug('socketserver not installed, I percieve you\'re using python2')
     from SocketServer import BaseRequestHandler, TCPServer
+import socket
 
 class TranxFer(NetworkMixin):
     

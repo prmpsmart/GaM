@@ -3,6 +3,7 @@ from .core import *
 
 
 
+
 family = '{Times New Roman}'
 
 font2 = f"-family {family} -size {5 if which_platform() == 'and' else 11} -weight bold"
@@ -641,8 +642,8 @@ class MiniFileTranxFer(FileTranxFer):
     def setServing(self):
         super().setServing()
         self.sentS.config(text=AutoUploadHandler.count)
-        if self.isServing:
-            if self.localhostS.get(): self.serverS.set(self.networkInfo.ip)
+        if not self.isServing:
+            if not self.localhostS.get(): self.serverS.set(self.networkInfo.ip)
             self.serverS.config(state='disabled')
     
     def stop(self, ev=0):
