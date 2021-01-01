@@ -143,12 +143,15 @@ class ImageWidget:
     
     def loadImage(self, prmpImage=None):
         self.delMenu()
+        dif = 20
+        w = self.width-dif, self.height-dif
         if prmpImage:
             if not isinstance(prmpImage, PRMP_Image):
                 prmpImage = PRMP_Image(prmpImage, thumb=self.thumb)
             if isinstance(prmpImage, PRMP_Image):
                 self._image = prmpImage
                 self.imageFile = prmpImage.imageFile
+                self._image = prmpImage.resizeTk(w)
             
             self.image =  prmpImage
 
@@ -173,12 +176,12 @@ class ImageWidget:
     def bindMenu(self):
         self.bind('<1>', self.delMenu, '+')
         self.bind('<3>', self.showMenu, '+')
-        # self.bind('<Double-1>', self.showMenu)
+        self.bind('<Double-1>', self.camera)
     
     def unBindMenu(self):
         self.unbind('<1>')
         self.unbind('<3>')
-        # self.unbind('<Double-1>')
+        self.unbind('<Double-1>')
     
     def get(self): return self.imageFile
     
@@ -188,7 +191,7 @@ class ImageWidget:
             del self.rt
             self.rt = None
         
-    def camera(self):
+    def camera(self, e=0):
         self.delMenu()
         self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
     
