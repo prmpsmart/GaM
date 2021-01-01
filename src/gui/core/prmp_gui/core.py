@@ -699,7 +699,7 @@ class PRMP_Widget(PRMP_Theme):
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
        
     def addTip(self, tip='Tip', delay=0, follow=True):
-        if PRMP_Widget.TIPPING: from .extensions import ToolTip; ToolTip(self, msg=tip, delay=delay, follow=follow)
+        if PRMP_Widget.TIPPING: from .extensions import PRMP_ToolTip; PRMP_ToolTip(self, msg=tip, delay=delay, follow=follow)
     
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')

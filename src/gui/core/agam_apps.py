@@ -2,17 +2,17 @@ from .agam_dialogs import *
 
 class TreeColumns:
     def columns(self, sup):
-        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className'}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
         return [{'text': 'Name', 'width': 250}, {'text': 'Date'}, {'text': 'Last Active', 'attr': {'last': 'date'}}]
 
 
-class RegionLookUp(PRMP_MainWindow, FillWidgets):
+class RegionLookUp(PRMP_MainWindow, PRMP_FillWidgets):
     
     def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, tm=1, gaw=1, **kwargs):
         
         PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=gaw, ntb=1, tm=tm, atb=1, asb=1, **kwargs)
         
-        FillWidgets.__init__(self, values=values)
+        PRMP_FillWidgets.__init__(self, values=values)
         
         self.region = region
         self.personDialog = None
@@ -73,7 +73,7 @@ class RegionLookUp(PRMP_MainWindow, FillWidgets):
         new.place(x=208, y=175, h=24, w=140)
        
         
-        self.image = ImageLabel(self.container, status='Profile Picture')
+        self.image = PRMP_ImageLabel(self.container, status='Profile Picture')
         self.image.place(relx=.61, y=10, h=170, relw=.382)
         
         

@@ -348,10 +348,10 @@ class SubsList(LabelFrame):
         elif self.callback: self.callback(selected)
 
 
-class RegionDetails(FillWidgets, LabelFrame):
+class RegionDetails(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, region=None, **kwargs):
         LabelFrame.__init__(self, master, **kwargs)
-        FillWidgets.__init__(self)
+        PRMP_FillWidgets.__init__(self)
 
         self.region = region
 
@@ -384,12 +384,12 @@ class RegionDetails(FillWidgets, LabelFrame):
         super().set(values)
 
 
-class FurtherDetails(FillWidgets, LabelFrame):
+class FurtherDetails(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, text='Details', region=None, **kwargs):
         LabelFrame.__init__(self, master, text=text, **kwargs)
 
         self.region = region
-        FillWidgets.__init__(self)
+        PRMP_FillWidgets.__init__(self)
         
         self.persons = LabelLabel(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.22, relw=.4), orient='h', longent=.5)
 

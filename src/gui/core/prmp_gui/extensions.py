@@ -55,7 +55,7 @@ class AutoScroll:
         return str(self.master)
 AS = AutoScroll
 
-class FillWidgets(Mixins):
+class PRMP_FillWidgets(Mixins):
     
     def __init__(self, values={}):
         self.__resultsWidgets = []
@@ -115,17 +115,17 @@ class FillWidgets(Mixins):
                         return
                 else: result[widgetName] = get
         return result
-FW = FillWidgets
+FW = PRMP_FillWidgets
 
-class ImageWidget:
+class PRMP_ImageWidget:
     def __init__(self, prmpImage=None, thumb=None, resize=None):
         self.rt = None
         self.__image = None
         self.thumb = thumb or (200, 170)
         self.resize = resize or (100, 100)
-        from .dialogs import PRMP_MsgBox, CameraDialog
+        from .dialogs import PRMP_MsgBox, PRMP_CameraDialog
         self.PMB = PRMP_MsgBox
-        self.CD = CameraDialog
+        self.CD = PRMP_CameraDialog
         
         self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb, db=1)
         
@@ -205,27 +205,27 @@ class ImageWidget:
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
         self.rt = rt = PRMP_Toplevel(self, geo=(50, 75, x, y), tm=1, asb=0, atb=0)
-        PRMP_Button(rt, text='Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.25, relw=1))
+        PRMP_Button(rt, text='PRMP_Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.25, relw=1))
         PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.25, relh=.25, relw=1))
         PRMP_Button(rt, config=dict(text='Save', command=self.saveImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.5, relh=.25, relw=1))
         PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.75, relh=.25, relw=1))
         rt.paint()
 
-IW = ImageWidget
+IW = PRMP_ImageWidget
 
-class ImageLabel(ImageWidget, PRMP_Style_Label):
+class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
     def __init__(self, master, prmpImage=None, resize=(), thumb=(), **kwargs):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center'), **kwargs)
-        ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize)
-IL = ImageLabel
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize)
+IL = PRMP_ImageLabel
 
 class PRMP_DateWidget:
     attr = 'strDate'
     def __init__(self, min_=None, max_=None, callback=None):
         self.callback = callback
         self.date = None
-        from .dialogs import CalendarDialog, DateTime
-        self.CD = CalendarDialog
+        from .dialogs import PRMP_CalendarDialog, DateTime
+        self.CD = PRMP_CalendarDialog
         self.DT = DateTime
         self.min = min_
         self.max = max_
@@ -297,35 +297,35 @@ class ScrollableFrame(PRMP_Frame):
         self.canvas.configure(scrollregion=p)
 SF = ScrollableFrame
 
-class ToolTip(PRMP_Toplevel):
+class PRMP_ToolTip(PRMP_Toplevel):
     """
-    Provides a ToolTip widget for Tkinter.
-    To apply a ToolTip to any Tkinter widget, simply pass the widget to the
-    ToolTip constructor
+    Provides a PRMP_ToolTip widget for Tkinter.
+    To apply a PRMP_ToolTip to any Tkinter widget, simply pass the widget to the
+    PRMP_ToolTip constructor
     """
     def __init__(self, wdgt, msg=None, msgFunc=None, delay=1, follow=True):
         """
-        Initialize the ToolTip
+        Initialize the PRMP_ToolTip
 
         Arguments:
-          wdgt: The widget this ToolTip is assigned to
+          wdgt: The widget this PRMP_ToolTip is assigned to
           font: Font to be used
-          msg:  A static string message assigned to the ToolTip
-          msgFunc: A function that retrieves a string to use as the ToolTip text
-          delay:   The delay in seconds before the ToolTip appears(may be float)
-          follow:  If True, the ToolTip follows motion, otherwise hides
+          msg:  A static string message assigned to the PRMP_ToolTip
+          msgFunc: A function that retrieves a string to use as the PRMP_ToolTip text
+          delay:   The delay in seconds before the PRMP_ToolTip appears(may be float)
+          follow:  If True, the PRMP_ToolTip follows motion, otherwise hides
         """
         self.wdgt = wdgt
-        # The parent of the ToolTip is the parent of the ToolTips widget
+        # The parent of the PRMP_ToolTip is the parent of the ToolTips widget
         # self.parent = self.wdgt.master
         # Initalise the Toplevel
         super().__init__(self.wdgt.topest, padx=1, pady=1, asb=0, atb=0, geo=(), ntb=1)
         # Hide initially
         self.withdraw()
-        # The ToolTip Toplevel should have no frame or title bar
+        # The PRMP_ToolTip Toplevel should have no frame or title bar
         # self.overrideredirect(True)
 
-        # The msgVar will contain the text displayed by the ToolTip
+        # The msgVar will contain the text displayed by the PRMP_ToolTip
         self.msgVar = tk.StringVar()
         if msg is None: self.msgVar.set('No message provided')
         else: self.msgVar.set(msg)
@@ -334,7 +334,7 @@ class ToolTip(PRMP_Toplevel):
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
-        # The text of the ToolTip is displayed in a Message widget
+        # The text of the PRMP_ToolTip is displayed in a Message widget
         self.msgwid = PRMP_Message(self, config=dict(textvariable=self.msgVar, aspect=1000), font=PRMP_Theme.DEFAULT_MINUTE_FONT, background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
         self.msgwid.grid()
 
@@ -348,7 +348,7 @@ class ToolTip(PRMP_Toplevel):
 
     def spawn(self, event=None):
         """
-        Spawn the ToolTip.  This simply makes the ToolTip eligible for display.
+        Spawn the PRMP_ToolTip.  This simply makes the PRMP_ToolTip eligible for display.
         Usually this is caused by entering the widget
 
         Arguments:
@@ -360,7 +360,7 @@ class ToolTip(PRMP_Toplevel):
 
     def show(self):
         """
-        Displays the ToolTip if the time delay has been long enough
+        Displays the PRMP_ToolTip if the time delay has been long enough
         """
         if self.visible == 1 and time.time() - self.lastMotion > self.delay:
             self.visible = 2
@@ -376,13 +376,13 @@ class ToolTip(PRMP_Toplevel):
         """
         self.lastMotion = time.time()
         # If the follow flag is not set, motion within the
-        # widget will make the ToolTip disappear
+        # widget will make the PRMP_ToolTip disappear
         #
         if self.follow is False:
             self.withdraw()
             self.visible = 1
 
-        # Offset the ToolTip 10x10 pixes southwest of the pointer
+        # Offset the PRMP_ToolTip 10x10 pixes southwest of the pointer
         self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
         try:
             # Try to call the message function.  Will not change
@@ -395,22 +395,22 @@ class ToolTip(PRMP_Toplevel):
 
     def hide(self, event=None):
         """
-        Hides the ToolTip.  Usually this is caused by leaving the widget
+        Hides the PRMP_ToolTip.  Usually this is caused by leaving the widget
         Arguments:
           event: The event that called this function
         """
         self.visible = 0
         self.withdraw()
-TT = ToolTip
+TT = PRMP_ToolTip
 
-class SolidScreen(PRMP_MainWindow):
+class PRMP_SolidScreen(PRMP_MainWindow):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
         super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, **kwargs)
         
         self.container.configure(borderwidth=12)
 
         self.paint()
-SS = SolidScreen
+SS = PRMP_SolidScreen
 
 class ScrolledText(AutoScroll, tk.Text):
 
@@ -426,12 +426,12 @@ class ScrolledEntry(AutoScroll, tk.Entry):
         tk.Entry.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
-class FramedCanvas(Frame):
+class PRMP_FramedCanvas(Frame):
     def __init__(self, master, canvasConfig={}, **kwargs):
         super().__init__(master, **kwargs)
         self.canvas = Canvas(self, **canvasConfig, place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
 
-class DateTimeView(LabelFrame):
+class PRMP_DateTimeView(LabelFrame):
 
     def __init__(self, master, text='Date and Time', **kwargs):
         super().__init__(master, config=dict(text=text), **kwargs)
@@ -463,7 +463,7 @@ class DateTimeView(LabelFrame):
         
         self.after(10, self.update)
 
-class Calendar(Frame):
+class PRMP_Calendar(Frame):
     _both = '◄►'
     _next = '►'
     _previous = '◄'
@@ -520,7 +520,7 @@ class Calendar(Frame):
         
         def offButton(self, e=0):
             if self.notPart: return
-            if self == Calendar.choosen: self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
+            if self == PRMP_Calendar.choosen: self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
             elif self.now: self.config(background=self.class_.now_bg, foreground=self.class_.now_fg)
             else:
                 if self.day: self.config(background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground='red' if self.redDay else PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -561,8 +561,8 @@ class Calendar(Frame):
         def choosen(self, e=0):
             if self.day: 
                 if self.notPart: return
-                b4 = Calendar.choosen
-                Calendar.choosen = self
+                b4 = PRMP_Calendar.choosen
+                PRMP_Calendar.choosen = self
                 if b4: b4.offButton()
                 self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
                 self.returnMethod(self.day)
@@ -695,11 +695,11 @@ class Calendar(Frame):
         if self.callback: self.callback(date)
 
 
-class Entry_Label(Label):
+class RPMP_Entry_Label(Label):
 
     def __init__(self, master, font='DEFAULT_FONT', **kwargs): super().__init__(master, asEntry=True, font=font, **kwargs)
 
-class Camera(PRMP_Frame):
+class PRMP_Camera(PRMP_Frame):
 
     def __init__(self, master, source=0, frameUpdateRate=10, callback=None, **kwargs):
         import cv2

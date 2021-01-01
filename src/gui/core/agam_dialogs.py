@@ -29,7 +29,7 @@ class PersonDialog(PRMP_Dialog):
         
         self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, rely=.56, relh=.44, relw=.96), bottomKwargs=dict(very=True), longent=.3, orient='h')
         
-        self.image = ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41))
+        self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41))
 
         self.regDate = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
 

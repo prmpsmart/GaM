@@ -7,11 +7,11 @@ from ..core.prmp_gui.plotCanvas import PlotCanvas, random, ChartSort
 class DC_ChartSort(ChartSort): pass
 
 
-class DC_Digits(FillWidgets, Frame):
+class DC_Digits(PRMP_FillWidgets, Frame):
     
     def __init__(self, master, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
-        FillWidgets.__init__(self, values)
+        PRMP_FillWidgets.__init__(self, values)
         font = self.DEFAULT_FONT.copy()
         font['size'] = 20
      # Incomes
