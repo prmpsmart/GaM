@@ -29,58 +29,6 @@ def confirm(msg='', **kwargs):
     return dialogFunc(ask=1, msg=msg, **kwargs)
 
 
-class Tip(tk.Toplevel):
-    def __init__(self, wdgt, msg=None, delay=.2, follow=True, root=None):
-        self.wdgt = wdgt
-        self.parent = self.wdgt.master if root == None else root
-        
-        super().__init__(self.parent, background='black', padx=1, pady=1)
-        self.attributes('-topmost', True)
-        self.msg = msg
-        self.withdraw()
-        self.overrideredirect(True)
-        
-        self.msgVar = tk.StringVar()
-
-        if msg is None: self.msgVar.set('No loaded File or Directory.')
-        else: self.msgVar.set(msg)
-        
-        self.delay = delay
-        self.follow = follow
-        self.visible = 0
-        self.lastMotion = 0
-        tk.Message(self, textvariable=self.msgVar, background="#d9d9d9", font=font2, aspect=1000).grid()
-        self.wdgt.bind('<Enter>', self.spawn, '+')
-        self.wdgt.bind('<Leave>', self.hide, '+')
-        self.wdgt.bind('<Motion>', self.move, '+')
-        
-    def update(self, msg): self.msgVar.set(msg)
-
-    def spawn(self, event=None):
-        self.visible = 1
-        self.after(int(self.delay * 1000), self.show)
-
-    def show(self):
-        if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
-        if self.visible == 2: self.deiconify()
-
-    def move(self, event):
-        self.lastMotion = time.time()
-        if self.follow is False:
-            self.withdraw()
-            self.visible = 1
-        self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-        
-        #To get the present event coordinates
-        # print(event.x_root,event.y_root)
-        
-        self.after(int(self.delay * 1000), self.show)
-
-    def hide(self, event=None):
-        self.visible = 0
-        self.withdraw()
-
-
 class Preview(Toplevel):
     images = ['.jpg', '.png', '.jpeg', '.gif', '.jpeg', '.jpg', '.png', '.PNG', '.psd', '.tif', '.tiff', '.ico']
     audios = ['.wav', '.aif', '.cda', '.mid', '.midi', '.mp3', '.mpa', '.ogg', '.wma']
@@ -154,28 +102,22 @@ class Details(LabelFrame):
         self.pathStat = None
         
         self.nameL = Button(self.detConts, text='Name', command=self.reload, place=dict(relx=.01, rely=.01, relh=.12, relw=.164))
-        self.nameS = Label(self.detConts, text='File Name', place=dict(relx=.175, rely=.01, relh=.12, relw=.82))
-        self.nameTip = Tip(self.nameS, root=root)
+        self.nameS = Label(self.detConts, text='File Name', place=dict(relx=.175, rely=.01, relh=.12, relw=.82), tip='None')
 
         self.sizeL = Label(self.detConts, text='Size', place=dict(relx=.01, rely=.14, relh=.12, relw=.164))
-        self.sizeS = Label(self.detConts, place=dict(relx=.175, rely=.14, relh=.12, relw=.274))
-        self.sizeTip = Tip(self.sizeS, root=root)
+        self.sizeS = Label(self.detConts, place=dict(relx=.175, rely=.14, relh=.12, relw=.274), tip='None')
 
         self.typeL = Label(self.detConts, text='Type', place=dict(relx=.01, rely=.27, relh=.12, relw=.164))
-        self.typeS = Label(self.detConts, place=dict(relx=.175, rely=.27, relh=.12, relw=.274))
-        self.typeTip = Tip(self.typeS, root=root)
+        self.typeS = Label(self.detConts, place=dict(relx=.175, rely=.27, relh=.12, relw=.274), tip='None')
 
         self.ctimeL = Label(self.detConts, text='CTime', place=dict(relx=.01, rely=.4, relh=.12, relw=.164))
-        self.ctimeS = Label(self.detConts,  place=dict(relx=.175, rely=.4, relh=.12, relw=.274))
-        self.ctimeTip = Tip(self.ctimeS, root=root)
+        self.ctimeS = Label(self.detConts,  place=dict(relx=.175, rely=.4, relh=.12, relw=.274), tip='None')
 
         self.atimeL = Label(self.detConts, text='ATime', place=dict(relx=.01, rely=.53, relh=.12, relw=.164))
-        self.atimeS = Label(self.detConts,  place=dict(relx=.175, rely=.53, relh=.12, relw=.274))
-        self.atimeTip = Tip(self.atimeS, root=root)
+        self.atimeS = Label(self.detConts,  place=dict(relx=.175, rely=.53, relh=.12, relw=.274), tip='None')
 
         self.mtimeL = Label(self.detConts, text='MTime', place=dict(relx=.01, rely=.66, relh=.12, relw=.164))
-        self.mtimeS = Label(self.detConts, place=dict(relx=.175, rely=.66, relh=.12, relw=.274))
-        self.mtimeTip = Tip(self.mtimeS, root=root)
+        self.mtimeS = Label(self.detConts, place=dict(relx=.175, rely=.66, relh=.12, relw=.274), tip='None')
 
         self.filesCountL = Label(self.detConts, text='Files Count', place=dict(relx=.47, rely=.14, relh=.12, relw=.329))
         self.filesCountS = Label(self.detConts, place=dict(relx=.8, rely=.14, relh=.12, relw=.194))
@@ -184,8 +126,7 @@ class Details(LabelFrame):
         self.dirsCountS = Label(self.detConts, place=dict(relx=.8, rely=.27, relh=.12, relw=.194))
         
         self.innerSizeL = Label(self.detConts, text='Inner Files Size', place=dict(relx=.47, rely=.4, relh=.12, relw=.329))
-        self.innerSizeS = Label(self.detConts,  place=dict(relx=.8, rely=.4, relh=.12, relw=.194))
-        self.innerSizeTip = Tip(self.innerSizeS, root=root)
+        self.innerSizeS = Label(self.detConts,  place=dict(relx=.8, rely=.4, relh=.12, relw=.194), tip='None')
         
         
         
@@ -197,8 +138,7 @@ class Details(LabelFrame):
         self.detailsL = Label(self.detConts, text='Details', place=dict(relx=.493, rely=.53, relh=.12, relw=.268))
         self.detailsS = Label(self.detConts, font=font2,  text='No', place=dict(relx=.78, rely=.53, relh=.12, relw=.205))
         
-        self.compress = Checkbutton(self, text=compText,  place=dict(relx=.493, rely=.69, relw=.268, relh=.1))
-        self.compressTip = Tip(self.compress, msg=tip, root=root)
+        self.compress = Checkbutton(self, text=compText,  place=dict(relx=.493, rely=.69, relw=.268, relh=.1), tip=tip)
 
         self.previewBtn = Button(self, text='Preview', command=self.preview, place=dict(relx=.77, rely=.69, relh=.1, relw=.205))
 
@@ -240,29 +180,29 @@ class Details(LabelFrame):
         if pathStat: self.pathStat = pathStat
         if self.pathStat:
             self.nameS.config(text=self.pathStat.name)
-            self.nameTip.update(self.pathStat.fullName)
+            self.nameS.tip.update(self.pathStat.fullName)
             
             self.sizeS.config(text=self.pathStat.fSize)
-            self.sizeTip.update(self.pathStat.fullSize)
+            self.sizeS.tip.update(self.pathStat.fullSize)
             
             self.typeS.config(text=self.pathStat.type)
-            self.typeTip.update(self.pathStat.fullType)
+            self.typeS.tip.update(self.pathStat.fullType)
             
             self.ctimeS.config(text=self.pathStat.cTime)
-            self.ctimeTip.update(self.pathStat.fullCTime)
+            self.ctimeS.tip.update(self.pathStat.fullCTime)
             
             self.atimeS.config(text=self.pathStat.aTime)
-            self.atimeTip.update(self.pathStat.fullATime)
+            self.atimeS.tip.update(self.pathStat.fullATime)
             
             self.mtimeS.config(text=self.pathStat.mTime)
-            self.mtimeTip.update(self.pathStat.fullMTime)
+            self.mtimeS.tip.update(self.pathStat.fullMTime)
             
             self.filesCountS.config(text=self.pathStat.filesCount)
             
             self.dirsCountS.config(text=self.pathStat.dirsCount)
             
             self.innerSizeS.config(text=self.pathStat.fInnerSize)
-            self.innerSizeTip.update(self.pathStat.fullInnerSize)
+            self.innerSizeS.tip.update(self.pathStat.fullInnerSize)
         self.after(1000, self.load)
     
     def localLoad(self, path):
@@ -360,6 +300,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         self.paint()
 
         self.after(10, self.update)
+        # self.after(100, self.tips)
 
         self.mainloop()
     
@@ -748,8 +689,7 @@ class FullFileTranxFer(FileTranxFer):
         
         self.reloadNetworkBtn = Button(self.network, text='Reload', command=lambda: self.loadNetworkInfo(1), place=dict(relx=.01, rely=.43, relh=.12, relw=.18))
         
-        self.handShakeS = Checkbutton(self.network,  text='HS?', command=self.toServe, place=dict(relx=.2, rely=.43, relh=.12, relw=.15))
-        Tip(self.handShakeS, 'Do you want Hand Shake security?')
+        self.handShakeS = Checkbutton(self.network,  text='HS?', command=self.toServe, place=dict(relx=.2, rely=.43, relh=.12, relw=.15), tip='Do you want Hand Shake security?')
         
         self.isServerS = Checkbutton(self.network,  text='Server?', command=self.toServe, place=dict(relx=.36, rely=.43, relh=.12, relw=.2))
         
@@ -844,7 +784,6 @@ class FullFileTranxFer(FileTranxFer):
                 self.setServing()
                 return True
             else: show('Not Set', 'Server and Port not set.', 'warn')
-
 
 
 

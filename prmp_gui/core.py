@@ -385,7 +385,9 @@ class PRMP_Theme(PRMP_Mixins):
             if asEntry != None:
                 asEntry = kwargs.pop('asEntry')
                 wt = 'Entry' if asEntry else wt
-                _dict.update(dict(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background))
+                # _dict.update(dict(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background))
+                try: self.config(**dict(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background))
+                except: pass
             
             oneColor = True
             col = PRMP_Theme.DEFAULT_BUTTON_COLOR
@@ -485,8 +487,6 @@ class PRMP_Widget(PRMP_Theme):
     
     max_ = chr(9645)
     min_ = chr(10134)
-
-    TIPPING = False
     
     @property
     def topest(self): return PRMP_Window.TOPEST
@@ -494,16 +494,25 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def _children(self): return self.winfo_children()
     @property
-    def toplevel(self):
+    def topest2(self):
         prmp_master = self.prmp_master
         while True:
             master = prmp_master.prmp_master
             if master == None: return prmp_master
             prmp_master = master
+    @property
+    def toplevel(self):
+        prmp_master = self.prmp_master
+        while True:
+            master = prmp_master.prmp_master
+            if isinstance(master, (PRMP_Tk, PRMP_Toplevel)):
+                print(master)
+                return prmp_master
+            prmp_master = master
 
 
 
-    def __init__(self, _ttk_=False, tip=None, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', **kwargs):
+    def __init__(self, _ttk_=False, tip='', status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', **kwargs):
 
         self.kwargs = kwargs.copy()
         self.kwargs['font'] = font or 'PRMP_FONT'
@@ -532,6 +541,7 @@ class PRMP_Widget(PRMP_Theme):
         try: self.useFont(font)
         except: pass
         
+        self.tip = None
         if tip: self.addTip(tip)
         
         self.bind('<Enter>', self.entered, '+')
@@ -699,8 +709,9 @@ class PRMP_Widget(PRMP_Theme):
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
        
     def addTip(self, tip='Tip', delay=0, follow=True):
-        if PRMP_Widget.TIPPING: from .extensions import PRMP_ToolTip; PRMP_ToolTip(self, msg=tip, delay=delay, follow=follow)
-    
+        from .extensions import PRMP_ToolTip
+        self.tip = PRMP_ToolTip(self, msg=tip, delay=delay, follow=follow)
+
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
         elif platform.system() == 'Darwin': self.yview_scroll(-1*int(event.delta),'units')
@@ -1898,9 +1909,15 @@ class PRMP_Window(PRMP_Widget):
         
         self.placeOnScreen(side, geometry)
 
-        self.after(50, self.loadAfters)
+        self.after(100, self.loadAfters)
+    
+    
+    def withdrawTips(self):
+        from .extensions import PRMP_ToolTip
+        for tip in PRMP_ToolTip.tips: tip.withdraw()
     
     def loadAfters(self):
+        self.withdrawTips()
         for al in self.__afters: al()
     
     def addAfters(self, child):

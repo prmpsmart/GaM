@@ -297,110 +297,122 @@ class ScrollableFrame(PRMP_Frame):
         self.canvas.configure(scrollregion=p)
 SF = ScrollableFrame
 
-class PRMP_ToolTip(PRMP_Toplevel):
-    """
-    Provides a PRMP_ToolTip widget for Tkinter.
-    To apply a PRMP_ToolTip to any Tkinter widget, simply pass the widget to the
-    PRMP_ToolTip constructor
-    """
-    def __init__(self, wdgt, msg=None, msgFunc=None, delay=1, follow=True):
-        """
-        Initialize the PRMP_ToolTip
 
-        Arguments:
-          wdgt: The widget this PRMP_ToolTip is assigned to
-          font: Font to be used
-          msg:  A static string message assigned to the PRMP_ToolTip
-          msgFunc: A function that retrieves a string to use as the PRMP_ToolTip text
-          delay:   The delay in seconds before the PRMP_ToolTip appears(may be float)
-          follow:  If True, the PRMP_ToolTip follows motion, otherwise hides
-        """
-        self.wdgt = wdgt
-        # The parent of the PRMP_ToolTip is the parent of the ToolTips widget
-        # self.parent = self.wdgt.master
-        # Initalise the Toplevel
-        super().__init__(self.wdgt.topest, padx=1, pady=1, asb=0, atb=0, geo=(), ntb=1)
-        # Hide initially
-        self.withdraw()
-        # The PRMP_ToolTip Toplevel should have no frame or title bar
-        # self.overrideredirect(True)
+class PRMP_ToolTip(Toplevel):
+    tips = []
 
-        # The msgVar will contain the text displayed by the PRMP_ToolTip
+    def __init__(self, master, msg=None, delay=.2, follow=True, root=None):
+        super().__init__(master, geo=(), atb=0, asb=0, tm=1)
+        
+        self.msg = msg
         self.msgVar = tk.StringVar()
-        if msg is None: self.msgVar.set('No message provided')
-        else: self.msgVar.set(msg)
-        self.msgFunc = msgFunc
+        self.msgVar.set(msg)
+    
         self.delay = delay
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
-        # The text of the PRMP_ToolTip is displayed in a Message widget
-        self.msgwid = PRMP_Message(self, config=dict(textvariable=self.msgVar, aspect=1000), font=PRMP_Theme.DEFAULT_MINUTE_FONT, background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
-        self.msgwid.grid()
 
-        # Add bindings to the widget.  This will NOT override
-        # bindings that the widget already has
-        self.wdgt.bind('<Enter>', self.spawn, '+')
-        self.wdgt.bind('<Leave>', self.hide, '+')
-        self.wdgt.bind('<Motion>', self.move, '+')
+        Message(self, config=dict(textvariable=self.msgVar, aspect=1000), asEntry=True).grid()
+    
+        self.master.bind('<Enter>', self.spawn, '+')
+        self.master.bind('<Leave>', self.hide, '+')
+        self.master.bind('<Motion>', self.move, '+')
 
         self.withdraw()
+        PRMP_ToolTip.tips.append(self)
+        
+    def update(self, msg): self.msgVar.set(msg)
 
     def spawn(self, event=None):
-        """
-        Spawn the PRMP_ToolTip.  This simply makes the PRMP_ToolTip eligible for display.
-        Usually this is caused by entering the widget
-
-        Arguments:
-          event: The event that called this funciton
-        """
         self.visible = 1
-        # The after function takes a time argument in miliseconds
         self.after(int(self.delay * 1000), self.show)
 
     def show(self):
-        """
-        Displays the PRMP_ToolTip if the time delay has been long enough
-        """
-        if self.visible == 1 and time.time() - self.lastMotion > self.delay:
-            self.visible = 2
-        if self.visible == 2:
-            self.msgwid.configure(background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
-            self.deiconify()
+        if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
+        if self.visible == 2: self.deiconify()
 
     def move(self, event):
-        """
-        Processes motion within the widget.
-        Arguments:
-          event: The event that called this function
-        """
         self.lastMotion = time.time()
-        # If the follow flag is not set, motion within the
-        # widget will make the PRMP_ToolTip disappear
-        #
         if self.follow is False:
             self.withdraw()
             self.visible = 1
-
-        # Offset the PRMP_ToolTip 10x10 pixes southwest of the pointer
         self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-        try:
-            # Try to call the message function.  Will not change
-            # the message if the message function is None or
-            # the message function fails
-            self.msgVar.set(self.msgFunc())
-        except:
-            pass
+        
+        #To get the present event coordinates
+        # print(event.x_root,event.y_root)
+        
         self.after(int(self.delay * 1000), self.show)
 
     def hide(self, event=None):
-        """
-        Hides the PRMP_ToolTip.  Usually this is caused by leaving the widget
-        Arguments:
-          event: The event that called this function
-        """
         self.visible = 0
         self.withdraw()
+
+class Test_PRMP_ToolTip:
+    def __init__(self, master, msg='', delay=.01, follow=True, root=None):
+
+        self.msg = msg
+        self.master = master
+
+        self.msgVar = tk.StringVar()
+        self.msgVar.set(msg)
+
+        self.delay = delay
+        self.follow = follow
+
+        self.tip = None
+        self.hidden = 0
+
+        self.master.bind('<Enter>', self.spawn, '+')
+        self.master.bind('<Leave>', self.hide, '+')
+        self.master.bind('<Motion>', self.move, '+')
+
+    def deleteTip(self):
+        if self.tip:
+            if (time.time() - self.hidden > 3):
+                self.tip.destroy()
+                self.tip = None
+            else: self.tip.after(100, self.deleteTip)
+    
+    def spawn(self, event=0):
+        self.visible = 1
+        self.lastMotion = 0
+
+        if not self.tip:
+            self.tip = PRMP_Toplevel(self.master, geo=(), atb=0, asb=0, tm=1)
+            Message(self.tip, config=dict(textvariable=self.msgVar, aspect=1000), asEntry=True).grid()
+
+            self.tip.after(10, self.deleteTip)
+
+            self.placeTip(event)
+            
+        self.tip.after(int(self.delay * 1000), self.show)
+    
+    def update(self, msg): self.msgVar.set(msg)
+
+    def show(self):
+        if self.tip: 
+            if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
+            if self.visible == 2: self.tip.deiconify()
+    
+    def placeTip(self, event=None): self.tip.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
+
+    def move(self, event):
+        if self.tip:
+            self.lastMotion = time.time()
+            if self.follow is False:
+                self.tip.withdraw()
+                self.visible = 1
+            self.placeTip(event)
+            
+            self.tip.after(int(self.delay * 1000), self.show)
+        else: self.spawn(event)
+
+    def hide(self, event=None):
+        self.hidden = time.time()
+        self.visible = 0
+        if self.tip: self.tip.withdraw()
+
 TT = PRMP_ToolTip
 
 class PRMP_SolidScreen(PRMP_MainWindow):
