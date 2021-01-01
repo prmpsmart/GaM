@@ -1,8 +1,9 @@
-# from prmp_gui.core import *
-from tkinter.ttk import *
-from tkinter import *
+from prmp_gui.core import *
+# from tkinter.ttk import *
+# from tkinter import *
 from prmp_gui.dialogs import dialogFunc
 from .core import *
+
 
 
 family = '{Times New Roman}'
@@ -12,7 +13,7 @@ font1 = f"-family {family} -size {4 if which_platform() == 'and' else 10} -weigh
 font0 = f"-family {family} -size {2 if which_platform() == 'and' else 7} -weight bold"
 compStr = '      ' if (which_platform() == 'and') else ''
 
-def show(title=None, msg=None, which='info'):
+def show(title=None, msg=None, which='info', **kwargs):
     if which == 'error':
         TranxFerLogger.error(msg)
         title = title or which.title()
@@ -23,7 +24,7 @@ def show(title=None, msg=None, which='info'):
         TranxFerLogger.warning(msg)
         title = title or 'Warning'
 
-    dialogFunc(title=title, msg=msg, which=which)
+    dialogFunc(title=title, msg=msg, which=which, **kwargs)
 
 def confirm(msg='', **kwargs):
     TranxFerLogger.info(msg)
@@ -40,7 +41,9 @@ class Tip(Toplevel):
         self.msg = msg
         self.withdraw()
         self.overrideredirect(True)
-        self.msgVar = StringVar()
+        
+        self.msgVar = tk.StringVar()
+
         if msg is None: self.msgVar.set('No loaded File or Directory.')
         else: self.msgVar.set(msg)
         
@@ -358,68 +361,57 @@ class Details(LabelFrame):
             if self.tranxFer: self.tranxFer.startThreadedReceiving()
             else: show('TranxFer Error', 'Load remotely first to get the path details', 'warn')
 
-class GuiMixin(NetworkMixin):
+class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     _path = ''
     _server = ''
     _port = 7767
+    _name = 'gui'
+    geo = (600, 270)
     
-    def __init__(self, root, name='gui'):
-        self.name = name
+    def __init__(self, master=None, geo=(), title="File TranxFer", tm=1, tw=1, side='center', **kwargs):
+        PRMP_MainWindow.__init__(self, master, geo=geo or self.geo, title=title, side=side, tm=tm, tw=tw, **kwargs)
         
-        self.isDir = StringVar()
-        self.isServer = StringVar()
-        self.handShake = StringVar()
-        self.serverEnt = StringVar()
-        self.portEnt = StringVar()
-        self.path = StringVar()
-        self.localhost = StringVar()
-        self.sameAsGateway = StringVar()
-        
-        self.sameAsGateway.set('0')
-        self.isDir.set('0')
-        self.isServer.set('0')
-        self.handShake.set('0')
-        self.localhost.set('0')
-        self.portEnt.set('7767')
-        self.path.set(self._path)
-        
-        self.serverDefault()
-        
+        self.path = ''
         self.networkInfo = None
         self.server = None
         self.client = None
         self.connecting = False
         self.networkOn = False
+
+        self._setupApp()
+
+        self.serverDefault()
         
-        self.root.attributes('-topmost', True)
+        # if get_os_name() != 'Android':  self.attributes('-tool', True)
         
-        if get_os_name() != 'Android':  self.root.attributes('-tool', True)
+        self.bind('<Control-M>', os.sys.exit)
+        self.bind('<Control-m>', os.sys.exit)
+        self.bind('<Control-n>', self.new)
+        self.bind('<Control-N>', self.new)
+        self.bind('<Control-a>', self.another)
+        self.bind('<Control-A>', self.another)
         
-        self.root.configure(background="#d9d9d9")
-        self.root.bind('<Control-m>', sys.exit)
-        self.root.bind('<Control-M>', sys.exit)
-        self.root.bind('<Control-n>', self.new)
-        self.root.bind('<Control-N>', self.new)
-        self.root.bind('<Control-a>', self.another)
-        self.root.bind('<Control-A>', self.another)
-        
-        if root == None: self.root.protocol('WM_DELETE_WINDOW', self.exiting)
-        
-        self.root.resizable(0, 0)
-        
-        self.cmds()
+        self.protocol('WM_DELETE_WINDOW', self.exiting)
+
+        self.defaults()
+        self.paint()
+        self.after(10, self.update)
+        self.mainloop()
     
-    def cmds(self):
-        self.path.set(self._path)
-        self.serverEnt.set(self._server)
-        self.portEnt.set(self._port)
+    def _setupApp(self):
+        pass
+    
+    def defaults(self):
+        self.path = self._path
+        self.serverS.set(self._server)
+        self.portS.set(self._port)
     
     def exiting(self):
         try: self.stop(1)
         except Exception as error: TranxFerLogger.debug(error)
         sys.exit()
     
-    def serverDefault(self): self.serverEnt.set('192.168.43.')
+    def serverDefault(self): self.serverS.set('192.168.43.')
     
     def new(self, e=None):
         if self.name == 'mini': MiniFileTranxFer(root=self.root)
@@ -468,12 +460,12 @@ class GuiMixin(NetworkMixin):
         if self.networkInfo: self.networkOn = self.networkInfo.on
         else: self.networkOn = False
        
-        if self.localhost.get() == '1':
+        if self.localhostS.get():
             self.networkOn = True
-            self.serverEnt.set(self.networkInfo.ip if self.networkInfo else self.lh)
+            self.serverS.set(self.networkInfo.ip if self.networkInfo else self.lh)
             self.serverS.config(state='disabled')
         else:
-            if self.sameAsGateway.get() == '0' and self.isServer.get() == '0': self.serverS.config(state='normal')
+            if self.name == 'full' and self.sameAsGatewayS.get() and self.isServerS.get(): self.serverS.config(state='normal')
         
         if self.networkOn == True:
             self.networkS.config(bg='green', text='Yes', fg='white')
@@ -484,7 +476,7 @@ class GuiMixin(NetworkMixin):
         else: self.servingS.config(text='No', bg='red')
     
     def getPort(self):
-        port = self.portEnt.get()
+        port = self.portS.get() or 0
         try:
                 port = int(port)
                 assert port > 7000
@@ -496,7 +488,7 @@ class GuiMixin(NetworkMixin):
         except AssertionError as error: show('Invalid', 'Port should be in the range(7000, 9001)', 'error')
     
     def getServer(self):
-        server = self.serverEnt.get()
+        server = self.serverS.get()
         if self.checkIp(server): return server
         else: show('Invalid', 'Server IP is invalid.\nThis is an example (192.168.43.36) or \'localhost\'', 'error')
     
@@ -511,7 +503,7 @@ class GuiMixin(NetworkMixin):
     def setServerDetails(self):
         if self.localhost.get() =='1':
             server = self.lh
-            self.serverEnt.set(self.lh)
+            self.serverS.set(self.lh)
         server = self.getServer()
         
         if server:
@@ -531,7 +523,7 @@ class GuiMixin(NetworkMixin):
             if self.isServer.get() == '1':
                 if self.localhost.get() == '1': ip = self.lh
                 else: ip = self.networkInfo.ip if self.networkInfo else self.lh
-                self.serverEnt.set(ip)
+                self.serverS.set(ip)
                 self.serverS.config(state='disabled')
             else: self.serverS.config(state='normal')
             return True
@@ -542,7 +534,7 @@ class GuiMixin(NetworkMixin):
             elif self.connecting: show('Connecting', 'Making attempt to connect to the server', 'warn')
             elif self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
             else:
-                server = self.serverEnt.get()
+                server = self.serverS.get()
                 if self.checkIp(server):
                     port = self.getPort()
                     if port:
@@ -560,10 +552,10 @@ class GuiMixin(NetworkMixin):
                 else: return True
 
     def browse(self):
-        self.path.set('')
-        _path = showPath(folder=int(self.isDir.get()))
-        if path.exists(_path):
-            self.path.set(_path)
+        self.path = ''
+        _path = dialogFunc(path=1, folder=int(self.isDir.get()))
+        if os.path.exists(_path):
+            self.path = _path
             return _path
         elif _path == '': return
         else: show('Invalid', 'The path provided is invalid', 'error')
@@ -595,7 +587,7 @@ class GuiMixin(NetworkMixin):
                 else: show('Invalid Action', 'You\'re not currently connected or connected to', 'error')
     
     def checkPath(self, dir_='', event=None):
-        path = self.path.get()
+        path = self.path
         if path:
             pathStat = LocalPathStat(path)
             if dir_:
@@ -605,102 +597,73 @@ class GuiMixin(NetworkMixin):
             else: show('Invalid Path', 'The path provided is invalid.', 'error')
         else: show('Path Error', 'The path provided is invalid.', 'error')
 
-class MiniFileTranxFer(GuiMixin):
-    
-    def __init__(self, root=None):
-        if root: self.root = Toplevel(root)
-        else: self.root = Tk()
-        
-        super().__init__(root, name='mini')
-        
-        self.root.geometry("506x200")
-        self.root.title("Mini File TranxFer")
-        # self.root.attributes('-alpha', .3)
-        
-        self.network = LabelFrame(self.root, relief='groove', background="#d9d9d9")
-        self.network.place(relx=.02, rely=.02, relh=.47, relw=.96)
-        
-        self.titleL = Label(self.network, background="#0000ff", bd="3", disabledforeground="#a3a3a3", font=font2, foreground="#ffffff", relief="ridge", text='''Mini FileTranxFer by PRMP Smart!!!.''', anchor='center')
-        self.titleL.place(relx=.01, rely=.02, relh=.3, relw=.98)
-        
-        self.clock = Label(self.titleL, font=font1, fg="black", bg='white', relief='solid')
-        self.clock.place(relx=.01, rely=.04, relh=.9, relw=.2)
-        self.tick()
-        
-        self.full = Button(self.titleL, activebackground="#ececec", activeforeground="#000000", background="blue", disabledforeground="#a3a3a3", font=font2, foreground="white", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Full''', relief='groove', overrelief='groove', command=self.another)
-        self.full.place(relx=.8, rely=.04, relh=.9, relw=.2)
-        
-        self.networkL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font1, relief="groove", anchor='center', text='Network?')
-        self.networkL.place(relx=.01, rely=.34, relh=.3, relw=.15)
-        self.networkS = Label(self.network, background="#008000", foreground="#ffffff", font=font1, relief="groove", anchor='center')
-        self.networkS.place(relx=.17, rely=.34, relh=.3, relw=.1)
-        
-        self.servingL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", anchor='center', text='Serving?')
-        self.servingL.place(relx=.01, rely=.66, relh=.3, relw=.15)
-        self.servingS = Label(self.network, background="#008000", foreground="#ffffff", font=font1, relief="groove", anchor='center')
-        self.servingS.place(relx=.17, rely=.66, relh=.3, relw=.1)
+class MiniFileTranxFer(FileTranxFer):
+    name = 'mini'
+    geo = (600, 300)
 
-        self.serverL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Server')
-        self.serverL.place(relx=.3, rely=.34, relh=.25, relw=.15)
-        self.serverS = Entry(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", textvariable=self.serverEnt)
-        self.serverS.place(relx=.45, rely=.34, relh=.25, relw=.24)
+    def __init__(self, master=None, title='Mini File TranxFer', **kwargs):
+        super().__init__(master, title=title,  **kwargs)
+        
+    def _setupApp(self):
+        cont = self.container
 
-        self.portL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Port')
-        self.portL.place(relx=.3, rely=.6, relh=.25, relw=.15)
-        self.portS = Entry(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", textvariable=self.portEnt)
-        self.portS.place(relx=.45, rely=.6, relh=.25, relw=.13)
+        self.network = LabelFrame(cont, place=dict(relx=.02, rely=.02, relh=.47, relw=.96))
         
-        self.localhostS = Checkbutton(self.root, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Lh?', variable=self.localhost, command=self.setNetwork)
-        self.localhostS.place(relx=.7, rely=.185, relh=.11, relw=.12)
+        self.titleL = Label(self.network, text='''Mini FileTranxFer by PRMP Smart!!!.''', place=dict(relx=.01, rely=.02, relh=.3, relw=.98))
         
-        self.stopBtn = Button(self.network, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='Stop', command=self.stop, relief='groove')
-        self.stopBtn.place(relx=.595, rely=.66, relh=.3, relw=.1)
+        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.2))
         
-        self.sentL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Sent')
-        self.sentL.place(relx=.71, rely=.6, relh=.3, relw=.1)
-        self.sentS = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove")
-        self.sentS.place(relx=.815, rely=.6, relh=.3, relw=.175)
+        self.full = Button(self.titleL, text='''Full''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2))
         
-        self.pathCont = LabelFrame(self.root, relief='groove', background="#d9d9d9")
-        self.pathCont.place(relx=.02, rely=.5, relh=.48, relw=.96)
+        self.networkL = Label(self.network, text='Network?', place=dict(relx=.01, rely=.34, relh=.3, relw=.15))
+        self.networkS = Label(self.network, place=dict(relx=.17, rely=.34, relh=.3, relw=.1))
         
-        self.pathEnt = Entry(self.pathCont, background="white", disabledforeground="#a3a3a3", font="-family {Courier New} -size 10", foreground="#000000", insertbackground="black", textvariable=self.path)
-        self.pathEnt.place(relx=.02, rely=.02,relh=.25, relw=.96)
+        self.servingL = Label(self.network, text='Serving?', place=dict(relx=.01, rely=.66, relh=.3, relw=.15))
+        self.servingS = Label(self.network, place=dict(relx=.17, rely=.66, relh=.3, relw=.1))
+
+        self.serverL = Label(self.network, text='Server', place=dict(relx=.3, rely=.34, relh=.25, relw=.15))
+        self.serverS = Entry(self.network, place=dict(relx=.45, rely=.34, relh=.25, relw=.24))
+
+        self.portL = Label(self.network, text='Port', place=dict(relx=.3, rely=.6, relh=.25, relw=.15))
+        self.portS = Entry(self.network, place=dict(relx=.45, rely=.6, relh=.25, relw=.13))
+        
+        self.localhost = Checkbutton(cont, text='Lh?', command=self.setNetwork, place=dict(relx=.7, rely=.185, relh=.11, relw=.12))
+        
+        self.stopBtn = Button(self.network, text='Stop', command=self.stop, place=dict(relx=.595, rely=.66, relh=.3, relw=.1))
+        
+        self.sentL = Label(self.network, text='Sent', place=dict(relx=.71, rely=.6, relh=.3, relw=.1))
+        self.sentS = Label(self.network, place=dict(relx=.815, rely=.6, relh=.3, relw=.175))
+        
+        self.pathCont = LabelFrame(cont, place=dict(relx=.02, rely=.5, relh=.48, relw=.96))
+        
+        self.pathEnt = Entry(self.pathCont, place=dict(relx=.02, rely=.02,relh=.25, relw=.96))
         self.pathEnt.bind('<Return>', self.checkPath)
         self.pathEnt.bind('<KeyRelease>', self.setPath)
 
-        self.browseBtn = Button(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Browse''', command=self.browse, relief='groove')
-        self.browseBtn.place(relx=.02, rely=.33, relh=.25, relw=.134)
+        self.browseBtn = Button(self.pathCont, text='''Browse''', command=self.browse, place=dict(relx=.02, rely=.33, relh=.25, relw=.134))
         
-        self.isDirBtn = Checkbutton(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Directory?''', variable=self.isDir, relief='groove')
-        self.isDirBtn.place(relx=.17, rely=.33, relh=.25, relw=.2)
+        self.isDir = Checkbutton(self.pathCont, pady="0", text='''Directory?''', place=dict(relx=.17, rely=.33, relh=.25, relw=.2))
 
-        self.serveBtn = Button(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Serve''', command=self.serve, relief='groove')
-        self.serveBtn.place(relx=.71, rely=.33, relh=.25, relw=.134)
+        self.serveBtn = Button(self.pathCont, pady="0", text='''Serve''', command=self.serve, place=dict(relx=.71, rely=.33, relh=.25, relw=.134))
         
-        self.receiveBtn = Button(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Receive''', command=self.receive, relief='groove')
-        self.receiveBtn.place(relx=.85, rely=.33, relh=.25, relw=.134)
+        self.receiveBtn = Button(self.pathCont, pady="0", text='''Receive''', command=self.receive, place=dict(relx=.85, rely=.33, relh=.25, relw=.134))
 
-        self.receiving = Label(self.pathCont, background="#d9d9d9", foreground="#000000", font=font1, relief="groove", text='''Receiving''')
-        self.receiving.place(relx=.02, rely=.7, relh=.25, relw=.16)
+        self.receiving = Label(self.pathCont, text='''Receiving''', place=dict(relx=.02, rely=.7, relh=.25, relw=.16))
         
-        self.progressBar = Progressbar(self.pathCont, length="450")
-        self.progressBar.place(relx=.19, rely=.7, relh=.25, relw=.63)
+        self.progressBar = Progressbar(self.pathCont, length="450", place=dict(relx=.19, rely=.7, relh=.25, relw=.63))
 
-        self.progressTxt = Label(self.pathCont, background="#d9d9d9", foreground="#000000", font=font1, relief="groove")
-        self.progressTxt.place(relx=.84, rely=.7, relh=.25, relw=.14)
-        
+        self.progressTxt = Label(self.pathCont, place=dict(relx=.84, rely=.7, relh=.25, relw=.14))
+    
+    def defaults(self):
         self.setPath()
-        
         self.tranxFer = None
         self.setProgress()
-        self.root.after(10, self.update)
-        self.root.mainloop()
+        self.tick()
     
-    def setPath(self, e=0): 
-        path_ = self.path.get()
-        if os.path.exists(path_):
-            AutoUploadHandler.setPath(path_)
+    def setPath(self, e=0):
+        self.pathEnt.set(self.path)
+        if os.path.exists(self.path):
+            AutoUploadHandler.setPath(self.path)
     
     def browse(self):
         super().browse()
@@ -716,7 +679,7 @@ class MiniFileTranxFer(GuiMixin):
         super().setServing()
         self.sentS.config(text=AutoUploadHandler.count)
         if self.isServing:
-            if self.localhost.get() == '0': self.serverEnt.set(self.networkInfo.ip)
+            if self.localhost.get() == '0': self.serverS.set(self.networkInfo.ip)
             self.serverS.config(state='disabled')
     
     def stop(self, ev=0):
@@ -732,8 +695,10 @@ class MiniFileTranxFer(GuiMixin):
 
     def serve(self):
         path = self.checkPath()
-        port = self.getPort()
-        if super().serve() and path and port and confirm('Serve it', 'Do you want to serve this path (%s) for download?'%path, 1): self.server = AutoUploadServer(start=True, port=port)
+        if path:
+            port = self.getPort()
+            if port:
+                if super().serve() and confirm('Serve it', 'Do you want to serve this path (%s) for download?'%path, 1): self.server = AutoUploadServer(start=True, port=port)
 
     def setDestPath(self):
         path = self.checkPath(dir_=True)
@@ -767,7 +732,7 @@ class MiniFileTranxFer(GuiMixin):
             self.progressTxt.config(text='0.00%')
         self.progressBar.update()
 
-class FullFileTranxFer(GuiMixin):
+class FullFileTranxFer(FileTranxFer):
     
     def __init__(self, root=None):
         if root: self.root = Toplevel(root)

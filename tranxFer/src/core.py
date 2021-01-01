@@ -280,7 +280,7 @@ class PathStat(PRMP_Mixins):
             for r, ds, fs in os.walk(self.fullName):
                 for f in fs:
                     self.filesCount += 1
-                    self.innerSize += os.path.getsize(path.join(r, f))
+                    self.innerSize += os.path.getsize(os.path.join(r, f))
                 for d in ds: self.dirsCount += 1
     
     def formatTime(self, time='c', full=0):
@@ -385,7 +385,7 @@ class LocalPathStat(PathStat):
     def asRoot(self, path_, obj=False):
         s, p = self.normalizePath(self), self.normalizePath(path_)
         assert (s != p) and (s in p), 'Path must be descendant of {} not {}.'.format(self, path_)
-        np = p.replace(path.dirname(s),'').strip('\\').strip('/')
+        np = p.replace(os.path.dirname(s),'').strip('\\').strip('/')
         if obj: return LocalPathStat(path_, np)
         return np
 
@@ -1119,7 +1119,7 @@ class AutoUploadHandler(BaseRequestHandler):
     
     @classmethod
     def setPath(cls, path_):
-        assert path.exists(path_)
+        assert os.path.exists(path_)
         cls.path = path_
         cls.count = 0
     @classmethod

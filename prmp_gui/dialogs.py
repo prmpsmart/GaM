@@ -32,9 +32,9 @@ def askPath(opened=False, folder=False, many=False, save=False):
     else: return filedialog.askdirectory()
 
 def dialogFunc(ask=0, path=0, **kwargs):
-    if path: askPath(**kwargs)
-    elif ask: confirmDialog(**kwargs)
-    else: showDialog(**kwargs)
+    if path: return askPath(**kwargs)
+    elif ask: return confirmDialog(**kwargs)
+    else: return showDialog(**kwargs)
 
 
 

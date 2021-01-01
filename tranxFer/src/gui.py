@@ -1,91 +1,64 @@
 from ._gui import *
 from prmp_gui.core import *
 
+
 class Details(LabelFrame):
     def __init__(self, master, which='s', main=None, **kw):
         
         root = master.master
 
-        super().__init__(master, relief='groove', font=font2, foreground="black", background="#d9d9d9", highlightbackground="#d9d9d9", highlightcolor="black", **kw)
+        super().__init__(master, **kw)
         
         self.main = main
         self.which = which
-        self.destDir = StringVar()
-        self.destDir.set('0')
         self.destPath = ''
         
-        self.indicatorLbl = Label(self, activebackground="#ececec", activeforeground="#000000", background="red", disabledforeground="#a3a3a3", font=font2, foreground="white", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", relief='groove')
-        self.indicatorLbl.place(relx=.61, rely=0, relh=.1, relw=.1)
+        self.indicatorLbl = Label(self, place=dict(relx=.61, rely=0, relh=.1, relw=.1))
         
-        self.actionBtn = Button(self, activebackground="#ececec", activeforeground="#000000", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", relief='ridge', highlightcolor="black",  text='Send' if which == 's' else 'Receive', command=self.send if which == 's' else self.receive)
-        self.actionBtn.place(relx=.781, rely=0, relh=.1, relw=.154)
+        self.actionBtn = Button(self,  text='Send' if which == 's' else 'Receive', command=self.send if which == 's' else self.receive, place=dict(relx=.781, rely=0, relh=.1, relw=.154))
         
-        self.browseBtn = Button(self, activebackground="#ececec", activeforeground="#000000", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief='ridge',text='Browse' if which == 's' else 'Remote Load', command=self.main.browse if which == 's' else self.remoteLoad)
-        self.browseBtn.place(relx=.015, rely=0, relh=.1, relw=.154 if which == 's' else .26)
+        self.browseBtn = Button(self, text='Browse' if which == 's' else 'Remote Load', command=self.main.browse if which == 's' else self.remoteLoad, place=dict(relx=.015, rely=0, relh=.1, relw=.154 if which == 's' else .26))
         
         if which == 'r':
-            self.destDirChk = Checkbutton(self, text=f'{compStr} Destination?', activebackground="#ececec", activeforeground="#000000", background="#d9d9d9", disabledforeground="#a3a3a3", font=font1, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", relief="groove", command=self.setDest)
-            self.destDirChk.place(relx=.313, rely=0, relw=.255, relh=.082)
+            self.destDir = Checkbutton(self, text=f'{compStr} Destination?',  command=self.setDest, place=dict(relx=.313, rely=0, relw=.255, relh=.082))
         
-        self.detConts = Frame(self, relief='groove', border="2", background="#d9d9d9")
-        self.detConts.place(relx=.01, rely=.114, relh=.868, relw=.981)
+        self.detConts = Frame(self, border="2", place=dict(relx=.01, rely=.114, relh=.868, relw=.981))
         
         self.which = which
         self.pathStat = None
         
-        self.decompAndComp = StringVar()
-        self.decompAndComp.set('0')
-
-        self.nameL = Button(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Name', command=self.reload)
-        self.nameL.place(relx=.01, rely=.01, relh=.12, relw=.164)
-        self.nameS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='File Name')
-        self.nameS.place(relx=.175, rely=.01, relh=.12, relw=.82)
+        self.nameL = Button(self.detConts, text='Name', command=self.reload, place=dict(relx=.01, rely=.01, relh=.12, relw=.164))
+        self.nameS = Label(self.detConts, text='File Name', place=dict(relx=.175, rely=.01, relh=.12, relw=.82))
         self.nameTip = Tip(self.nameS, root=root)
 
-        self.sizeL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Size')
-        self.sizeL.place(relx=.01, rely=.14, relh=.12, relw=.164)
-        self.sizeS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", anchor='ne')
-        self.sizeS.place(relx=.175, rely=.14, relh=.12, relw=.274)
+        self.sizeL = Label(self.detConts, text='Size', place=dict(relx=.01, rely=.14, relh=.12, relw=.164))
+        self.sizeS = Label(self.detConts, anchor='ne', place=dict(relx=.175, rely=.14, relh=.12, relw=.274))
         self.sizeTip = Tip(self.sizeS, root=root)
 
-        self.typeL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Type')
-        self.typeL.place(relx=.01, rely=.27, relh=.12, relw=.164)
-        self.typeS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", anchor='ne', justify='right')
-        self.typeS.place(relx=.175, rely=.27, relh=.12, relw=.274)
+        self.typeL = Label(self.detConts, text='Type', place=dict(relx=.01, rely=.27, relh=.12, relw=.164))
+        self.typeS = Label(self.detConts, anchor='ne', justify='right', place=dict(relx=.175, rely=.27, relh=.12, relw=.274))
         self.typeTip = Tip(self.typeS, root=root)
 
-        self.ctimeL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='CTime')
-        self.ctimeL.place(relx=.01, rely=.4, relh=.12, relw=.164)
-        self.ctimeS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font0, relief="groove", anchor='nw', justify='right')
-        self.ctimeS.place(relx=.175, rely=.4, relh=.12, relw=.274)
+        self.ctimeL = Label(self.detConts, text='CTime', place=dict(relx=.01, rely=.4, relh=.12, relw=.164))
+        self.ctimeS = Label(self.detConts, foreground="#000000", font=font0,  anchor='nw', justify='right', place=dict(relx=.175, rely=.4, relh=.12, relw=.274))
         self.ctimeTip = Tip(self.ctimeS, root=root)
 
-        self.atimeL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='ATime')
-        self.atimeL.place(relx=.01, rely=.53, relh=.12, relw=.164)
-        self.atimeS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font0, relief="groove", anchor='nw', justify='right')
-        self.atimeS.place(relx=.175, rely=.53, relh=.12, relw=.274)
+        self.atimeL = Label(self.detConts, text='ATime', place=dict(relx=.01, rely=.53, relh=.12, relw=.164))
+        self.atimeS = Label(self.detConts, foreground="#000000", font=font0,  anchor='nw', justify='right', place=dict(relx=.175, rely=.53, relh=.12, relw=.274))
         self.atimeTip = Tip(self.atimeS, root=root)
 
-        self.mtimeL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='MTime')
-        self.mtimeL.place(relx=.01, rely=.66, relh=.12, relw=.164)
-        self.mtimeS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font0, relief="groove", anchor='nw', justify='right')
-        self.mtimeS.place(relx=.175, rely=.66, relh=.12, relw=.274)
+        self.mtimeL = Label(self.detConts, text='MTime', place=dict(relx=.01, rely=.66, relh=.12, relw=.164))
+        self.mtimeS = Label(self.detConts, place=dict(relx=.175, rely=.66, relh=.12, relw=.274))
         self.mtimeTip = Tip(self.mtimeS, root=root)
 
-        self.filesCountL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Files Count')
-        self.filesCountL.place(relx=.47, rely=.14, relh=.12, relw=.329)
-        self.filesCountS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", anchor='ne')
-        self.filesCountS.place(relx=.8, rely=.14, relh=.12, relw=.194)
+        self.filesCountL = Label(self.detConts, text='Files Count', place=dict(relx=.47, rely=.14, relh=.12, relw=.329))
+        self.filesCountS = Label(self.detConts, anchor='ne', place=dict(relx=.8, rely=.14, relh=.12, relw=.194))
 
-        self.dirsCountL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Dirs Count')
-        self.dirsCountL.place(relx=.47, rely=.27, relh=.12, relw=.329)
-        self.dirsCountS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", anchor='ne')
-        self.dirsCountS.place(relx=.8, rely=.27, relh=.12, relw=.194)
+        self.dirsCountL = Label(self.detConts, text='Dirs Count', place=dict(relx=.47, rely=.27, relh=.12, relw=.329))
+        self.dirsCountS = Label(self.detConts, anchor='ne', place=dict(relx=.8, rely=.27, relh=.12, relw=.194))
         
-        self.innerSizeL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Inner Files Size')
-        self.innerSizeL.place(relx=.47, rely=.4, relh=.12, relw=.329)
-        self.innerSizeS = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font1, relief="groove", anchor='ne')
-        self.innerSizeS.place(relx=.8, rely=.4, relh=.12, relw=.194)
+        self.innerSizeL = Label(self.detConts, text='Inner Files Size', place=dict(relx=.47, rely=.4, relh=.12, relw=.329))
+        self.innerSizeS = Label(self.detConts,  anchor='ne', place=dict(relx=.8, rely=.4, relh=.12, relw=.194))
         self.innerSizeTip = Tip(self.innerSizeS, root=root)
         
         
@@ -95,23 +68,17 @@ class Details(LabelFrame):
         tip = 'Compress before sending (Good for Directories).' if which == 's' else 'Decompress after receiving (Good for Directories).'
         
         
-        self.detailsL = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Details')
-        self.detailsL.place(relx=.493, rely=.53, relh=.12, relw=.268)
-        self.detailsS = Label(self.detConts, background="red", foreground="white", font=font2, relief="groove", text='No')
-        self.detailsS.place(relx=.78, rely=.53, relh=.12, relw=.205)
+        self.detailsL = Label(self.detConts, text='Details', place=dict(relx=.493, rely=.53, relh=.12, relw=.268))
+        self.detailsS = Label(self.detConts, background="red", foreground="white", font=font2,  text='No', place=dict(relx=.78, rely=.53, relh=.12, relw=.205))
         
-        self.compress = Checkbutton(self, text=compText, activebackground="#ececec", activeforeground="#000000", background="#d9d9d9", disabledforeground="#a3a3a3", font=font1, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", relief="groove")
-        self.compress.place(relx=.493, rely=.69, relw=.268, relh=.1)
+        self.compress = Checkbutton(self, text=compText, activebackground="#ececec", activeforeground="#000000", disabledforeground="#a3a3a3", font=font1, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",  place=dict(relx=.493, rely=.69, relw=.268, relh=.1))
         self.compressTip = Tip(self.compress, msg=tip, root=root)
 
-        self.previewBtn = Button(self, activebackground="#ececec", activeforeground="#000000", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", relief="ridge", text='Preview', command=self.preview)
-        self.previewBtn.place(relx=.77, rely=.69, relh=.1, relw=.205)
+        self.previewBtn = Button(self, relief="ridge", text='Preview', command=self.preview, place=dict(relx=.77, rely=.69, relh=.1, relw=.205))
 
-        self.level = Progressbar(self, value="30")
-        self.level.place(relx=.02, rely=.82, relh=.14, relw=.75)
+        self.level = Progressbar(self, value="30", place=dict(relx=.02, rely=.82, relh=.14, relw=.75))
 
-        self.percent = Label(self.detConts, background="#d9d9d9", foreground="#000000", font=font1, relief="groove", anchor='center', text='100%')
-        self.percent.place(relx=.78, rely=.82, relh=.14, relw=.22)
+        self.percent = Label(self.detConts, text='100%', place=dict(relx=.78, rely=.82, relh=.14, relw=.22))
         
         self.tranxFer = None
         self.pathStat = None
@@ -122,9 +89,9 @@ class Details(LabelFrame):
     
     def setDest(self):
         self.destPath = ''
-        if self.destDir.get() == '1':
-            p = showPath(folder=1)
-            if path.exists(p): self.destPath = p
+        if self.destDir == '1':
+            p = dialogFunc(path=1, folder=1)
+            if os.path.exists(p): self.destPath = p
             else: show('Path Error', 'The choosen directory does not exists', 'warn')
     
     def setDetails(self):
@@ -174,7 +141,7 @@ class Details(LabelFrame):
     
     def localLoad(self, path):
         if isinstance(path, str): pass
-        else: path = path.get()
+        else: path = os.path.get()
         
         pathStat = LocalPathStat(path)
         if pathStat.exists: self.load(pathStat)
@@ -231,401 +198,156 @@ class Details(LabelFrame):
             if self.tranxFer: self.tranxFer.startThreadedReceiving()
             else: show('TranxFer Error', 'Load remotely first to get the path details', 'warn')
 
-class GuiMixin(NetworkMixin):
-    _path = ''
-    _server = ''
-    _port = 7767
-    
-    def __init__(self, root, name='gui'):
-        self.name = name
-        
-        self.serverDefault()
-        self.path = ''
-        
-        self.networkInfo = None
-        self.server = None
-        self.client = None
-        self.connecting = False
-        self.networkOn = False
-        
-        # self.root.attributes('-topmost', True)
-        
-        # if get_os_name() != 'Android':  self.root.attributes('-tool', True)
-        
-        self.root.bind('<Control-m>', sys.exit)
-        self.root.bind('<Control-M>', sys.exit)
-        self.root.bind('<Control-n>', self.new)
-        self.root.bind('<Control-N>', self.new)
-        self.root.bind('<Control-a>', self.another)
-        self.root.bind('<Control-A>', self.another)
-        
-        if root == None: self.root.protocol('WM_DELETE_WINDOW', self.exiting)
 
-        self.cmds()
-        self.paint()
-    
-    def cmds(self):
-        self.path = self._path
-        self.serverS.set(self._server)
-        self.portS.set(self._port)
-    
-    def exiting(self):
-        try: self.stop(1)
-        except Exception as error: TranxFerLogger.debug(error)
-        sys.exit()
-    
-    def serverDefault(self): self.serverS.set('192.168.43.')
-    
-    def new(self, e=None):
-        if self.name == 'mini': MiniFileTranxFer(root=self.root)
-        elif self.name == 'full': FullFileTranxFer(root=self.root)
-    
-    def another(self, e=None):
-        if self.name == 'full': MiniFileTranxFer(root=self.root)
-        elif self.name == 'mini': FullFileTranxFer(root=self.root)
+class FullFileTranxFer(FileTranxFer):
+    name = 'full'
+    geo = (400, 800)
 
-    def tick(self):
-        setTime = time.strftime('%I:%M:%S %p')
-        self.clock.config(text=setTime)
-        self.clock.after(200, self.tick)
+    def __init__(self, master=None, title='Full File TranxFer', **kwargs):
+        super().__init__(master, title=title,  **kwargs)
+        
     
-    @property
-    def isServing(self): return self.server
-    
-    @property
-    def connection(self):
-        if self.client != None: return self.client
-        elif self.server != None: return self.server
-    
-    @property
-    def whichConnection(self):
-        if self.client: return 'client'
-        elif self.server: return 'server'
-    
-    @property
-    def connected(self):
-        if self.connection:
-            if self.connection.connected: return True
-    
-    @property
-    def checkConnected(self):
-        if self.connected: return True
-        else:
-            show('No connection', 'No current connection', 'warn')
-            return False
-    
-    def update(self):
-        self.setServing()
-        self.testConnected()
+    def defaults(self):
 
-    def setNetwork(self):
-        self.networkInfo = self.getNetwork()
-        if self.networkInfo: self.networkOn = self.networkInfo.on
-        else: self.networkOn = False
-       
-        if self.localhost.get() == '1':
-            self.networkOn = True
-            self.serverS.set(self.networkInfo.ip if self.networkInfo else self.lh)
-            self.serverS.config(state='disabled')
-        else:
-            if self.sameAsGateway.get() == '0' and self.isServer.get() == '0': self.serverS.config(state='normal')
+        self.serverSet = False
+    
+    def _setupApp(self):
+        self.titleL = Label(self.root,  text='FileTranxFer by PRMPSmart', place=dict(relx=.01, rely=.01, relh=.029, relw=.98))
         
-        if self.networkOn == True:
-            self.networkS.config(bg='green', text='Yes', fg='white')
-        else: self.networkS.config(bg='red', text='No', fg='white')
-    
-    def setServing(self):
-        if self.isServing: self.servingS.config(text='Yes', bg='green')
-        else: self.servingS.config(text='No', bg='red')
-    
-    def getPort(self):
-        port = self.portS.get()
-        try:
-                port = int(port)
-                assert port > 7000
-                assert port < 9001
-                return port
-        except ValueError as error:
-            TranxFerLogger.debug(error)
-            show('Invalid', error, 'error')
-        except AssertionError as error: show('Invalid', 'Port should be in the range(7000, 9001)', 'error')
-    
-    def getServer(self):
-        server = self.serverS.get()
-        if self.checkIp(server): return server
-        else: show('Invalid', 'Server IP is invalid.\nThis is an example (192.168.43.36) or \'localhost\'', 'error')
-    
-    def setConnected(self):
-        if self.connected: self.connectedS.config(text='Yes', bg='green')
-        else: self.connectedS.config(text='No', bg='red')
-    
-    def isNetwork(self):
-        if self.networkOn: return True
-        else: show('No Network Connection', 'This device is not connected to any network', 'error')
-    
-    def setServerDetails(self):
-        if self.localhost.get() =='1':
-            server = self.lh
-            self.serverS.set(self.lh)
-        server = self.getServer()
-        
-        if server:
-            port = self.getPort()
-            if port:
-                self.port = port
-                self.serverSet = True
-                return True
-            else: return False
-        else: return False
-        
-    def toServe(self):
-        if self.connected:
-            show('Connected', 'Already Connected, Stop to continue', 'warn')
-        else:
-            self.serverSet = False
-            if self.isServer.get() == '1':
-                if self.localhost.get() == '1': ip = self.lh
-                else: ip = self.networkInfo.ip if self.networkInfo else self.lh
-                self.serverS.set(ip)
-                self.serverS.config(state='disabled')
-            else: self.serverS.config(state='normal')
-            return True
-    
-    def connect(self):
-        if self.isNetwork() and self.setServerDetails():
-            if self.isServing: show('Serving', 'Already Serving, Stop Server to continue', 'info')
-            elif self.connecting: show('Connecting', 'Making attempt to connect to the server', 'warn')
-            elif self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
-            else:
-                server = self.serverS.get()
-                if self.checkIp(server):
-                    port = self.getPort()
-                    if port:
-                        if self.client == None:
-                            self.client = Client(server, port, True if self.handShake.get() == '1' else False)
-                            self.connecting = True
-    
-    def serve(self):
-        if self.isNetwork():
-            if self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
-            else:
-                self.isServer.set('1')
-                self.toServe()
-                if self.isServing: show('Serving', 'Already Serving', 'warn')
-                else: return True
-
-    def browse(self):
-        self.path.set('')
-        _path = show(path=1, folder=int(self.isDir.get()))
-        if path.exists(_path):
-            self.path.set(_path)
-            return _path
-        elif _path == '': return
-        else: show('Invalid', 'The path provided is invalid', 'error')
-    
-    def testConnected(self):
-        if self.connecting == False: return
-        if self.connection:
-            if self.connection.error:
-                show(f'{self.connection.error.__class__.__name__}', f'{self.connection.error}', 'error')
-                self.connecting = False
-                self.connection.shutdown()
-                if self.client:
-                    del self.client
-                    self.client = None
-            elif self.connected:
-                self.connecting = False
-                show('Connection Successfull', 'The connection to the server was accepted successfully.')
-    
-    def stopped(self): show('Disconnected', 'Disconnection is successful', 'info')
-    
-    def stop(self, ev=0):
-        if (ev != 0) or self.isNetwork():
-            which = self.whichConnection
-            if (which in ['client', 'server']) and confirm('Confirmation', 'Are you sure to disconnect', 1):
-                if self.connection:
-                    self.connection.shutdown()
-                    self.client = self.server = None
-                    self.stopped()
-                else: show('Invalid Action', 'You\'re not currently connected or connected to', 'error')
-    
-    def checkPath(self, dir_='', event=None):
-        path = self.path.get()
-        if path:
-            pathStat = LocalPathStat(path)
-            if dir_:
-                if pathStat.isDir: return path
-                else: show('Invalid Path', 'The path provided is an invalid directory', 'error')
-            elif dir_ == '' and pathStat.exists: return path
-            else: show('Invalid Path', 'The path provided is invalid.', 'error')
-        else: show('Path Error', 'The path provided is invalid.', 'error')
-
-class MiniFileTranxFer(GuiMixin):
-    
-    def __init__(self, root=None):
-        kw = dict(geo=(506, 500), title="Mini File TranxFer", tm=1, side='center')
-        if root: self.root = Toplevel(root, **kw)
-        else: self.root = Tk(**kw)
-        
-        cont = self.root.container
-        # super().__init__(root, name='mini')
-        
-        
-        self.network = LabelFrame(cont)
-        self.network.place(relx=.02, rely=.02, relh=.47, relw=.96)
-        
-        self.titleL = Label(self.network, background="#0000ff", bd="3", disabledforeground="#a3a3a3", font=font2, foreground="#ffffff", relief="ridge", text='''Mini FileTranxFer by PRMP Smart!!!.''', anchor='center')
-        self.titleL.place(relx=.01, rely=.02, relh=.3, relw=.98)
-        
-        self.clock = Label(self.titleL, font=font1, fg="black", bg='white', relief='solid')
-        self.clock.place(relx=.01, rely=.04, relh=.9, relw=.2)
+        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.24))
         self.tick()
         
-        self.full = Button(self.titleL, activebackground="#ececec", activeforeground="#000000", background="blue", disabledforeground="#a3a3a3", font=font2, foreground="white", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Full''', relief='groove', overrelief='groove', command=self.another)
-        self.full.place(relx=.8, rely=.04, relh=.9, relw=.2)
+        self.miniBtn = Button(self.titleL, text='''Mini''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2))
         
-        self.networkL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font1, relief="groove", anchor='center', text='Network?')
-        self.networkL.place(relx=.01, rely=.34, relh=.3, relw=.15)
-        self.networkS = Label(self.network, background="#008000", foreground="#ffffff", font=font1, relief="groove", anchor='center')
-        self.networkS.place(relx=.17, rely=.34, relh=.3, relw=.1)
+        self.localhostS = Checkbutton(self.root,  text='Localhost?', place=dict(relx=.02, rely=.045, relh=.04, relw=.3))
         
-        self.servingL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", anchor='center', text='Serving?')
-        self.servingL.place(relx=.01, rely=.66, relh=.3, relw=.15)
-        self.servingS = Label(self.network, background="#008000", foreground="#ffffff", font=font1, relief="groove", anchor='center')
-        self.servingS.place(relx=.17, rely=.66, relh=.3, relw=.1)
+        self.osL = Label(self.root, text='OS', place=dict(relx=.69, rely=.045, relh=.04, relw=.1))
+        self.osS = Label(self.root, text=get_os_name(), place=dict(relx=.79, rely=.045, relh=.04, relw=.2))
+        
 
-        self.serverL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Server')
-        self.serverL.place(relx=.3, rely=.34, relh=.25, relw=.15)
-        self.serverS = Entry(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove")
-        self.serverS.place(relx=.45, rely=.34, relh=.25, relw=.24)
+        self.network = LabelFrame(self.root, text='Network Details', place=dict(relx=.013, rely=.085, relh=.27, relw=.98))
+        
+        self.networkL = Label(self.network, text='Network?', place=dict(relx=.01, rely=.02, relh=.12, relw=.2))
+        self.networkS = Label(self.network, place=dict(relx=.22, rely=.02, relh=.12, relw=.1))
+        
+        self.connectedL = Label(self.network, text='Connected?', place=dict(relx=.37, rely=.02, relh=.12, relw=.2))
+        self.connectedS = Label(self.network, place=dict(relx=.58, rely=.02, relh=.12, relw=.1))
+        
+        self.servingL = Label(self.network, text='Serving?', place=dict(relx=.7, rely=.02, relh=.12, relw=.18))
+        self.servingS = Label(self.network, place=dict(relx=.89, rely=.02, relh=.12, relw=.1))
 
-        self.portL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Port')
-        self.portL.place(relx=.3, rely=.6, relh=.25, relw=.15)
-        self.portS = Entry(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove")
-        self.portS.place(relx=.45, rely=.6, relh=.25, relw=.13)
-        
-        self.localhostS = Checkbutton(cont, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Lh?', command=self.setNetwork)
-        self.localhostS.place(relx=.7, rely=.185, relh=.11, relw=.12)
-        
-        self.stopBtn = Button(self.network, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='Stop', command=self.stop, relief='groove')
-        self.stopBtn.place(relx=.595, rely=.66, relh=.3, relw=.1)
-        
-        self.sentL = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove", text='Sent')
-        self.sentL.place(relx=.71, rely=.6, relh=.3, relw=.1)
-        self.sentS = Label(self.network, background="#d9d9d9", foreground="#000000", font=font2, relief="groove")
-        self.sentS.place(relx=.815, rely=.6, relh=.3, relw=.175)
-        
-        self.pathCont = LabelFrame(cont, relief='groove', background="#d9d9d9")
-        self.pathCont.place(relx=.02, rely=.5, relh=.48, relw=.96)
-        
-        self.pathEnt = Entry(self.pathCont, background="white", disabledforeground="#a3a3a3", font="-family {Courier New} -size 10", foreground="#000000", insertbackground="black")
-        self.pathEnt.bind('<Return>', self.checkPath)
-        self.pathEnt.bind('<KeyRelease>', self.setPath)
+        self.ipAddressL = Label(self.network,  text='IP4 Address', place=dict(relx=.01, rely=.15, relh=.12, relw=.25))
 
-        self.browseBtn = Button(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Browse''', command=self.browse, relief='groove')
-        self.browseBtn.place(relx=.02, rely=.33, relh=.25, relw=.134)
+        self.ipAddressS = Label(self.network, place=dict(relx=.26, rely=.15, relh=.12, relw=.3))
         
-        self.isDirBtn = Checkbutton(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Directory?''', relief='groove')
-        self.isDirBtn.place(relx=.17, rely=.33, relh=.25, relw=.2)
+        self.gatewayL = Label(self.network,  text='Gateway', place=dict(relx=.01, rely=.28, relh=.12, relw=.25))
+        self.gatewayS = Label(self.network, place=dict(relx=.26, rely=.28, relh=.12, relw=.3))
+        
+        self.reloadNetworkBtn = Button(self.network, text='Reload', command=lambda: self.loadNetworkInfo(1), place=dict(relx=.01, rely=.43, relh=.12, relw=.18))
+        
+        # self.handShakeS = Checkbutton(self.network,  text='HS?', command=self.toServe, place=dict(relx=.2, rely=.43, relh=.12, relw=.15))
+        # Tip(self.handShakeS, 'Do you want Hand Shake security?')
+        
+        self.isServerS = Checkbutton(self.network,  text='Server?', command=self.toServe, place=dict(relx=.36, rely=.43, relh=.12, relw=.2))
+        
+        self.serverL = Label(self.network,  text='Server', place=dict(relx=.01, rely=.56, relh=.12, relw=.18))
+        self.serverS = Entry(self.network, place=dict(relx=.2, rely=.56, relh=.12, relw=.3))
+        
+        self.sameAsGatewayS = Checkbutton(self.network,  text='Gateway?', command=self.isGateway, place=dict(relx=.51, rely=.56, relh=.12, relw=.23))
+        
+        self.portL = Label(self.network,  text='Port', place=dict(relx=.01, rely=.69, relh=.12, relw=.18))
+        self.portS = Entry(self.network, place=dict(relx=.2, rely=.69, relh=.12, relw=.3))
 
-        self.serveBtn = Button(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Serve''', command=self.serve, relief='groove')
-        self.serveBtn.place(relx=.71, rely=.33, relh=.25, relw=.134)
-        
-        self.receiveBtn = Button(self.pathCont, activebackground="#ececec", activeforeground="#0000ff", background="#d9d9d9", disabledforeground="#a3a3a3", font=font2, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black", pady="0", text='''Receive''', command=self.receive, relief='groove')
-        self.receiveBtn.place(relx=.85, rely=.33, relh=.25, relw=.134)
+        self.transRateL = Label(self.network, text='Transmission Rates', place=dict(relx=.58, rely=.15, relh=.12, relw=.41))
+        self.upRateL = Label(self.network, text='TX / UP', place=dict(relx=.58, rely=.28, relh=.12, relw=.15))
+        self.upRateS = Label(self.network, place=dict(relx=.74, rely=.28, relh=.12, relw=.25))
+        self.dnRateL = Label(self.network, text='RX / DN', place=dict(relx=.58, rely=.41, relh=.12, relw=.15))
+        self.dnRateS = Label(self.network, place=dict(relx=.74, rely=.41, relh=.12, relw=.25))
 
-        self.receiving = Label(self.pathCont, background="#d9d9d9", foreground="#000000", font=font1, relief="groove", text='''Receiving''')
-        self.receiving.place(relx=.02, rely=.7, relh=.25, relw=.16)
+        self.serverDetailL = Label(self.network,  text='Server IP : Port', place=dict(relx=.01, rely=.87, relh=.12, relw=.313))
+        self.serverDetailS = Label(self.network, place=dict(relx=.33, rely=.87, relh=.12, relw=.42))
         
-        self.progressBar = Progressbar(self.pathCont, length="450")
-        self.progressBar.place(relx=.19, rely=.7, relh=.25, relw=.63)
+        self.setBtn = Button(self.network, text='Set', command=self.setServerDetails, place=dict(relx=.51, rely=.7, relh=.12, relw=.18))
+        
+        self.serveBtn = Button(self.network, text='Serve', command=self.serve, place=dict(relx=.77, rely=.56, relh=.12, relw=.18))
 
-        self.progressTxt = Label(self.pathCont, background="#d9d9d9", foreground="#000000", font=font1, relief="groove")
-        self.progressTxt.place(relx=.84, rely=.7, relh=.25, relw=.14)
+        self.stopBtn = Button(self.network, text='Stop', command=self.stop, place=dict(relx=.77, rely=.7, relh=.12, relw=.18))
         
-        super().__init__(root, name='mini')
+        self.connectBtn = Button(self.network, text='Connect', command=self.connect, place=dict(relx=.77, rely=.87, relh=.12, relw=.18))
 
-        self.setPath()
+
+
+        self.sendDetails = Details(self.root,text='Send', main=self, place=dict(relx=.01, rely=.358, relh=.33, relw=.98))
         
-        self.tranxFer = None
-        self.setProgress()
+        if self._path: self.sendDetails.localLoad(self._path)
+
+        self.isDir = Checkbutton(self.sendDetails, text=f'{compStr} Directory?', place=dict(relx=.313, rely=0, relw=.255, relh=.082))
+
+        self.receiveDetails = Details(self.root, text='Receive', main=self, which='r', place=dict(relx=.013, rely=.695, relh=.3, relw=.98))
+        self.root.after(1000, self.loadNetworkInfo)
         self.root.after(10, self.update)
         self.root.mainloop()
-    
-    def setPath(self, e=0):
-        if os.path.exists(self.path):
-            AutoUploadHandler.setPath(self.path)
-    
-    def browse(self):
-        super().browse()
-        self.setPath()
         
     def update(self):
         super().update()
+        self.setConnected()
+        self.root.after(100, self.update)
+    
+    def mini(self): MiniFileTranxFer(self.root)
+    
+    def browse(self):
+        super().browse()
+        if self.path: self.sendDetails.localLoad(self.path)
+    
+    def setNetwork(self):
+        super().setNetwork()
+        if self.networkInfo: self.gatewayS.config(text=self.networkInfo.gateway)
+        else:  self.gatewayS.config(text='No network.')
+    
+    def loadNetworkInfo(self, e=0):
         self.setNetwork()
-        self.setProgress()
-        self.root.after(10, self.update)
+        if self.networkInfo:
+            self.ipAddressS.config(text=self.networkInfo.ip)
+            self.gatewayS.config(text=self.networkInfo.gateway)
+            if which_platform() != 'nt':
+                self.upRateS.config(text=self.networkInfo.tx.fBytes)
+                self.dnRateS.config(text=self.networkInfo.rx.fBytes)
+        if e==0: self.root.after(1000, self.loadNetworkInfo)
     
-    def setServing(self):
-        super().setServing()
-        self.sentS.config(text=AutoUploadHandler.count)
-        if self.isServing:
-            if self.localhost.get() == '0': self.serverS.set(self.networkInfo.ip)
-            self.serverS.config(state='disabled')
-    
-    def stop(self, ev=0):
-        super().stop(ev)
-        self.serverS.config(state='normal')
-        if self.server:
-            self.server.shutdown()
-            self.server = None
-        
-        if self.tranxFer:
-            self.tranxFer.shutdown()
-            self.tranxFer = None
-
-    def serve(self):
-        path = self.checkPath()
-        port = self.getPort()
-        if super().serve() and path and port and confirm('Serve it', 'Do you want to serve this path (%s) for download?'%path, 1): self.server = AutoUploadServer(start=True, port=port)
-
-    def setDestPath(self):
-        path = self.checkPath(dir_=True)
-        if path and confirm('Destination Directory', f'Do you want to save the downloaded file in this directory {path}?', 1): return path
-
-    def receive(self):
-        port = self.getPort()
-        if port:
-            server = self.getServer()
-            if server:
-                path = self.setDestPath()
-                if port and server and path:
-                    try:
-                        soc = socket.socket()
-                        soc.connect((server, port))
-                    except ConnectionRefusedError as error: show(error.__class__.__name__, error, 'error')
-                    self.tranxFer = TranxFer(soc, which='download', dest=path, goOn=True)
-                    self.tranxFer.startThreadedTranxFer()
-
-    def setProgress(self):
-        if self.tranxFer:
-            self.progressBar.config(value=self.tranxFer.tranxFered)
-            self.progressTxt.config(text=self.tranxFer.tranxFeredPercent)
-            
-            if self.tranxFer.finished:
-                del self.tranxFer
-                self.tranxFer = None
-                show('Download Complete', 'Download completed successfully', 'info')
+    def isGateway(self):
+        if self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
         else:
-            self.progressBar.config(value=0)
-            self.progressTxt.config(text='0.00%')
-        self.progressBar.update()
+            self.serverSet = False
+            self.isServer.set('0')
+            if self.sameAsGateway.get() == '1':
+                self.serverEnt.set(self.networkInfo.gateway if self.networkInfo else self.lh)
+                self.serverS.config(state='disabled')
+            else: self.serverS.config(state='normal')
+    
+    def toServe(self):
+        if super().toServe(): self.sameAsGateway.set('0')
+        
+    def setServerDetails(self):
+        if self.localhost.get() == '1' and 8: 0
+            # if
+        self.serverDetailS.config(text='')
+        if super().setServerDetails():
+            self.serverDetailS.config(text=f'{self.serverEnt.get()} : {self.getPort()}')
+            return True
+    
+    def serve(self):
+        if super().serve():
+            if self.setServerDetails():
+                self.server = Server(self.port, True if self.handShake.get() == '1' else False)
+                self.setServing()
+                return True
+            else: show('Not Set', 'Server and Port not set.', 'warn')
 
 
 
 
 
-class FileTranxFer:
+class GuiFileTranxFer:
     def __init__(self, full=True):
         TranxFerLogger.setLevel('critical')
         FullFileTranxFer() if full else MiniFileTranxFer()
