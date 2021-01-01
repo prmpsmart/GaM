@@ -575,9 +575,9 @@ class MiniFileTranxFer(FileTranxFer):
         
         self.titleL = Label(self.network, text='''Mini FileTranxFer by PRMP Smart!!!.''', place=dict(relx=.01, rely=.02, relh=.3, relw=.98))
         
-        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.2))
+        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.2), relief='flat')
         
-        self.full = Button(self.titleL, text='''Full''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2))
+        self.full = Button(self.titleL, text='''Full''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2), relief='flat')
         
         self.networkL = Label(self.network, text='Network?', place=dict(relx=.01, rely=.34, relh=.3, relw=.15))
         self.networkS = Label(self.network, place=dict(relx=.17, rely=.34, relh=.3, relw=.1))
@@ -713,10 +713,10 @@ class FullFileTranxFer(FileTranxFer):
 
         self.titleL = Label(cont,  text='FileTranxFer by PRMPSmart', place=dict(relx=.01, rely=.01, relh=.029, relw=.98))
         
-        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.24))
+        self.clock = Label(self.titleL, place=dict(relx=0, rely=0, relh=1, relw=.24), relief='flat')
         self.tick()
         
-        self.miniBtn = Button(self.titleL, text='''Mini''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2))
+        self.miniBtn = Button(self.titleL, text='''Mini''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2), relief='flat')
         
         self.localhostS = Checkbutton(cont,  text='Localhost?', place=dict(relx=.02, rely=.045, relh=.04, relw=.3))
         
@@ -846,9 +846,9 @@ class FullFileTranxFer(FileTranxFer):
 
 
 class GuiFileTranxFer:
-    def __init__(self, full=True):
+    def __init__(self, full=True, **kwargs):
         TranxFerLogger.setLevel('critical')
-        FullFileTranxFer() if full else MiniFileTranxFer()
+        FullFileTranxFer(**kwargs) if full else MiniFileTranxFer(**kwargs)
 
 
 
