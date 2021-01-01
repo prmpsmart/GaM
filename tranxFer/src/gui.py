@@ -313,7 +313,7 @@ class Details(LabelFrame):
     def send(self):
         if self.main.checkConnected:
             if self.main.checkPath():
-                self.tranxFer = TranxFer(self.main.connection, LocalPathStat(self.main.path.get()))
+                self.tranxFer = TranxFer(self.main.connection, LocalPathStat(self.main.path, compress=self.compress.get()))
                 self.tranxFer.startThreadedTranxFer()
     
     def receive(self):
@@ -488,7 +488,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
             show('Connected', 'Already Connected, Stop to continue', 'warn')
         else:
             self.serverSet = False
-            if self.isServerS.get():
+            if self.name == 'mini' or self.isServerS.get():
                 if self.localhostS.get(): ip = self.lh
                 else: ip = self.networkInfo.ip if self.networkInfo else self.lh
                 self.serverS.set(ip)
@@ -514,7 +514,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         if self.isNetwork():
             if self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
             else:
-                self.isServer.set('1')
+                if self.name == 'full': self.isServerS.set('1')
                 self.toServe()
                 if self.isServing: show('Serving', 'Already Serving', 'warn')
                 else: return True
@@ -547,7 +547,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     def stop(self, ev=0):
         if (ev != 0) or self.isNetwork():
             which = self.whichConnection
-            if (which in ['client', 'server']) and confirm('Confirmation', 'Are you sure to disconnect', 1):
+            if (which in ['client', 'server']) and confirm(title='Confirmation', msg='Are you sure to disconnect', which=1):
                 if self.connection:
                     self.connection.shutdown()
                     self.client = self.server = None
@@ -667,11 +667,11 @@ class MiniFileTranxFer(FileTranxFer):
         if path:
             port = self.getPort()
             if port:
-                if super().serve() and confirm('Serve it', 'Do you want to serve this path (%s) for download?'%path, 1): self.server = AutoUploadServer(start=True, port=port)
+                if super().serve() and confirm(title='Serve it', msg='Do you want to serve this path (%s) for download?'%path, which=1): self.server = AutoUploadServer(start=True, port=port)
 
     def setDestPath(self):
         path = self.checkPath(dir_=True)
-        if path and confirm('Destination Directory', f'Do you want to save the downloaded file in this directory {path}?', 1): return path
+        if path and confirm(title='Destination Directory', msg=f'Do you want to save the downloaded file in this directory {path}?', which=1): return path
 
     def receive(self):
         port = self.getPort()
@@ -748,8 +748,8 @@ class FullFileTranxFer(FileTranxFer):
         
         self.reloadNetworkBtn = Button(self.network, text='Reload', command=lambda: self.loadNetworkInfo(1), place=dict(relx=.01, rely=.43, relh=.12, relw=.18))
         
-        # self.handShakeS = Checkbutton(self.network,  text='HS?', command=self.toServe, place=dict(relx=.2, rely=.43, relh=.12, relw=.15))
-        # Tip(self.handShakeS, 'Do you want Hand Shake security?')
+        self.handShakeS = Checkbutton(self.network,  text='HS?', command=self.toServe, place=dict(relx=.2, rely=.43, relh=.12, relw=.15))
+        Tip(self.handShakeS, 'Do you want Hand Shake security?')
         
         self.isServerS = Checkbutton(self.network,  text='Server?', command=self.toServe, place=dict(relx=.36, rely=.43, relh=.12, relw=.2))
         
@@ -834,13 +834,13 @@ class FullFileTranxFer(FileTranxFer):
     def setServerDetails(self):
         self.serverDetailS.config(text='')
         if super().setServerDetails():
-            self.serverDetailS.config(text=f'{self.serverEnt.get()} : {self.getPort()}')
+            self.serverDetailS.config(text=f'{self.serverS.get()} : {self.getPort()}')
             return True
     
     def serve(self):
         if super().serve():
             if self.setServerDetails():
-                self.server = Server(self.port, True if self.handShake.get() else False)
+                self.server = Server(self.port, True if self.handShakeS.get() else False)
                 self.setServing()
                 return True
             else: show('Not Set', 'Server and Port not set.', 'warn')
