@@ -739,9 +739,12 @@ class PRMP_Camera(PRMP_Frame):
     def saveImage(self):
         self.imageFile = PRMP_ImageFile(image=self._image)
         if self.callback: return self.callback(self.imageFile)
+        
+    @staticmethod
+    def _saveImage(image):
         file = asksaveasfilename(filetypes=picTypes)
         
-        if file: self.imageFile.save(file)
+        if file: image.save(file)
     
     def get(self): return self.saveImage()
 

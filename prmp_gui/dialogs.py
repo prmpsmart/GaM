@@ -186,6 +186,7 @@ class PRMP_CameraDialog(PRMP_Dialog):
 
     def getImage(self, imageFile):
         self._setResult(imageFile)
+        if not self.callback: PRMP_Camera._saveImage(imageFile)
         if self._return: self.destroy()
     
     def __del__(self): del self.camera
