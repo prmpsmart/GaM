@@ -1,4 +1,5 @@
 # from prmp_gui.core import *
+from tkinter.ttk import *
 from tkinter import *
 from prmp_gui.dialogs import dialogFunc
 from .core import *
