@@ -1,7 +1,6 @@
 from ..core.agam_apps import *
-from ..core.prmp_gui.two_widgets import *
 from ...backend.dc.dc_regions import *
-from ..core.prmp_gui.plotCanvas import PlotCanvas, random, ChartSort
+from prmp_gui.plot_canvas import PRMP_PlotCanvas, random, ChartSort
 
 
 class DC_ChartSort(ChartSort): pass
@@ -134,9 +133,9 @@ class DC_Overview(Frame):
 
         self.dcDigits = DC_Digits(self)
 
-        self.plotCanvas1 = PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+        self.plotCanvas1 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
-        self.plotCanvas2 = PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+        self.plotCanvas2 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
         if orient == 'v': self.placeVertically()
         else: self.placeHorizontally()

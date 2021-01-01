@@ -1,4 +1,4 @@
-from .prmp_gui.core import PRMP_Window, os
+from prmp_gui.core import PRMP_Window, os
 
 join = os.path.join
 _dir = os.path.dirname(__file__)
