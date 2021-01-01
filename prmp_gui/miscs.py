@@ -1,7 +1,7 @@
 import platform
 import tkinter.messagebox as msgbox
 
-from ....backend.core.bases import Mixins, DateTime
+from prmp_miscs.mixins import PRMP_Mixins
 from functools import partial
 
 
@@ -83,7 +83,7 @@ def copyClassMethods(obj, copyClass, *args):
 
             setattr(obj, key, func)
 
-class Col_Mixins(Mixins):
+class Col_Mixins(PRMP_Mixins):
     
     def __str__(self): return f'{self.className}({str(self.columns)})'
     
