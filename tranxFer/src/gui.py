@@ -379,12 +379,12 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     def serverDefault(self): self.serverS.set('192.168.43.')
     
     def new(self, e=None):
-        if self.name == 'mini': MiniFileTranxFer(root=self.root)
-        elif self.name == 'full': FullFileTranxFer(root=self.root)
+        if self.name == 'mini': MiniFileTranxFer(self)
+        elif self.name == 'full': FullFileTranxFer(self)
     
     def another(self, e=None):
-        if self.name == 'full': MiniFileTranxFer(root=self.root)
-        elif self.name == 'mini': FullFileTranxFer(root=self.root)
+        if self.name == 'full': MiniFileTranxFer(self)
+        elif self.name == 'mini': FullFileTranxFer(self)
 
     def tick(self):
         setTime = time.strftime('%I:%M:%S %p')
@@ -428,7 +428,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         if self.localhostS.get():
             self.networkOn = True
             self.serverS.set(self.networkInfo.ip if self.networkInfo else self.lh)
-            self.serverS.config(state='disabled')
+            if self.isServerS.get(): self.serverS.config(state='disabled')
         else:
             if self.name == 'full' and self.sameAsGatewayS.get() and self.isServerS.get(): self.serverS.config(state='normal')
         
@@ -643,7 +643,8 @@ class MiniFileTranxFer(FileTranxFer):
         super().setServing()
         self.sentS.config(text=AutoUploadHandler.count)
         if not self.isServing:
-            if not self.localhostS.get(): self.serverS.set(self.networkInfo.ip)
+            if not self.localhostS.get():
+                if self.networkInfo: self.serverS.set(self.networkInfo.ip)
             self.serverS.config(state='disabled')
     
     def stop(self, ev=0):
