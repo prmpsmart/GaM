@@ -1,4 +1,4 @@
-from prmp_gui.dialogs import dialogFunc
+from prmp_gui.dialogs import *
 from .core import *
 
 
@@ -48,7 +48,7 @@ class Tip(tk.Toplevel):
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
-        Message(self, textvariable=self.msgVar, background="#d9d9d9", font=font2, aspect=1000).grid()
+        tk.Message(self, textvariable=self.msgVar, background="#d9d9d9", font=font2, aspect=1000).grid()
         self.wdgt.bind('<Enter>', self.spawn, '+')
         self.wdgt.bind('<Leave>', self.hide, '+')
         self.wdgt.bind('<Motion>', self.move, '+')
@@ -157,19 +157,19 @@ class Details(LabelFrame):
         self.nameTip = Tip(self.nameS, root=root)
 
         self.sizeL = Label(self.detConts, text='Size', place=dict(relx=.01, rely=.14, relh=.12, relw=.164))
-        self.sizeS = Label(self.detConts, anchor='ne', place=dict(relx=.175, rely=.14, relh=.12, relw=.274))
+        self.sizeS = Label(self.detConts, place=dict(relx=.175, rely=.14, relh=.12, relw=.274))
         self.sizeTip = Tip(self.sizeS, root=root)
 
         self.typeL = Label(self.detConts, text='Type', place=dict(relx=.01, rely=.27, relh=.12, relw=.164))
-        self.typeS = Label(self.detConts, anchor='ne', justify='right', place=dict(relx=.175, rely=.27, relh=.12, relw=.274))
+        self.typeS = Label(self.detConts, place=dict(relx=.175, rely=.27, relh=.12, relw=.274))
         self.typeTip = Tip(self.typeS, root=root)
 
         self.ctimeL = Label(self.detConts, text='CTime', place=dict(relx=.01, rely=.4, relh=.12, relw=.164))
-        self.ctimeS = Label(self.detConts, foreground="#000000", font=font0,  anchor='nw', justify='right', place=dict(relx=.175, rely=.4, relh=.12, relw=.274))
+        self.ctimeS = Label(self.detConts,  place=dict(relx=.175, rely=.4, relh=.12, relw=.274))
         self.ctimeTip = Tip(self.ctimeS, root=root)
 
         self.atimeL = Label(self.detConts, text='ATime', place=dict(relx=.01, rely=.53, relh=.12, relw=.164))
-        self.atimeS = Label(self.detConts, foreground="#000000", font=font0,  anchor='nw', justify='right', place=dict(relx=.175, rely=.53, relh=.12, relw=.274))
+        self.atimeS = Label(self.detConts,  place=dict(relx=.175, rely=.53, relh=.12, relw=.274))
         self.atimeTip = Tip(self.atimeS, root=root)
 
         self.mtimeL = Label(self.detConts, text='MTime', place=dict(relx=.01, rely=.66, relh=.12, relw=.164))
@@ -177,13 +177,13 @@ class Details(LabelFrame):
         self.mtimeTip = Tip(self.mtimeS, root=root)
 
         self.filesCountL = Label(self.detConts, text='Files Count', place=dict(relx=.47, rely=.14, relh=.12, relw=.329))
-        self.filesCountS = Label(self.detConts, anchor='ne', place=dict(relx=.8, rely=.14, relh=.12, relw=.194))
+        self.filesCountS = Label(self.detConts, place=dict(relx=.8, rely=.14, relh=.12, relw=.194))
 
         self.dirsCountL = Label(self.detConts, text='Dirs Count', place=dict(relx=.47, rely=.27, relh=.12, relw=.329))
-        self.dirsCountS = Label(self.detConts, anchor='ne', place=dict(relx=.8, rely=.27, relh=.12, relw=.194))
+        self.dirsCountS = Label(self.detConts, place=dict(relx=.8, rely=.27, relh=.12, relw=.194))
         
         self.innerSizeL = Label(self.detConts, text='Inner Files Size', place=dict(relx=.47, rely=.4, relh=.12, relw=.329))
-        self.innerSizeS = Label(self.detConts,  anchor='ne', place=dict(relx=.8, rely=.4, relh=.12, relw=.194))
+        self.innerSizeS = Label(self.detConts,  place=dict(relx=.8, rely=.4, relh=.12, relw=.194))
         self.innerSizeTip = Tip(self.innerSizeS, root=root)
         
         
@@ -194,12 +194,12 @@ class Details(LabelFrame):
         
         
         self.detailsL = Label(self.detConts, text='Details', place=dict(relx=.493, rely=.53, relh=.12, relw=.268))
-        self.detailsS = Label(self.detConts, background="red", foreground="white", font=font2,  text='No', place=dict(relx=.78, rely=.53, relh=.12, relw=.205))
+        self.detailsS = Label(self.detConts, font=font2,  text='No', place=dict(relx=.78, rely=.53, relh=.12, relw=.205))
         
-        self.compress = Checkbutton(self, text=compText, activebackground="#ececec", activeforeground="#000000", disabledforeground="#a3a3a3", font=font1, foreground="#000000", highlightbackground="#d9d9d9", highlightcolor="black",  place=dict(relx=.493, rely=.69, relw=.268, relh=.1))
+        self.compress = Checkbutton(self, text=compText,  place=dict(relx=.493, rely=.69, relw=.268, relh=.1))
         self.compressTip = Tip(self.compress, msg=tip, root=root)
 
-        self.previewBtn = Button(self, relief="ridge", text='Preview', command=self.preview, place=dict(relx=.77, rely=.69, relh=.1, relw=.205))
+        self.previewBtn = Button(self, text='Preview', command=self.preview, place=dict(relx=.77, rely=.69, relh=.1, relw=.205))
 
         self.level = Progressbar(self, value="30", place=dict(relx=.02, rely=.82, relh=.14, relw=.75))
 
@@ -214,7 +214,7 @@ class Details(LabelFrame):
     
     def setDest(self):
         self.destPath = ''
-        if self.destDir == '1':
+        if self.destDir.get():
             p = dialogFunc(path=1, folder=1)
             if os.path.exists(p): self.destPath = p
             else: show('Path Error', 'The choosen directory does not exists', 'warn')
@@ -373,7 +373,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
     def exiting(self):
         try: self.stop(1)
         except Exception as error: TranxFerLogger.debug(error)
-        sys.exit()
+        os.sys.exit()
     
     def serverDefault(self): self.serverS.set('192.168.43.')
     
@@ -431,8 +431,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         else:
             if self.name == 'full' and self.sameAsGatewayS.get() and self.isServerS.get(): self.serverS.config(state='normal')
         
-        if self.networkOn == True:
-            self.networkS.config(bg='green', text='Yes', fg='white')
+        if self.networkOn == True: self.networkS.config(bg='green', text='Yes', fg='white')
         else: self.networkS.config(bg='red', text='No', fg='white')
     
     def setServing(self):
@@ -465,7 +464,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
         else: show('No Network Connection', 'This device is not connected to any network', 'error')
     
     def setServerDetails(self):
-        if self.localhost.get() =='1':
+        if self.localhostS.get() =='1':
             server = self.lh
             self.serverS.set(self.lh)
         server = self.getServer()
@@ -484,8 +483,8 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
             show('Connected', 'Already Connected, Stop to continue', 'warn')
         else:
             self.serverSet = False
-            if self.isServer.get() == '1':
-                if self.localhost.get() == '1': ip = self.lh
+            if self.isServerS.get():
+                if self.localhostS.get(): ip = self.lh
                 else: ip = self.networkInfo.ip if self.networkInfo else self.lh
                 self.serverS.set(ip)
                 self.serverS.config(state='disabled')
@@ -503,7 +502,7 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
                     port = self.getPort()
                     if port:
                         if self.client == None:
-                            self.client = Client(server, port, True if self.handShake.get() == '1' else False)
+                            self.client = Client(server, port, True if self.handShake.get() else False)
                             self.connecting = True
     
     def serve(self):
@@ -591,7 +590,7 @@ class MiniFileTranxFer(FileTranxFer):
         self.portL = Label(self.network, text='Port', place=dict(relx=.3, rely=.6, relh=.25, relw=.15))
         self.portS = Entry(self.network, place=dict(relx=.45, rely=.6, relh=.25, relw=.13))
         
-        self.localhost = Checkbutton(cont, text='Lh?', command=self.setNetwork, place=dict(relx=.7, rely=.185, relh=.11, relw=.12))
+        self.localhostS = Checkbutton(cont, text='Lh?', command=self.setNetwork, place=dict(relx=.7, rely=.185, relh=.11, relw=.12))
         
         self.stopBtn = Button(self.network, text='Stop', command=self.stop, place=dict(relx=.595, rely=.66, relh=.3, relw=.1))
         
@@ -643,7 +642,7 @@ class MiniFileTranxFer(FileTranxFer):
         super().setServing()
         self.sentS.config(text=AutoUploadHandler.count)
         if self.isServing:
-            if self.localhost.get() == '0': self.serverS.set(self.networkInfo.ip)
+            if self.localhostS.get(): self.serverS.set(self.networkInfo.ip)
             self.serverS.config(state='disabled')
     
     def stop(self, ev=0):
@@ -817,18 +816,16 @@ class FullFileTranxFer(FileTranxFer):
         if self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
         else:
             self.serverSet = False
-            self.isServer.set('0')
-            if self.sameAsGateway.get() == '1':
+            self.isServerS.set('0')
+            if self.sameAsGatewayS.get():
                 self.serverEnt.set(self.networkInfo.gateway if self.networkInfo else self.lh)
                 self.serverS.config(state='disabled')
             else: self.serverS.config(state='normal')
     
     def toServe(self):
-        if super().toServe(): self.sameAsGateway.set('0')
+        if super().toServe(): self.sameAsGatewayS.set('0')
         
     def setServerDetails(self):
-        if self.localhost.get() == '1' and 8: 0
-            # if
         self.serverDetailS.config(text='')
         if super().setServerDetails():
             self.serverDetailS.config(text=f'{self.serverEnt.get()} : {self.getPort()}')
@@ -837,7 +834,7 @@ class FullFileTranxFer(FileTranxFer):
     def serve(self):
         if super().serve():
             if self.setServerDetails():
-                self.server = Server(self.port, True if self.handShake.get() == '1' else False)
+                self.server = Server(self.port, True if self.handShake.get() else False)
                 self.setServing()
                 return True
             else: show('Not Set', 'Server and Port not set.', 'warn')

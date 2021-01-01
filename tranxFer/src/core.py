@@ -289,7 +289,7 @@ class PathStat(PRMP_Mixins):
             if time == 'a': tm = self.atime
             elif time == 'c': tm = self.ctime
             elif time == 'm': tm = self.mtime
-            return datetime.fromtimestamp(tm).strftime(strT)
+            return datetime.datetime.fromtimestamp(tm).strftime(strT)
         
         # Monday, March 9, 2020, 3:16:43 PM
     
