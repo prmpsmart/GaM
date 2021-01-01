@@ -737,10 +737,10 @@ class PRMP_Camera(PRMP_Frame):
             self.placeSave()
     
     def saveImage(self):
-        self.imageFile = ImageFile(image=self._image)
+        self.imageFile = PRMP_ImageFile(image=self._image)
         if self.callback: return self.callback(self.imageFile)
         file = asksaveasfilename(filetypes=picTypes)
-        print(file)
+        
         if file: self.imageFile.save(file)
     
     def get(self): return self.saveImage()
@@ -768,12 +768,11 @@ class PRMP_Camera(PRMP_Frame):
     def setImage(self):
         success, frame = self.getFrame()
         if success:
+            dif = 20
+            w_h = self.width-dif, self.height-dif
             self._image = Image.fromarray(frame)
-            # res = self.cv2.resize(img,(2*self.width, 2*self.height), interpolation = self.cv2.INTER_CUBIC)
-            # self._image
             image = self._image.copy()
-            # image.resize(self.isMaximized())
-            image.thumbnail((self.width-30, self.height-60))
+            image.thumbnail(w_h)
             self.image = PhotoImage(image=image)
         
         # else: print('Read Error')

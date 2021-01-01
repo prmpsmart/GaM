@@ -9,7 +9,9 @@ class PRMP_Pics:
     subDir = ''
     
     @classmethod
-    def picsExt(cls): return cls.subDir[:-1]
+    def picsExt(cls):
+        ext = cls.subDir[:-1]
+        return ext.replace('prmp_', '')
     
     @classmethod
     def picsHome(cls): return path.join(path.dirname(__file__), cls._dir)
@@ -33,7 +35,6 @@ class PRMP_Pics:
     def filesDict(cls):
         files = cls.files()
         _filesDict = {cls.picName(file): file for file in files}
-        print(_filesDict)
         return _filesDict
     
     @classmethod
@@ -135,7 +136,7 @@ class PRMP_Image:
         self.tkImage = None
         self.name = ''
 
-        if imageFile:
+        if imageFile or image:
             if isinstance(imageFile, (str, bytes)): self.imageFile = PRMP_ImageFile(imageFile, ext=ext, db=db)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
             
@@ -157,7 +158,6 @@ class PRMP_Image:
             PRMP_Image.count += 1
             
         else: raise ValueError('imageFile is None')
-
 
     def __str__(self): return str(self.tkImage)
 
