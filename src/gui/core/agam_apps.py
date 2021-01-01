@@ -3,7 +3,7 @@ from .agam_dialogs import *
 class TreeColumns:
     def columns(self, sup):
         if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className'}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-        return ['Name', 'Date']
+        return [{'text': 'Name', 'width': 250}, {'text': 'Date'}, {'text': 'Last Active', 'attr': {'last': 'date'}}]
 
 
 class RegionLookUp(PRMP_MainWindow, FillWidgets):

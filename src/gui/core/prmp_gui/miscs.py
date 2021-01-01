@@ -110,7 +110,7 @@ class Column(Col_Mixins):
             self.value = column.get('value', value)
             self.width = column.get('width', width)
             self.type = column.get('type')
-        
+
         else:
             self.text = column
             self.attr = self.propertize(self.text)
@@ -127,7 +127,7 @@ class Column(Col_Mixins):
             if self.type:
                 try: return self.type(obj)
                 except: pass
-            try: obj[self.attr]
+            try: return obj[self.attr]
             except: return ''
 
     def proof(self, obj): return self.get(obj) == self.value
