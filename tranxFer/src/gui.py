@@ -1,12 +1,137 @@
-from ._gui import *
-from prmp_gui.core import *
+from prmp_gui.dialogs import dialogFunc
+from .core import *
+
+
+
+family = '{Times New Roman}'
+
+font2 = f"-family {family} -size {5 if which_platform() == 'and' else 11} -weight bold"
+font1 = f"-family {family} -size {4 if which_platform() == 'and' else 10} -weight bold"
+font0 = f"-family {family} -size {2 if which_platform() == 'and' else 7} -weight bold"
+compStr = '      ' if (which_platform() == 'and') else ''
+
+def show(title=None, msg=None, which='info', **kwargs):
+    if which == 'error':
+        TranxFerLogger.error(msg)
+        title = title or which.title()
+    elif which == 'info':
+        TranxFerLogger.info(msg)
+        title = title or 'Information'
+    elif which == 'warn':
+        TranxFerLogger.warning(msg)
+        title = title or 'Warning'
+
+    dialogFunc(title=title, msg=msg, which=which, **kwargs)
+
+def confirm(msg='', **kwargs):
+    TranxFerLogger.info(msg)
+    return dialogFunc(ask=1, msg=msg, **kwargs)
+
+
+class Tip(tk.Toplevel):
+    def __init__(self, wdgt, msg=None, delay=.2, follow=True, root=None):
+        self.wdgt = wdgt
+        self.parent = self.wdgt.master if root == None else root
+        
+        super().__init__(self.parent, background='black', padx=1, pady=1)
+        self.attributes('-topmost', True)
+        self.msg = msg
+        self.withdraw()
+        self.overrideredirect(True)
+        
+        self.msgVar = tk.StringVar()
+
+        if msg is None: self.msgVar.set('No loaded File or Directory.')
+        else: self.msgVar.set(msg)
+        
+        self.delay = delay
+        self.follow = follow
+        self.visible = 0
+        self.lastMotion = 0
+        Message(self, textvariable=self.msgVar, background="#d9d9d9", font=font2, aspect=1000).grid()
+        self.wdgt.bind('<Enter>', self.spawn, '+')
+        self.wdgt.bind('<Leave>', self.hide, '+')
+        self.wdgt.bind('<Motion>', self.move, '+')
+        
+    def update(self, msg): self.msgVar.set(msg)
+
+    def spawn(self, event=None):
+        self.visible = 1
+        self.after(int(self.delay * 1000), self.show)
+
+    def show(self):
+        if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
+        if self.visible == 2: self.deiconify()
+
+    def move(self, event):
+        self.lastMotion = time.time()
+        if self.follow is False:
+            self.withdraw()
+            self.visible = 1
+        self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
+        
+        #To get the present event coordinates
+        # print(event.x_root,event.y_root)
+        
+        self.after(int(self.delay * 1000), self.show)
+
+    def hide(self, event=None):
+        self.visible = 0
+        self.withdraw()
+
+
+class Preview(Toplevel):
+    images = ['.jpg', '.png', '.jpeg', '.gif', '.jpeg', '.jpg', '.png', '.PNG', '.psd', '.tif', '.tiff', '.ico']
+    audios = ['.wav', '.aif', '.cda', '.mid', '.midi', '.mp3', '.mpa', '.ogg', '.wma']
+    videos = ['.mp4', '.3gp', '.mkv', '.rm', '.wmv', '.mpeg']
+    texts = ['.txt', '.rtf', '.py', '.bat', '.c', '.c++', '.cpp', '.pl', '.log', '.h', '.hpp']
+    
+    def __init__(self, master, pathStat):
+        ext = pathStat.type
+        file = pathStat.fullName
+        
+        if not pathStat.exists:
+            er = f'Path ({file}) does not exists.'
+            show('Invalid Path', er, 'error')
+            return
+        
+        super().__init__(master)
+        
+        self.geometry('500x500')
+        self.attributes('-topmost', 1)
+        loadable = 0
+        if ext in self.images: self.renderImage(file); loadable = 1
+        elif ext in self.audios: self.renderAudio(file)
+        elif ext in self.videos: self.renderVideo(file)
+        elif ext in self.texts: self.renderText(file); loadable = 1
+        
+        if loadable: self.mainloop()
+        else:
+            self.destroy()
+            show('Load error', 'Not Loadable Yet', 'error')
+    
+    def renderImage(self, file):
+        self.image = Image.open(file)
+        self.image = self.image.resize((500, 500))
+        self.geometry('%dx%d'%(self.image.width, self.image.height))
+        self.photo = PhotoImage(self.image)
+        self.label = Label(self, image=self.photo)
+        self.label.place(relx=0, rely=0, relh=1, relw=1)
+        
+    def renderAudio(self, file): pass
+    def renderVideo(self, file): pass
+    def renderText(self, file):
+        self.txt = open(file).read()
+        self.text = Text(self)
+        self.text.insert('insert', self.txt)
+        self.text.config(state='disabled')
+        self.text.place(relx=0, rely=0, relh=1, relw=1)
 
 
 class Details(LabelFrame):
     def __init__(self, master, which='s', main=None, **kw):
         
         root = master.master
-
         super().__init__(master, **kw)
         
         self.main = main
@@ -198,34 +323,407 @@ class Details(LabelFrame):
             if self.tranxFer: self.tranxFer.startThreadedReceiving()
             else: show('TranxFer Error', 'Load remotely first to get the path details', 'warn')
 
+class FileTranxFer(PRMP_MainWindow, NetworkMixin):
+    _path = ''
+    _server = ''
+    _port = 7767
+    _name = 'gui'
+    geo = (600, 270)
+    
+    def __init__(self, master=None, geo=(), title="File TranxFer", tm=1, tw=1, side='center', **kwargs):
+        PRMP_MainWindow.__init__(self, master, geo=geo or self.geo, title=title, side=side, tm=tm, tw=tw, **kwargs)
+        
+        self.path = ''
+        self.networkInfo = None
+        self.server = None
+        self.client = None
+        self.connecting = False
+        self.networkOn = False
+
+        self._setupApp()
+
+        self.serverDefault()
+        
+        # if get_os_name() != 'Android':  self.attributes('-tool', True)
+        
+        self.bind('<Control-M>', os.sys.exit)
+        self.bind('<Control-m>', os.sys.exit)
+        self.bind('<Control-n>', self.new)
+        self.bind('<Control-N>', self.new)
+        self.bind('<Control-a>', self.another)
+        self.bind('<Control-A>', self.another)
+        
+        self.protocol('WM_DELETE_WINDOW', self.exiting)
+
+        self.defaults()
+        self.paint()
+
+        self.after(10, self.update)
+
+        self.mainloop()
+    
+    def _setupApp(self):
+        pass
+    
+    def defaults(self):
+        self.path = self._path
+        self.serverS.set(self._server)
+        self.portS.set(self._port)
+    
+    def exiting(self):
+        try: self.stop(1)
+        except Exception as error: TranxFerLogger.debug(error)
+        sys.exit()
+    
+    def serverDefault(self): self.serverS.set('192.168.43.')
+    
+    def new(self, e=None):
+        if self.name == 'mini': MiniFileTranxFer(root=self.root)
+        elif self.name == 'full': FullFileTranxFer(root=self.root)
+    
+    def another(self, e=None):
+        if self.name == 'full': MiniFileTranxFer(root=self.root)
+        elif self.name == 'mini': FullFileTranxFer(root=self.root)
+
+    def tick(self):
+        setTime = time.strftime('%I:%M:%S %p')
+        self.clock.config(text=setTime)
+        self.clock.after(200, self.tick)
+    
+    @property
+    def isServing(self): return self.server
+    
+    @property
+    def connection(self):
+        if self.client != None: return self.client
+        elif self.server != None: return self.server
+    
+    @property
+    def whichConnection(self):
+        if self.client: return 'client'
+        elif self.server: return 'server'
+    
+    @property
+    def connected(self):
+        if self.connection:
+            if self.connection.connected: return True
+    
+    @property
+    def checkConnected(self):
+        if self.connected: return True
+        else:
+            show('No connection', 'No current connection', 'warn')
+            return False
+    
+    def update(self):
+        self.setServing()
+        self.testConnected()
+
+    def setNetwork(self):
+        self.networkInfo = self.getNetwork()
+        if self.networkInfo: self.networkOn = self.networkInfo.on
+        else: self.networkOn = False
+       
+        if self.localhostS.get():
+            self.networkOn = True
+            self.serverS.set(self.networkInfo.ip if self.networkInfo else self.lh)
+            self.serverS.config(state='disabled')
+        else:
+            if self.name == 'full' and self.sameAsGatewayS.get() and self.isServerS.get(): self.serverS.config(state='normal')
+        
+        if self.networkOn == True:
+            self.networkS.config(bg='green', text='Yes', fg='white')
+        else: self.networkS.config(bg='red', text='No', fg='white')
+    
+    def setServing(self):
+        if self.isServing: self.servingS.config(text='Yes', bg='green')
+        else: self.servingS.config(text='No', bg='red')
+    
+    def getPort(self):
+        port = self.portS.get() or 0
+        try:
+                port = int(port)
+                assert port > 7000
+                assert port < 9001
+                return port
+        except ValueError as error:
+            TranxFerLogger.debug(error)
+            show('Invalid', error, 'error')
+        except AssertionError as error: show('Invalid', 'Port should be in the range(7000, 9001)', 'error')
+    
+    def getServer(self):
+        server = self.serverS.get()
+        if self.checkIp(server): return server
+        else: show('Invalid', 'Server IP is invalid.\nThis is an example (192.168.43.36) or \'localhost\'', 'error')
+    
+    def setConnected(self):
+        if self.connected: self.connectedS.config(text='Yes', bg='green')
+        else: self.connectedS.config(text='No', bg='red')
+    
+    def isNetwork(self):
+        if self.networkOn: return True
+        else: show('No Network Connection', 'This device is not connected to any network', 'error')
+    
+    def setServerDetails(self):
+        if self.localhost.get() =='1':
+            server = self.lh
+            self.serverS.set(self.lh)
+        server = self.getServer()
+        
+        if server:
+            port = self.getPort()
+            if port:
+                self.port = port
+                self.serverSet = True
+                return True
+            else: return False
+        else: return False
+        
+    def toServe(self):
+        if self.connected:
+            show('Connected', 'Already Connected, Stop to continue', 'warn')
+        else:
+            self.serverSet = False
+            if self.isServer.get() == '1':
+                if self.localhost.get() == '1': ip = self.lh
+                else: ip = self.networkInfo.ip if self.networkInfo else self.lh
+                self.serverS.set(ip)
+                self.serverS.config(state='disabled')
+            else: self.serverS.config(state='normal')
+            return True
+    
+    def connect(self):
+        if self.isNetwork() and self.setServerDetails():
+            if self.isServing: show('Serving', 'Already Serving, Stop Server to continue', 'info')
+            elif self.connecting: show('Connecting', 'Making attempt to connect to the server', 'warn')
+            elif self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
+            else:
+                server = self.serverS.get()
+                if self.checkIp(server):
+                    port = self.getPort()
+                    if port:
+                        if self.client == None:
+                            self.client = Client(server, port, True if self.handShake.get() == '1' else False)
+                            self.connecting = True
+    
+    def serve(self):
+        if self.isNetwork():
+            if self.connected: show('Connected', 'Already Connected, Stop to continue', 'warn')
+            else:
+                self.isServer.set('1')
+                self.toServe()
+                if self.isServing: show('Serving', 'Already Serving', 'warn')
+                else: return True
+
+    def browse(self):
+        self.path = ''
+        _path = dialogFunc(path=1, folder=int(self.isDir.get()))
+        if os.path.exists(_path):
+            self.path = _path
+            return _path
+        elif _path == '': return
+        else: show('Invalid', 'The path provided is invalid', 'error')
+    
+    def testConnected(self):
+        if self.connecting == False: return
+        if self.connection:
+            if self.connection.error:
+                show(f'{self.connection.error.__class__.__name__}', f'{self.connection.error}', 'error')
+                self.connecting = False
+                self.connection.shutdown()
+                if self.client:
+                    del self.client
+                    self.client = None
+            elif self.connected:
+                self.connecting = False
+                show('Connection Successfull', 'The connection to the server was accepted successfully.')
+    
+    def stopped(self): show('Disconnected', 'Disconnection is successful', 'info')
+    
+    def stop(self, ev=0):
+        if (ev != 0) or self.isNetwork():
+            which = self.whichConnection
+            if (which in ['client', 'server']) and confirm('Confirmation', 'Are you sure to disconnect', 1):
+                if self.connection:
+                    self.connection.shutdown()
+                    self.client = self.server = None
+                    self.stopped()
+                else: show('Invalid Action', 'You\'re not currently connected or connected to', 'error')
+    
+    def checkPath(self, dir_='', event=None):
+        path = self.path
+        if path:
+            pathStat = LocalPathStat(path)
+            if dir_:
+                if pathStat.isDir: return path
+                else: show('Invalid Path', 'The path provided is an invalid directory', 'error')
+            elif dir_ == '' and pathStat.exists: return path
+            else: show('Invalid Path', 'The path provided is invalid.', 'error')
+        else: show('Path Error', 'The path provided is invalid.', 'error')
+
+class MiniFileTranxFer(FileTranxFer):
+    name = 'mini'
+    geo = (600, 300)
+
+    def __init__(self, master=None, title='Mini File TranxFer', **kwargs):
+        super().__init__(master, title=title,  **kwargs)
+        
+    def _setupApp(self):
+        cont = self.container
+
+        self.network = LabelFrame(cont, place=dict(relx=.02, rely=.02, relh=.47, relw=.96))
+        
+        self.titleL = Label(self.network, text='''Mini FileTranxFer by PRMP Smart!!!.''', place=dict(relx=.01, rely=.02, relh=.3, relw=.98))
+        
+        self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.2))
+        
+        self.full = Button(self.titleL, text='''Full''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2))
+        
+        self.networkL = Label(self.network, text='Network?', place=dict(relx=.01, rely=.34, relh=.3, relw=.15))
+        self.networkS = Label(self.network, place=dict(relx=.17, rely=.34, relh=.3, relw=.1))
+        
+        self.servingL = Label(self.network, text='Serving?', place=dict(relx=.01, rely=.66, relh=.3, relw=.15))
+        self.servingS = Label(self.network, place=dict(relx=.17, rely=.66, relh=.3, relw=.1))
+
+        self.serverL = Label(self.network, text='Server', place=dict(relx=.3, rely=.34, relh=.25, relw=.15))
+        self.serverS = Entry(self.network, place=dict(relx=.45, rely=.34, relh=.25, relw=.24))
+
+        self.portL = Label(self.network, text='Port', place=dict(relx=.3, rely=.6, relh=.25, relw=.15))
+        self.portS = Entry(self.network, place=dict(relx=.45, rely=.6, relh=.25, relw=.13))
+        
+        self.localhost = Checkbutton(cont, text='Lh?', command=self.setNetwork, place=dict(relx=.7, rely=.185, relh=.11, relw=.12))
+        
+        self.stopBtn = Button(self.network, text='Stop', command=self.stop, place=dict(relx=.595, rely=.66, relh=.3, relw=.1))
+        
+        self.sentL = Label(self.network, text='Sent', place=dict(relx=.71, rely=.6, relh=.3, relw=.1))
+        self.sentS = Label(self.network, place=dict(relx=.815, rely=.6, relh=.3, relw=.175))
+        
+        self.pathCont = LabelFrame(cont, place=dict(relx=.02, rely=.5, relh=.48, relw=.96))
+        
+        self.pathEnt = Entry(self.pathCont, place=dict(relx=.02, rely=.02,relh=.25, relw=.96))
+        self.pathEnt.bind('<Return>', self.checkPath)
+        self.pathEnt.bind('<KeyRelease>', self.setPath)
+
+        self.browseBtn = Button(self.pathCont, text='''Browse''', command=self.browse, place=dict(relx=.02, rely=.33, relh=.25, relw=.134))
+        
+        self.isDir = Checkbutton(self.pathCont, pady="0", text='''Directory?''', place=dict(relx=.17, rely=.33, relh=.25, relw=.2))
+
+        self.serveBtn = Button(self.pathCont, pady="0", text='''Serve''', command=self.serve, place=dict(relx=.71, rely=.33, relh=.25, relw=.134))
+        
+        self.receiveBtn = Button(self.pathCont, pady="0", text='''Receive''', command=self.receive, place=dict(relx=.85, rely=.33, relh=.25, relw=.134))
+
+        self.receiving = Label(self.pathCont, text='''Receiving''', place=dict(relx=.02, rely=.7, relh=.25, relw=.16))
+        
+        self.progressBar = Progressbar(self.pathCont, length="450", place=dict(relx=.19, rely=.7, relh=.25, relw=.63))
+
+        self.progressTxt = Label(self.pathCont, place=dict(relx=.84, rely=.7, relh=.25, relw=.14))
+    
+    def defaults(self):
+        self.setPath()
+        self.tranxFer = None
+        self.setProgress()
+        self.tick()
+    
+    def setPath(self, e=0):
+        self.pathEnt.set(self.path)
+        if os.path.exists(self.path):
+            AutoUploadHandler.setPath(self.path)
+    
+    def browse(self):
+        super().browse()
+        self.setPath()
+        
+    def update(self):
+        super().update()
+        self.setNetwork()
+        self.setProgress()
+        self.root.after(10, self.update)
+    
+    def setServing(self):
+        super().setServing()
+        self.sentS.config(text=AutoUploadHandler.count)
+        if self.isServing:
+            if self.localhost.get() == '0': self.serverS.set(self.networkInfo.ip)
+            self.serverS.config(state='disabled')
+    
+    def stop(self, ev=0):
+        super().stop(ev)
+        self.serverS.config(state='normal')
+        if self.server:
+            self.server.shutdown()
+            self.server = None
+        
+        if self.tranxFer:
+            self.tranxFer.shutdown()
+            self.tranxFer = None
+
+    def serve(self):
+        path = self.checkPath()
+        if path:
+            port = self.getPort()
+            if port:
+                if super().serve() and confirm('Serve it', 'Do you want to serve this path (%s) for download?'%path, 1): self.server = AutoUploadServer(start=True, port=port)
+
+    def setDestPath(self):
+        path = self.checkPath(dir_=True)
+        if path and confirm('Destination Directory', f'Do you want to save the downloaded file in this directory {path}?', 1): return path
+
+    def receive(self):
+        port = self.getPort()
+        if port:
+            server = self.getServer()
+            if server:
+                path = self.setDestPath()
+                if port and server and path:
+                    try:
+                        soc = socket.socket()
+                        soc.connect((server, port))
+                    except ConnectionRefusedError as error: show(error.__class__.__name__, error, 'error')
+                    self.tranxFer = TranxFer(soc, which='download', dest=path, goOn=True)
+                    self.tranxFer.startThreadedTranxFer()
+
+    def setProgress(self):
+        if self.tranxFer:
+            self.progressBar.config(value=self.tranxFer.tranxFered)
+            self.progressTxt.config(text=self.tranxFer.tranxFeredPercent)
+            
+            if self.tranxFer.finished:
+                del self.tranxFer
+                self.tranxFer = None
+                show('Download Complete', 'Download completed successfully', 'info')
+        else:
+            self.progressBar.config(value=0)
+            self.progressTxt.config(text='0.00%')
+        self.progressBar.update()
 
 class FullFileTranxFer(FileTranxFer):
     name = 'full'
-    geo = (400, 800)
+    geo = (500, 900)
 
     def __init__(self, master=None, title='Full File TranxFer', **kwargs):
         super().__init__(master, title=title,  **kwargs)
         
-    
     def defaults(self):
 
         self.serverSet = False
     
     def _setupApp(self):
-        self.titleL = Label(self.root,  text='FileTranxFer by PRMPSmart', place=dict(relx=.01, rely=.01, relh=.029, relw=.98))
+        cont = self.container
+
+        self.titleL = Label(cont,  text='FileTranxFer by PRMPSmart', place=dict(relx=.01, rely=.01, relh=.029, relw=.98))
         
         self.clock = Label(self.titleL, place=dict(relx=.01, rely=.04, relh=.9, relw=.24))
         self.tick()
         
         self.miniBtn = Button(self.titleL, text='''Mini''', command=self.another, place=dict(relx=.8, rely=.04, relh=.9, relw=.2))
         
-        self.localhostS = Checkbutton(self.root,  text='Localhost?', place=dict(relx=.02, rely=.045, relh=.04, relw=.3))
+        self.localhostS = Checkbutton(cont,  text='Localhost?', place=dict(relx=.02, rely=.045, relh=.04, relw=.3))
         
-        self.osL = Label(self.root, text='OS', place=dict(relx=.69, rely=.045, relh=.04, relw=.1))
-        self.osS = Label(self.root, text=get_os_name(), place=dict(relx=.79, rely=.045, relh=.04, relw=.2))
+        self.osL = Label(cont, text='OS', place=dict(relx=.69, rely=.045, relh=.04, relw=.1))
+        self.osS = Label(cont, text=get_os_name(), place=dict(relx=.79, rely=.045, relh=.04, relw=.2))
         
 
-        self.network = LabelFrame(self.root, text='Network Details', place=dict(relx=.013, rely=.085, relh=.27, relw=.98))
+        self.network = LabelFrame(cont, text='Network Details', place=dict(relx=.013, rely=.085, relh=.27, relw=.98))
         
         self.networkL = Label(self.network, text='Network?', place=dict(relx=.01, rely=.02, relh=.12, relw=.2))
         self.networkS = Label(self.network, place=dict(relx=.22, rely=.02, relh=.12, relw=.1))
@@ -277,23 +775,24 @@ class FullFileTranxFer(FileTranxFer):
 
 
 
-        self.sendDetails = Details(self.root,text='Send', main=self, place=dict(relx=.01, rely=.358, relh=.33, relw=.98))
+        self.sendDetails = Details(cont,text='Send', main=self, place=dict(relx=.01, rely=.358, relh=.33, relw=.98))
         
         if self._path: self.sendDetails.localLoad(self._path)
 
         self.isDir = Checkbutton(self.sendDetails, text=f'{compStr} Directory?', place=dict(relx=.313, rely=0, relw=.255, relh=.082))
 
-        self.receiveDetails = Details(self.root, text='Receive', main=self, which='r', place=dict(relx=.013, rely=.695, relh=.3, relw=.98))
-        self.root.after(1000, self.loadNetworkInfo)
-        self.root.after(10, self.update)
-        self.root.mainloop()
+        self.receiveDetails = Details(cont, text='Receive', main=self, which='r', place=dict(relx=.013, rely=.695, relh=.3, relw=.98))
+    
+    def defaults(self):
+        super().defaults()
+        self.after(1000, self.loadNetworkInfo)
         
     def update(self):
         super().update()
         self.setConnected()
         self.root.after(100, self.update)
     
-    def mini(self): MiniFileTranxFer(self.root)
+    def mini(self): MiniFileTranxFer(self)
     
     def browse(self):
         super().browse()
