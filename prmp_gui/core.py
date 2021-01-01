@@ -2223,11 +2223,13 @@ class PRMP_Window(PRMP_Widget):
         if self == self.topest: exit()
         self.destroy()
     
-    def setTkIcon(self, icon): self.iconbitmap(icon)
+    def setTkIcon(self, icon):
+        if icon: self.iconbitmap(icon)
 
     def setPRMPIcon(self, icon):
-        self.imgIcon = PRMP_Image(icon, resize=(20, 20))
-        self._icon['image'] = self.imgIcon
+        if icon:
+            self.imgIcon = PRMP_Image(icon, resize=(20, 20))
+            self._icon['image'] = self.imgIcon
     
     def placeTitlebar(self):
         if self.titleBar:
