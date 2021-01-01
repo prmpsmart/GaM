@@ -1,8 +1,6 @@
 import argparse
-from .tranxFer import autoDownload, autoUpload
-from .tranxFerGui import FileTranxFer, GuiMixin
-from .tranxFerGui import path as PATH
-from .tranxFerLogger import TranxFerLogger
+from .core import autoDownload, autoUpload, TranxFerLogger
+from .gui import FileTranxFer, GuiMixin, path as PATH
 
 def tranxFerMain():
     parser = argparse.ArgumentParser(prog='TranxFer', description="TranxFer by PRMP Smart", epilog="By PRMP Smart < prmpsmart@gmail.com >")
