@@ -1,4 +1,4 @@
-from .date_time import DateTime, CompareByDate
+from .date_time import PRMP_DateTime, CompareByDate
 from .bases import ObjectsMixins, Object, ObjectsManager
 from .errors import Errors
 
@@ -166,7 +166,7 @@ class AccountsManager(ObjectsManager):
     
     def balanceAccount(self, month=None):
         if month:
-            DateTime.checkDateTime(month)
+            PRMP_DateTime.checkDateTime(month)
             account = self.getAccount(month)
             if account: account.balanceAccount()
         else:
@@ -178,10 +178,10 @@ class AccountsManager(ObjectsManager):
         for accounts in self: accounts.balanceAccount()
         return self.accounts
     
-    def currentMonthAccounts(self): return self.sortAccountsByMonth(DateTime.now())
+    def currentMonthAccounts(self): return self.sortAccountsByMonth(PRMP_DateTime.now())
     
     def sortSubRegionsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
+        PRMP_DateTime.checkDateTime(month)
         subRegionsActiveByMonth = self.region.subRegionsActiveByMonth(month)
         accounts = []
         for subRegion in subRegionsActiveByMonth:
@@ -201,7 +201,7 @@ class AccountsManager(ObjectsManager):
     
    #Month Sorting
     def sortSubsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
+        PRMP_DateTime.checkDateTime(month)
         Subs = self.subRegionsActiveByMonth(month)
         accounts = []
         for Sub in Subs:

@@ -1,7 +1,6 @@
 
-from ....backend.core.date_time import DateTime
+from prmp_miscs.prmp_datetime import PRMP_DateTime
 from .extensions import *
-from .pics import PRMP_Image
 
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
@@ -80,7 +79,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     
     def processInput(self, e=0):
         result = self.get()
-        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
+        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': PRMP_DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
         self._setResult(result)
         
         return self.result

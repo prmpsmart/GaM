@@ -1,5 +1,5 @@
 from ..core.regions_managers import Region, RegionsManager, Person, PersonsManager
-from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, DateTime, CardDues, DCErrors, Rates
+from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, PRMP_DateTime, CardDues, DCErrors, Rates
 
 class ClientDetail(Person):
     Manager = 'ClientDetailsManager'
@@ -66,16 +66,16 @@ class Client(DCRegion):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
     
     def addContribution(self, contribution, month=None, **kwargs):
-        if month == None: month = DateTime.now()
+        if month == None: month = PRMP_DateTime.now()
         return self.accountsManager.addContribution(contribution, **kwargs)
     
     def addPaid(self, paid, month):
-        if month == None: month = DateTime.now()
+        if month == None: month = PRMP_DateTime.now()
         monthAcc = self.accountManager.getAccount(month)
         if monthAcc: monthAcc.paids.addPaid(paid)
     
     def addUpfront(self, upfront, month):
-        assert DateTime.now().isSameMonth(month)
+        assert PRMP_DateTime.now().isSameMonth(month)
         pass
 
 

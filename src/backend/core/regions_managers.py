@@ -72,7 +72,7 @@ class RegionsManager(ObjectsManager):
     
    #Month Sorting
     def sortRegionsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
+        PRMP_DateTime.checkDateTime(month)
         clients = [client for client in self.clients if client.lastAccount.date.isSameMonth(month)]
         accounts = []
         for client in clients:

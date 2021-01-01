@@ -1,7 +1,7 @@
 from .prmp_gui.extensions import *
 from .prmp_gui.two_widgets import *
 from .prmp_gui.dialogs import *
-from ...backend.core.date_time import MONTHS_NAMES, DAYS_NAMES, DateTime
+from ...backend.core.date_time import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
 from ...backend.agam.agam import AGAM
 from ...backend.dc.dc_regions import Client
 
@@ -282,7 +282,7 @@ class DateSearch(LabelFrame):
 
         self.monthName = RadioCombo(self, topKwargs=dict(config=dict(text='Month Name', style='Group.TRadiobutton', variable=self.seasonNames, value='monthName')), orient='h', place=dict(relx=.49, rely=.48, relh=.25 , relw=.48), bottomKwargs=dict(values=MONTHS_NAMES[1:]), tttk=1)
 
-        self.yearNumber = RadioCombo(self, topKwargs=dict(config=dict(text='Year Number', style='Group.TRadiobutton', variable=self.seasonNames, value='yearNumber')), orient='h', place=dict(relx=.49, rely=.75, relh=.25 , relw=.48), bottomKwargs=dict(values=list(range(2017, DateTime.now().year + 1)), _type='number'), tttk=1)
+        self.yearNumber = RadioCombo(self, topKwargs=dict(config=dict(text='Year Number', style='Group.TRadiobutton', variable=self.seasonNames, value='yearNumber')), orient='h', place=dict(relx=.49, rely=.75, relh=.25 , relw=.48), bottomKwargs=dict(values=list(range(2017, PRMP_DateTime.now().year + 1)), _type='number'), tttk=1)
 
         self.setRadioGroups([self.dayName, self.weekNumber, self.monthName, self.yearNumber])
 
@@ -427,13 +427,13 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
             if not isinstance(self.region, Client):
                 self.actSubsAccs.T.config(text='Active Subs Accounts')
                 values.update(dict(
-                    actSubs=len(self.region.subRegionsManager.sortSubsByMonth(DateTime.now())),
+                    actSubs=len(self.region.subRegionsManager.sortSubsByMonth(PRMP_DateTime.now())),
                     actSubsAccs=self.region.lastAccount.get('ledgerNumbers', 0)
                     ))
             else:
                 self.actSubsAccs.T.config(text='Active Accounts')
                 values.update(dict(
-                    actSubsAccs=len(self.region.accounts.sortSubsByDate(DateTime.now()))
+                    actSubsAccs=len(self.region.accounts.sortSubsByDate(PRMP_DateTime.now()))
                 ))
             
             if values: super().set(values)

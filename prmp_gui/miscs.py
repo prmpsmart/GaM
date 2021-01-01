@@ -1,7 +1,7 @@
 import platform
 import tkinter.messagebox as msgbox
 
-from prmp_miscs.mixins import PRMP_Mixins
+from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime
 from functools import partial
 
 

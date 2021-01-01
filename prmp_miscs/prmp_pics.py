@@ -4,7 +4,7 @@ from io import BytesIO
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
 import zlib, pickle
 
-class Pics:
+class PRMP_Pics:
     _dir = 'prmp_pics'
     subDir = ''
     
@@ -47,16 +47,16 @@ class Pics:
             try: return files[bitmap]
             except: filesL[0]
 
-class Xbms(Pics): subDir = 'prmp_xbms'
+class PRMP_Xbms(PRMP_Pics): subDir = 'prmp_xbms'
     
-class Pngs(Pics): subDir = 'prmp_pngs'
+class PRMP_Pngs(PRMP_Pics): subDir = 'prmp_pngs'
     
-class Gifs(Pics): subDir = 'prmp_gifs'
+class PRMP_Gifs(PRMP_Pics): subDir = 'prmp_gifs'
 
-class ImageFile(BytesIO):
+class PRMP_ImageFile(BytesIO):
     count = 0
 
-    def getFile(self, pix, ext='.png', db=0):
+    def getImageFile(self, pix, ext='.png', db=0):
         if isinstance(pix, str):
             e = path.splitext(pix)[-1]
 
@@ -64,8 +64,9 @@ class ImageFile(BytesIO):
             else: self.ext = ext
 
             if db:
-                if self.ext == 'png': pic = Pngs.get(pix)
-                elif self.ext == 'gif': pic = Gifs.get(pix)
+                if self.ext == 'png': pic = PRMP_Pngs.get(pix)
+                elif self.ext == 'gif': pic = PRMP_Gifs.get(pix)
+                elif self.ext == 'xbm': pic = PRMP_Xbms.get(pix)
             else: pic = pix
             self.name = pix
             self.basename = path.basename(pic)
@@ -78,7 +79,7 @@ class ImageFile(BytesIO):
         self._data = b''
 
         if isinstance(fp, str):
-            file = self.getFile(fp, ext=ext, db=db)
+            file = self.getImageFile(fp, ext=ext, db=db)
             self._data = open(file, 'rb').read()
         elif isinstance(fp, bytes): self._data = fp
 
@@ -86,11 +87,11 @@ class ImageFile(BytesIO):
 
         if image: image.save(self, 'png')
 
-        ImageFile.count += 1
+        PRMP_ImageFile.count += 1
 
     def __str__(self):
-        if self.name:return f'ImageFile({self.name})'
-        else: return f'ImageFile({ImageFile.count})'
+        if self.name:return f'PRMP_ImageFile({self.name})'
+        else: return f'PRMP_ImageFile({PRMP_ImageFile.count})'
 
     def __len__(self): return self.size
 
@@ -134,8 +135,8 @@ class PRMP_Image:
         self.name = ''
 
         if imageFile:
-            if isinstance(imageFile, (str, bytes)): self.imageFile = ImageFile(imageFile, ext=ext, db=db)
-            elif image: self.imageFile = ImageFile(image=image)
+            if isinstance(imageFile, (str, bytes)): self.imageFile = PRMP_ImageFile(imageFile, ext=ext, db=db)
+            elif image: self.imageFile = PRMP_ImageFile(image=image)
             
             self.name = self.imageFile.name
             self.ext = self.imageFile.ext

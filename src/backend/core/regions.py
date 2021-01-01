@@ -1,4 +1,4 @@
-from .accounts import AccountsManager, DateTime, ObjectsMixins, Errors, Object, ObjectsManager, CompareByDate
+from .accounts import AccountsManager, PRMP_DateTime, ObjectsMixins, Errors, Object, ObjectsManager, CompareByDate
 from .records_managers import *
 import os
 
@@ -145,7 +145,7 @@ class Region(Object):
     def hierachyNames(self): return [d.name for d in self.hierachy]
     
     @property
-    def reignMonths(self): return self.date - DateTime.now() + 1
+    def reignMonths(self): return self.date - PRMP_DateTime.now() + 1
     @property
     def reignMonthsYears(self): return divmod(self.reignMonths, 12)
     @property

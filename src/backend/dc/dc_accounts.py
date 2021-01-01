@@ -1,6 +1,6 @@
 
 from .dc_records_managers import *
-from ..core.accounts import DateTime, Account, AccountsManager
+from ..core.accounts import PRMP_DateTime, Account, AccountsManager
 
 
 class DCAccount(Account):
@@ -78,8 +78,8 @@ class ClientAccount(DCAccount):
         self.rates = Rates(self, rate)
     
     def income(self, date=None):
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
         return sum([rec.savings for rec in self.contributions if rec.date.month == date.month])
     
     @property
@@ -105,7 +105,7 @@ class ClientAccount(DCAccount):
         self.debits.addDebit(debit, _type=_type)
     
     def addUpfront(self, upfront):
-        # assert DateTime.now().isSameMonth(month)
+        # assert PRMP_DateTime.now().isSameMonth(month)
         pass
 
 
@@ -207,17 +207,17 @@ class ClientAccountsManager(DCAccountsManager):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
     
     def addContribution(self, contribution, month=None, **kwargs):
-        if month == None: month = DateTime.now()
+        if month == None: month = PRMP_DateTime.now()
         account = self.sortSubsByMonth(month)[0]
         return account.addContribution(contribution, **kwargs)
     
     def addDebit(self, debit, month):
-        if month == None: month = DateTime.now()
+        if month == None: month = PRMP_DateTime.now()
         monthAcc = self.accountManager.getAccount(month)
         if monthAcc: monthAcc.debits.addDebit(debit)
     
     def addUpfront(self, upfront, month):
-        assert DateTime.now().isSameMonth(month)
+        assert PRMP_DateTime.now().isSameMonth(month)
         pass
 
 

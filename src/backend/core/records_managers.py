@@ -1,6 +1,6 @@
 
 from .errors import Errors
-from .date_time import DateTime, CompareByMonth, CompareByWeek, CompareByYear, DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES, timedelta
+from .date_time import PRMP_DateTime, CompareByMonth, CompareByWeek, CompareByYear, DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES, timedelta
 from .bases import ObjectsManager, ObjectsMixins
 from .records import *
 
@@ -96,7 +96,7 @@ class MonthRecord(SeasonRecord, CompareByMonth):
     def sortRecordsIntoWeeks(self):
         if self.__sorted: return self
         daysRec = [record for record in self if record.date.isSameMonth(self.date)]
-        weeks = DateTime.monthYearOfMonthWeekDays(dateObj=self.date)
+        weeks = PRMP_DateTime.monthYearOfMonthWeekDays(dateObj=self.date)
         week1 = []
         week2 = []
         week3 = []
@@ -259,7 +259,7 @@ class RecordsManager(ObjectsManager):
     def createRecord(self, money, date=None, newRecord=True, notAdd=False, **kwargs):
         '''
         money: type int; transaction to be in the record.
-        date: type DateTime; date of the transaction.
+        date: type PRMP_DateTime; date of the transaction.
         newRecord: type bool; whether to create a new record or (add/set) to a record already done
         notAdd: type bool; useful when param newRecord=False, it\'s whether to set the money to a transaction already made or not
         kwargs: further params that a ObjectType might need.
@@ -268,8 +268,8 @@ class RecordsManager(ObjectsManager):
         new = False
         record = None
         
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
         
         if newRecord: new = True
         else:

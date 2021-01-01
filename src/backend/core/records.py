@@ -1,4 +1,4 @@
-from .bases import Object, DateTime, Errors
+from .bases import Object, PRMP_DateTime, Errors
 from datetime import timedelta
 
 # Record is the {money, date} recieved daily a.k.a DayRecord
@@ -109,7 +109,7 @@ class Repayment(Record):
     def records(self): return self.repaymentsManager.records
     
     @property
-    def isDue(self): return DateTime.now() > self.dueDate
+    def isDue(self): return PRMP_DateTime.now() > self.dueDate
     
     @property
     def dueDate(self): return self.__dueDate

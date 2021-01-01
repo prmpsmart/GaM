@@ -1,6 +1,6 @@
 from .core import *
 from .miscs import create_container, bound_to_mousewheel, Columns
-from .pics import *
+from prmp_miscs.prmp_pics import *
 
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
 # Extensions
@@ -55,7 +55,7 @@ class AutoScroll:
         return str(self.master)
 AS = AutoScroll
 
-class PRMP_FillWidgets(Mixins):
+class PRMP_FillWidgets(PRMP_Mixins):
     
     def __init__(self, values={}):
         self.__resultsWidgets = []
@@ -224,9 +224,9 @@ class PRMP_DateWidget:
     def __init__(self, min_=None, max_=None, callback=None):
         self.callback = callback
         self.date = None
-        from .dialogs import PRMP_CalendarDialog, DateTime
+        from .dialogs import PRMP_CalendarDialog, PRMP_DateTime
         self.CD = PRMP_CalendarDialog
-        self.DT = DateTime
+        self.DT = PRMP_DateTime
         self.min = min_
         self.max = max_
     
@@ -239,7 +239,7 @@ class PRMP_DateWidget:
     def get(self):
         if self.date: return self.date
         text = self['text']
-        if text: return DateTime.getDMYFromDate(text)
+        if text: return PRMP_DateTime.getDMYFromDate(text)
 
     def set(self, date):
         if isinstance(date, str):
@@ -444,7 +444,7 @@ class PRMP_DateTimeView(LabelFrame):
         self.update()
     
     def update(self):
-        now = DateTime.now()
+        now = PRMP_DateTime.now()
         day = now.day
         dayN = now.dayName
         month = now.monthName
@@ -544,10 +544,10 @@ class PRMP_Calendar(Frame):
                 self['bg'] = background
         
         @property
-        def now(self): return self.day == DateTime.now()
+        def now(self): return self.day == PRMP_DateTime.now()
         
         def changeDay(self, day):
-            now = DateTime.now()
+            now = PRMP_DateTime.now()
             if day == now: self.config(background=self.class_.now_bg, foreground=self.class_.now_fg)
             self.day = day
             self.redDay = day.dayName in ['Saturday', 'Sunday']
@@ -570,11 +570,11 @@ class PRMP_Calendar(Frame):
     def __init__(self, master=None, month=None, dest='', callback=None, min_=None, max_=None, **kwargs):
         super().__init__(master, **kwargs)
         
-        if month == None: month = DateTime.now()
-        DateTime.checkDateTime(month)
+        if month == None: month = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(month)
         
-        self.min = DateTime.getDMYFromDate(min_)
-        self.max = DateTime.getDMYFromDate(max_)
+        self.min = PRMP_DateTime.getDMYFromDate(min_)
+        self.max = PRMP_DateTime.getDMYFromDate(max_)
         self.__date = None
         self.month = month
         self.callback = callback
@@ -601,7 +601,7 @@ class PRMP_Calendar(Frame):
         
         col = 0
         self.headers = []
-        daysAbbrs = [DateTime.daysAbbr[-1]] + DateTime.daysAbbr[:-1]
+        daysAbbrs = [PRMP_DateTime.daysAbbr[-1]] + PRMP_DateTime.daysAbbr[:-1]
         w = 1/7
         for dayAbbr in daysAbbrs:
             x = col * w
@@ -638,7 +638,7 @@ class PRMP_Calendar(Frame):
         self.yearLbl.config(**dic)
     
     def resetDate(self, e=0):
-        self.month = DateTime.now()
+        self.month = PRMP_DateTime.now()
         self.updateDays()
     
     def nextYear(self):

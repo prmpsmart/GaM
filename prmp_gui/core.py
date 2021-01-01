@@ -6,8 +6,8 @@ from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from random import randint
 from tkinter.filedialog import askopenfilename, asksaveasfilename
-from .pics import PRMP_Image
-from .miscs import Mixins, partial, copyClassMethods, DateTime, bound_to_mousewheel, Columns
+from prmp_miscs.prmp_pics import PRMP_Image
+from .miscs import PRMP_Mixins, partial, copyClassMethods, PRMP_DateTime, bound_to_mousewheel, Columns
 from ctypes import windll
 import _tkinter
 
@@ -24,7 +24,7 @@ PRes = PRMP_Result
 'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'
 
 
-class PRMP_Theme(Mixins):
+class PRMP_Theme(PRMP_Mixins):
     # exerpt from PySimpleGUI theming engine
     
     BLUES = ("#082567", "#0A37A3", "#00345B")
@@ -1096,7 +1096,7 @@ class PRMP_Sizegrip(PRMP_Style_, ttk.Sizegrip):
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
 Sizegrip = PSg = PRMP_Sizegrip
 
-class PRMP_Style(ttk.Style, Mixins):
+class PRMP_Style(ttk.Style, PRMP_Mixins):
     loaded = False
     ttkthemes = ("black", "blue", 'prmp')
     ttkstyles = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
@@ -2321,7 +2321,7 @@ class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
 Toplevel = PTl = PRMP_Toplevel
 
-class PRMP_MainWindow(Mixins):
+class PRMP_MainWindow(PRMP_Mixins):
     
     def __init__(self, master=None, _ttk_=False, **kwargs):
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, **kwargs)

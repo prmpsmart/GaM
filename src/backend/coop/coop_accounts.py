@@ -1,5 +1,5 @@
 from .coop_records import Expenses, Materials, Savings, Levies, Shares, LoanBonds, CoopErrors
-from ..core.accounts import DateTime, Account
+from ..core.accounts import PRMP_DateTime, Account
 
 
 class CoopAccount(Account):

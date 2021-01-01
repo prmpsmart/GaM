@@ -1,4 +1,4 @@
-from .errors import PRMP_Errors
+from .prmp_errors import PRMP_Errors
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
@@ -10,7 +10,7 @@ class PRMP_Mixins:
     euro = chr(163)
     yen = chr(165)
     _moneySign = naira + chr(32)
-    Error = Errors
+    Errors = PRMP_Errors
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
     @property
@@ -63,7 +63,7 @@ class PRMP_Mixins:
                     return ret
         return unget
         
-    def printError(self, func, error): print(f"Error from {self}->{func}: ", error)
+    def printError(self, func, error): print(f"Errors from {self}->{func}: ", error)
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
     

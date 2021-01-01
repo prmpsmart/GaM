@@ -2,7 +2,7 @@ __author__ = 'PRMPSmart@gmail.com'
 
 from datetime import datetime, timedelta, date
 from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
-from .mixins import Mixins, Errors
+from .prmp_mixins import PRMP_Mixins, PRMP_Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
 
@@ -226,10 +226,10 @@ def _ord2ymd(n):
     return year, month, n+1
 
 
-class DateTime(datetime, Mixins):
+class PRMP_DateTime(datetime, PRMP_Mixins):
     date_fmt = "%d/%m/%Y"
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
-    Error = Errors.DateTimeError
+    Errors = PRMP_Errors.PRMP_DateTimeError
     # the __add__ and __sub__ are implementaions are purely by PRMPSmart@gmail.com
     def __add__(self, add_month):
         if isinstance(add_month, timedelta): return self.createDateTime(obj=super().__add__(add_month))
@@ -278,11 +278,11 @@ class DateTime(datetime, Mixins):
                     return second
                 
                 else:
-                    # therefore, subtract the recent years from the current year, creating a new DateTime with everything else in place except the year
+                    # therefore, subtract the recent years from the current year, creating a new PRMP_DateTime with everything else in place except the year
                     # the sub_month is more than 12
                     year = self.createDateTime(self.year - div, self.month, self.day)
                     # the remaining months will now fall into the categories of (sub_month < self.month) and ( sub_month == self.month).
-                    # it will now look as if it's a loop, the remaining months will now be subtracted from the new year-DateTime, the process will now fall into the first two conditions in the new year-DateTime
+                    # it will now look as if it's a loop, the remaining months will now be subtracted from the new year-PRMP_DateTime, the process will now fall into the first two conditions in the new year-PRMP_DateTime
                     return year - mod
     
     def __str__(self): return self.strftime(self.date_fmt)
@@ -299,7 +299,7 @@ class DateTime(datetime, Mixins):
     
     @classmethod
     def getDayNum(cls, day):
-        error = cls.Error(f'day must be among {cls.daysAbbrs} or {cls.daysNames}')
+        error = cls.Errors(f'day must be among {cls.daysAbbrs} or {cls.daysNames}')
         if isinstance(day, str):
             if day in cls.daysAbbrs: dayNum = cls.daysAbbrs.index(day) + 1
             elif day in cls.daysNames: dayNum = cls.daysNames.index(day) + 1
@@ -310,7 +310,7 @@ class DateTime(datetime, Mixins):
     @classmethod
     def getDayName(cls, day, abbr=False):
         range_ = list(range(1, 31))
-        error = cls.Error(f'day must be among {range_}')
+        error = cls.Errors(f'day must be among {range_}')
         if isinstance(day, int):
             if day in range_:
                 if abbr: dayName = cls.daysAbbrs[day - 1]
@@ -321,9 +321,9 @@ class DateTime(datetime, Mixins):
     
     @classmethod
     def checkDateTime(cls, date, dontRaise=False):
-        if not isinstance(date, DateTime):
+        if not isinstance(date, PRMP_DateTime):
             if dontRaise: return False
-            raise cls.Error('Date must be an instance of DateTime')
+            raise cls.Errors('Date must be an instance of PRMP_DateTime')
         return True
     
     @classmethod
@@ -331,7 +331,7 @@ class DateTime(datetime, Mixins):
     
     @classmethod
     def getMonthNum(cls, month):
-        error = cls.Error(f'month must be among {cls.monthsAbbrs} or {cls.monthsNames}')
+        error = cls.Errors(f'month must be among {cls.monthsAbbrs} or {cls.monthsNames}')
         if isinstance(month, str):
             if month in cls.monthsAbbrs: monthNum = cls.monthsAbbrs.index(month)
             elif month in cls.monthsNames: monthNum = cls.monthsNames.index(month)
@@ -342,7 +342,7 @@ class DateTime(datetime, Mixins):
     @classmethod
     def getMonthName(cls, month, abbr=False):
         range_ = list(range(1, 12))
-        error = cls.Error(f'month must be among {range_}')
+        error = cls.Errors(f'month must be among {range_}')
         if isinstance(month, int):
             if month in range_:
                 if abbr: monthName = cls.monthsAbbrs[month - 1]
@@ -496,9 +496,9 @@ class DateTime(datetime, Mixins):
 
     @classmethod
     def getMonth(cls, status="current", y_r=False):
-        if status == "current": return DateTime.now()
-        elif status == "next": return DateTime.now() + 1
-        elif status == "previous": return DateTime.now() - 1
+        if status == "current": return PRMP_DateTime.now()
+        elif status == "next": return PRMP_DateTime.now() + 1
+        elif status == "previous": return PRMP_DateTime.now() - 1
     
     @classmethod
     def getYear(cls, status="current"):

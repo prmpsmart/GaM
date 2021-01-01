@@ -1,4 +1,4 @@
-from src.backend.core.records_managers import Repayment, DateTime, RecordsManager, RepaymentsManager, Record
+from src.backend.core.records_managers import Repayment, PRMP_DateTime, RecordsManager, RepaymentsManager, Record
 from .dc_errors import DCErrors
 
 class DCRecord(Record):

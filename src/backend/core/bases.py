@@ -1,5 +1,5 @@
 from .errors import Errors
-from .date_time import CompareByDate, DateTime
+from .date_time import CompareByDate, PRMP_DateTime
 from .mixins import Mixins
 from hashlib import sha224
 import time
@@ -113,8 +113,8 @@ class ObjectsMixins(Mixins, CompareByDate):
 
     @date.setter
     def date(self, _date):
-        # assert isinstance(_date, DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of DateTime'
-        if isinstance(_date, str): _date = DateTime.getDMYFromDate(_date)
+        # assert isinstance(_date, PRMP_DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of PRMP_DateTime'
+        if isinstance(_date, str): _date = PRMP_DateTime.getDMYFromDate(_date)
         self._date = _date
 
     def __getattr__(self, attr, dontRaise=False):
@@ -171,9 +171,9 @@ class Object(CompareByNumber, ObjectsMixins):
     
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
         ObjectsMixins.__init__(self)
-        from .date_time import DateTime
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
+        from .date_time import PRMP_DateTime
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
 
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
@@ -301,7 +301,7 @@ class ObjectsManager(ObjectsMixins):
     
     def createSub(self, *args, date=None, **kwargs):
         last = self.last
-        exist = self.sortSubsByMonth(date or DateTime.now())
+        exist = self.sortSubsByMonth(date or PRMP_DateTime.now())
         if len(exist) and not self.MultipleSubsPerMonth: raise self.Error(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)
@@ -319,8 +319,8 @@ class ObjectsManager(ObjectsMixins):
  ########## Sorting
 
     def sortSubsByDate(self, date):
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
 
         _rec = [rec for rec in self if str(rec.date) == str(date)]
         return _rec
@@ -331,18 +331,18 @@ class ObjectsManager(ObjectsMixins):
         return recs
     
     def sortSubsIntoDaysInWeek(self, week):
-        DateTime.checkDateTime(week)
+        PRMP_DateTime.checkDateTime(week)
         days = [sub for sub in self if sub.date.isSameWeek(week)]
         return days
     
     def sortSubsIntoDaysInMonth(self, month):
-        DateTime.checkDateTime(month)
+        PRMP_DateTime.checkDateTime(month)
         days = [sub for sub in self if sub.date.isSameMonth(month)]
         return days
     
     #Week Sorting
     def sortSubsByWeek(self, date):
-        DateTime.checkDateTime(date)
+        PRMP_DateTime.checkDateTime(date)
         subs = []
         for sub in self:
             if sub.date.weekNum == int(date.weekNum): subs.append(sub)
@@ -359,19 +359,19 @@ class ObjectsManager(ObjectsMixins):
     def sortSubsByMonth(self, month): return self.sortSubsIntoDaysInMonth(month)
     
     def sortSubsIntoMonthsInYear(self, year):
-        DateTime.checkDateTime(year)
+        PRMP_DateTime.checkDateTime(year)
         yearSubs = [sub for sub in self if sub.date.isSameYear(year)]
         return yearSubs
     
     #Year Sorting
     def sortSubsByYear(self, year):
-        DateTime.checkDateTime(year)
+        PRMP_DateTime.checkDateTime(year)
         recs = [rec for rec in self if rec.date.isSameYear(year)]
         return recs
 
     def sortSubsIntoYears(self):
         years = self.subsYears
-        yearsSubs = [self.sortSubsByYear(DateTime.creatDateTime(year=year)) for year in years]
+        yearsSubs = [self.sortSubsByYear(PRMP_DateTime.creatDateTime(year=year)) for year in years]
         return yearsSubs
 
 
@@ -478,7 +478,7 @@ class ObjectSort(Mixins):
     def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
         '''
         validations = [
-            {'value': DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
+            {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
         objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
