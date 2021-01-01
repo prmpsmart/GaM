@@ -427,10 +427,14 @@ class FileTranxFer(PRMP_MainWindow, NetworkMixin):
        
         if self.localhostS.get():
             self.networkOn = True
-            self.serverS.set(self.networkInfo.ip if self.networkInfo else self.lh)
-            if self.isServerS.get(): self.serverS.config(state='disabled')
+            if self.networkInfo: ip = self.networkInfo.ip
+            else: self.lh
+            
+            self.serverS.set(ip)
+            if self.name == 'full' and self.isServerS.get(): self.serverS.config(state='disabled')
         else:
             if self.name == 'full' and self.sameAsGatewayS.get() and self.isServerS.get(): self.serverS.config(state='normal')
+            elif self.name == 'mini': self.serverS.config(state='normal')
         
         if self.networkOn == True: self.networkS.config(bg='green', text='Yes', fg='white')
         else: self.networkS.config(bg='red', text='No', fg='white')
