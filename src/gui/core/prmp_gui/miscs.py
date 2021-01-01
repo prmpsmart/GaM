@@ -127,7 +127,8 @@ class Column(Col_Mixins):
             if self.type:
                 try: return self.type(obj)
                 except: pass
-            return getattr(obj, self.attr, '') or ''
+            try: obj[self.attr]
+            except: return ''
 
     def proof(self, obj): return self.get(obj) == self.value
 

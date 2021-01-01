@@ -154,17 +154,17 @@ class AccountDialog(PRMP_Dialog):
 
     def newAccount(self, w):
         if w:
-            # try:
-            account = self.manager.createAccount(**self.result)
-            self._setResult(account)
-            print(account)
-            print(self.manager[:])
-            print()
-            # except Exception as error:
-            #     print(error)
-            #     font = self.DEFAULT_FONT.copy()
-            #     font['size'] = 15
-            #     PRMP_MsgBox(self, title='Account Creation Error', message=error, _type='error', ask=0, msgFont=font)
+            try:
+                account = self.manager.createAccount(**self.result)
+                self._setResult(account)
+                print(account)
+                print(self.manager[:])
+                print()
+            except Exception as error:
+                print(error)
+                font = self.DEFAULT_FONT.copy()
+                font['size'] = 15
+                PRMP_MsgBox(self, title='Account Creation Error', message=error, _type='error', ask=0, msgFont=font)
         self.destroyDialog()
 AccD = AccountDialog
 
