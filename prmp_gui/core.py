@@ -1,5 +1,4 @@
 import os
-import platform
 import time
 import tkinter as tk
 from tkinter.font import Font, families
@@ -7,7 +6,7 @@ import tkinter.ttk as ttk
 from random import randint
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from prmp_miscs.prmp_pics import PRMP_Image
-from .miscs import PRMP_Mixins, partial, copyClassMethods, PRMP_DateTime, bound_to_mousewheel, Columns
+from .miscs import PRMP_Mixins, partial, bound_to_mousewheel, Columns, platform
 from ctypes import windll
 
 class PRMP_Result:
