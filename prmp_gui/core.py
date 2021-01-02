@@ -21,7 +21,6 @@ PRes = PRMP_Result
 
 'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'
 
-
 class PRMP_Theme(PRMP_Mixins):
     # exerpt from PySimpleGUI theming engine
     
@@ -993,9 +992,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     def __init__(self, master=None, config={}, **kwargs):
         tk.Listbox.__init__(self, master=master, **config)
         PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
-    
 Listbox = PLb = PRMP_Listbox
-
 
 # based on ttk only
 
@@ -1071,7 +1068,6 @@ class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
             widget.state(['alternate'])
         else:
             widget.state(['!alternate'])
-
 Notebook = PN = PRMP_Notebook
 
 class PRMP_Panedwindow(PRMP_Style_, ttk.Panedwindow):
@@ -2334,7 +2330,6 @@ class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
 Toplevel = PTl = PRMP_Toplevel
 
-
 class PRMP_ToolTip(PRMP_Toplevel):
     tips = []
 
@@ -2384,7 +2379,7 @@ class PRMP_ToolTip(PRMP_Toplevel):
     def hide(self, event=None):
         self.visible = 0
         self.withdraw()
-
+PTip = PRMP_ToolTip
 
 class PRMP_MainWindow(PRMP_Mixins):
     
@@ -2407,7 +2402,6 @@ class PRMP_MainWindow(PRMP_Mixins):
 
     def __getattr__(self, name): return getattr(self.root, name)
 MainWindow = PMW = PRMP_MainWindow
-
 
 #   scrollable widgets
 
@@ -2459,8 +2453,6 @@ class PRMP_ListBox(PRMP_Frame):
             select = []
             for sel in sels: select.append(self.values[sel])
             return select
-
-
 ListBox = PLB = PRMP_ListBox
 
 class PRMP_TreeView(PRMP_Frame):
@@ -2583,9 +2575,7 @@ class PRMP_TreeView(PRMP_Frame):
             self._set(obj, op=op)
     
     def reload(self): self.set(self.obj)
-
 TreeView = PTV = PRMP_TreeView
-
 
 class PRMP_SText(PRMP_Frame):
     
