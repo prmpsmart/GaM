@@ -1,16 +1,6 @@
 from prmp_gui.dialogs import *
 from .core import *
 
-
-
-
-family = '{Times New Roman}'
-
-font2 = f"-family {family} -size {5 if which_platform() == 'and' else 11} -weight bold"
-font1 = f"-family {family} -size {4 if which_platform() == 'and' else 10} -weight bold"
-font0 = f"-family {family} -size {2 if which_platform() == 'and' else 7} -weight bold"
-compStr = '      ' if (which_platform() == 'and') else ''
-
 def show(title=None, msg=None, which='info', **kwargs):
     if which == 'error':
         TranxFerLogger.error(msg)
@@ -76,7 +66,6 @@ class Preview(Toplevel):
         self.text.config(state='disabled')
         self.text.place(relx=0, rely=0, relh=1, relw=1)
 
-
 class Details(LabelFrame):
     def __init__(self, master, which='s', main=None, **kw):
         
@@ -94,7 +83,7 @@ class Details(LabelFrame):
         self.browseBtn = Button(self, text='Browse' if which == 's' else 'Remote Load', command=self.main.browse if which == 's' else self.remoteLoad, place=dict(relx=.015, rely=0, relh=.1, relw=.154 if which == 's' else .26))
         
         if which == 'r':
-            self.destDir = Checkbutton(self, text=f'{compStr} Destination?',  command=self.setDest, place=dict(relx=.313, rely=0, relw=.255, relh=.082))
+            self.destDir = Checkbutton(self, text='Destination?',  command=self.setDest, place=dict(relx=.313, rely=0, relw=.255, relh=.082))
         
         self.detConts = Frame(self, border="2", place=dict(relx=.01, rely=.114, relh=.868, relw=.981))
         
@@ -131,14 +120,13 @@ class Details(LabelFrame):
         
         
         text = 'Compress?' if which == 's' else 'Decompress?'
-        compText = compStr + text
         tip = 'Compress before sending (Good for Directories).' if which == 's' else 'Decompress after receiving (Good for Directories).'
         
         
         self.detailsL = Label(self.detConts, text='Details', place=dict(relx=.493, rely=.53, relh=.12, relw=.268))
-        self.detailsS = Label(self.detConts, font=font2,  text='No', place=dict(relx=.78, rely=.53, relh=.12, relw=.205))
+        self.detailsS = Label(self.detConts, text='No', place=dict(relx=.78, rely=.53, relh=.12, relw=.205))
         
-        self.compress = Checkbutton(self, text=compText,  place=dict(relx=.493, rely=.69, relw=.268, relh=.1), tip=tip)
+        self.compress = Checkbutton(self, text=text,  place=dict(relx=.493, rely=.69, relw=.268, relh=.1), tip=tip)
 
         self.previewBtn = Button(self, text='Preview', command=self.preview, place=dict(relx=.77, rely=.69, relh=.1, relw=.205))
 
@@ -724,7 +712,7 @@ class FullFileTranxFer(FileTranxFer):
         
         if self._path: self.sendDetails.localLoad(self._path)
 
-        self.isDir = Checkbutton(self.sendDetails, text=f'{compStr} Directory?', place=dict(relx=.313, rely=0, relw=.255, relh=.082))
+        self.isDir = Checkbutton(self.sendDetails, text='Directory?', place=dict(relx=.313, rely=0, relw=.255, relh=.082))
 
         self.receiveDetails = Details(cont, text='Receive', main=self, which='r', place=dict(relx=.013, rely=.695, relh=.3, relw=.98))
     
@@ -784,9 +772,6 @@ class FullFileTranxFer(FileTranxFer):
                 self.setServing()
                 return True
             else: show('Not Set', 'Server and Port not set.', 'warn')
-
-
-
 
 class GuiFileTranxFer:
     def __init__(self, full=True, **kwargs):

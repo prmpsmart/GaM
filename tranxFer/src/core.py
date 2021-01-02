@@ -1123,6 +1123,7 @@ class AutoUploadHandler(BaseRequestHandler):
         assert os.path.exists(path_)
         cls.path = path_
         cls.count = 0
+    
     @classmethod
     def setCompress(cls, comp): cls.compress = comp
     
@@ -1136,18 +1137,20 @@ class AutoUploadHandler(BaseRequestHandler):
         AutoUploadHandler.count += 1
         
     def handle(self):
-        # print(TranxFerLogger.cmd)
         self.tranxFer = None
         assert self.path != ''
-        self.tranxfer = TranxFer(self.request, LocalPathStat(self.path, latest=True, compress=self.compress))
+        compress = os.path.isdir(self.path)
+        path = LocalPathStat(self.path, latest=True, compress=compress)
+        self.tranxfer = TranxFer(self.request, path=path)
         self.tranxfer.startTranxFer()
-        # self.finishIt()
+        
+        self.finish()
 
 class AutoUploadServer(TCPServer, NetworkMixin):
     allow_reuse_address = True
     
     def __init__(self, port=7767, handler=None, start=False):
-        Handler = AutoUploadHandler if handler == None else handler
+        Handler = handler or AutoUploadHandler
         TCPServer.__init__(self, ('', port), Handler)
         
         TranxFerLogger.info('Serving on %s : %d ' % (self.getNetwork().ip or self.lh, port))
