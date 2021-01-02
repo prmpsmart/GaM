@@ -1,111 +1,10 @@
 __author__ = 'PRMPSmart@gmail.com'
 
-from datetime import datetime, timedelta, date
+import datetime
 from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
 from .prmp_mixins import PRMP_Mixins, PRMP_Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
-
-
-class OldCompareByDate:
-    def __lt__(self, other):
-        if other == None: return False
-        return self.date < other.date
-    def __le__(self, other):
-        if other == None: return False
-        return self.date <= other.date
-    def __eq__(self, other):
-        if other == None: return False
-        return self.date is other.date
-    def __ne__(self, other):
-        if other == None: return True
-        return self.date != other.date
-    def __gt__(self, other):
-        if other == None: return True
-        return self.date > other.date
-    def __ge__(self, other):
-        if other == None: return True
-        return self.date >= other.date
-
-class CompareByDate:
-    def __lt__(self, other):
-        if other == None: return False
-        return self.date.ymdToOrd < other.date.ymdToOrd
-    def __le__(self, other):
-        if other == None: return False
-        return self.date.ymdToOrd <= other.date.ymdToOrd
-    def __eq__(self, other):
-        if other == None: return False
-        return self.date.ymdToOrd is other.date.ymdToOrd
-    def __ne__(self, other):
-        if other == None: return True
-        return self.date.ymdToOrd != other.date.ymdToOrd
-    def __gt__(self, other):
-        if other == None: return True
-        return self.date.ymdToOrd > other.date.ymdToOrd
-    def __ge__(self, other):
-        if other == None: return True
-        return self.date.ymdToOrd >= other.date.ymdToOrd
-
-class CompareByWeek:
-    def __lt__(self, other):
-        if other == None: return False
-        return self.date.weekMonthYearTuple < other.date.weekMonthYearTuple
-    def __le__(self, other):
-        if other == None: return False
-        return self.date.weekMonthYearTuple <= other.date.weekMonthYearTuple
-    def __eq__(self, other):
-        if other == None: return False
-        return self.date.weekMonthYearTuple == other.date.weekMonthYearTuple
-    def __ne__(self, other):
-        if other == None: return True
-        return self.date.weekMonthYearTuple != other.date.weekMonthYearTuple
-    def __gt__(self, other):
-        if other == None: return True
-        return self.date.weekMonthYearTuple > other.date.weekMonthYearTuple
-    def __ge__(self, other):
-        if other == None: return True
-        return self.date.weekMonthYearTuple >= other.date.weekMonthYearTuple
-
-class CompareByMonth:
-    def __lt__(self, other):
-        if other == None: return False
-        return self.date.monthYearTuple < other.date.monthYearTuple
-    def __le__(self, other):
-        if other == None: return False
-        return self.date.monthYearTuple <= other.date.monthYearTuple
-    def __eq__(self, other):
-        if other == None: return False
-        return self.date.monthYearTuple == other.date.monthYearTuple
-    def __ne__(self, other):
-        if other == None: return True
-        return self.date.monthYearTuple != other.date.monthYearTuple
-    def __gt__(self, other):
-        if other == None: return True
-        return self.date.monthYearTuple > other.date.monthYearTuple
-    def __ge__(self, other):
-        if other == None: return True
-        return self.date.monthYearTuple >= other.date.monthYearTuple
-
-class CompareByYear:
-    def __lt__(self, other):
-        if other == None: return False
-        return self.date.year < other.date.year
-    def __le__(self, other):
-        if other == None: return False
-        return self.date.year <= other.date.year
-    def __eq__(self, other):
-        if other == None: return False
-        return self.date.year == other.date.year
-    def __ne__(self, other):
-        if other == None: return True
-        return self.date.year != other.date.year
-    def __gt__(self, other):
-        if other == None: return True
-        return self.date.year > other.date.year
-    def __ge__(self, other):
-        if other == None: return True
-        return self.date.year >= other.date.year
 
 
 _DAYS_IN_MONTH = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -225,14 +124,113 @@ def _ord2ymd(n):
     # start of that month:  we're done!
     return year, month, n+1
 
+class OldCompareByDate:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.date < other.date
+    def __le__(self, other):
+        if other == None: return False
+        return self.date <= other.date
+    def __eq__(self, other):
+        if other == None: return False
+        return self.date is other.date
+    def __ne__(self, other):
+        if other == None: return True
+        return self.date != other.date
+    def __gt__(self, other):
+        if other == None: return True
+        return self.date > other.date
+    def __ge__(self, other):
+        if other == None: return True
+        return self.date >= other.date
 
-class PRMP_DateTime(datetime, PRMP_Mixins):
+class CompareByDate:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.date.ymdToOrd < other.date.ymdToOrd
+    def __le__(self, other):
+        if other == None: return False
+        return self.date.ymdToOrd <= other.date.ymdToOrd
+    def __eq__(self, other):
+        if other == None: return False
+        return self.date.ymdToOrd is other.date.ymdToOrd
+    def __ne__(self, other):
+        if other == None: return True
+        return self.date.ymdToOrd != other.date.ymdToOrd
+    def __gt__(self, other):
+        if other == None: return True
+        return self.date.ymdToOrd > other.date.ymdToOrd
+    def __ge__(self, other):
+        if other == None: return True
+        return self.date.ymdToOrd >= other.date.ymdToOrd
+
+class CompareByWeek:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.date.weekMonthYearTuple < other.date.weekMonthYearTuple
+    def __le__(self, other):
+        if other == None: return False
+        return self.date.weekMonthYearTuple <= other.date.weekMonthYearTuple
+    def __eq__(self, other):
+        if other == None: return False
+        return self.date.weekMonthYearTuple == other.date.weekMonthYearTuple
+    def __ne__(self, other):
+        if other == None: return True
+        return self.date.weekMonthYearTuple != other.date.weekMonthYearTuple
+    def __gt__(self, other):
+        if other == None: return True
+        return self.date.weekMonthYearTuple > other.date.weekMonthYearTuple
+    def __ge__(self, other):
+        if other == None: return True
+        return self.date.weekMonthYearTuple >= other.date.weekMonthYearTuple
+
+class CompareByMonth:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.date.monthYearTuple < other.date.monthYearTuple
+    def __le__(self, other):
+        if other == None: return False
+        return self.date.monthYearTuple <= other.date.monthYearTuple
+    def __eq__(self, other):
+        if other == None: return False
+        return self.date.monthYearTuple == other.date.monthYearTuple
+    def __ne__(self, other):
+        if other == None: return True
+        return self.date.monthYearTuple != other.date.monthYearTuple
+    def __gt__(self, other):
+        if other == None: return True
+        return self.date.monthYearTuple > other.date.monthYearTuple
+    def __ge__(self, other):
+        if other == None: return True
+        return self.date.monthYearTuple >= other.date.monthYearTuple
+
+class CompareByYear:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.date.year < other.date.year
+    def __le__(self, other):
+        if other == None: return False
+        return self.date.year <= other.date.year
+    def __eq__(self, other):
+        if other == None: return False
+        return self.date.year == other.date.year
+    def __ne__(self, other):
+        if other == None: return True
+        return self.date.year != other.date.year
+    def __gt__(self, other):
+        if other == None: return True
+        return self.date.year > other.date.year
+    def __ge__(self, other):
+        if other == None: return True
+        return self.date.year >= other.date.year
+
+class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     date_fmt = "%d/%m/%Y"
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
     Errors = PRMP_Errors.PRMP_DateTimeError
     # the __add__ and __sub__ are implementaions are purely by PRMPSmart@gmail.com
     def __add__(self, add_month):
-        if isinstance(add_month, timedelta): return self.createDateTime(obj=super().__add__(add_month))
+        if isinstance(add_month, datetime.timedelta): return self.createDateTime(obj=super().__add__(add_month))
         
         elif isinstance(add_month, int):
             months = self.month + add_month
@@ -251,7 +249,7 @@ class PRMP_DateTime(datetime, PRMP_Mixins):
                 return self.createDateTime(self.year + div, mod, self.day)
         
     def __sub__(self, sub_month):
-        if isinstance(sub_month, timedelta): return self.createDateTime(obj=super().__sub__(sub_month))
+        if isinstance(sub_month, datetime.timedelta): return self.createDateTime(obj=super().__sub__(sub_month))
         
         elif isinstance(sub_month, self.__class__): return self.diffInMonth(sub_month)
         elif isinstance(sub_month, int):
@@ -353,7 +351,7 @@ class PRMP_DateTime(datetime, PRMP_Mixins):
     
     @classmethod
     def createDateTime(cls, year=None, month=1, day=1, auto=False, obj=None, week=None, hour=0, minute=0, second=0):
-        if isinstance(obj, (date,datetime)):
+        if isinstance(obj, (datetime.date, datetime.datetime)):
             year = obj.year
             month = obj.month
             day = obj.day
@@ -479,7 +477,7 @@ class PRMP_DateTime(datetime, PRMP_Mixins):
     def date(cls, status=0, form=1, day_=0):
 
         now = cls.now()
-        days = timedelta(status)
+        days = datetime.timedelta(status)
         day = now + days
 
         if form == 0: fmt = "%D"
@@ -532,7 +530,6 @@ class PRMP_DateTime(datetime, PRMP_Mixins):
             
         return monthsDiff
     
-    
     @classmethod
     def is_leap(cls, year): return _is_leap(year)
     
@@ -564,5 +561,3 @@ class PRMP_DateTime(datetime, PRMP_Mixins):
     
     @classmethod
     def ord2ymd(cls, ord_): return _ord2ymd(ord_)
-    
-

@@ -1,8 +1,7 @@
 
-from os import path, walk
 from io import BytesIO
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
-import zlib, pickle
+import zlib, pickle, os
 
 class PRMP_Pics:
     _dir = 'prmp_pics'
@@ -14,20 +13,20 @@ class PRMP_Pics:
         return ext.replace('prmp_', '')
     
     @classmethod
-    def picsHome(cls): return path.join(path.dirname(__file__), cls._dir)
+    def picsHome(cls): return os.path.join(os.path.dirname(__file__), cls._dir)
     
     @classmethod
-    def picName(cls, pic): return path.splitext(path.basename(pic))[0]
+    def picName(cls, pic): return os.path.splitext(os.path.basename(pic))[0]
     
     @classmethod
     def files(cls):
-        _dir = path.join(cls.picsHome(), cls.subDir)
+        _dir = os.path.join(cls.picsHome(), cls.subDir)
         _files = []
         
-        for r, d, ff in walk(_dir):
+        for r, d, ff in os.walk(_dir):
             for f in ff:
                 if f.endswith(cls.picsExt()):
-                    _files.append(path.join(r, f))
+                    _files.append(os.path.join(r, f))
         
         return _files
     
@@ -60,7 +59,7 @@ class PRMP_ImageFile(BytesIO):
 
     def getImageFile(self, pix, ext='.png', db=0):
         if isinstance(pix, str):
-            e = path.splitext(pix)[-1]
+            e = os.path.splitext(pix)[-1]
 
             if e in ['.png', '.xbm', '.gif', '.jpg', '.jpeg']: self.ext = e[1:]
             else: self.ext = ext
@@ -71,7 +70,7 @@ class PRMP_ImageFile(BytesIO):
                 elif self.ext == 'xbm': pic = PRMP_Xbms.get(pix)
             else: pic = pix
             self.name = pix
-            self.basename = path.basename(pic)
+            self.basename = os.path.basename(pic)
             return pic
 
     def __init__(self, fp=None, ext='.png', db=0, image=None):
