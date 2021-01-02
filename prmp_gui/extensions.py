@@ -298,56 +298,6 @@ class ScrollableFrame(PRMP_Frame):
 SF = ScrollableFrame
 
 
-class PRMP_ToolTip(Toplevel):
-    tips = []
-
-    def __init__(self, master, msg=None, delay=.2, follow=True, root=None):
-        super().__init__(master, geo=(), atb=0, asb=0, tm=1)
-        
-        self.msg = msg
-        self.msgVar = tk.StringVar()
-        self.msgVar.set(msg)
-    
-        self.delay = delay
-        self.follow = follow
-        self.visible = 0
-        self.lastMotion = 0
-
-        Message(self, config=dict(textvariable=self.msgVar, aspect=1000), asEntry=True).grid()
-    
-        self.master.bind('<Enter>', self.spawn, '+')
-        self.master.bind('<Leave>', self.hide, '+')
-        self.master.bind('<Motion>', self.move, '+')
-
-        self.withdraw()
-        PRMP_ToolTip.tips.append(self)
-        
-    def update(self, msg): self.msgVar.set(msg)
-
-    def spawn(self, event=None):
-        self.visible = 1
-        self.after(int(self.delay * 1000), self.show)
-
-    def show(self):
-        if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
-        if self.visible == 2: self.deiconify()
-
-    def move(self, event):
-        self.lastMotion = time.time()
-        if self.follow is False:
-            self.withdraw()
-            self.visible = 1
-        self.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-        
-        #To get the present event coordinates
-        # print(event.x_root,event.y_root)
-        
-        self.after(int(self.delay * 1000), self.show)
-
-    def hide(self, event=None):
-        self.visible = 0
-        self.withdraw()
-
 class Test_PRMP_ToolTip:
     def __init__(self, master, msg='', delay=.01, follow=True, root=None):
 
