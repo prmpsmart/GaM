@@ -30,7 +30,9 @@ class Daily_Contribution(ObjectsManager):
     MultipleSubsPerMonth = True
     
     def __init__(self, manager, date=None, **kwargs):
+        print(manager)
         super().__init__(manager)
+        print(self.manager, 'kkad')
 
         self._date = date
     
@@ -52,7 +54,7 @@ class Daily_Contribution(ObjectsManager):
 
         prevs = self.objectSort.sort(validations=date_validations)
 
-        if prevs: raise ValueError(f'Daily_Contribution({date.date}) already exists.')
+        if len(prevs): raise ValueError(f'Daily_Contribution({date.date}) already exists.')
 
         account = self.getClientAccount(number, month)
         # print(account)

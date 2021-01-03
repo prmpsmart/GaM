@@ -116,7 +116,6 @@ class ObjectSort(Mixins):
 
         if subs and attrs: raise SyntaxError('Only one of [subs, attrs] is required.')
 
-        object_ = object_ or self.object
         objects = subs
         if object_ and not objects:
             if getattr(object_, 'subRegions', None): objects.extend(object_.subRegions[:])
@@ -509,8 +508,9 @@ class ObjectsManager(ObjectsMixins):
     
     def createSub(self, *args, date=None, **kwargs):
         last = self.last
-        exist = self.sortSubsByMonth(date or PRMP_DateTime.now())
-        if len(exist) and not self.MultipleSubsPerMonth: raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
+        
+        if not self.MultipleSubsPerMonth:
+            if len(self.sortSubsByMonth(date or PRMP_DateTime.now())): raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)
         if last: last.next = sub
