@@ -15,7 +15,9 @@ class ContribContainer(Object):
     @property
     def name(self): return f'{self.manager} | {self.className}({self.date}) '
     
-    def __eq__(self, other): return (self.manager is other.manager) and (self.date is other.date)
+    def __eq__(self, other):
+        if other == None: return False
+        return (self.manager is other.manager) and (self.date is other.date)
 
     @property
     def contrib(self): return self.account.contributions
@@ -29,23 +31,29 @@ class Daily_Contribution(ObjectsManager):
     ObjectType = ContribContainer
     MultipleSubsPerMonth = True
     
-    def __init__(self, manager, date=None, **kwargs):
-        print(manager)
+    def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)
-        print(self.manager, 'kkad')
 
         self._date = date
+        self.previous = previous
+        self.number = number
+        self.next = None
+    
+    @property
+    def manager(self): return self.master
     
     @property
     def name(self): return f'{self.manager} | {self.className}({self.date.date})'
     
-    def __eq__(self, other): return (self.manager is other.manager) and (self.date is other.date)
+    def __eq__(self, other):
+        if other == None: return False
+        return (self.manager is other.manager) and (self.date is other.date)
 
     @property
     def region(self): return self.manager.region
 
     
-    def createSub(self, number, month=None, date=None, **kwargs):
+    def creatfeSub(self, number, month=None, date=None):
         
         if date == None: date = PRMP_DateTime.now()
         PRMP_DateTime.checkDateTime(date)
@@ -59,7 +67,7 @@ class Daily_Contribution(ObjectsManager):
         account = self.getClientAccount(number, month)
         # print(account)
 
-        return super().createSub(account=account, date=date, **kwargs)
+        return super().createSub(account=account, date=date)
     
     @property
     def accountsManager(self): return self.master.accountsManager
@@ -88,7 +96,7 @@ class Daily_Contributions(ObjectsManager):
     MultipleSubsPerMonth = True
     
     @property
-    def name(self): return f'{self.master} | {self.className} '
+    def name(self): return f'{self.master} | {self.className}'
 
     def createSub(self, date=None, **kwargs):
         
@@ -98,6 +106,7 @@ class Daily_Contributions(ObjectsManager):
         date_validations = [dict(value=True, attr='date', attrMethod='isSameDate', attrMethodParams=[date])]
 
         prevs = self.objectSort.sort(validations=date_validations)
+        # prevs = []
 
         if prevs:
             # print(prevs)

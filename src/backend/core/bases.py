@@ -108,7 +108,6 @@ class ObjectSort(Mixins):
     
     def getObjects(self, object_=None, subs=[], attrs=[]):
         object_ = object_ or self.object
-        print(subs, object_)
         
         if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
 
@@ -131,6 +130,7 @@ class ObjectSort(Mixins):
             {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
+        print(subs, 99)
         objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
         if not objects: return
 
@@ -508,7 +508,7 @@ class ObjectsManager(ObjectsMixins):
     
     def createSub(self, *args, date=None, **kwargs):
         last = self.last
-        
+
         if not self.MultipleSubsPerMonth:
             if len(self.sortSubsByMonth(date or PRMP_DateTime.now())): raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         
