@@ -36,6 +36,10 @@ class Record(Object):
 
     def updateOtherCoRecord(self, other):
         for rec in self.__coRecords: rec.addCoRecord(self)
+    
+    def classInLinkedRecords(self, className): return className in [rec.className for rec in self]
+
+    cilr = classInLinkedRecords
 
     def updateCoRecord(self):
         for rec in self.__coRecords: rec.updateOtherCoRecord(self)
@@ -67,7 +71,7 @@ class Record(Object):
     def __repr__(self): return f'<{self.name}>'
 
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date}, {self.note})'
 
     @property
     def region(self): return self.manager.region

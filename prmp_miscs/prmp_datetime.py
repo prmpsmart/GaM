@@ -287,7 +287,10 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     # def __str__(self): return self.strftime(self.date_fmt)
     
     @property
-    def strDate(self): return str(self)
+    def date(self): return self.strftime(self.date_fmt)
+
+    @property
+    def strDate(self): return self.date
     
     @property
     def totalDays(self): # also equal to _days_in_month
@@ -475,7 +478,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
             if self in wk: return weeks.index(wk) + 1
     
     @classmethod
-    def date(cls, status=0, form=1, day_=0):
+    def getDate(cls, status=0, form=1, day_=0):
 
         now = cls.now()
         days = datetime.timedelta(status)

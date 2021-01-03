@@ -76,6 +76,9 @@ class ClientAccount(DCAccount):
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate)
     
+    @property
+    def name(self): return f'{self.className}({self.date.dayMonthYear} | No. {self.ledgerNumber})'
+    
     def income(self, date=None):
         if date == None: date = PRMP_DateTime.now()
         PRMP_DateTime.checkDateTime(date)
@@ -176,6 +179,11 @@ class AreaAccount(DCAccount):
 
     @property
     def clientsAccounts(self, month=None): return sorted(self.manager.sortClientsAccountsByMonth(month or self.date))
+
+    def getClientAccount(self, number, month=None):
+        clientsAccounts = self.clientsAccounts
+        for clientsAccount in clientsAccounts:
+            if clientsAccount.ledgerNumber == number: return clientsAccount
 
 
 class ClientAccountsManager(DCAccountsManager):

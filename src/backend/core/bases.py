@@ -25,6 +25,209 @@ class CompareByNumber:
         return self.number >= other.number
 
 
+class ObjectSort(Mixins):
+
+    __lt = ('lt', '<')
+    __le = ('le', '<=')
+    __eq = ('eq', '==')
+    __ne = ('ne', '!=')
+    __gt = ('gt', '>')
+    __ge = ('ge', '>=')
+    __comparisons = (__lt, __le, __eq, __ne, __gt, __ge)
+
+    __lt_lt = (__lt, __lt)
+    __lt_le = (__lt, __le)
+    __lt_gt = (__lt, __gt)
+    __lt_ge = (__lt, __ge)
+
+    __le_lt = (__le, __lt)
+    __le_le = (__le, __le)
+    __le_gt = (__le, __gt)
+    __le_ge = (__le, __ge)
+
+    __gt_lt = (__gt, __lt)
+    __gt_le = (__gt, __le)
+    __gt_gt = (__gt, __gt)
+    __gt_ge = (__gt, __ge)
+    
+    __ge_lt = (__ge, __lt)
+    __ge_le = (__ge, __le)
+    __ge_gt = (__ge, __gt)
+    __ge_ge = (__ge, __ge)
+    
+    __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
+
+    def __init__(self, object_=None): self.object = object_
+
+    def getCompType(self, _type):
+        for c in self.__comparisons:
+            ind = self.__comparisons.index(c)
+            if _type in c: return c[1]
+
+    def compare(self, a, b, _type='=='):
+        comp = self.getCompType(_type)
+        if comp:
+            equation = f'{a} {comp} {b}'
+            return eval(equation)
+    
+    def getRangeType(self, _type):
+        t1, t2 = _type
+        for r in self.__ranges:
+            ind = self.__ranges.index(r)
+            a, b = r
+            if t1 in a and t2 in b: return a[1], b[1]
+
+    def rangeComp(self, a, b, c, _type=('>', '>')):
+        rang = self.getRangeType(_type)
+        if rang:
+            r1, r2 = rang
+            equation = f'{a} {r1} {b} {r2} {c}'
+            return eval(equation)
+    
+    def getAllObjects(self, object_=None):
+        object_ = object_ or self.object
+
+        subs = []
+        __subs = []
+        if 'Record' in object_.mroStr: return subs
+
+        if getattr(object_, 'subRegions', None): __subs.append(object_.subRegions)
+        if getattr(object_, 'subs', None): __subs.append(object_.subs)
+
+        for s in __subs: subs.extend(s[:])
+        
+        allSubs = []
+        allSubs.extend(subs)
+
+        for sub in subs:
+            new = self.getAllObjects(sub)
+            new_  = [b for b in new if b not in allSubs]
+            allSubs.extend(new_)
+
+        return allSubs
+    
+    def getObjects(self, object_=None, subs=[], attrs=[]):
+        object_ = object_ or self.object
+        
+        if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
+
+        if attrs and not object_: raise ValueError('This ObjectSort instance has no attributed object.')
+
+        if subs and attrs: raise SyntaxError('Only one of [subs, attrs] is required.')
+
+        object_ = object_ or self.object
+        objects = subs
+        if object_ and not objects:
+            if getattr(object_, 'subRegions', None): objects.extend(object_.subRegions[:])
+            objects.extend(object_.subs[:])
+        
+        if attrs and not subs: objects = [object_[attr] for attr in attrs]
+
+        return objects
+
+    def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
+        '''
+        validations = [
+            {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
+        ]
+        '''
+        objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
+        if not objects: return
+
+        if validations:
+            validated = []
+            for obj in objects:
+                valid = True
+                val = obj
+
+                for validation in validations:
+                    if not valid: break
+
+                    className = validation.get('className')
+                    if className and (obj.className != className):
+                        valid = False
+                        break
+                    mroStr = validation.get('mroStr')
+                    if mroStr and (mroStr not in obj.mroStr):
+                        valid = False
+                        break
+
+                    value = validation.get('value')
+
+                    method = validation.get('method')
+                    methodParams = validation.get('methodParams')
+
+                    attr = validation.get('attr')
+                    attrMethod = validation.get('attrMethod')
+                    attrMethodParams = validation.get('attrMethodParams')
+                    
+                    valueType = validation.get('valueType')
+
+                    comp = validation.get('comp', 'eq')
+                    compType = validation.get('compType', 'comp')
+                    minValue = validation.get('minValue')
+                    range_ = validation.get('range', self.__lt_lt)
+
+                    if method:
+                        meth = getattr(obj, method, None)
+                        if not meth:
+                            valid = False
+                            break
+                        if methodParams: val = meth(*methodParams)
+                        else: val = meth()
+                    elif attr:
+                        attr_ = getattr(obj, attr, None)
+                        if not attr_:
+                            valid = False
+                            break
+                        if attrMethod:
+                            attrMeth = getattr(attr_, attrMethod, None)
+                            if not attrMeth:
+                                valid = False
+                                break
+                            if attrMethodParams: val = attrMeth(*attrMethodParams)
+                            else: val = attrMeth()
+                        else: val = attr_
+                    if val:
+                        if valueType:
+                            try: val = valueType(val)
+                            except:
+                                valid = False
+                                break
+                        if compType == 'comp':
+                            if self.compare(val, value, comp): valid = True
+                            else: valid = False
+                        elif compType == 'range':
+                            assert minValue, f'minValue must be given if compType is range.'
+                            assert isinstance(range_, tuple), f'range must be a tuple of two comp'
+                            if self.rangeComp(minValue, val, value, range_): valid = True
+                            else: valid = False
+                        else: raise SyntaxError(f'{compType} is not valid, valid options are [range, comp].')
+                    else: valid = False
+
+                if valid: validated.append(obj)
+            
+            objects = validated
+
+        # last one
+        if _type: objects = [_type(v) for v in objects]
+
+        return objects
+
+    def search(self, _type=None, className='ObjectsMixins', value=None, attr='', searchType='', allSubs=False, object_=None, validations=[]):
+        results = []
+        subs = []
+
+        object_ = object_ or self.object
+        if not object_: return
+
+        subs = self.getAllObjects(object_)
+
+        if validations: return self.sort(subs=subs, validations=validations)
+
+        return subs
+
+
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
 
@@ -244,6 +447,7 @@ class ObjectsManager(ObjectsMixins):
         self._master = master
         self._subs = []
         self._date = master.date
+        self.objectSort = ObjectSort(self)
     
     def __len__(self): return len(self.subs)
 
@@ -377,207 +581,6 @@ class ObjectsManager(ObjectsMixins):
         yearsSubs = [self.sortSubsByYear(PRMP_DateTime.creatDateTime(year=year)) for year in years]
         return yearsSubs
 
-
-class ObjectSort(Mixins):
-
-    __lt = ('lt', '<')
-    __le = ('le', '<=')
-    __eq = ('eq', '==')
-    __ne = ('ne', '!=')
-    __gt = ('gt', '>')
-    __ge = ('ge', '>=')
-    __comparisons = (__lt, __le, __eq, __ne, __gt, __ge)
-
-    __lt_lt = (__lt, __lt)
-    __lt_le = (__lt, __le)
-    __lt_gt = (__lt, __gt)
-    __lt_ge = (__lt, __ge)
-
-    __le_lt = (__le, __lt)
-    __le_le = (__le, __le)
-    __le_gt = (__le, __gt)
-    __le_ge = (__le, __ge)
-
-    __gt_lt = (__gt, __lt)
-    __gt_le = (__gt, __le)
-    __gt_gt = (__gt, __gt)
-    __gt_ge = (__gt, __ge)
-    
-    __ge_lt = (__ge, __lt)
-    __ge_le = (__ge, __le)
-    __ge_gt = (__ge, __gt)
-    __ge_ge = (__ge, __ge)
-    
-    __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
-
-    def __init__(self, object_=None): self.object = object_
-
-    def getCompType(self, _type):
-        for c in self.__comparisons:
-            ind = self.__comparisons.index(c)
-            if _type in c: return c[1]
-
-    def compare(self, a, b, _type='=='):
-        comp = self.getCompType(_type)
-        if comp:
-            equation = f'{a} {comp} {b}'
-            return eval(equation)
-    
-    def getRangeType(self, _type):
-        t1, t2 = _type
-        for r in self.__ranges:
-            ind = self.__ranges.index(r)
-            a, b = r
-            if t1 in a and t2 in b: return a[1], b[1]
-
-    def rangeComp(self, a, b, c, _type=('>', '>')):
-        rang = self.getRangeType(_type)
-        if rang:
-            r1, r2 = rang
-            equation = f'{a} {r1} {b} {r2} {c}'
-            return eval(equation)
-    
-    def getAllObjects(self, object_=None):
-        object_ = object_ or self.object
-
-        subs = []
-        __subs = []
-        if 'Record' in object_.mroStr: return subs
-
-        if getattr(object_, 'subRegions', None): __subs.append(object_.subRegions)
-        if getattr(object_, 'subs', None): __subs.append(object_.subs)
-
-        for s in __subs: subs.extend(s[:])
-        
-        allSubs = []
-        allSubs.extend(subs)
-
-        for sub in subs:
-            new = self.getAllObjects(sub)
-            new_  = [b for b in new if b not in allSubs]
-            allSubs.extend(new_)
-
-        return allSubs
-    
-    def getObjects(self, object_=None, subs=[], attrs=[]):
-        object_ = object_ or self.object
-        
-        if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
-
-        if attrs and not object_: raise ValueError('This ObjectSort instance has no attributed object.')
-
-        if subs and attrs: raise SyntaxError('Only one of [subs, attrs] is required.')
-
-        object_ = object_ or self.object
-        objects = subs
-        if object_ and not objects:
-            if getattr(object_, 'subRegions', None): objects.extend(object_.subRegions[:])
-            objects.extend(object_.subs[:])
-        
-        if attrs and not subs: objects = [object_[attr] for attr in attrs]
-
-        return objects
-
-    def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
-        '''
-        validations = [
-            {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
-        ]
-        '''
-        objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
-        if not objects: return
-
-        if validations:
-            validated = []
-            for obj in objects:
-                valid = True
-                val = obj
-
-                for validation in validations:
-                    if not valid: break
-
-                    className = validation.get('className')
-                    if className and (obj.className != className):
-                        valid = False
-                        break
-                    mroStr = validation.get('mroStr')
-                    if mroStr and (mroStr not in obj.mroStr):
-                        valid = False
-                        break
-
-                    value = validation.get('value')
-
-                    method = validation.get('method')
-                    methodParams = validation.get('methodParams')
-
-                    attr = validation.get('attr')
-                    attrMethod = validation.get('attrMethod')
-                    attrMethodParams = validation.get('attrMethodParams')
-                    
-                    valueType = validation.get('valueType')
-
-                    comp = validation.get('comp', 'eq')
-                    compType = validation.get('compType', 'comp')
-                    minValue = validation.get('minValue')
-                    range_ = validation.get('range', self.__lt_lt)
-
-                    if method:
-                        meth = getattr(obj, method, None)
-                        if not meth:
-                            valid = False
-                            break
-                        if methodParams: val = meth(*methodParams)
-                        else: val = meth()
-                    elif attr:
-                        attr_ = getattr(obj, attr, None)
-                        if not attr_:
-                            valid = False
-                            break
-                        if attrMethod:
-                            attrMeth = getattr(attr_, attrMethod, None)
-                            if not attrMeth:
-                                valid = False
-                                break
-                            if attrMethodParams: val = attrMeth(*attrMethodParams)
-                            else: val = attrMeth()
-                        else: val = attr_
-                    if val:
-                        if valueType:
-                            try: val = valueType(val)
-                            except:
-                                valid = False
-                                break
-                        if compType == 'comp':
-                            if self.compare(val, value, comp): valid = True
-                            else: valid = False
-                        elif compType == 'range':
-                            assert minValue, f'minValue must be given if compType is range.'
-                            assert isinstance(range_, tuple), f'range must be a tuple of two comp'
-                            if self.rangeComp(minValue, val, value, range_): valid = True
-                            else: valid = False
-                        else: raise SyntaxError(f'{compType} is not valid, valid options are [range, comp].')
-
-                if valid: validated.append(obj)
-            
-            objects = validated
-
-        # last one
-        if _type: objects = [_type(v) for v in objects]
-
-        return objects
-
-    def search(self, _type=None, className='ObjectsMixins', value=None, attr='', searchType='', allSubs=False, object_=None, validations=[]):
-        results = []
-        subs = []
-
-        object_ = object_ or self.object
-        if not object_: return
-
-        subs = self.getAllObjects(object_)
-
-        if validations: return self.sort(subs=subs, validations=validations)
-
-        return subs
 
 
 
