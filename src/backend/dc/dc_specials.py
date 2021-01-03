@@ -21,41 +21,28 @@ class ContribContainer(Object):
     def contrib(self): return self.account.contributions
 
     @property
-    def region(self): return self.account.region
+    def region(self): return self.manager.region
 
 
 class Daily_Contribution(ObjectsManager):
     Manager = 'Daily_Contributions'
+    ObjectType = ContribContainer
+    MultipleSubsPerMonth = True
     
-    def __init__(self, manager, account=None, **kwargs):
-        super().__init__(manager, **kwargs)
+    def __init__(self, manager, date=None, **kwargs):
+        super().__init__(manager)
 
-        self.account = account
+        self._date = date
     
     @property
-    def name(self): return f'{self.manager} | {self.className}({self.date}) '
+    def name(self): return f'{self.manager} | {self.className}({self.date.date})'
     
     def __eq__(self, other): return (self.manager is other.manager) and (self.date is other.date)
 
     @property
-    def contrib(self): return self.account.contributions
+    def region(self): return self.manager.region
 
-    @property
-    def region(self): return self.account.region
-
-
-
-
-class Daily_Contributions(ObjectsManager):
-    ObjectType = Daily_Contribution
-    MultipleSubsPerMonth = True
-
-    def __init__(self, area):
-        super().__init__(area)
     
-    @property
-    def name(self): return f'{self.master} {self.className} '
-
     def createSub(self, number, month=None, date=None, **kwargs):
         
         if date == None: date = PRMP_DateTime.now()
@@ -65,7 +52,7 @@ class Daily_Contributions(ObjectsManager):
 
         prevs = self.objectSort.sort(validations=date_validations)
 
-        if prevs: raise ValueError(f'Daily_Contribution({date}) already exists.')
+        if prevs: raise ValueError(f'Daily_Contribution({date.date}) already exists.')
 
         account = self.getClientAccount(number, month)
         # print(account)
@@ -91,6 +78,35 @@ class Daily_Contributions(ObjectsManager):
     def updateSubs(self):
         pass
 
+
+
+
+class Daily_Contributions(ObjectsManager):
+    ObjectType = Daily_Contribution
+    MultipleSubsPerMonth = True
+    
+    @property
+    def name(self): return f'{self.master} | {self.className} '
+
+    def createSub(self, date=None, **kwargs):
+        
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
+        
+        date_validations = [dict(value=True, attr='date', attrMethod='isSameDate', attrMethodParams=[date])]
+
+        prevs = self.objectSort.sort(validations=date_validations)
+
+        if prevs:
+            # print(prevs)
+            raise ValueError(f'Daily_Contribution({date.date}) already exists.')
+
+        return super().createSub(date=date, **kwargs)
+    
+    createDailyContributions = createSub
+
+    @property
+    def accountsManager(self): return self.master.accountsManager
 
 
 

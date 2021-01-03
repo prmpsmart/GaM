@@ -108,6 +108,7 @@ class ObjectSort(Mixins):
     
     def getObjects(self, object_=None, subs=[], attrs=[]):
         object_ = object_ or self.object
+        print(subs, object_)
         
         if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
 
