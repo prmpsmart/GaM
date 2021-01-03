@@ -27,11 +27,28 @@ class Commission(DCRecord): pass
 class Contribution(DCRecord):
     
     def update(self, values={}, first=1):
+        mn = 'money'
+        money = values.get(mn)
+        if money: self.checkNewUpdates(money)
         super().update(values, 0)
-        values['money'] = self.money * self.manager.rate
+        
+        if money: values[mn] = self.money * self.rate
+
         if first:
             for rec in self: rec.update(values, 0)
         self.manager.update()
+    
+    def checkNewUpdates(self, cont):
+        total = float(self.manager)
+        own = self.money
+
+        minusOwn = total - own
+
+        if (minusOwn + cont) >= 31.0: raise ValueError(f'Updating with {cont} makes the total contributions exceed 31.0 and the current is {total}.')
+        else: return True
+    
+    @property
+    def rate(self): return self.manager.rate
 
 class Paidout(DCRecord): pass
 

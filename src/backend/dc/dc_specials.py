@@ -14,14 +14,20 @@ class ContribContainer(Object):
         self._transfer = transfer
         self._money = money
         
-        contribs = float(self.contributions)
         max_ = 31.0
+        contribs = float(self.contributions)
 
         if money:
             contributed = amount/self.rate
-            if (contribs + contributed) <= max_:
-                remain = max_ - contribs
+            new = contribs + contributed
+            if new <= max_: pass
+            else:
+                excess = new - max_
+                required = max_ - contribs
+                print(excess, required, contribs)
                 'The amount'
+                print(new)
+
 
         else:
             pass
