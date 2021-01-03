@@ -99,13 +99,18 @@ class ClientAccount(DCAccount):
         rate = float(self.rates)
         bal = float(self.broughtForwards) + float(self.savings) - float(self.upfronts.outstanding) - float(self.debits) - rate
         
-        if bal: self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
+        self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 
-    def addContribution(self, contribution, **kwargs): return self.contributions.addContribution(contribution, **kwargs)
+    def addContribution(self, contribution, **kwargs):
+        rec = self.contributions.addContribution(contribution, **kwargs)
+        self.balanceAccount()
+        return rec
     
-    def addDebit(self, debit, up=1, _type='w'):
-        if up: self._balanceAccount()
-        self.debits.addDebit(debit, _type=_type)
+    def addDebit(self, debit, _type='w', **kwargs):
+        self._balanceAccount()
+        rec = self.debits.addDebit(debit, _type=_type, **kwargs)
+        self.balanceAccount()
+        return rec
     
     def addUpfront(self, upfront):
         # assert PRMP_DateTime.now().isSameMonth(month)

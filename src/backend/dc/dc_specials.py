@@ -8,10 +8,11 @@ class ContribContainer(Object):
         assert clientAccount, 'Account must be given'
 
         self.account = clientAccount
+        self.debRecord = None
+        self.contRecord = None
         
         self._paidout = paidout
         self._transfer = transfer
-        self._money = money
         
         max_ = 31.0
         contribs = float(self.contributions)
@@ -27,7 +28,7 @@ class ContribContainer(Object):
 
         bal = float(self.account.balances)
         debit = float(debit)
-        if debit <= bal: self.debit = debit
+        if debit <= bal or debit == .0: self.debit = debit
         else: raise ValueError(f'Balance is {bal}, but amount to be debited is {debit}')
 
         del self.objectSort
@@ -70,12 +71,10 @@ class ContribContainer(Object):
     def rate(self): return self.account.rate
     
     def update(self):
-        if self.contributed:
-            pass
+        if self.contributed and not self.contRecord: self.contRecord = self.account.addContribution(self.contributed, date=self.date, _type='t' if self._transfer else 'n')
 
-        if self.debit:
-            pass
-
+        if self.debit and not self.debRecord: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self._paidout else 'w')
+        # print(self.contRecord[:])
 
 class Daily_Contribution(ObjectsManager):
     Manager = 'Daily_Contributions'
@@ -147,8 +146,8 @@ class Daily_Contribution(ObjectsManager):
     def setBto(self, bto):
         pass
 
-    def updateSubs(self):
-        pass
+    def update(self):
+        for sub in self: sub.update()
 
 
 class Daily_Contributions(ObjectsManager):
