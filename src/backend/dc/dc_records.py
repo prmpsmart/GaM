@@ -52,10 +52,16 @@ class Income(DCRecord): pass
 
 class Saving(DCRecord): pass
 
+class UpfrontRepayment(Record): Manager = 'UpfrontRepaymentsManager'
+
+class UpfrontRepaymentsManager(RecordsManager): ObjectType = UpfrontRepayment
+
+
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1
     Manager = 'Upfronts'
+    ObjectType = UpfrontRepaymentsManager
 
     def update(self, values={}, first=1): super().update(values, first)
 

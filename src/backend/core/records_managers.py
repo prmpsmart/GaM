@@ -385,6 +385,7 @@ class RecordsManager(ObjectsManager):
         yearsRecs = self.sortSubsIntoYears()
         return SeasonRecord(yearsRecs)
 
+
 class RepaymentsManager(RecordsManager):
     ObjectType = Repayment
     

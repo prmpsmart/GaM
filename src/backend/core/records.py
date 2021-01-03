@@ -91,6 +91,7 @@ class Repayment(Record):
     duing =  True
     Manager = 'RepaymentsManager'
     subTypes = ['Repayments']
+    ObjectType = None
     
     def __init__(self, manager, money, date=None, **kwargs):
         super().__init__(manager, money, date, **kwargs)
@@ -101,9 +102,11 @@ class Repayment(Record):
         elif self.dueSeason == 'month': self.__dueDate = self.date + self.dueTime
         elif self.dueSeason == 'day': self.__dueDate = self.date + timedelta(days=self.dueTime)
         
-        from .records_managers import RecordsManager
+        if not self.ObjectType:
+            from .records_managers import RecordsManager
+            self.ObjectType = RecordsManager
         
-        self.__repaymentsManager = RecordsManager(self)
+        self.__repaymentsManager = self.ObjectType(self)
     
     def __getitem__(self, num): return self.repaymentsManager[num]
     

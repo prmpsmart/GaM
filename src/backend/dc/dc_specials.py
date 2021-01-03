@@ -3,12 +3,44 @@ from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 class ContribContainer(Object):
     Manager = 'Daily_Contribution'
     
-    def __init__(self, manager, account=None, **kwargs):
+    def __init__(self, manager, clientAccount=None, amount=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
         super().__init__(manager, **kwargs)
+        assert clientAccount, 'Account must be given'
+        self.account = clientAccount
+        self._paidout = paidout
+        self._transfer = transfer
+        self._money = money
 
-        self.account = account
-        self.month = self.account.date
-        self._subs = []
+        self.amount = amount
+        self.contributed = 0
+        self.debit = debit
+
+
+        del self.objectSort
+
+    @property
+    def isUpfrontRepay(self): return
+
+    @property
+    def withdraw(self): return
+
+    @property
+    def paidout(self): return
+
+    @property
+    def transfer(self): return
+
+    @property
+    def isUpfrontRepay(self): return
+
+    @property
+    def isUpfrontRepay(self): return
+
+    @property
+    def isUpfrontRepay(self): return
+
+    @property
+    def month(self): return self.account.date
     
     @property
     def subs(self): return self._subs
@@ -21,10 +53,18 @@ class ContribContainer(Object):
         return (self.manager is other.manager) and (self.date is other.date)
 
     @property
-    def contrib(self): return self.account.contributions
+    def contributions(self): return self.account.contributions
 
     @property
-    def region(self): return self.manager.region
+    def regName(self): return self.region.name
+
+    @property
+    def region(self): return self.account.region
+
+    @property
+    def rate(self): return self.account.rate
+    
+    
 
 
 class Daily_Contribution(ObjectsManager):
@@ -78,10 +118,8 @@ class Daily_Contribution(ObjectsManager):
 
         if prevs and len(prevs): raise ValueError(f'{prevs[0].name} already exists.')
 
-        account = self.getClientAccount(number, month)
-        # print(account)
-
-        return super().createSub(account=account, date=date)
+        clientAccount = self.getClientAccount(number, month)
+        if clientAccount: return super().createSub(clientAccount=clientAccount, date=date)
     
     @property
     def accountsManager(self): return self.manager.accountsManager
