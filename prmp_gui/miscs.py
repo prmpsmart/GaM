@@ -1,7 +1,7 @@
 import platform
 
 from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime
-from functools import partial
+import functools
 
 
 def on_mousewheel(event, widget):
@@ -65,8 +65,8 @@ def copyClassMethods(obj, copyClass, *args):
     for key, val in copyClass.__dict__.items():
         if key.startswith('__'): continue
         if callable(val):
-            if obj.class_ == copyClass: func = partial(val, obj)
-            else: func = partial(val, *args)
+            if obj.class_ == copyClass: func =functools. partial(val, obj)
+            else: func = functools.partial(val, *args)
 
             setattr(obj, key, func)
 

@@ -65,7 +65,6 @@ class DCAccountsManager(AccountsManager):
         return containerDict
 
 
-
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
     

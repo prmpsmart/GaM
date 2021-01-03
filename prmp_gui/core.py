@@ -1,13 +1,9 @@
-import os
-import time
-import tkinter as tk
+import os, time, random, ctypes, tkinter as tk
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
-from random import randint
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from prmp_miscs.prmp_pics import PRMP_Image
-from .miscs import PRMP_Mixins, partial, bound_to_mousewheel, Columns, platform
-from ctypes import windll
+from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
 class PRMP_Result:
     def __init__(self): self.__result = None
@@ -249,7 +245,7 @@ class PRMP_Theme(PRMP_Mixins):
         # search for valid l&f name
         if opt1 in lf_values: ix = lf_values.index(opt1)
         elif opt2 in lf_values: ix = lf_values.index(opt2)
-        else: ix = randint(0, len(lf_values) - 1); print('** Warning - {} Theme is not a valid theme. Change your theme call. **'.format(theme))
+        else: ix = random.randint(0, len(lf_values) - 1); print('** Warning - {} Theme is not a valid theme. Change your theme call. **'.format(theme))
         
         selection = cls.themesList()[ix]
         
@@ -750,13 +746,13 @@ class PRMP_Widget(PRMP_Theme):
     
     def _moveroot(self):
         root = self.winfo_toplevel()
-        self.bind("<ButtonPress-1>", partial(PRMP_Widget._move, root), '+')
-        self.bind("<ButtonRelease-1>", partial(PRMP_Widget._move, root), '+')
-        self.bind("<B1-Motion>", partial(PRMP_Widget._onMotion, root), '+')
+        self.bind("<ButtonPress-1>", functools.partial(PRMP_Widget._move, root), '+')
+        self.bind("<ButtonRelease-1>",functools. partial(PRMP_Widget._move, root), '+')
+        self.bind("<B1-Motion>", functools.partial(PRMP_Widget._onMotion, root), '+')
         
-        self.bind("<ButtonPress-3>", partial(PRMP_Widget._move, root), '+')
-        self.bind("<ButtonRelease-3>", partial(PRMP_Widget._move, root), '+')
-        self.bind("<B3-Motion>", partial(PRMP_Widget._onMotion, root), '+')
+        self.bind("<ButtonPress-3>", functools.partial(PRMP_Widget._move, root), '+')
+        self.bind("<ButtonRelease-3>",functools. partial(PRMP_Widget._move, root), '+')
+        self.bind("<B3-Motion>", functools.partial(PRMP_Widget._onMotion, root), '+')
     
     def _grab_anywhere_on(self):
         self.bind("<ButtonPress-3>", self._move, '+')
@@ -1950,8 +1946,8 @@ class PRMP_Window(PRMP_Widget):
     def addWindowToTaskBar(self, e=0):
         self.withdraw()
         winfo_id = self.winfo_id()
-        parent = windll.user32.GetParent(winfo_id)
-        res = windll.user32.SetWindowLongW(parent, -20, 0)
+        parent = ctypes.windll.user32.GetParent(winfo_id)
+        res = ctypes.windll.user32.SetWindowLongW(parent, -20, 0)
         self.deiconify()
         if not res: self.after(10, self.addWindowToTaskBar)
         if res: self.attributes('-alpha', self.alpha, '-topmost', self.topMost)
@@ -2052,7 +2048,7 @@ class PRMP_Window(PRMP_Widget):
         _x, w = self.x_w
         return (_x, w/x)
         
-    def getWhichSide(self): return randint(1, 15) % 3
+    def getWhichSide(self): return random.randint(1, 15) % 3
     
     @property
     def getXY(self):
@@ -2390,7 +2386,7 @@ class PRMP_MainWindow(PRMP_Mixins):
 
         for k, v in self.class_.__dict__.items():
             if k.startswith('__') or k == 'root': continue
-            if callable(v): self.root.__dict__[k] = partial(v, self)
+            if callable(v): self.root.__dict__[k] = functools.partial(v, self)
 
     
     def __str__(self): return str(self.root)
