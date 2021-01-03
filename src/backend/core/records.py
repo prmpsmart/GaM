@@ -64,7 +64,8 @@ class Record(Object):
             for rec in self: rec.update(values, 0)
         self.manager.update()
     
-    def __int__(self): return self.money
+    def __int__(self): return int(self.money)
+    def __float__(self): return float(self.money)
     
     def __str__(self): return f'{self.manager} | {self.name}'
 
@@ -149,7 +150,7 @@ class Repayment(Record):
                 return repayment
     
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date}, {self.note})'
     
     def completed(self): pass
 

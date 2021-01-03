@@ -92,19 +92,19 @@ class Account(Object):
     def previousAccount(self): return self.previous
     
     @property
-    def recordsManagersAsList(self): return [int(recordsManager) for recordsManager in self]
+    def recordsManagersAsList(self): return [float(recordsManager) for recordsManager in self]
     @property
-    def recordsManagersAsTupleFull(self): return [(recordsManager, int(recordsManager)) for recordsManager in self]
+    def recordsManagersAsTupleFull(self): return [(recordsManager, float(recordsManager)) for recordsManager in self]
     @property
-    def recordsManagersAsTupleShort(self): return [(recordsManager.shortName, int(recordsManager)) for recordsManager in self]
+    def recordsManagersAsTupleShort(self): return [(recordsManager.shortName, float(recordsManager)) for recordsManager in self]
     @property
-    def recordsManagersAsTuple(self): return [(recordsManager.className, int(recordsManager)) for recordsManager in self]
+    def recordsManagersAsTuple(self): return [(recordsManager.className, float(recordsManager)) for recordsManager in self]
     @property
-    def recordsManagersAsDict(self): return [{recordsManager.className: int(recordsManager)} for recordsManager in self]
+    def recordsManagersAsDict(self): return [{recordsManager.className: float(recordsManager)} for recordsManager in self]
     @property
-    def recordsManagersAsDictFull(self): return [{recordsManager: int(recordsManager)} for recordsManager in self]
+    def recordsManagersAsDictFull(self): return [{recordsManager: float(recordsManager)} for recordsManager in self]
     @property
-    def recordsManagersAsDictShort(self): return [{recordsManager.shortName: int(recordsManager)} for recordsManager in self]
+    def recordsManagersAsDictShort(self): return [{recordsManager.shortName: float(recordsManager)} for recordsManager in self]
 
     def _balanceAccount(self):
             pass
@@ -126,6 +126,7 @@ class AccountsManager(ObjectsManager):
     def __eq__(self, manager):
         if manager == None: return False
         return self.region == manager.region
+    def __float__(self): return sum([float(acc.balances) for acc in self])
     def __int__(self): return sum([int(acc.balances) for acc in self])
     def __str__(self):
         if self.region != None: return f'{self.region} | {self.className}'
@@ -160,7 +161,7 @@ class AccountsManager(ObjectsManager):
                 for recordManager in account:
                     name = recordManager.className
                     if name not in containerDict: containerDict[name] = 0
-                    containerDict[name] += int(recordManager)
+                    containerDict[name] += float(recordManager)
             return containerDict
         
     def getAccount(self, month): return self.getSub({'date-m': month})

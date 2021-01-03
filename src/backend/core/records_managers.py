@@ -29,6 +29,7 @@ class SeasonRecord(ObjectsMixins):
         self.__records.sort()
     
     def __int__(self): return sum([int(rec) for rec in self])
+    def __float__(self): return sum([float(rec) for rec in self])
     
     def __getitem__(self, num): return self.records[num]
     
@@ -219,7 +220,8 @@ class RecordsManager(ObjectsManager):
     
     def __init__(self, account=None): ObjectsManager.__init__(self, account)
     
-    def __int__(self): return self.totalMonies
+    def __float__(self): return float(self.totalMonies)
+    def __int__(self): return int(self.totalMonies)
     
     def __str__(self): return f'{self.account} | {self.name}'
     
@@ -240,16 +242,16 @@ class RecordsManager(ObjectsManager):
     def records(self): return self.subs
     
     @property
-    def lastMoney(self): return int(self.lastRecord) if self.last else 0
+    def lastMoney(self): return float(self.lastRecord) if self.last else 0
     
     @property
     def lastRecord(self): return self.last
     
     @property
-    def totalMonies(self): return sum([int(record) for record in self[:]])
+    def totalMonies(self): return sum([float(record) for record in self[:]])
     
     @property
-    def recordDateTuples(self): return [(str(record.date), int(record)) for record in self]
+    def recordDateTuples(self): return [(str(record.date), float(record)) for record in self]
     
     @property
     def dates(self): return [record.date for record in self]
@@ -258,13 +260,13 @@ class RecordsManager(ObjectsManager):
     
     def createRecord(self, money, date=None, newRecord=True, notAdd=False, **kwargs):
         '''
-        money: type int; transaction to be in the record.
+        money: type float; transaction to be in the record.
         date: type PRMP_DateTime; date of the transaction.
         newRecord: type bool; whether to create a new record or (add/set) to a record already done
         notAdd: type bool; useful when param newRecord=False, it\'s whether to set the money to a transaction already made or not
         kwargs: further params that a ObjectType might need.
         '''
-        money = int(money)
+        money = float(money)
         new = False
         record = None
         
@@ -290,7 +292,7 @@ class RecordsManager(ObjectsManager):
     
     def updateWithOtherManagers(self, managers):
         self.deleteSubs()
-        total = sum([int(manager) for manager in managers])
+        total = sum([float(manager) for manager in managers])
         self.createRecord(total, newRecord=False, notAdd=True)
     
     def removeRecord(self, date):
@@ -316,19 +318,19 @@ class RecordsManager(ObjectsManager):
         return years
     
     @property
-    def recordsAsList(self): return [int(record) for record in self]
+    def recordsAsList(self): return [float(record) for record in self]
     @property
-    def recordsAsTupleFull(self): return [(record, int(record)) for record in self]
+    def recordsAsTupleFull(self): return [(record, float(record)) for record in self]
     @property
-    def recordsAsTupleShort(self): return [(self.className, str(record.date), int(record)) for record in self]
+    def recordsAsTupleShort(self): return [(self.className, str(record.date), float(record)) for record in self]
     @property
-    def recordsAsTuple(self): return [(str(record.date), int(record)) for record in self]
+    def recordsAsTuple(self): return [(str(record.date), float(record)) for record in self]
     @property
-    def recordsAsDict(self): return [{str(record.date): int(record)} for record in self]
+    def recordsAsDict(self): return [{str(record.date): float(record)} for record in self]
     @property
-    def recordsAsDictFull(self): return [{record: int(record)} for record in self]
+    def recordsAsDictFull(self): return [{record: float(record)} for record in self]
     @property
-    def recordsAsDictShort(self): return [{str(record.date): int(record)} for record in self]
+    def recordsAsDictShort(self): return [{str(record.date): float(record)} for record in self]
 
     ############ Sorting
     #Date Sorting
@@ -384,7 +386,6 @@ class RecordsManager(ObjectsManager):
     def sortRecordsIntoYears(self):
         yearsRecs = self.sortSubsIntoYears()
         return SeasonRecord(yearsRecs)
-
 
 class RepaymentsManager(RecordsManager):
     ObjectType = Repayment

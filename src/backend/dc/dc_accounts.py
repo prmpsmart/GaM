@@ -22,6 +22,7 @@ class DCAccount(Account):
 
         
     def __int__(self): return int(self.balances)
+    def __float__(self): return float(self.balances)
     
     @property
     def region(self):
@@ -45,7 +46,7 @@ class DCAccount(Account):
         self.updateBroughtForwards()
     
     def updateBroughtForwards(self):
-        if self.nextAccount: self.nextAccount.addBroughtForward(int(self.balances))
+        if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances))
 
 
 class DCAccountsManager(AccountsManager):
@@ -61,7 +62,7 @@ class DCAccountsManager(AccountsManager):
         for recordManager in self.lastAccount:
             name = recordManager.className
             if name not in containerDict: containerDict[name] = 0
-            containerDict[name] += int(recordManager)
+            containerDict[name] += float(recordManager)
         return containerDict
 
 
@@ -70,7 +71,7 @@ class ClientAccount(DCAccount):
     
     def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, **kwargs):
         super().__init__(manager, **kwargs)
-        rate = int(rate)
+        rate = float(rate)
         self.areaAccount = areaAccount
         self.ledgerNumber = ledgerNumber
         self.contributions = Contributions(self)
@@ -92,11 +93,11 @@ class ClientAccount(DCAccount):
         return recordsManagers_
     
     @property
-    def rate(self): return int(self.rates)
+    def rate(self): return float(self.rates)
 
     def _balanceAccount(self, date=None):
-        rate = int(self.rates)
-        bal = int(self.broughtForwards) + int(self.savings) - int(self.upfronts.outstanding) - int(self.debits) - rate
+        rate = float(self.rates)
+        bal = float(self.broughtForwards) + float(self.savings) - float(self.upfronts.outstanding) - float(self.debits) - rate
         
         if bal: self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 

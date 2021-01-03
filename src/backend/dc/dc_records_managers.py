@@ -9,8 +9,12 @@ class DCRecordsManager(RecordsManager):
         self._lastRecord = lastRecord
     
     def __int__(self):
-        if self._lastRecord: return self.lastMoney
+        if self._lastRecord: return int(self.lastMoney)
         else: return super().__int__()
+    
+    def __float__(self):
+        if self._lastRecord: return float(self.lastMoney)
+        else: return super().__float__()
 
     def balance(self): return self.account.balanceAccount()
 
@@ -25,9 +29,13 @@ class Rates(DCRecordsManager):
     def __int__(self):
         try: return int(self[-1])
         except: return 0
+        
+    def __float__(self):
+        try: return float(self[-1])
+        except: return 0
     
     def payUpBal(self, rate):
-        contributions = int(self.account.contributions)
+        contributions = float(self.account.contributions)
         if rate > self.rate:
             payUpBal = (rate - self.rate) * contributions
             return payUpBal
@@ -86,7 +94,7 @@ class Contributions(DCRecordsManager):
 
     def addContribution(self, contribution, note='Note', _type='n',  **kwargs):
         assert contribution != 0, 'Contributions can not be zero.'
-        newContributions = int(self) + contribution
+        newContributions = float(self) + contribution
         if newContributions < 32:
             conRec = self.createRecord(contribution, note=note, **kwargs)
             
@@ -134,7 +142,7 @@ class Debits(DCRecordsManager):
 
     def addDebit(self, toDebit, _type='w', **kwargs):
         if self.checkMoney(toDebit):
-            balance = int(self.account.balances)
+            balance = float(self.account.balances)
             if toDebit <= balance:
                 debRec = self.createRecord(toDebit, **kwargs)
 
@@ -185,7 +193,7 @@ class Upfronts(RepaymentsManager):
         savings = self.account.savings
         maxDebit = rate * 30
         
-        if (int(self.account.debits) + int(self) + upfront) > maxDebit: raise DCErrors.UpfrontsError(f'Client\'s debit can\'t be more than {maxDebit}')
+        if (float(self.account.debits) + float(self) + upfront) > maxDebit: raise DCErrors.UpfrontsError(f'Client\'s debit can\'t be more than {maxDebit}')
         else: return self.createRecord(upfront)
     
     @property
