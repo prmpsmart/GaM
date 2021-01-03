@@ -26,7 +26,7 @@ class CompareByNumber:
 
 
 class ObjectSort(Mixins):
-
+   #
     __lt = ('lt', '<')
     __le = ('le', '<=')
     __eq = ('eq', '==')
@@ -56,7 +56,7 @@ class ObjectSort(Mixins):
     __ge_ge = (__ge, __ge)
     
     __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
-
+   #
     def __init__(self, object_=None): self.object = object_
 
     def getCompType(self, _type):
@@ -68,6 +68,7 @@ class ObjectSort(Mixins):
         comp = self.getCompType(_type)
         if comp:
             equation = f'{a} {comp} {b}'
+            # print(equation)
             return eval(equation)
     
     def getRangeType(self, _type):
@@ -82,6 +83,7 @@ class ObjectSort(Mixins):
         if rang:
             r1, r2 = rang
             equation = f'{a} {r1} {b} {r2} {c}'
+            # print(equation)
             return eval(equation)
     
     def getAllObjects(self, object_=None):
@@ -115,7 +117,7 @@ class ObjectSort(Mixins):
 
         if subs and attrs: raise SyntaxError('Only one of [subs, attrs] is required.')
 
-        objects = subs
+        objects = subs.copy()
         if object_ and not objects:
             if getattr(object_, 'subRegions', None): objects.extend(object_.subRegions[:])
             objects.extend(object_.subs[:])
@@ -130,7 +132,6 @@ class ObjectSort(Mixins):
             {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
-        print(subs, 99)
         objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
         if not objects: return
 
@@ -169,19 +170,22 @@ class ObjectSort(Mixins):
                     range_ = validation.get('range', self.__lt_lt)
 
                     if method:
-                        meth = getattr(obj, method, None)
+                        # meth = getattr(obj, method, None)
+                        meth = obj[method]
                         if not meth:
                             valid = False
                             break
                         if methodParams: val = meth(*methodParams)
                         else: val = meth()
                     elif attr:
-                        attr_ = getattr(obj, attr, None)
+                        # attr_ = getattr(obj, attr, None)
+                        attr_ = obj[attr]
                         if not attr_:
                             valid = False
                             break
                         if attrMethod:
-                            attrMeth = getattr(attr_, attrMethod, None)
+                            # attrMeth = getattr(attr_, attrMethod, None)
+                            attrMeth = attr_[attrMethod]
                             if not attrMeth:
                                 valid = False
                                 break
@@ -234,8 +238,17 @@ class ObjectsMixins(Mixins, CompareByDate):
     def __init__(self):
         self.__editableValues = []
         self._date = None
+        self.objectSort = ObjectSort(self)
+    
+    @property
+    def sort(self): return self.objectSort.sort
+
+    @property
+    def search(self): return self.objectSort.search
     
     def __str__(self): return self.name
+
+    def __repr__(self): return f'<{self.name}>'
 
     @property
     def editableValues(self): return self.__editableValues
@@ -440,6 +453,9 @@ class Object(CompareByNumber, ObjectsMixins):
 class ObjectsManager(ObjectsMixins):
     ObjectType = Object
     MultipleSubsPerMonth = False
+
+    @property
+    def objectName(self): return self.ObjectType.__name__
     
     def __init__(self, master=None):
         assert master != None, 'Master can not be None.'
@@ -447,7 +463,6 @@ class ObjectsManager(ObjectsMixins):
         self._master = master
         self._subs = []
         self._date = master.date
-        self.objectSort = ObjectSort(self)
     
     def __len__(self): return len(self.subs)
 
@@ -456,6 +471,8 @@ class ObjectsManager(ObjectsMixins):
         if ret != self._unget: return ret
         else:
             if self.last: return getattr(self.last, attr)
+    
+    def __str__(self): return f'{self.master} | {self.name}'
     
     @property
     def master(self): return self._master
