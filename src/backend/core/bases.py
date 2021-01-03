@@ -246,9 +246,12 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def search(self): return self.objectSort.search
     
-    def __str__(self): return self.name
+    def __str__(self): return f'{self.manager} | {self.name}'
 
     def __repr__(self): return f'<{self.name}>'
+
+    @property
+    def name(self): return f'{self.className}({self.date.date})'
 
     @property
     def editableValues(self): return self.__editableValues
@@ -335,10 +338,10 @@ class ObjectsMixins(Mixins, CompareByDate):
         if isinstance(_date, str): _date = PRMP_DateTime.getDMYFromDate(_date)
         self._date = _date
 
-    def __getattr__(self, attr, dontRaise=False):
-        ret = self.getFromSelf(attr, self._unget)
-        if ret != self._unget: return ret
-        elif not dontRaise: self.attrError(attr)
+    # def __getattr__(self, attr, dontRaise=False):
+    #     ret = self.getFromSelf(attr, self._unget)
+    #     if ret != self._unget: return ret
+    #     elif not dontRaise: self.attrError(attr)
     
     # def __setattr__(self, attr, value): return None
     
@@ -423,7 +426,9 @@ class Object(CompareByNumber, ObjectsMixins):
     def uniqueID(self): return self._uniqueID
         
     @property
-    def name(self): return self._name
+    def name(self):
+        if self._name: return self._name
+        return super().name
     @name.setter
     def name(self, n): self._name = n
     

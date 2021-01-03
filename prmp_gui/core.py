@@ -480,6 +480,8 @@ class PRMP_Widget(PRMP_Theme):
     
     max_ = chr(9645)
     min_ = chr(10134)
+
+    TIPPING = False
     
     @property
     def topest(self): return PRMP_Window.TOPEST
@@ -498,9 +500,7 @@ class PRMP_Widget(PRMP_Theme):
         prmp_master = self.prmp_master
         while True:
             master = prmp_master.prmp_master
-            if isinstance(master, (PRMP_Tk, PRMP_Toplevel)):
-                print(master)
-                return prmp_master
+            if isinstance(master, (PRMP_Tk, PRMP_Toplevel)): return master
             prmp_master = master
 
 
@@ -701,7 +701,10 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
        
-    def addTip(self, tip='Tip', delay=0, follow=True): self.tip = PRMP_ToolTip(self, msg=tip, delay=delay, follow=follow)
+    def addTip(self, tip='Tip', delay=0, follow=True):
+        if not PRMP_Widget.TIPPING: return
+        self.tip = PRMP_ToolTip(self, msg=tip, delay=delay, follow=follow)
+        self.toplevel.tips.append(self.tip)
 
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
@@ -1865,7 +1868,8 @@ class PRMP_Window(PRMP_Widget):
         self.titleText = title
 
         self.__afters = []
-        
+        self.tips = []
+
         self.title(title)
         self.co = 0
 
@@ -1900,7 +1904,7 @@ class PRMP_Window(PRMP_Widget):
     
     
     def withdrawTips(self):
-        for tip in PRMP_ToolTip.tips: tip.withdraw()
+        for tip in self.tips: tip.withdraw()
     
     def loadAfters(self):
         self.withdrawTips()
