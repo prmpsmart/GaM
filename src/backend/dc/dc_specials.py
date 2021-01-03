@@ -6,7 +6,6 @@ class ContribContainer(Object):
     def __init__(self, manager, clientAccount=None, amount=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
         super().__init__(manager, **kwargs)
         assert clientAccount, 'Account must be given'
-        assert amount, 'Amount must be given'
 
         self.account = clientAccount
         
@@ -17,24 +16,19 @@ class ContribContainer(Object):
         max_ = 31.0
         contribs = float(self.contributions)
 
-        if money:
-            contributed = amount/self.rate
-            new = contribs + contributed
-            if new <= max_: pass
-            else:
-                excess = new - max_
-                required = max_ - contribs
-                print(excess, required, contribs)
-                'The amount'
-                print(new)
-
-
+        contributed = amount/self.rate if money else amount
+        new = contribs + contributed
+        if new <= max_: self.contributed = contributed
         else:
-            pass
+            excess = new - max_
+            required = max_ - contribs
+            print(excess, required, contribs)
+            raise ValueError(f'Excess of {excess}, Required [contribution={required}, money={required*self.rate}], current contributions is {contribs}.')
 
-        self.amount = amount if money else amount * self.rate
-        self.contributed = amount/self.rate if money else amount
-        self.debit = debit
+        bal = float(self.account.balances)
+        debit = float(debit)
+        if debit <= bal: self.debit = debit
+        else: raise ValueError(f'Balance is {bal}, but amount to be debited is {debit}')
 
         del self.objectSort
 
@@ -76,7 +70,11 @@ class ContribContainer(Object):
     def rate(self): return self.account.rate
     
     def update(self):
-        pass
+        if self.contributed:
+            pass
+
+        if self.debit:
+            pass
 
 
 class Daily_Contribution(ObjectsManager):
