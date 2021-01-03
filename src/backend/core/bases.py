@@ -31,6 +31,8 @@ class ObjectsMixins(Mixins, CompareByDate):
     def __init__(self):
         self.__editableValues = []
         self._date = None
+    
+    def __str__(self): return self.name
 
     @property
     def editableValues(self): return self.__editableValues
@@ -229,7 +231,7 @@ class Object(CompareByNumber, ObjectsMixins):
     @next.setter
     def next(self, next_):
         if self._next == None: self._next = next_
-        else: raise self.Error('A next is already set.')
+        else: raise self.Errors('A next is already set.')
 
 
 class ObjectsManager(ObjectsMixins):
@@ -286,11 +288,13 @@ class ObjectsManager(ObjectsMixins):
                     if val == None: v = True
                     
                     elif 'date' in attr:
-                        w = attr.split('-')[1]
-                        if w == 'd': v = sub.date.isSameDay(val)
-                        elif w == 'm': v = sub.date.isSameMonth(val)
-                        elif w == 'y': v = sub.date.isSameYear(val)
-                        elif w == 't': v = sub.date.isSameDate(val)
+                        if '-' in attr:
+                            w = attr.split('-')[1]
+                            if w == 'd': v = sub.date.isSameDay(val)
+                            elif w == 'm': v = sub.date.isSameMonth(val)
+                            elif w == 'y': v = sub.date.isSameYear(val)
+                            elif w == 't': v = sub.date.isSameDate(val)
+                        else: v = sub.date == val
                         
                     else: v = getattr(sub, attr) == val
                         
@@ -301,7 +305,7 @@ class ObjectsManager(ObjectsMixins):
     def createSub(self, *args, date=None, **kwargs):
         last = self.last
         exist = self.sortSubsByMonth(date or PRMP_DateTime.now())
-        if len(exist) and not self.MultipleSubsPerMonth: raise self.Error(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
+        if len(exist) and not self.MultipleSubsPerMonth: raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)
         if last: last.next = sub

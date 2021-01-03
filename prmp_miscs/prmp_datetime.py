@@ -283,7 +283,8 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
                     # it will now look as if it's a loop, the remaining months will now be subtracted from the new year-PRMP_DateTime, the process will now fall into the first two conditions in the new year-PRMP_DateTime
                     return year - mod
     
-    def __str__(self): return self.strftime(self.date_fmt)
+    def __str__(self): return repr(self)
+    # def __str__(self): return self.strftime(self.date_fmt)
     
     @property
     def strDate(self): return str(self)

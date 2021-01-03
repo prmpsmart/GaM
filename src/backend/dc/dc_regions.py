@@ -1,5 +1,6 @@
 from ..core.regions_managers import Region, RegionsManager, Person, PersonsManager
 from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, PRMP_DateTime, CardDues, DCErrors, Rates
+from .dc_specials import Daily_Contributions
 
 class ClientDetail(Person):
     Manager = 'ClientDetailsManager'
@@ -101,6 +102,8 @@ class Area(DCRegion):
     def __init__(self, manager, number, date=None, autoAccount=True, **kwargs):
         super().__init__(manager, number=number, date=date, nameFromNumber=True, **kwargs)
         self.__otherName = f'DC {self.number}'
+        
+        self.dailyContributions = self.dailys = Daily_Contributions(self)
         
     def __str__(self): return f'{self.manager.master} | {self.name}'
     
