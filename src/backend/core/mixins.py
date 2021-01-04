@@ -12,7 +12,7 @@ class Mixins(PRMP_Mixins):
         return date
     
     def addSignToMoney(self, money):
-        int(money)
+        float(money)
         return self.addSignToNum(money)
     
     numberToMoney = addSignToMoney
@@ -25,7 +25,7 @@ class Mixins(PRMP_Mixins):
     def checkMoney(self, money):
         try:
             if self._moneySign in money:
-                int(self.stripSignFromMoney(money))
+                float(self.stripSignFromMoney(money))
                 return True
             return False
         except: return False
@@ -39,7 +39,7 @@ class Mixins(PRMP_Mixins):
             for data in list1:
                 try:
                     if isinstance(data, Mixins): raise
-                    money = int(data)
+                    money = float(data)
                     new = self.addSignToMoney(money)
                     newList.append(new)
                 except: newList.append(data)

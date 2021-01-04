@@ -285,7 +285,7 @@ class ObjectsMixins(Mixins, CompareByDate):
     
     def __repr__(self): return f'<{self.name}>'
     
-    def sumRecords(self, records): return sum(int(rec) for rec in records)
+    def sumRecords(self, records): return sum(float(rec) for rec in records)
     
     @property
     def withCommas(self): return self.numWithCommas(self.money)
@@ -302,7 +302,7 @@ class ObjectsMixins(Mixins, CompareByDate):
         except: return default
     
     @property
-    def moneyWithSign(self): return f'{self._moneySign}{int(self)}'
+    def moneyWithSign(self): return f'{self._moneySign}{float(self)}'
     
     @property
     def regDate(self): return self.date

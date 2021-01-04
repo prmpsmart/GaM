@@ -57,7 +57,7 @@ class MemberAccount(CoopAccount):
     @property
     def validLoan(self):
         self.balanceAccount()
-        return int(self.savings) * self.loanRate
+        return float(self.savings) * self.loanRate
 
 
 class UnitAccount(CoopAccount):

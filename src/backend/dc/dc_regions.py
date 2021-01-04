@@ -61,7 +61,7 @@ class Client(DCRegion):
     def cardDue(self): return self.cardDues
     
     @property
-    def rate(self): return int(self.accountsManager.rate)
+    def rate(self): return float(self.accountsManager.rate)
     
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)

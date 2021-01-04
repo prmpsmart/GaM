@@ -14,6 +14,11 @@ class Record(Object):
     _type = 'rec'
     subTypes = ['Co Records', 'Linked Records']
 
+    def __del__(self):
+        for a in self:
+            # print(a)
+            del a
+
     def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
         Object.__init__(self, manager, name=note, **kwargs)
 
@@ -123,13 +128,13 @@ class Repayment(Record):
     def dueDate(self): return self.__dueDate
     
     @property
-    def outstanding(self): return int(self) - self.repaid
+    def outstanding(self): return float(self) - self.repaid
     
     @property
-    def paid(self): return int(self) == self.repaid
+    def paid(self): return float(self) == self.repaid
     
     @property
-    def repaid(self): return int(self.repaymentsManager)
+    def repaid(self): return float(self.repaymentsManager)
     
     @property
     def repayment(self): return self.repaid

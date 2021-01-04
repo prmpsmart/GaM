@@ -60,7 +60,7 @@ class CoopLoanBondDetails(LoanBondDetails):
     def unit(self): return self.member.unit
     
     def setDetails(self, members, accountName, accountNumber, bank, rate=.1, date=None):
-        validLoan = (int(self.loanBond.manager.savings) * 2)
+        validLoan = (float(self.loanBond.manager.savings) * 2)
         assert validLoan <= self.proposedLoan, f'Loan exceed maximum valid loan of {validLoan}.'
         
         self.setMemberSureties(members)
