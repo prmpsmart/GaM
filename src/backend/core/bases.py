@@ -506,7 +506,7 @@ class ObjectsManager(ObjectsMixins):
     
     def addSub(self, sub): self._subs.append(sub)
     
-    def getSub(self, attrs_vals={}):
+    def getSub(self, **attrs_vals):
         if len(self):
             for sub in self:
                 count = []

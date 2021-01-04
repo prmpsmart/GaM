@@ -224,13 +224,11 @@ class ClientAccountsManager(DCAccountsManager):
     
     def createAccount(self, rate=0, month=None, **kwargs):
         area = self.region.sup
-        validations = dict(month=month)
-        areaAcc = area.accountsManager.getAccount(validations)
-        print(areaAcc)
+        areaAcc = area.accountsManager.getAccount(month=month)
         if areaAcc:
             ledgerNumber = areaAcc.ledgerNumbers + 1
 
-            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, **kwargs)
+            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, month=month, **kwargs)
 
             areaAcc.addClientAccount(acc)
             return acc

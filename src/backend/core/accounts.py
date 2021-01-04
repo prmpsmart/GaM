@@ -193,7 +193,7 @@ class AccountsManager(ObjectsManager):
     def subRegionsActiveByMonth(self, month):
         subRegions = []
         for subRegion in self.region.subRegionsManager:
-            monthAccount = subRegion.accountsManager.getAccount(month)
+            monthAccount = subRegion.accountsManager.getAccount(month=month)
             if monthAccount != None: subRegions.append(subRegion)
         # or Subs = [Sub for Sub in self.Subs if Sub.lastAccount.date.isSameMonth(month)]
         
