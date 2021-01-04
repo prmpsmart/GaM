@@ -84,10 +84,8 @@ class ContribContainer(Object):
         # print(self.contRecord[:])
     
     def delete(self):
-        # del self.contRecord, self.debRecord
         if self.contRecord: self.contRecord.delete()
         if self.debRecord: self.debRecord.delete()
-        # self.account.balanceAccount()
         self.manager.removeSub(self)
 
 
