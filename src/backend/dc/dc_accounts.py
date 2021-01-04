@@ -86,9 +86,7 @@ class ClientAccount(DCAccount):
     
     def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, month=None, **kwargs):
         self.areaAccount = areaAccount
-        if month:
-            print(month.monthYear, areaAccount.month.monthYear)
-            assert month.monthYear == areaAccount.month.monthYear, 'ClientAccount month must be same as AreaAccount month.'
+        if month: assert month.monthYear == areaAccount.month.monthYear, 'ClientAccount month must be same as AreaAccount month.'
 
         super().__init__(manager, month=month or areaAccount.month, **kwargs)
 

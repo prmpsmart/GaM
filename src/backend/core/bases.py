@@ -512,6 +512,8 @@ class ObjectsManager(ObjectsMixins):
                 count = []
                 for attr, val in attrs_vals.items():
                     if val == None: v = True
+
+                    elif attr == 'month': v = getattr(sub, attr).monthYear == val.monthYear
                     
                     elif 'date' in attr:
                         if '-' in attr:
