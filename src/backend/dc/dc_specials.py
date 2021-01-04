@@ -11,6 +11,7 @@ class ContribContainer(Object):
         self.debRecord = None
         self.contRecord = None
         self.upfrontRepay = 0
+        self.saved = 0
         
         self.paidout = True if paidout else False
         self.transfer = True if transfer else False
@@ -38,7 +39,11 @@ class ContribContainer(Object):
 
         del self.objectSort
 
-    def isUpfrontRepay(self): return
+    def isUpfrontRepay(self):
+        if not self.account.upfronts.paid:
+            repay, remain = self.contributions._toUpfrontRepay(self.income)
+            self.saved = remain
+            self.upfrontRepay = repay
 
     @property
     def withdraw(self): return
@@ -78,6 +83,9 @@ class Daily_Contribution(ObjectsManager):
     Manager = 'Daily_Contributions'
     ObjectType = ContribContainer
     MultipleSubsPerMonth = True
+    
+    columns = ['Month', 'Name', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
+    col_attr = [{'Month': 'date'}, 'Reg Name', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)
@@ -135,7 +143,6 @@ class Daily_Contribution(ObjectsManager):
         account = self.accountsManager.getAccount(month)
         if account: return account.getClientAccount(number)
     
-
     def deleteSub(self, number, month=None):
         pass
 
@@ -144,6 +151,9 @@ class Daily_Contribution(ObjectsManager):
 
     def update(self):
         for sub in self: sub.update()
+    
+    @property
+    def subsDatas(self): return [sub[self.col_attr] for sub in self]
 
 
 class Daily_Contributions(ObjectsManager):

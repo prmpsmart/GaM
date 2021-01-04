@@ -203,7 +203,9 @@ class ClientAccountsManager(DCAccountsManager):
     @property
     def areaAccountsManager(self): return self.master.accountsManager
     
-    def createAccount(self, rate=0, month=None, **kwargs):
+    def createAccount(self, rate=0, month=None, date=None, **kwargs):
+        month = month or date
+        # assert month, 'Month or Date must be given'
         area = self.region.sup
         areaAcc = area.accountsManager.getAccount(month)
         if areaAcc:

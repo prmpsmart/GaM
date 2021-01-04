@@ -103,10 +103,7 @@ class Contributions(DCRecordsManager):
 
             if not self.upfronts.paid:
 
-                out = self.upfronts.outstanding
-
-                money = contr if out > contr else out
-                repay, remain = money, contr - money
+                repay, remain = self._toUpfrontRepay(contr)
 
                 repRec = self.upfronts.repayUpfront(repay, note=note, coRecord=incRec, **kwargs)
                 
@@ -115,10 +112,16 @@ class Contributions(DCRecordsManager):
                 if remain > 0: savRec = self.savings.addSaving(remain, note=note, coRecord=repRec, **kwargs)
 
             else: savRec = self.savings.addSaving(contr, coRecord=incRec, note=note, **kwargs)
-            # self.balance()
+            self.account.balanceAccount()
             return conRec
 
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')
+    
+    def _toUpfrontRepay(self, contr):
+        out = self.upfronts.outstanding
+        money = contr if out > contr else out
+        repay, remain = money, contr - money
+        return (repay, remain)
     
     @property
     def rate(self): return self.account.rate
