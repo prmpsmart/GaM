@@ -370,12 +370,18 @@ class ObjectsMixins(Mixins, CompareByDate):
                     length_of_tail_props = len(tail_props)
                     while count < length_of_tail_props:
                         tail_prop = tail_props[count]
-                        tail_1 = head[tail_prop[0]]
-                        tail_2 = tail_1[tail_prop[1]]
+                        try: tail_1 = head[tail_prop[0]]
+                        except: tail_1  = getattr(head, tail_prop[0])
+                        
+                        try: tail_2 = tail_1[tail_prop[1]]
+                        except: tail_2  = getattr(tail_1, tail_prop[1])
+
                         tail.append(tail_2)
                         count += 1
                 else:
-                    if head: tail = head[v]
+                    if head:
+                        try: tail = head[v]
+                        except: tail = getattr(head, v)
                     else: self.attrError(k)
                 res.append(tail)
             return res if len(res) > 1 else res[0]

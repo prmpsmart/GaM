@@ -3,23 +3,26 @@ from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 class ContribContainer(Object):
     Manager = 'Daily_Contribution'
     
-    def __init__(self, manager, clientAccount=None, amount=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
+    def __init__(self, manager, clientAccount=None, income=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
         super().__init__(manager, **kwargs)
         assert clientAccount, 'Account must be given'
 
         self.account = clientAccount
         self.debRecord = None
         self.contRecord = None
+        self.upfrontRepay = 0
         
-        self._paidout = paidout
-        self._transfer = transfer
+        self.paidout = True if paidout else False
+        self.transfer = True if transfer else False
         
         max_ = 31.0
         contribs = float(self.contributions)
 
-        contributed = amount/self.rate if money else amount
+        contributed = income/self.rate if money else income
         new = contribs + contributed
-        if new <= max_: self.contributed = contributed
+        if new <= max_:
+            self.contributed = contributed
+            self.income = contributed * self.rate
         else:
             excess = new - max_
             required = max_ - contribs
@@ -29,21 +32,16 @@ class ContribContainer(Object):
         bal = float(self.account.balances)
         debit = float(debit)
         if debit <= bal or debit == .0: self.debit = debit
-        else: raise ValueError(f'Balance is {bal}, but amount to be debited is {debit}')
+        else: raise ValueError(f'Balance is {bal}, but income to be debited is {debit}')
+
+        self.isUpfrontRepay()
 
         del self.objectSort
 
-    @property
     def isUpfrontRepay(self): return
 
     @property
     def withdraw(self): return
-
-    @property
-    def paidout(self): return
-
-    @property
-    def transfer(self): return
 
     @property
     def month(self): return self.account.date
@@ -71,9 +69,9 @@ class ContribContainer(Object):
     def rate(self): return self.account.rate
     
     def update(self):
-        if self.contributed and not self.contRecord: self.contRecord = self.account.addContribution(self.contributed, date=self.date, _type='t' if self._transfer else 'n')
+        if self.contributed and not self.contRecord: self.contRecord = self.account.addContribution(self.contributed, date=self.date, _type='t' if self.transfer else 'n')
 
-        if self.debit and not self.debRecord: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self._paidout else 'w')
+        if self.debit and not self.debRecord: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self.paidout else 'w')
         # print(self.contRecord[:])
 
 class Daily_Contribution(ObjectsManager):
@@ -114,12 +112,10 @@ class Daily_Contribution(ObjectsManager):
     @property
     def region(self): return self.manager.region
     
-    def createSub(self, number, month=None, date=None, **kwargs):
+    def createSub(self, number, month=None, **kwargs):
         now = PRMP_DateTime.now()
         if month == None: month = now
-        if date == None: date = now
         PRMP_DateTime.checkDateTime(month)
-        PRMP_DateTime.checkDateTime(date)
         
         validations = [dict(value=number, attr='number'), dict(value=month, attr={'account': 'date'})]
 
@@ -128,7 +124,9 @@ class Daily_Contribution(ObjectsManager):
         if prevs and len(prevs): raise ValueError(f'{prevs[0].name} already exists.')
 
         clientAccount = self.getClientAccount(number, month)
-        if clientAccount: return super().createSub(clientAccount=clientAccount, date=date, **kwargs)
+        if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
+    
+    def addIncome(self, number, month=None, income=0, money=False, debit=0, paidout=False, transfer=False): return self.createSub(number, month=month, income=income, money=money, debit=debit, paidout=paidout, transfer=transfer)
     
     @property
     def accountsManager(self): return self.manager.accountsManager
@@ -137,8 +135,6 @@ class Daily_Contribution(ObjectsManager):
         account = self.accountsManager.getAccount(month)
         if account: return account.getClientAccount(number)
     
-    def addAmount(self, number, month=None, money=False, date=None):
-        pass
 
     def deleteSub(self, number, month=None):
         pass
@@ -173,7 +169,7 @@ class Daily_Contributions(ObjectsManager):
 
         return super().createSub(date=date, **kwargs)
     
-    createDailyContributions = createSub
+    addDailyC = createSub
 
     @property
     def accountsManager(self): return self.master.accountsManager
