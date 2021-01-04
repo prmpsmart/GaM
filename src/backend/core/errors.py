@@ -1,6 +1,6 @@
+from prmp_miscs.prmp_errors import PRMP_Errors
 
-
-class Errors(Exception):
+class Errors(PRMP_Errors):
     class RegionsManagerError(Exception): pass
     class DateTimeError(Exception): pass
     class AccountError(Exception): pass

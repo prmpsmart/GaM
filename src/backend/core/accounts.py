@@ -58,6 +58,7 @@ class YearlyAccounts(ObjectsMixins):
 class Account(Object):
     Manager = 'AccountsManager'
     subTypes = ['Records Managers']
+    Error = Errors
     
     def __init__(self, manager, **kwargs):
         assert manager != None, 'No manager passed.'

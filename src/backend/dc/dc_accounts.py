@@ -6,8 +6,11 @@ from ..core.accounts import PRMP_DateTime, Account, AccountsManager
 class DCAccount(Account):
     Manager = 'DCAccountsManager'
     
-    def __init__(self, manager, **kwargs):
+    def __init__(self, manager, month=None, **kwargs):
         super().__init__(manager, **kwargs)
+        assert month, 'Month that this account belongs to must be given.'
+        self.month = month
+
         self.incomes = Incomes(self)
         self.broughtForwards = BroughtForwards(self)
         self.savings = Savings(self)
@@ -70,9 +73,11 @@ class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
     
     def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, **kwargs):
-        super().__init__(manager, **kwargs)
-        rate = float(rate)
         self.areaAccount = areaAccount
+
+        super().__init__(manager, month=areaAccount.month, **kwargs)
+        
+        rate = float(rate)
         self.ledgerNumber = ledgerNumber
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate)
@@ -204,19 +209,18 @@ class ClientAccountsManager(DCAccountsManager):
     def areaAccountsManager(self): return self.master.accountsManager
     
     def createAccount(self, rate=0, month=None, date=None, **kwargs):
-        month = month or date
-        # assert month, 'Month or Date must be given'
+        assert month, 'Month or Date must be given'
         area = self.region.sup
         areaAcc = area.accountsManager.getAccount(month)
         if areaAcc:
             ledgerNumber = areaAcc.ledgerNumbers + 1 if areaAcc else 1
 
-            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, **kwargs)
+            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, month=month, date=date, **kwargs)
 
             areaAcc.addClientAccount(acc)
             return acc
 
-        else: raise self.Errors.AccountError(f'{area} does not have an account in {month.monthYear} ')
+        else: raise DCErrors.AccountsError(f'{area} does not have an account in {month.monthYear} ')
 
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)

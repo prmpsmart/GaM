@@ -133,6 +133,7 @@ class Daily_Contribution(ObjectsManager):
 
         clientAccount = self.getClientAccount(number, month)
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
+        else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
     def addIncome(self, number, month=None, income=0, money=False, debit=0, paidout=False, transfer=False): return self.createSub(number, month=month, income=income, money=money, debit=debit, paidout=paidout, transfer=transfer)
     
