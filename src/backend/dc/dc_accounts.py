@@ -245,7 +245,7 @@ class ClientAccountsManager(DCAccountsManager):
     
     def addDebit(self, debit, month):
         if month == None: month = PRMP_DateTime.now()
-        monthAcc = self.accountManager.getAccount(month)
+        monthAcc = self.accountManager.getAccount(month=month)
         if monthAcc: monthAcc.debits.addDebit(debit)
     
     def addUpfront(self, upfront, month):

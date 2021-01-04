@@ -67,12 +67,12 @@ class Client(DCRegion):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
     
     def addContribution(self, contribution, month=None, **kwargs):
-        if month == None: month = PRMP_DateTime.now()
+        month = self.getDate(month)
         return self.accountsManager.addContribution(contribution, **kwargs)
     
     def addPaid(self, paid, month):
-        if month == None: month = PRMP_DateTime.now()
-        monthAcc = self.accountManager.getAccount(month)
+        month = self.getDate(month)
+        monthAcc = self.accountManager.getAccount(month=month)
         if monthAcc: monthAcc.paids.addPaid(paid)
     
     def addUpfront(self, upfront, month):

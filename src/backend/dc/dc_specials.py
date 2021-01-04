@@ -139,7 +139,7 @@ class Daily_Contribution(ObjectsManager):
     def accountsManager(self): return self.manager.accountsManager
     
     def getClientAccount(self, number, month=None):
-        account = self.accountsManager.getAccount(month)
+        account = self.accountsManager.getAccount(month=month)
         if account: return account.getClientAccount(number)
     
     def deleteSub(self, number, month=None):

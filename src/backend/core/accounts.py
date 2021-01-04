@@ -168,7 +168,7 @@ class AccountsManager(ObjectsManager):
     def balanceAccount(self, month=None):
         if month:
             PRMP_DateTime.checkDateTime(month)
-            account = self.getAccount(month)
+            account = self.getAccount(month=month)
             if account: account.balanceAccount()
         else:
             account = self.getLastAccount()
