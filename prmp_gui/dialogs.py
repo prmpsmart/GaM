@@ -159,8 +159,6 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.ask = ask
         self._cancel = cancel
         
-        from .pics import Xbms
-        self.XBM = Xbms
         if okText: self.ask = 0
         
         super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, **kwargs)
@@ -193,7 +191,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         elif _type in self._xbms: return f'@{self._xbms[_type]}'
     
     @property
-    def _xbms(self): return self.XBM.filesDict()
+    def _xbms(self): return Xbms.filesDict()
 
     def yesCom(self):
         if self.ask: self._setResult(True)

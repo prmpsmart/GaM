@@ -1,7 +1,7 @@
 from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 
 class Thrifts(Object):
-    Manager = 'Daily_Contribution'
+    Manager = 'DailyContribution'
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
         super().__init__(manager, **kwargs)
@@ -89,14 +89,14 @@ class Thrifts(Object):
         self.manager.removeSub(self)
 
 
-class Daily_Contribution(ObjectsManager):
-    Manager = 'Daily_Contributions'
+class DailyContribution(ObjectsManager):
+    Manager = 'DailyContributionsManager'
     ObjectType = Thrifts
     MultipleSubsPerMonth = True
-    subTypes = ['Daily_Contributions']
+    subTypes = ['Thrifts']
     
     columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
-    col_attr = [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'rate', 'contributed', 'income', 'transfer', 'debit', 'paidout', 'upfrontRepay', 'saved']
+    col_attr = [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)
@@ -106,6 +106,9 @@ class Daily_Contribution(ObjectsManager):
         self.number = number
         self._bto = 0
         self._next = None
+
+    @property
+    def thrifts(self): return self.subs
 
     @property
     def previous(self): return self._previous
@@ -167,10 +170,10 @@ class Daily_Contribution(ObjectsManager):
     def subsDatas(self): return [sub[self.col_attr] for sub in self]
 
 
-class Daily_Contributions(ObjectsManager):
-    ObjectType = Daily_Contribution
+class DailyContributionsManager(ObjectsManager):
+    ObjectType = DailyContribution
     MultipleSubsPerMonth = True
-    subTypes = ['Daily_Contributions']
+    subTypes = ['Daily Contributions']
 
     @property
     def region(self): return self.master

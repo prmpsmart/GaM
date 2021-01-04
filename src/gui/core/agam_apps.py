@@ -1,8 +1,14 @@
 from .agam_dialogs import *
+from ...backend.core.bases import ObjectsManager
 
 class TreeColumns:
     def columns(self, sup):
         if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        
+        elif isinstance(sup, (DailyContribution)): return [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
+        
+        elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
 
@@ -243,7 +249,6 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
     
         return creations[st]
 
-
     @property
     def selectedSubType(self): return self.subType.get()
 
@@ -258,11 +263,15 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
     def changeSubs(self, e=0):
         st = self.selectedSubType
         if self.new.get():
-            if self.c_or_m and st == 'Persons':
-                PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className} ', _type='error', ask=0)
+            new = self._sup[st]
+            if self.c_or_m and new.className == 'Persons':
+                PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error', ask=0)
                 return
-            dialog = self.getNewObjectDialog(st)
-            if dialog: dialog(self, manager=self._sup)
+
+            try:
+                dialog = self.getNewObjectDialog(st)
+                if dialog: dialog(self, manager=self._sup)
+            except: PRMP_MsgBox(self, title='Creation Error ', message=f'A new one cannot be created for {st}.', _type='error', ask=0)
         else:
             subs = self.getSubs()
             if subs: self.subsList.set(subs)
