@@ -116,13 +116,13 @@ class AccountsManager(ObjectsManager):
     ObjectType = Account
     subTypes = ['Accounts']
     
-    def __init__(self, region, autoAccount=True, firstMonth=None, **kwargs):
+    def __init__(self, region, autoAccount=True, **kwargs):
         
         ObjectsManager.__init__(self, region)
         
         self.addAccount = self.addSub
         
-        if autoAccount == True: self.createAccount(month=firstMonth, **kwargs)
+        if autoAccount == True: self.createAccount(**kwargs)
         
     def __eq__(self, manager):
         if manager == None: return False

@@ -5,6 +5,11 @@ from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
 
 
 class Mixins(PRMP_Mixins):
+
+    def getDate(self, date=None):
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
+        return date
     
     def addSignToMoney(self, money):
         int(money)

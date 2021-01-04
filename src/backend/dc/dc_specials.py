@@ -121,9 +121,7 @@ class Daily_Contribution(ObjectsManager):
     def region(self): return self.manager.region
     
     def createSub(self, number, month=None, **kwargs):
-        now = PRMP_DateTime.now()
-        if month == None: month = now
-        PRMP_DateTime.checkDateTime(month)
+        month = self.getDate(month)
         
         validations = [dict(value=number, attr='number'), dict(value=month, attr={'account': 'date'})]
 
@@ -169,8 +167,7 @@ class Daily_Contributions(ObjectsManager):
 
     def createSub(self, date=None, **kwargs):
         
-        if date == None: date = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(date)
+        date = self.getDate(date)
         
         date_validations = [dict(value=True, attr='date', attrMethod='isSameDate', attrMethodParams=[date])]
 

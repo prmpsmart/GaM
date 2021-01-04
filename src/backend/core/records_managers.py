@@ -270,8 +270,7 @@ class RecordsManager(ObjectsManager):
         new = False
         record = None
         
-        if date == None: date = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(date)
+        date = self.getDate(date)
         
         if newRecord: new = True
         else:

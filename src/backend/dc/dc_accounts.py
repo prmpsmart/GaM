@@ -56,7 +56,8 @@ class DCAccount(Account):
 class DCAccountsManager(AccountsManager):
     ObjectType = DCAccount
     
-    def __init__(self, region, **kwargs):
+    def __init__(self, region, firstMonth=None, **kwargs):
+
         super().__init__(region, **kwargs)
     
     @property
@@ -71,8 +72,7 @@ class DCAccountsManager(AccountsManager):
     
     
     def createAccount(self, month=None, **kwargs):
-        if month == None: month = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(month)
+        month = self.getDate(month)
         return super().createAccount(month=month, **kwargs)
 
 
@@ -96,8 +96,7 @@ class ClientAccount(DCAccount):
     def name(self): return f'{self.className}({self.date.dayMonthYear} | No. {self.ledgerNumber})'
     
     def income(self, date=None):
-        if date == None: date = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(date)
+        date = self.getDate(date)
         return sum([rec.savings for rec in self.contributions if rec.date.month == date.month])
     
     @property

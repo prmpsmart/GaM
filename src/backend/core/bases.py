@@ -399,8 +399,7 @@ class Object(CompareByNumber, ObjectsMixins):
     
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
         ObjectsMixins.__init__(self)
-        if date == None: date = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(date)
+        date = self.getDate(date)
 
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
@@ -550,8 +549,7 @@ class ObjectsManager(ObjectsMixins):
  ########## Sorting
 
     def sortSubsByDate(self, date):
-        if date == None: date = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(date)
+        date = self.getDate(date)
 
         _rec = [rec for rec in self if str(rec.date) == str(date)]
         return _rec
