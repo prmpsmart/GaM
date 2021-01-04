@@ -1,5 +1,6 @@
 from .agam_dialogs import *
-from ...backend.core.bases import ObjectsManager
+# from ...backend.core.bases import ObjectsManager
+from ...backend.dc.dc_specials import *
 
 class TreeColumns:
     def columns(self, sup):

@@ -1,5 +1,6 @@
 from ..core.agam_apps import *
-from ...backend.dc.dc_regions import *
+from ...backend.dc.dc_regions import */
+from ...backend.dc.dc_specials import */
 from prmp_gui.plot_canvas import PRMP_PlotCanvas, random, ChartSort
 
 
@@ -201,11 +202,6 @@ class DC_Overview(Frame):
         if _prev: self.updateDCDigits(_prev)
 
 
-class DailyView(Frame):
-    
-    def __init__(self, master, title='Area 1 Daily Contribution', area=None, **kwargs):
-        
-        self.tree = PRMP_TreeView(self, place=dict())
 
 
 

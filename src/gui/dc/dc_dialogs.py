@@ -62,8 +62,23 @@ class ClientAccountDialog(AccountDialog):
         self.addResultsWidgets('rate')
 
 
+class ThriftsDialog(PRMP_Dialog):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
 
-class DailyDailog(PRMP_Dialog):
+        self.showAccount = None
+        self.contributed = None
+        self.income = None
+        self.debit = None
+        self.paidout = None
+        self.transfer = None
+        self.showAccount = None
+        self.showAccount = None
+        self.showAccount = None
+        self.showAccount = None
+
+
+class DailyContributionDailog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', area=None, **kwargs):
         super().__init__(master, **kwargs)
