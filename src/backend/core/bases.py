@@ -548,10 +548,10 @@ class ObjectsManager(ObjectsMixins):
         
         return sub
 
-    def deleteSubs(self):
-        del self._subs
-        self._subs = []
+    def deleteSubs(self): self._subs = []
     
+    def removeSub(self, sub):
+        if sub in self: self._subs.remove(sub)
     
  ########## Sorting
 

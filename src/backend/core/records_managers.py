@@ -294,14 +294,13 @@ class RecordsManager(ObjectsManager):
         total = sum([float(manager) for manager in managers])
         self.createRecord(total, newRecord=False, notAdd=True)
     
-    def removeRecord(self, date):
-        for record in self:
-            if record.date == date: self.records.remove(record)
-            del record
-            return
+    def removeRecord(self, rec):
+        self.removeSub(rec)
+        # del rec
     
     def removeRecordByIndex(self, index):
-        if len(self.records) >= index: del self.records[index]
+        if len(self.records) >= index:
+            self.removeRecord(self.records[index])
     
     def checkMoney(self, money):
         if (money < self.lowest): raise ValueError(f'Amount of {money} is too small.')

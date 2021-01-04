@@ -5,6 +5,11 @@ class DCRecord(Record):
     Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers', 'Withdrawals', 'Paidouts', 'NormalIncomes')
     def update(self, values={}, first=1):
         if not first: super().update(values, first)
+    
+    def __del__(self):
+        for a in self: del a
+        self.manager.removeRecord(self)
+
 
 
 class DCRepayment(Repayment): pass

@@ -14,11 +14,6 @@ class Record(Object):
     _type = 'rec'
     subTypes = ['Co Records', 'Linked Records']
 
-    def __del__(self):
-        for a in self:
-            # print(a)
-            del a
-
     def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
         Object.__init__(self, manager, name=note, **kwargs)
 

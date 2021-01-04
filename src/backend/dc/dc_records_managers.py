@@ -32,7 +32,7 @@ class Rates(DCRecordsManager):
         
     def __float__(self):
         try: return float(self[-1])
-        except: return 0
+        except: return 0.0
     
     def payUpBal(self, rate):
         contributions = float(self.account.contributions)

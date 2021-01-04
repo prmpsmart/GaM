@@ -32,7 +32,7 @@ class ContribContainer(Object):
 
         bal = float(self.account.balances)
         debit = float(debit)
-        if debit <= bal or debit == .0: self.debit = debit
+        if debit <= bal or debit == 0.0: self.debit = debit
         else: raise ValueError(f'Balance is {bal}, but income to be debited is {debit}')
 
         self.isUpfrontRepay()
@@ -86,7 +86,6 @@ class ContribContainer(Object):
     def __del__(self):
         del self.contRecord, self.debRecord
         self.account.balanceAccount()
-        del self
 
 
 class Daily_Contribution(ObjectsManager):
