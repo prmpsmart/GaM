@@ -529,12 +529,12 @@ class ObjectsManager(ObjectsMixins):
 
                 if count.count(True) == len(count): return sub
     
-    def createSub(self, *args, date=None, **kwargs):
+    def createSub(self, *args, date=None, month=None, **kwargs):
         last = self.last
 
         if not self.MultipleSubsPerMonth:
-            if len(self.sortSubsByMonth(date or PRMP_DateTime.now())): raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
-        
+            if len(self.sortSubsByMonth(month or PRMP_DateTime.now())): raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
+        if month: kwargs = dict(month=month, **kwargs)
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)
         if last: last.next = sub
         
