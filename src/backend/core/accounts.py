@@ -121,7 +121,7 @@ class AccountsManager(ObjectsManager):
         ObjectsManager.__init__(self, region)
         
         self.addAccount = self.addSub
-        self.getAccount = self.get
+        self.getAccount = self.getSub
         if autoAccount == True: self.createAccount(**kwargs)
         
     def __eq__(self, manager):
