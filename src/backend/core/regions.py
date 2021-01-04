@@ -75,18 +75,6 @@ class Region(Object):
             
         if self.PersonsManager: self._personsManager = self.PersonsManager(self, name=name, date=date, phone=phone, **kwargs)
     
-    def __getattr__(self, name):
-        ret = self.getFromSelf(name, self._unget)
-        if str(ret) != self._unget: return ret
-
-        aret = getattr(self.accountsManager, name, self._unget)
-        if str(aret) != self._unget: return aret
-
-        sret = getattr(self.accountsManager, name, self._unget)
-        if str(sret) != self._unget: return sret
-
-        self.attrError(name)
-    
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property

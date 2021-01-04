@@ -185,9 +185,6 @@ class Savings(DCRecordsManager):
 class Upfronts(RepaymentsManager):
     ObjectType = Upfront
     
-    def __init__(self, accounts):
-        super().__init__(accounts)
-    
     def addUpfront(self, upfront):
         rate = self.account.rate
         savings = self.account.savings

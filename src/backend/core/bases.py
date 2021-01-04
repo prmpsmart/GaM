@@ -237,6 +237,7 @@ class ObjectsMixins(Mixins, CompareByDate):
 
     def __init__(self):
         self.__editableValues = []
+        self._subs = None
         self._date = None
         self.objectSort = ObjectSort(self)
     
@@ -470,12 +471,6 @@ class ObjectsManager(ObjectsMixins):
         self._date = master.date
     
     def __len__(self): return len(self.subs)
-
-    def __getattr__(self, attr):
-        ret = self.getFromSelf(attr, self._unget)
-        if ret != self._unget: return ret
-        else:
-            if self.last: return getattr(self.last, attr)
     
     def __str__(self): return f'{self.master} | {self.name}'
     

@@ -91,6 +91,10 @@ class DCOffice(SubOffice):
     SubRegionsManager = AreasManager
     PersonsManager = DCManagerDetailsManager
     DEPARTMENT = 'DC'
+
+    def __init__(self, manager, **kwargs):
+        super().__init__(manager, **kwargs)
+        self.subRegionsActiveByMonth = self.accountsManager.subRegionsActiveByMonth
     
     @property
     def areasManager(self): return self.subRegionsManager

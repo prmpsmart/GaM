@@ -104,6 +104,7 @@ class Area(DCRegion):
         self.__otherName = f'DC {self.number}'
         
         self.dailyContributions = self.dailys = Daily_Contributions(self)
+        self.subRegionsActiveByMonth = self.accountsManager.subRegionsActiveByMonth
         
     def __str__(self): return f'{self.manager.master} | {self.name}'
     
