@@ -74,10 +74,19 @@ class ContribContainer(Object):
     def rate(self): return self.account.rate
     
     def update(self):
-        if self.contributed and not self.contRecord: self.contRecord = self.account.addContribution(self.contributed, date=self.date, _type='t' if self.transfer else 'n')
+        if self.contributed:
+            if self.contRecord: pass
+            else: self.contRecord = self.account.addContribution(self.contributed, date=self.date, _type='t' if self.transfer else 'n')
 
-        if self.debit and not self.debRecord: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self.paidout else 'w')
+        if self.debit:
+            if self.debRecord: pass
+            else: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self.paidout else 'w')
         # print(self.contRecord[:])
+    
+    def __del__(self):
+        del self.contRecord, self.debRecord
+        self.account.balanceAccount()
+        del self
 
 
 class Daily_Contribution(ObjectsManager):
@@ -85,8 +94,8 @@ class Daily_Contribution(ObjectsManager):
     ObjectType = ContribContainer
     MultipleSubsPerMonth = True
     
-    columns = ['Month', 'Name', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
-    col_attr = [{'Month': 'monthYear'}, 'Reg Name', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
+    columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
+    col_attr = [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'rate', 'contributed', 'income', 'transfer', 'debit', 'paidout', 'upfrontRepay', 'saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)
@@ -132,7 +141,7 @@ class Daily_Contribution(ObjectsManager):
         if prevs and len(prevs): raise ValueError(f'{prevs.name} already exists.')
 
         clientAccount = self.getClientAccount(number, month)
-        print(clientAccount)
+        
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
@@ -141,7 +150,7 @@ class Daily_Contribution(ObjectsManager):
     def getClientAccount(self, number, month=None):
         month = self.getDate(month)
         account = self.accountsManager.getAccount(month=month)
-        print(account)
+        
         if account: return account.getClientAccount(number)
     
     def deleteSub(self, number, month=None):

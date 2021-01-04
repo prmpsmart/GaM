@@ -204,7 +204,7 @@ class AreaAccount(DCAccount):
 
     def getClientAccount(self, number, month=None):
         clientsAccounts = self.clientsAccounts(month)
-        print(clientsAccounts)
+        
         for clientsAccount in clientsAccounts:
             if clientsAccount.ledgerNumber == number: return clientsAccount
 

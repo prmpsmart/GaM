@@ -184,7 +184,7 @@ class AccountsManager(ObjectsManager):
     def sortSubRegionsAccountsByMonth(self, month):
         PRMP_DateTime.checkDateTime(month)
         subRegionsActiveByMonth = self.region.subRegionsActiveByMonth(month)
-        print(subRegionsActiveByMonth, 'k')
+        
         accounts = []
         for subRegion in subRegionsActiveByMonth:
             subRegionsAccounts = subRegion.sortAccountsByMonth(month) or []
