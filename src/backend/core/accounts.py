@@ -121,7 +121,7 @@ class AccountsManager(ObjectsManager):
         ObjectsManager.__init__(self, region)
         
         self.addAccount = self.addSub
-        
+        self.getAccount = self.get
         if autoAccount == True: self.createAccount(**kwargs)
         
     def __eq__(self, manager):
@@ -165,8 +165,6 @@ class AccountsManager(ObjectsManager):
                     containerDict[name] += float(recordManager)
             return containerDict
         
-    def getAccount(self, month): return self.getSub({'date-m': month})
-    
     def balanceAccount(self, month=None):
         if month:
             PRMP_DateTime.checkDateTime(month)

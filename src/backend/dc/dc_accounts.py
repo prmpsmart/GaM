@@ -9,6 +9,7 @@ class DCAccount(Account):
     def __init__(self, manager, month=None, **kwargs):
         super().__init__(manager, **kwargs)
         assert month, 'Month that this account belongs to must be given.'
+
         self._month = month
 
         self.incomes = Incomes(self)
@@ -26,6 +27,8 @@ class DCAccount(Account):
         
     def __int__(self): return int(self.balances)
     def __float__(self): return float(self.balances)
+    @property
+    def name(self): return f'{self.className}({self._month.dayMonthYear})'
     @property
     def month(self): return self._month
     @property
@@ -56,8 +59,7 @@ class DCAccount(Account):
 class DCAccountsManager(AccountsManager):
     ObjectType = DCAccount
     
-    def __init__(self, region, firstMonth=None, **kwargs):
-
+    def __init__(self, region, **kwargs):
         super().__init__(region, **kwargs)
     
     @property
@@ -82,10 +84,12 @@ class DCAccountsManager(AccountsManager):
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
     
-    def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, **kwargs):
+    def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, month=None, **kwargs):
         self.areaAccount = areaAccount
+        if month:
+            assert month == areaAccount.month, 'ClientAccount month must be same as AreaAccount month.'
 
-        super().__init__(manager, month=areaAccount.month, **kwargs)
+        super().__init__(manager, month=month or areaAccount.month, **kwargs)
 
         rate = float(rate)
         self.ledgerNumber = ledgerNumber
@@ -93,7 +97,7 @@ class ClientAccount(DCAccount):
         self.rates = Rates(self, rate)
     
     @property
-    def name(self): return f'{self.className}({self.date.dayMonthYear} | No. {self.ledgerNumber})'
+    def name(self): return f'{self.className}({self._month.dayMonthYear} | No. {self.ledgerNumber})'
     
     def income(self, date=None):
         date = self.getDate(date)
@@ -218,13 +222,14 @@ class ClientAccountsManager(DCAccountsManager):
     def areaAccountsManager(self): return self.master.accountsManager
     
     def createAccount(self, rate=0, month=None, **kwargs):
-        assert month, 'Month must be given'
         area = self.region.sup
+        validations = [dict()]
         areaAcc = area.accountsManager.getAccount(month)
+        print(areaAcc)
         if areaAcc:
-            ledgerNumber = areaAcc.ledgerNumbers + 1 if areaAcc else 1
+            ledgerNumber = areaAcc.ledgerNumbers + 1
 
-            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, month=month, **kwargs)
+            acc = super().createAccount(rate=rate, ledgerNumber=ledgerNumber, areaAccount=areaAcc, **kwargs)
 
             areaAcc.addClientAccount(acc)
             return acc
