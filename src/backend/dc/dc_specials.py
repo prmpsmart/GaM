@@ -55,7 +55,7 @@ class ContribContainer(Object):
     def subs(self): return self._subs
 
     @property
-    def name(self): return f'{self.className}({self.date.date}, No. {self.number})'
+    def name(self): return f'{self.className}({self.date.date}, No. {self.number}, [{self.account.region.name}, {self.account.name}])'
     
     def __eq__(self, other):
         if other == None: return False
@@ -112,6 +112,9 @@ class Daily_Contribution(ObjectsManager):
     def manager(self): return self.master
     
     @property
+    def accountsManager(self): return self.manager.accountsManager
+    
+    @property
     def name(self): return f'{self.className}({self.date.date})'
     
     def __eq__(self, other):
@@ -123,26 +126,22 @@ class Daily_Contribution(ObjectsManager):
     
     def createSub(self, number, month=None, **kwargs):
         month = self.getDate(month)
-        print(month)
-        
-        validations = [dict(value=number, attr='number'), dict(value=month, attr={'account': 'month'})]
 
-        prevs = self.sort(validations=validations)
+        prevs = self.getSub(number=number, month=month) or []
 
-        if prevs and len(prevs): raise ValueError(f'{prevs[0].name} already exists.')
+        if prevs and len(prevs): raise ValueError(f'{prevs.name} already exists.')
 
         clientAccount = self.getClientAccount(number, month)
+        print(clientAccount)
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
     def addIncome(self, number, month=None, income=0, money=False, debit=0, paidout=False, transfer=False): return self.createSub(number, month=month, income=income, money=money, debit=debit, paidout=paidout, transfer=transfer)
     
-    @property
-    def accountsManager(self): return self.manager.accountsManager
-    
     def getClientAccount(self, number, month=None):
         month = self.getDate(month)
         account = self.accountsManager.getAccount(month=month)
+        print(account)
         if account: return account.getClientAccount(number)
     
     def deleteSub(self, number, month=None):

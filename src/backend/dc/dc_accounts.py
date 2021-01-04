@@ -188,7 +188,7 @@ class AreaAccount(DCAccount):
     def addBto(self, bto, date=None):
         clientsAccounts = self.clientsAccounts
 
-        incomes = [self.sumRecords(acc.incomes.sortSubsByDate(date)) for acc in clientsAccounts]
+        incomes = [self.sumRecords(acc.incomes.sortSubsByDate(date)) for acc in clientsAccounts()]
 
         contributed = sum(incomes)
 
@@ -200,11 +200,11 @@ class AreaAccount(DCAccount):
         if bto > contributed: self.excesses.createRecord(bto - contributed, date, coRecord=btoRec)
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date, coRecord=btoRec)
 
-    @property
-    def clientsAccounts(self, month=None): return sorted(self.manager.sortClientsAccountsByMonth(month or self.date))
+    def clientsAccounts(self, month=None): return sorted(self.manager.sortClientsAccountsByMonth(month or self.month))
 
     def getClientAccount(self, number, month=None):
-        clientsAccounts = self.clientsAccounts
+        clientsAccounts = self.clientsAccounts(month)
+        print(clientsAccounts)
         for clientsAccount in clientsAccounts:
             if clientsAccount.ledgerNumber == number: return clientsAccount
 
