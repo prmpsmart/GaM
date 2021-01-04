@@ -2,8 +2,8 @@ from .agam_dialogs import *
 
 class TreeColumns:
     def columns(self, sup):
-        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, 'Date', {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-        return [{'text': 'Name', 'width': 250}, {'text': 'Date'}, {'text': 'Last Active', 'attr': {'last': 'date'}}]
+        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
 
 class RegionLookUp(PRMP_MainWindow, PRMP_FillWidgets):

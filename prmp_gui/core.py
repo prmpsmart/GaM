@@ -702,7 +702,7 @@ class PRMP_Widget(PRMP_Theme):
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
        
     def addTip(self, tip='Tip', delay=0, follow=True):
-        if not PRMP_Widget.TIPPING: return
+        if not PRMP_Window.TIPPING: return
         self.tip = PRMP_ToolTip(self, msg=tip, delay=delay, follow=follow)
         self.toplevel.tips.append(self.tip)
 

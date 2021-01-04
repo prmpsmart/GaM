@@ -19,6 +19,7 @@ class DCRepayment(Repayment): pass
 
 
 class Rate(DCRecord): pass
+
 class Balance(DCRecord): pass
 
 class BroughtForward(DCRecord): pass

@@ -1,6 +1,6 @@
 from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 
-class ContribContainer(Object):
+class Thrifts(Object):
     Manager = 'Daily_Contribution'
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
@@ -91,8 +91,9 @@ class ContribContainer(Object):
 
 class Daily_Contribution(ObjectsManager):
     Manager = 'Daily_Contributions'
-    ObjectType = ContribContainer
+    ObjectType = Thrifts
     MultipleSubsPerMonth = True
+    subTypes = ['Daily_Contributions']
     
     columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
     col_attr = [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'rate', 'contributed', 'income', 'transfer', 'debit', 'paidout', 'upfrontRepay', 'saved']
@@ -169,12 +170,13 @@ class Daily_Contribution(ObjectsManager):
 class Daily_Contributions(ObjectsManager):
     ObjectType = Daily_Contribution
     MultipleSubsPerMonth = True
+    subTypes = ['Daily_Contributions']
 
     @property
     def region(self): return self.master
     
     @property
-    def name(self): return f'{self.master} | {self.className}'
+    def name(self): return f'{self.className}({self.master.name})'
 
     def createSub(self, date=None, **kwargs):
         

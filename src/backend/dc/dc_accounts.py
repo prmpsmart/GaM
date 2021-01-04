@@ -76,6 +76,9 @@ class DCAccountsManager(AccountsManager):
     def createAccount(self, month=None, **kwargs):
         month = self.getDate(month)
         return super().createAccount(month=month, **kwargs)
+    
+    @property
+    def recordsManagers(self): return self.last if len(self) else []
 
 
 

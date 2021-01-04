@@ -63,5 +63,14 @@ class ClientAccountDialog(AccountDialog):
 
 
 
+class DailyDailog(PRMP_Dialog):
+    
+    def __init__(self, master=None, title='Area 1 Daily Contribution', area=None, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.area = area
+        self.addTitleBar(title)
+
+
 
 

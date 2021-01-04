@@ -98,6 +98,8 @@ class Area(DCRegion):
     Manager = 'AreasManager'
     SubRegionsManager = ClientsManager
     PersonsManager = DC_COsManager
+
+    subTypes = ['Accounts', 'Records Managers', 'Persons', 'Daily Contributions']
     
     def __init__(self, manager, number, date=None, autoAccount=True, **kwargs):
         super().__init__(manager, number=number, date=date, nameFromNumber=True, **kwargs)

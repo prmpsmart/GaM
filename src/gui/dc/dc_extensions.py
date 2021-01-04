@@ -201,6 +201,12 @@ class DC_Overview(Frame):
         if _prev: self.updateDCDigits(_prev)
 
 
+class DailyView(Frame):
+    
+    def __init__(self, master, title='Area 1 Daily Contribution', area=None, **kwargs):
+        
+        self.tree = PRMP_TreeView(self, place=dict())
+
 
 
 
