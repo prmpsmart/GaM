@@ -18,6 +18,10 @@ class DCRecordsManager(RecordsManager):
 
     def balance(self): return self.account.balanceAccount()
 
+    def removeRecord(self, rec, called=0):
+        super().removeRecord(rec)
+        if called == 0: self.balance()
+
 class Rates(DCRecordsManager):
     ObjectType = Rate
     lowest = 50

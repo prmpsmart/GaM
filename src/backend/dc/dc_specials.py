@@ -59,7 +59,7 @@ class ContribContainer(Object):
     
     def __eq__(self, other):
         if other == None: return False
-        return (self.manager is other.manager) and (self.date is other.date)
+        return (self.manager is other.manager) and (self.date == other.date) and (self.number == other.number)
 
     @property
     def contributions(self): return self.account.contributions
@@ -83,9 +83,12 @@ class ContribContainer(Object):
             else: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self.paidout else 'w')
         # print(self.contRecord[:])
     
-    def __del__(self):
-        del self.contRecord, self.debRecord
-        self.account.balanceAccount()
+    def delete(self):
+        # del self.contRecord, self.debRecord
+        if self.contRecord: self.contRecord.delete()
+        if self.debRecord: self.debRecord.delete()
+        # self.account.balanceAccount()
+        self.manager.removeSub(self)
 
 
 class Daily_Contribution(ObjectsManager):
@@ -104,7 +107,7 @@ class Daily_Contribution(ObjectsManager):
         self.number = number
         self._bto = 0
         self._next = None
-    
+
     @property
     def previous(self): return self._previous
     

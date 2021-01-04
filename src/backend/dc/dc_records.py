@@ -6,9 +6,10 @@ class DCRecord(Record):
     def update(self, values={}, first=1):
         if not first: super().update(values, first)
     
-    def __del__(self):
-        for a in self: del a
-        self.manager.removeRecord(self)
+    def delete(self, called=0):
+        if called == 0:
+            for a in self: a.delete(1)
+        self.manager.removeRecord(self, called)
 
 
 
@@ -18,7 +19,6 @@ class DCRepayment(Repayment): pass
 
 
 class Rate(DCRecord): pass
-
 class Balance(DCRecord): pass
 
 class BroughtForward(DCRecord): pass

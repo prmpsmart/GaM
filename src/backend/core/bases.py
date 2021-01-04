@@ -551,6 +551,7 @@ class ObjectsManager(ObjectsMixins):
     def deleteSubs(self): self._subs = []
     
     def removeSub(self, sub):
+        # print(sub)
         if sub in self: self._subs.remove(sub)
     
  ########## Sorting
