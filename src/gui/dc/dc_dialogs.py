@@ -65,12 +65,12 @@ class NewThriftDialog(PRMP_Dialog):
     def __init__(self, master=None, thrift = None, manager=None, **kwargs):
         self.thrift = thrift
         self.manager = manager
-        super().__init__(master, **kwargs)
+        super().__init__(master, geo=(350, 300), **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
         self.addTitleBar('New Thrift Dialog')
-        self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.02, rely=.02, relh=.8, relw=.96))
+        self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96))
 
         self.ledgerNumber = self.thrifts.ledgerNumber
         self.monthYear = self.thrifts.monthYear
@@ -79,8 +79,9 @@ class NewThriftDialog(PRMP_Dialog):
         self.debit = self.thrifts.debit
         self.paidout = self.thrifts.paidout
         self.transfer = self.thrifts.transfer
+        self.date = self.thrifts.date
 
-        self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'debit', 'paidout', 'transfer'])
+        self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'debit', 'paidout', 'transfer', 'date'])
     
     def action(self):
         if self.result:
@@ -94,7 +95,6 @@ class NewThriftDialog(PRMP_Dialog):
     
     def newThrift(self, w):
         pass
-    
 
 
 class ThriftsDetailsDialog(PRMP_Dialog):
@@ -102,7 +102,7 @@ class ThriftsDetailsDialog(PRMP_Dialog):
         super().__init__(master, **kwargs)
 
     def _setupDialog(self):
-        self.thrifts = NewThrift(self, callback=self.set)
+        self.addEditButton()
 
 class DailyContributionDailog(PRMP_Dialog):
     
@@ -114,6 +114,8 @@ class DailyContributionDailog(PRMP_Dialog):
         self.addTitleBar(title)
 
         self.showAccount = Button
+        self.subs = SubsList
+        self.date
 
 
 

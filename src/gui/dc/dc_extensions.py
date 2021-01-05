@@ -212,14 +212,16 @@ class NewThrift(PRMP_FillWidgets, Frame):
 
         self.ledgerNumber = LabelEntry(self, topKwargs=dict(config=dict(text='Ledger Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.005, rely=.005, relh=.18, relw=.99), orient='h', longent=.46)
 
-        self.monthYear = LabelMonthYearButton(self, topKwargs=dict(config=dict(text='Month-Year')), place=dict(relx=.005, rely=.185, relh=.18, relw=.99), orient='h', longent=.46)
+        self.monthYear = LabelMonthYearButton(self, topKwargs=dict(config=dict(text='Month-Year')), place=dict(relx=.005, rely=.18, relh=.18, relw=.99), orient='h', longent=.46)
 
-        self.income = LabelEntry(self, topKwargs=dict(config=dict(text='Income')), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.365, relh=.18, relw=.6), orient='h', longent=.4)
-        self.money = Checkbutton(self, text='Money?', place=dict(relx=.65, rely=.365, relh=.13, relw=.3))
-        self.transfer = Checkbutton(self, text='Transfer?', place=dict(relx=.65, rely=.495, relh=.13, relw=.3))
+        self.income = LabelEntry(self, topKwargs=dict(config=dict(text='Income')), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.18, relw=.5), orient='h', longent=.5)
+        self.money = Checkbutton(self, text='Money?', place=dict(relx=.52, rely=.37, relh=.13, relw=.23))
+        self.transfer = Checkbutton(self, text='Transfer?', place=dict(relx=.76, rely=.37, relh=.13, relw=.24))
 
-        self.debit = LabelEntry(self, topKwargs=dict(config=dict(text='Debit')), bottomKwargs=dict(_type='money', default=0), orient='h', place=dict(relx=.005, rely=.73, relh=.18, relw=.6))
-        self.paidout = Checkbutton(self, text='Paidout?', place=dict(relx=.65, rely=.74, relh=.13, relw=.3))
+        self.debit = LabelEntry(self, topKwargs=dict(config=dict(text='Debit')), bottomKwargs=dict(_type='money', default=0), orient='h', place=dict(relx=.005, rely=.54, relh=.18, relw=.6))
+        self.paidout = Checkbutton(self, text='Paidout?', place=dict(relx=.62, rely=.555, relh=.13, relw=.235))
+
+        self.date = LabelDateButton(self, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46)
 
 
 
@@ -241,6 +243,9 @@ class ThriftDetail(Frame):
         self.show_debRecord = None
         self.show_contRecord = None
         self.updateBtn = None
+
+        self.date = None
+
 
 
 
