@@ -97,22 +97,23 @@ class NewThriftDialog(PRMP_Dialog):
         pass
 
 
-class ThriftsDetailsDialog(PRMP_Dialog):
+class ThriftDetailsDialog(PRMP_Dialog):
     def __init__(self, master=None, **kwargs):
-        super().__init__(master, **kwargs)
+        super().__init__(master, geo=(300, 600), **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
+        self.thriftDetail = ThriftDetail(self.container, background='orange', place=dict(relx=.02, rely=.005, relh=.9, relw=.96))
 
 
 class DailyContributionDailog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', area=None, **kwargs):
-        super().__init__(master, **kwargs)
+        super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):
         self.area = area
-        self.addTitleBar(title)
+        # self.addTitleBar(self.dumTitle)
 
         self.showAccount = Button
         self.subs = SubsList

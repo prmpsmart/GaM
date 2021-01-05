@@ -3,10 +3,10 @@ from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 class Thrifts(Object):
     Manager = 'DailyContribution'
     
-    def __init__(self, manager, clientAccount=None, income=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
+    def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=False, **kwargs):
         assert clientAccount, 'Account must be given'
 
-        self.account = clientAccount
+        self.account = self.clientAccount = clientAccount
         self.ledgerNumber = clientAccount.ledgerNumber
         self.debRecord = None
         self.contRecord = None
@@ -14,7 +14,7 @@ class Thrifts(Object):
         self.saved = 0
         
         super().__init__(manager, **kwargs)
-        self.paidout = True if paidout else False
+
         self.transfer = True if transfer else False
         
         max_ = 31.0
@@ -31,17 +31,17 @@ class Thrifts(Object):
             print(excess, required, contribs)
             raise ValueError(f'Excess of {excess}, Required [contribution={required}, money={required*self.rate}], current contributions is {contribs}.')
 
-        bal = float(self.account.balances)
-        debit = float(debit)
-        if debit <= bal or debit == 0.0: self.debit = debit
-        else: raise ValueError(f'Balance is {bal}, but income to be debited is {debit}')
+        bal = float(self.clientAccount.balances)
+        paidout = float(paidout)
+        if paidout <= bal or paidout == 0.0: self.paidout = paidout
+        else: raise ValueError(f'Balance is {bal}, but incamountome to be paidout is {paidout}')
 
         self.isUpfrontRepay()
 
         del self.objectSort
 
     def isUpfrontRepay(self):
-        if not self.account.upfronts.paid:
+        if not self.clientAccount.upfronts.paid:
             repay, remain = self.contributions._toUpfrontRepay(self.income)
             self.saved = remain
             self.upfrontRepay = repay
@@ -50,35 +50,35 @@ class Thrifts(Object):
     def withdraw(self): return
 
     @property
-    def month(self): return self.account.month
+    def month(self): return self.clientAccount.month
 
     @property
-    def name(self): return f'{self.className}({self.date.date}, No. {self.number}, [{self.account.region.name}, {self.account.name}])'
+    def name(self): return f'{self.className}({self.date.date}, No. {self.number}, {self.clientAccount.name})'
     
     def __eq__(self, other):
         if other == None: return False
         return (self.manager is other.manager) and (self.date == other.date) and (self.number == other.number)
 
     @property
-    def contributions(self): return self.account.contributions
+    def contributions(self): return self.clientAccount.contributions
 
     @property
     def regionName(self): return self.region.name
 
     @property
-    def region(self): return self.account.region
+    def region(self): return self.clientAccount.region
 
     @property
-    def rate(self): return self.account.rate
+    def rate(self): return self.clientAccount.rate
     
     def update(self):
         if self.contributed:
             if self.contRecord: pass
-            else: self.contRecord = self.account.addContribution(self.contributed, date=self.date, _type='t' if self.transfer else 'n')
+            else: self.contRecord = self.clientAccount.addContribution(self.contributed, date=self.date, _type='t' if self.transfer else 'n')
 
-        if self.debit:
+        if self.paidout:
             if self.debRecord: pass
-            else: self.debRecord = self.account.addDebit(self.debit, date=self.date, _type='p' if self.paidout else 'w')
+            else: self.debRecord = self.clientAccount.addDebit(self.paidout, date=self.date, _type='p')
         # print(self.contRecord[:])
     
     def delete(self):
@@ -93,8 +93,8 @@ class DailyContribution(ObjectsManager):
     MultipleSubsPerMonth = True
     subTypes = ['Thrifts']
     
-    columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
-    col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
+    columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Paidout', 'Upfront Repay', 'Saved']
+    col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)
@@ -126,7 +126,7 @@ class DailyContribution(ObjectsManager):
     def accountsManager(self): return self.manager.accountsManager
     
     @property
-    def name(self): return f'{self.className}({self.date.date})'
+    def name(self): return f'{self.className}({self.region.name} | {self.date.date})'
     
     def __eq__(self, other):
         if other == None: return False
@@ -147,7 +147,7 @@ class DailyContribution(ObjectsManager):
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
-    def addIncome(self, number, month=None, income=0, money=False, debit=0, paidout=False, transfer=False): return self.createSub(number, month=month, income=income, money=money, debit=debit, paidout=paidout, transfer=transfer)
+    def addIncome(self, number, month=None, income=0, money=False, paidout=0, transfer=False): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
     
     def getClientAccount(self, number, month=None):
         month = self.getDate(month)

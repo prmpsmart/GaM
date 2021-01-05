@@ -29,7 +29,7 @@ class DCAccount(Account):
     def __int__(self): return int(self.balances)
     def __float__(self): return float(self.balances)
     @property
-    def name(self): return f'{self.className}({self._month.dayMonthYear})'
+    def name(self): return f'{self.className}({self.region.name} | {self._month.dayMonthYear})'
     @property
     def month(self): return self._month
     @property
@@ -98,7 +98,7 @@ class ClientAccount(DCAccount):
         self.rates = Rates(self, rate)
     
     @property
-    def name(self): return f'{self.className}({self._month.monthYear} | Ledger-Number No. {self.ledgerNumber})'
+    def name(self): return f'{self.className}({self.region.name} | {self._month.monthYear} | Ledger-Number No. {self.ledgerNumber})'
     
     def income(self, date=None):
         date = self.getDate(date)
