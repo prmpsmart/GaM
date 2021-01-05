@@ -1089,7 +1089,7 @@ Progressbar = PPb = PRMP_Progressbar
 class PRMP_Separator(PRMP_Style_, ttk.Separator):
     
     def __init__(self, master=None, config={}, **kwargs):
-        ttk.Spinbox.__init__(self, master, **config)
+        ttk.Separator.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
 Separator = PS = PRMP_Separator
 

@@ -145,7 +145,7 @@ class TwoWidgets(PRMP_Frame):
             self.Bottom.place(relx=self.longent + .02, rely=0, relh=.945, relw=1 - self.longent - .02)
         else:
             self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
-            self.Bottom.place(relx=0, rely=.6, relw=1, relh=1 - self.longent - .05)
+            self.Bottom.place(relx=0, rely=self.longent+.05, relw=1, relh=1 - self.longent - .05)
         return self
 TW = TwoWidgets
 
