@@ -235,11 +235,16 @@ class ObjectSort(Mixins):
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
 
-    def __init__(self):
+    def __init__(self, date):
         self.__editableValues = []
-        self._subs = None
-        self._date = None
+        self._date = self.getDate(date)
         self.objectSort = ObjectSort(self)
+        
+        self._uniqueID = sha224(str(self).encode()).hexdigest()
+    
+    @property
+    def uniqueID(self): return self._uniqueID
+    
     
     @property
     def sort(self): return self.objectSort.sort
@@ -398,22 +403,21 @@ class Object(CompareByNumber, ObjectsMixins):
         return self is other
     
     def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
-        ObjectsMixins.__init__(self)
-        date = self.getDate(date)
-
+        
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
         self._number = number
         self._sup = sup
         
         self._name = name if not nameFromNumber else f'{self.className} {self.number}'
-        self._date = date
         self._manager = manager
         self._previous = previous
         self._next = None
+
+        ObjectsMixins.__init__(self, date)
         
-        self._uniqueID = sha224(self.id.encode()).hexdigest()
-    
+        # self._uniqueID = sha224(self.id.encode()).hexdigest()
+
     @property
     def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
     
@@ -429,11 +433,10 @@ class Object(CompareByNumber, ObjectsMixins):
     def subs(self): return []
     
     @property
-    def uniqueID(self): return self._uniqueID
-        
-    @property
     def name(self):
-        if self._name: return self._name
+        try:
+            if self._name: return self._name
+        except: pass
         return super().name
     @name.setter
     def name(self, n): self._name = n
@@ -470,10 +473,9 @@ class ObjectsManager(ObjectsMixins):
     
     def __init__(self, master=None):
         assert master != None, 'Master can not be None.'
-        super().__init__()
         self._master = master
         self._subs = []
-        self._date = master.date
+        super().__init__(master.date)
     
     def __len__(self): return len(self.subs)
     

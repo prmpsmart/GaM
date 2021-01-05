@@ -79,7 +79,7 @@ class Account(Object):
     def region(self): return self.manager.region
     
     @property
-    def subs(self): return self.recordsManagers
+    def subs(self): return self.recordsManagers or []
     
     @property
     def recordsManagers(self): self.notImp()
@@ -142,6 +142,7 @@ class AccountsManager(ObjectsManager):
     
     @property
     def accounts(self): return self.subs
+    
     @property
     def region(self): return self.master
     @property
@@ -167,8 +168,7 @@ class AccountsManager(ObjectsManager):
         
     def balanceAccount(self, month=None):
         if month:
-            PRMP_DateTime.checkDateTime(month)
-            account = self.getAccount(month=month)
+            account = self.getAccount(month=self.getDate(month))
             if account: account.balanceAccount()
         else:
             account = self.getLastAccount()

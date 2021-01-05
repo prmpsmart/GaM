@@ -15,13 +15,14 @@ class Record(Object):
     subTypes = ['Co Records', 'Linked Records']
 
     def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
-        Object.__init__(self, manager, name=note, **kwargs)
-
         self.money = money
         self.note = note
         self.__coRecord = coRecord
         self.__coRecords = None
         self.type = None
+
+        Object.__init__(self, manager, name=note, **kwargs)
+
 
         if coRecord != None: coRecord.addCoRecord(self)
         else:
@@ -45,7 +46,7 @@ class Record(Object):
         for rec in self.__coRecords: rec.updateOtherCoRecord(self)
 
     @property
-    def subs(self): return self.linkedRecords
+    def subs(self): return self.linkedRecords or []
 
     @property
     def coRecord(self): return self.__coRecord
@@ -96,7 +97,6 @@ class Repayment(Record):
     
     def __init__(self, manager, money, date=None, **kwargs):
         super().__init__(manager, money, date, **kwargs)
-        
         if self.duing: assert self.dueSeason and self.dueTime, 'Due Season and Time must be set.'
         
         if self.dueSeason == 'year': self.__dueDate = self.date + (self.dueTime * 12)

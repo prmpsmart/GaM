@@ -48,6 +48,7 @@ class Office(Region):
     
     @property
     def subs(self): return self.subRegions
+    
     @property
     def subRegions(self): return [self.coopOffice, self.dcOffice]
     

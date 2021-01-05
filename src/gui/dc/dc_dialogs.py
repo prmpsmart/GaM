@@ -104,6 +104,7 @@ class ThriftsDetailsDialog(PRMP_Dialog):
     def _setupDialog(self):
         self.addEditButton()
 
+
 class DailyContributionDailog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', area=None, **kwargs):

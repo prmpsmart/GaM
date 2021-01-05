@@ -78,9 +78,6 @@ class Region(Object):
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     
     @property
-    def subs(self): return self.accountsManager
-    
-    @property
     def totalSubs(self): return len(self.subs)
 
     @property
@@ -175,7 +172,7 @@ class Region(Object):
     def subRegionsManager(self): return self._subRegionsManager
     
     @property
-    def subs(self): return self.accountsManager if self.accountsManager else []
+    def subs(self): return self.accountsManager or []
     
     @property
     def subRegions(self): return self.subRegionsManager

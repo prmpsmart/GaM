@@ -5,8 +5,8 @@ class DCRecordsManager(RecordsManager):
     ObjectType = DCRecord
     
     def __init__(self, account, lastRecord=False):
-        super().__init__(account)
         self._lastRecord = lastRecord
+        super().__init__(account)
     
     def __int__(self):
         if self._lastRecord: return int(self.lastMoney)

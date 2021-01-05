@@ -226,12 +226,16 @@ class NewThrift(PRMP_FillWidgets, Frame):
 
 
 class ThriftDetail(Frame):
-    def __init__(self, master=None, thrift=None, manager=None, **kwargs):
+    def __init__(self, master=None, thrift=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, thrift)
 
         self.thrift = thrift
-        self.manager = manager
+
+        self.name = None
+        self.manager = None
+
+        self.account = None
 
         self.contributed = None
         self.income = None
@@ -245,6 +249,8 @@ class ThriftDetail(Frame):
         self.updateBtn = None
 
         self.date = None
+
+        self.uniqueID = None
 
 
 

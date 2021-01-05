@@ -4,7 +4,6 @@ class Thrifts(Object):
     Manager = 'DailyContribution'
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, debit=0, paidout=False, transfer=False, **kwargs):
-        super().__init__(manager, **kwargs)
         assert clientAccount, 'Account must be given'
 
         self.account = clientAccount
@@ -14,6 +13,7 @@ class Thrifts(Object):
         self.upfrontRepay = 0
         self.saved = 0
         
+        super().__init__(manager, **kwargs)
         self.paidout = True if paidout else False
         self.transfer = True if transfer else False
         
@@ -51,9 +51,6 @@ class Thrifts(Object):
 
     @property
     def month(self): return self.account.month
-    
-    @property
-    def subs(self): return self._subs
 
     @property
     def name(self): return f'{self.className}({self.date.date}, No. {self.number}, [{self.account.region.name}, {self.account.name}])'

@@ -7,10 +7,11 @@ class DCAccount(Account):
     Manager = 'DCAccountsManager'
     
     def __init__(self, manager, month=None, **kwargs):
-        super().__init__(manager, **kwargs)
         assert month, 'Month that this account belongs to must be given.'
 
         self._month = month
+
+        super().__init__(manager, **kwargs)
 
         self.incomes = Incomes(self)
         self.broughtForwards = BroughtForwards(self)
@@ -81,9 +82,6 @@ class DCAccountsManager(AccountsManager):
     def recordsManagers(self): return self.last if len(self) else []
 
 
-
-
-
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
     
@@ -91,15 +89,16 @@ class ClientAccount(DCAccount):
         self.areaAccount = areaAccount
         if month: assert month.monthYear == areaAccount.month.monthYear, 'ClientAccount month must be same as AreaAccount month.'
 
-        super().__init__(manager, month=month or areaAccount.month, **kwargs)
-
         rate = float(rate)
         self.ledgerNumber = ledgerNumber
+
+        super().__init__(manager, month=month or areaAccount.month, **kwargs)
+
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate)
     
     @property
-    def name(self): return f'{self.className}({self._month.monthYear} | No. {self.ledgerNumber})'
+    def name(self): return f'{self.className}({self._month.monthYear} | Ledger-Number No. {self.ledgerNumber})'
     
     def income(self, date=None):
         date = self.getDate(date)
