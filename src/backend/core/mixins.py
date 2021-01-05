@@ -17,19 +17,6 @@ class Mixins(PRMP_Mixins):
     
     numberToMoney = addSignToMoney
 
-    def stripSignFromMoney(self, money): return self.stripSignFromNum(money)
-
-    moneyToNumber = stripSignFromMoney
-   
-    
-    def checkMoney(self, money):
-        try:
-            if self._moneySign in money:
-                float(self.stripSignFromMoney(money))
-                return True
-            return False
-        except: return False
-
     def moneyWithSign_ListInList(self, listInList):
         try: listInList[0][0]
         except: raise AssertionError('Data must be list in another list')

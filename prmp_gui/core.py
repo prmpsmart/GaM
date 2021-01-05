@@ -806,6 +806,7 @@ class PRMP_Input:
         
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
+        self.returnType = str
 
         types = ['email', 'number', 'money']
         
@@ -817,6 +818,7 @@ class PRMP_Input:
             self.get = self.getNumber
             self.bind('<KeyRelease>', self.checkingNumber, '+')
             self.verify = self.checkingNumber
+            self.returnType = float
         elif _type == 'money':
             self.placeholder = self._moneySign
             self.set = self.setMoney
@@ -849,7 +851,7 @@ class PRMP_Input:
         
     def getNumber(self):
         number = self._get()
-        if self.checkNumber(number): return number
+        if self.checkNumber(number): return float(number)
 
     def setMoney(self, money=None):
         self.clear()
@@ -860,7 +862,7 @@ class PRMP_Input:
     def getMoney(self):
         money = self._get()
         if self.checkMoney(money): return self.moneyToNumber(money)
-        return money
+        return float(money)
         
     def entered(self, e=0):
         super().entered()

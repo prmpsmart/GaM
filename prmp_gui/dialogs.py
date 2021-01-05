@@ -105,7 +105,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
             self.unbindCR()
             self.submitBtn.place_forget()
     
-    def addEditButton(self, command=None, submitCommand=None):
+    def addEditButton(self, submitCommand=None):
         self.command = submitCommand
         if self.submitBtn == None: self.addSubmitButton(submitCommand)
         x, y = self.containerGeo
@@ -121,12 +121,12 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         
     def editInput(self, e=0):
         if self.editBtn == None: return
-        if e: self.editBtn.var.set('1')
-        if self.editBtn.var.get() == '1':self.placeSubmitBtn(1)
+        if e: self.editBtn.set('1')
+        if self.editBtn.get():self.placeSubmitBtn(1)
         else: self.placeSubmitBtn()
         for widgetName in self.resultsWidgets:
             wid = self[widgetName]
-            if self.editBtn.var.get() == '1': wid.normal()
+            if self.editBtn.get(): wid.normal()
             else: wid.disabled()
 PD = PRMP_Dialog
 

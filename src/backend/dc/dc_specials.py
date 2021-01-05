@@ -8,6 +8,7 @@ class Thrifts(Object):
         assert clientAccount, 'Account must be given'
 
         self.account = clientAccount
+        self.ledgerNumber = clientAccount.ledgerNumber
         self.debRecord = None
         self.contRecord = None
         self.upfrontRepay = 0
@@ -65,7 +66,7 @@ class Thrifts(Object):
     def contributions(self): return self.account.contributions
 
     @property
-    def regName(self): return self.region.name
+    def regionName(self): return self.region.name
 
     @property
     def region(self): return self.account.region
@@ -96,7 +97,7 @@ class DailyContribution(ObjectsManager):
     subTypes = ['Thrifts']
     
     columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
-    col_attr = [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
+    col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)

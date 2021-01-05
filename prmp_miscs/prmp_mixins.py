@@ -44,6 +44,7 @@ class PRMP_Mixins:
         num = num.replace(' ', '')
         return num.replace(' ', '').replace(self._moneySign, '')
     
+    moneyToNumber = stripSignFromMoney = stripSignFromNum
     
     @property
     def mro(self): return self.class_.__mro__
@@ -69,8 +70,15 @@ class PRMP_Mixins:
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
     
     def checkNumber(self, number): return str(number).isdigit()
-
     
+    def checkMoney(self, money):
+        try:
+            if self._moneySign in money:
+                float(self.stripSignFromMoney(money))
+                return True
+            return False
+        except: return False
+
     @classmethod
     def notImp(cls): raise NotImplementedError(f'A subclass of {cls} should call this method.')
 

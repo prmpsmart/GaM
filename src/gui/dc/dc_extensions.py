@@ -1,6 +1,6 @@
 from ..core.agam_apps import *
-from ...backend.dc.dc_regions import */
-from ...backend.dc.dc_specials import */
+from ...backend.dc.dc_regions import *
+from ...backend.dc.dc_specials import *
 from prmp_gui.plot_canvas import PRMP_PlotCanvas, random, ChartSort
 
 
@@ -200,6 +200,59 @@ class DC_Overview(Frame):
         if not self.account: return
         _prev = self.account.previous
         if _prev: self.updateDCDigits(_prev)
+
+
+class NewThrift(PRMP_FillWidgets, Frame):
+    def __init__(self, master=None, thrift=None, manager=None, callback=None, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self, thrift)
+
+        self.thrift = thrift
+        self.manager = manager
+
+        self.ledgerNumber = LabelEntry(self, topKwargs=dict(config=dict(text='Ledger Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.005, rely=.005, relh=.18, relw=.7), orient='h', longent=.655)
+
+        self.monthYear = LabelMonthYearButton(self, topKwargs=dict(config=dict(text='Month-Year')), place=dict(relx=.005, rely=.185, relh=.18, relw=.99), orient='h', longent=.46)
+
+        self.income = LabelEntry(self, topKwargs=dict(config=dict(text='Income')), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.365, relh=.36, relw=.4), orient='v')
+        self.money = Checkbutton(self, text='Money?', place=dict())
+        self.transfer = Checkbutton(self, text='Transfer?', place=dict())
+
+        self.debit = LabelEntry(self, topKwargs=dict(config=dict(text='Debit')), bottomKwargs=dict(_type='money'), orient='h')
+        self.paidout = Checkbutton(self, text='Paidout?', place=dict())
+
+
+
+class ThriftDetail(Frame):
+    def __init__(self, master=None, thrift=None, manager=None, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self, thrift)
+
+        self.thrift = thrift
+        self.manager = manager
+
+        self.contributed = None
+        self.income = None
+        self.debit = None
+        self.paidout = None
+        self.transfer = None
+
+        self.upfrontRepay = None
+        self.show_debRecord = None
+        self.show_contRecord = None
+        self.updateBtn = None
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

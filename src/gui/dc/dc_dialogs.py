@@ -62,29 +62,42 @@ class ClientAccountDialog(AccountDialog):
         self.addResultsWidgets('rate')
 
 
-class ThriftsDialog(PRMP_Dialog):
+class NewThriftDialog(PRMP_Dialog):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.showAccount = None
-        self.contributed = None
-        self.income = None
-        self.debit = None
-        self.paidout = None
-        self.transfer = None
-        self.showAccount = None
-        self.showAccount = None
-        self.showAccount = None
-        self.showAccount = None
+    def _setupDialog(self):
+        self.addEditButton()
+        self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.02, rely=.02, relh=.8, relw=.96))
 
+        self.ledgerNumber = self.thrifts.ledgerNumber
+        self.monthYear = self.thrifts.monthYear
+        self.income = self.thrifts.income
+        self.money = self.thrifts.money
+        self.debit = self.thrifts.debit
+        self.paidout = self.thrifts.paidout
+        self.transfer = self.thrifts.transfer
+
+        self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'debit', 'paidout', 'transfer'])
+
+class ThriftsDetailsDialog(PRMP_Dialog):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
+
+    def _setupDialog(self):
+        self.thrifts = NewThrift(self, callback=self.set)
 
 class DailyContributionDailog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', area=None, **kwargs):
         super().__init__(master, **kwargs)
 
+    def _setupDialog(self):
         self.area = area
         self.addTitleBar(title)
+
+        self.showAccount = Button
+
 
 
 
