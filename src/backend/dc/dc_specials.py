@@ -3,19 +3,22 @@ from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 class Thrifts(Object):
     Manager = 'DailyContribution'
     
-    def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=False, **kwargs):
+    def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=0, **kwargs):
         assert clientAccount, 'Account must be given'
 
         self.account = self.clientAccount = clientAccount
         self.ledgerNumber = clientAccount.ledgerNumber
         self.debRecord = None
         self.contRecord = None
-        self.upfrontRepay = 0
-        self.saved = 0
+        self.tranRecord = None
+        self.upfrontRepay = 0.
+        self.saved = 0.
+        self.updated = False
         
         super().__init__(manager, **kwargs)
 
-        self.transfer = True if transfer else False
+        self.transfer = float(transfer)
+        income = float(income)
         
         max_ = 31.0
         contribs = float(self.contributions)
@@ -72,14 +75,22 @@ class Thrifts(Object):
     def rate(self): return self.clientAccount.rate
     
     def update(self):
+        if self.updated: return
+
         if self.contributed:
             if self.contRecord: pass
-            else: self.contRecord = self.clientAccount.addContribution(self.contributed, date=self.date, _type='t' if self.transfer else 'n')
+            else:
+                cont = self.contributed
+                if self.transfer:
+                    cont -= (self.transfer/self.rate)
+                    self.tranRecord = self.clientAccount.addContribution(cont, date=self.date, _type='t')
+
+                if cont > 0.0: self.contRecord = self.clientAccount.addContribution(cont, date=self.date)
 
         if self.paidout:
             if self.debRecord: pass
             else: self.debRecord = self.clientAccount.addDebit(self.paidout, date=self.date, _type='p')
-        # print(self.contRecord[:])
+        self.updated = True
     
     def delete(self):
         if self.contRecord: self.contRecord.delete()
@@ -93,8 +104,8 @@ class DailyContribution(ObjectsManager):
     MultipleSubsPerMonth = True
     subTypes = ['Thrifts']
     
-    columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Paidout', 'Upfront Repay', 'Saved']
-    col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Paidout', 'Upfront Repay', 'Saved']
+    columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
+    col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager)
@@ -147,7 +158,7 @@ class DailyContribution(ObjectsManager):
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
-    def addIncome(self, number, month=None, income=0, money=False, paidout=0, transfer=False): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
+    def addIncome(self, number, month=None, income=0, money=False, paidout=0, transfer=0): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
     
     def getClientAccount(self, number, month=None):
         month = self.getDate(month)

@@ -224,7 +224,7 @@ class NewThrift(PRMP_FillWidgets, Frame):
 
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
-    def fff(self): print(self.a.__dict__)
+    
     def __init__(self, master=None, thrift=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, thrift)
@@ -235,23 +235,25 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.clientAccount = Button(self, text='Client Account', place=dict(relx=.4, rely=.01, relh=.06, relw=.55))
         self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.08, relh=.06, relw=.7), orient='h')
 
-        self.a = PRMP_Separator(self, place=dict(relx=.005, rely=.15, relh=.5, relw=.99), config=dict(command=self.fff))
+        PRMP_Separator(self, place=dict(relx=.005, rely=.15, relh=.004, relw=.99))
 
-        # self.contributed = LabelLabel(self, topKwargs=dict(text=''), place=dict(relx=.005, rely=.17, relh=.12, relw=.3))
-        self.income = LabelLabel(self, topKwargs=dict(text=''), place=dict())
-        self.paidout = LabelLabel(self, topKwargs=dict(text=''), place=dict())
+        self.contributed = LabelLabel(self, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.17, relh=.06, relw=.8), orient='h')
+        self.transfer = LabelLabel(self, topKwargs=dict(text='Transfer'), place=dict(relx=.005, rely=.24, relh=.06, relw=.8), orient='h')
+        self.income = LabelLabel(self, topKwargs=dict(text='Income'), place=dict(relx=.005, rely=.31, relh=.06, relw=.8), orient='h')
+        self.paidout = LabelLabel(self, topKwargs=dict(text='Paidout'), place=dict(relx=.005, rely=.38, relh=.06, relw=.8), orient='h')
 
-        self.saved = LabelLabel(self, topKwargs=dict(text=''), place=dict())
-        self.upfrontRepay = LabelLabel(self, topKwargs=dict(text=''), place=dict())
+        PRMP_Separator(self, place=dict(relx=.005, rely=.45, relh=.005, relw=.99))
 
-        self.transfer = LabelLabel(self, topKwargs=dict(text=''), place=dict())
+        self.saved = LabelLabel(self, topKwargs=dict(text='Saved'), place=dict(relx=.005, rely=.47, relh=.06, relw=.8), orient='h')
+        self.upfrontRepay = LabelLabel(self, topKwargs=dict(text='Upfront Repay'), place=dict(relx=.005, rely=.54, relh=.06, relw=.8), orient='h', longent=.6)
 
+        PRMP_Separator(self, place=dict(relx=.005, rely=.61, relh=.005, relw=.99))
 
-        self.uniqueID = LabelLabel(self, topKwargs=dict(text=''), place=dict())
+        self.uniqueID = LabelLabel(self, topKwargs=dict(text=''), place=dict(relx=.005, rely=.62, relh=.13, relw=.99))
 
-        self.debRecord = Button(self, text='Debit Record', place=dict())
-        self.contRecord = Button(self, text='Contribution Record', place=dict())
-        self.updateBtn = Button(self, text='Update', place=dict())
+        self.debRecord = Button(self, text='Debit Record', place=dict(relx=.005, rely=.77, relh=.06, relw=.4))
+        self.contRecord = Button(self, text='Contribution Record', place=dict(relx=.005, rely=.84, relh=.06, relw=.7))
+        self.updateBtn = Button(self, text='Update', place=dict(relx=.45, rely=.75, relh=.06, relw=.4))
 
     
     

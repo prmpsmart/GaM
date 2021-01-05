@@ -62,14 +62,13 @@ class ClientAccountDialog(AccountDialog):
 
 
 class NewThriftDialog(PRMP_Dialog):
-    def __init__(self, master=None, thrift = None, manager=None, **kwargs):
+    def __init__(self, master=None, thrift=None, title='New Thrift Dialog', manager=None, **kwargs):
         self.thrift = thrift
         self.manager = manager
-        super().__init__(master, geo=(350, 300), **kwargs)
+        super().__init__(master, geo=(350, 300), title=title, **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
-        self.addTitleBar('New Thrift Dialog')
         self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96))
 
         self.ledgerNumber = self.thrifts.ledgerNumber
@@ -97,12 +96,12 @@ class NewThriftDialog(PRMP_Dialog):
 
 
 class ThriftDetailsDialog(PRMP_Dialog):
-    def __init__(self, master=None, **kwargs):
-        super().__init__(master, geo=(300, 600), **kwargs)
+    def __init__(self, master=None, title='Thrift Details Dialog', **kwargs):
+        super().__init__(master, geo=(300, 550), title=title, **kwargs)
 
     def _setupDialog(self):
-        self.addEditButton()
-        self.thriftDetail = ThriftDetail(self.container, background='orange', place=dict(relx=.02, rely=.005, relh=.9, relw=.96))
+        # self.addEditButton()
+        self.thriftDetail = ThriftDetail(self.container, background='orange', place=dict(relx=.02, rely=.005, relh=.99, relw=.96))
 
 
 class DailyContributionDailog(PRMP_Dialog):
