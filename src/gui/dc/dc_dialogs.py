@@ -38,15 +38,14 @@ class ClientDialog(PersonDialog):
         self.addResultsWidgets(['rate', 'cardDue'])
     
     def processInput(self, e=0):
-        result = super().processInput(e)
+        result = super().processInput(1)
 
-        if result == None: return
+        if result:
 
-        if self.client and PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question').result == True: print('yes')
-        
-        elif self.manager and PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question').result == True: client = self.manager.createClient(**result)
+            if self.client and PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question').result == True: print('yes')
+            
+            elif self.manager and PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question').result == True: client = self.manager.createClient(**result)
 
-        if self._return: self.destroy()
 
         print(result)
 
@@ -63,11 +62,14 @@ class ClientAccountDialog(AccountDialog):
 
 
 class NewThriftDialog(PRMP_Dialog):
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, master=None, thrift = None, manager=None, **kwargs):
+        self.thrift = thrift
+        self.manager = manager
         super().__init__(master, **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
+        self.addTitleBar('New Thrift Dialog')
         self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.02, rely=.02, relh=.8, relw=.96))
 
         self.ledgerNumber = self.thrifts.ledgerNumber
@@ -79,6 +81,21 @@ class NewThriftDialog(PRMP_Dialog):
         self.transfer = self.thrifts.transfer
 
         self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'debit', 'paidout', 'transfer'])
+    
+    def action(self):
+        if self.result:
+            if self.thrift: PRMP_MsgBox(self, title='Edit thrift Details', message='Are you sure to edit the details of this thrift?', _type='question', callback=self.updateThrift)
+            
+            elif self.manager: PRMP_MsgBox(self, title='Thrift Creation', message='Are you sure to create a new Thrift?', _type='question', callback=newThrift)
+            else: PRMP_MsgBox(self, title='Thrift Dialog Error', message='No Thrift or Manager is given.', _type='error', ask=0)
+    
+    def updateThrift(self, w):
+        pass
+    
+    def newThrift(self, w):
+        pass
+    
+
 
 class ThriftsDetailsDialog(PRMP_Dialog):
     def __init__(self, master=None, **kwargs):

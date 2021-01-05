@@ -15,7 +15,7 @@ class PersonDialog(PRMP_Dialog):
         name = self.values.get('name')
         if name: self.addTitleBar(name)
         
-        self.addEditButton()
+        self.addEditButton(self.action)
         
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
         
@@ -35,12 +35,12 @@ class PersonDialog(PRMP_Dialog):
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
 
-    def processInput(self, e=0):
-        result = super().processInput()
-        if result:
+    def action(self):
+        if self.result:
             if self.person: PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question', callback=self.updatePerson)
             
             elif self.manager: PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', callback=newPerson)
+            else: PRMP_MsgBox(self, title='Person Dialog Error', message='No Person or Manager is given.', _type='error', ask=0)
 
 
     def updatePerson(self, w):
@@ -49,7 +49,7 @@ class PersonDialog(PRMP_Dialog):
 
     def newPerson(self, w):
         if w:
-            person = self.manager.createPerson(**result)
+            person = self.manager.createPerson(**self.result)
             self._setResult(person)
         self.destroyDialog()
 PerD = PersonDialog
@@ -93,12 +93,12 @@ class RecordDialog(PRMP_Dialog):
         self.changeGeometry(geo=geo)
         self.cont.place(relx=0, rely=0, relh=1, relw=relw)
 
-    def processInput(self):
-        result = super().processInput()
-        if result: 
+    def action(self):
+        if self.result: 
             if self.record: PRMP_MsgBox(self, title='Edit Record Details', message='Are you sure to edit the details of this record?', _type='question', callback=self.updateRecord)
         
             elif self.manager: PRMP_MsgBox(self, title='Record Creation', message='Are you sure to create a new record?', _type='question', callback=self.newRecord)
+            else: PRMP_MsgBox(self, title='Record Dialog Error', message='No Record or Manager is given.', _type='error', ask=0)
 
         if self._return: self.destroy()
 
@@ -108,7 +108,7 @@ class RecordDialog(PRMP_Dialog):
 
     def newRecord(self, w):
         if w:
-            record = self.manager.createRecord(**result)
+            record = self.manager.createRecord(**self.result)
             self._setResult(record)
         self.destroyDialog()
 RecD = RecordDialog
@@ -133,13 +133,13 @@ class AccountDialog(PRMP_Dialog):
 
         self.addResultsWidgets('month')
     
-    def processInput(self):
-        result = super().processInput()
-        if result:
+    def action(self):
+        if self.result:
 
             if self.account: PRMP_MsgBox(self, title='Edit Account Details', message='Are you sure to edit the details of this account?', _type='question', callback=self.updateAccount)
         
             elif self.manager: PRMP_MsgBox(self, title='Account Creation', message='Are you sure to create a new account?', _type='question', callback=self.newAccount)
+            else: PRMP_MsgBox(self, title='Account Dialog Error', message='No Account or Manager is given.', _type='error', ask=0)
     @property
     def result(self):
         res = super().result

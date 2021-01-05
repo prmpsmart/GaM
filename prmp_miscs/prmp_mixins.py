@@ -35,9 +35,15 @@ class PRMP_Mixins:
         return "".join(num_list)
     
     def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num))
-
     
-    def addSignToNum(self, num): return f'{self._moneySign}{num}'
+    def addSignToNum(self, num):
+        try: float(num)
+        except:
+            if num == self._moneySign: return num
+            
+        return f'{self._moneySign} {num}'
+    
+    numberToMoney = addSignToMoney = addSignToNum
 
     def stripSignFromNum(self, num):
         num = num.replace(self._moneySign, '')

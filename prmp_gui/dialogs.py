@@ -49,7 +49,6 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         self.callback = callback
         self._return = _return
 
-        self.command = None
         self.submitBtn = None
         self.editBtn = None
         
@@ -88,10 +87,10 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         self.__result = result
         if self.callback: self.callback(result)
     
-    def addSubmitButton(self, command=None):
-        self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=command or self.processInput))
+    def addSubmitButton(self):
+        self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=self.processInput))
     
-    def bindCR(self): self.bind('<Control-Return>', self.command or self.processInput)
+    def bindCR(self): self.bind('<Control-Return>', self.processInput)
     def unbindCR(self): self.unbind('<Control-Return>')
     
     def placeSubmitBtn(self, wh=0):
@@ -105,9 +104,8 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
             self.unbindCR()
             self.submitBtn.place_forget()
     
-    def addEditButton(self, submitCommand=None):
-        self.command = submitCommand
-        if self.submitBtn == None: self.addSubmitButton(submitCommand)
+    def addEditButton(self):
+        if self.submitBtn == None: self.addSubmitButton()
         x, y = self.containerGeo
         self.editBtn = xbtn = PRMP_Style_Checkbutton(self.container, config=dict(text='Edit', command=self.editInput))
         xbtn.place(x=10 , y=y-40, h=30, w=60)
@@ -116,8 +114,9 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         result = self.get()
         # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': PRMP_DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
         self._setResult(result)
-        
-        return self.result
+        self.action()
+            
+    def action(self): print('redefine this method for functionality')
         
     def editInput(self, e=0):
         if self.editBtn == None: return

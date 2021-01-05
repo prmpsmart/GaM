@@ -210,16 +210,16 @@ class NewThrift(PRMP_FillWidgets, Frame):
         self.thrift = thrift
         self.manager = manager
 
-        self.ledgerNumber = LabelEntry(self, topKwargs=dict(config=dict(text='Ledger Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.005, rely=.005, relh=.18, relw=.7), orient='h', longent=.655)
+        self.ledgerNumber = LabelEntry(self, topKwargs=dict(config=dict(text='Ledger Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.005, rely=.005, relh=.18, relw=.99), orient='h', longent=.46)
 
         self.monthYear = LabelMonthYearButton(self, topKwargs=dict(config=dict(text='Month-Year')), place=dict(relx=.005, rely=.185, relh=.18, relw=.99), orient='h', longent=.46)
 
-        self.income = LabelEntry(self, topKwargs=dict(config=dict(text='Income')), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.365, relh=.36, relw=.4), orient='v')
-        self.money = Checkbutton(self, text='Money?', place=dict())
-        self.transfer = Checkbutton(self, text='Transfer?', place=dict())
+        self.income = LabelEntry(self, topKwargs=dict(config=dict(text='Income')), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.365, relh=.18, relw=.6), orient='h', longent=.4)
+        self.money = Checkbutton(self, text='Money?', place=dict(relx=.65, rely=.365, relh=.13, relw=.3))
+        self.transfer = Checkbutton(self, text='Transfer?', place=dict(relx=.65, rely=.495, relh=.13, relw=.3))
 
-        self.debit = LabelEntry(self, topKwargs=dict(config=dict(text='Debit')), bottomKwargs=dict(_type='money'), orient='h')
-        self.paidout = Checkbutton(self, text='Paidout?', place=dict())
+        self.debit = LabelEntry(self, topKwargs=dict(config=dict(text='Debit')), bottomKwargs=dict(_type='money', default=0), orient='h', place=dict(relx=.005, rely=.73, relh=.18, relw=.6))
+        self.paidout = Checkbutton(self, text='Paidout?', place=dict(relx=.65, rely=.74, relh=.13, relw=.3))
 
 
 

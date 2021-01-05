@@ -352,7 +352,7 @@ class PRMP_Theme(PRMP_Mixins):
     
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder', '_type']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder', '_type', 'default']}
             
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -798,7 +798,7 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
     
-    def __init__(self, placeholder='', _type='text', values=[], very=False, **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], very=False, default=None, **kwargs):
         _type = _type.lower()
 
         self.placeholder = placeholder
@@ -821,6 +821,7 @@ class PRMP_Input:
             self.returnType = float
         elif _type == 'money':
             self.placeholder = self._moneySign
+            if default != None: self.placeholder = f'{self._moneySign}{default}'
             self.set = self.setMoney
             self.get = self.getMoney
             self.bind('<KeyRelease>', self.checkingMoney, '+')
@@ -830,7 +831,7 @@ class PRMP_Input:
             self.verify = self.normVery
         
         if self.values or (_type in types): self.very = True
-        else: self.very = False or very
+        else: self.very = very or False
 
         self.set(self.placeholder)
     
@@ -861,8 +862,8 @@ class PRMP_Input:
         
     def getMoney(self):
         money = self._get()
-        if self.checkMoney(money): return self.moneyToNumber(money)
-        return float(money)
+        if self.checkMoney(money): return float(self.moneyToNumber(money))
+        return money
         
     def entered(self, e=0):
         super().entered()

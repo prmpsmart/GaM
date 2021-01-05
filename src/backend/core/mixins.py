@@ -10,12 +10,6 @@ class Mixins(PRMP_Mixins):
         if date == None: date = PRMP_DateTime.now()
         PRMP_DateTime.checkDateTime(date)
         return date
-    
-    def addSignToMoney(self, money):
-        float(money)
-        return self.addSignToNum(money)
-    
-    numberToMoney = addSignToMoney
 
     def moneyWithSign_ListInList(self, listInList):
         try: listInList[0][0]
