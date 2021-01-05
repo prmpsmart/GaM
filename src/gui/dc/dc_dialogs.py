@@ -69,7 +69,7 @@ class ThriftDialog(PRMP_Dialog):
 
     def _setupDialog(self):
         self.addEditButton()
-        self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, manager=self.manager)
+        self.thrifts = Thrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, manager=self.manager)
 
         self.ledgerNumber = self.thrifts.ledgerNumber
         self.month = self.thrifts.month

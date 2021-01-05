@@ -202,7 +202,7 @@ class DC_Overview(Frame):
         if _prev: self.updateDCDigits(_prev)
 
 
-class NewThrift(PRMP_FillWidgets, Frame):
+class Thrift(PRMP_FillWidgets, Frame):
     def __init__(self, master=None, thrift=None, manager=None, callback=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
