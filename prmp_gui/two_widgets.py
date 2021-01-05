@@ -201,7 +201,9 @@ class LabelButton(TwoWidgets):
 LB = LabelButton
 
 class LabelLabel(TwoWidgets):
-    def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='label',**kwargs)
+    def __init__(self, master, bottomKwargs={}, **kwargs):
+        if not bottomKwargs.get('font'): bottomKwargs['font'] = 'DEFAULT_FONT'
+        super().__init__(master, top='label', bottom='label', bottomKwargs=bottomKwargs, **kwargs)
 LL = LabelLabel
 
 class LabelDateButton(TwoWidgets):

@@ -61,25 +61,25 @@ class ClientAccountDialog(AccountDialog):
         self.addResultsWidgets('rate')
 
 
-class NewThriftDialog(PRMP_Dialog):
-    def __init__(self, master=None, thrift=None, title='New Thrift Dialog', manager=None, **kwargs):
+class ThriftDialog(PRMP_Dialog):
+    def __init__(self, master=None, thrift=None, title='Thrift Dialog', manager=None, **kwargs):
         self.thrift = thrift
         self.manager = manager
         super().__init__(master, geo=(350, 300), title=title, **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
-        self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96))
+        self.thrifts = NewThrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, manager=self.manager)
 
         self.ledgerNumber = self.thrifts.ledgerNumber
-        self.monthYear = self.thrifts.monthYear
+        self.month = self.thrifts.month
         self.income = self.thrifts.income
         self.money = self.thrifts.money
         self.paidout = self.thrifts.paidout
         self.transfer = self.thrifts.transfer
         self.date = self.thrifts.date
 
-        self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'paidout', 'transfer', 'date'])
+        self.addResultsWidgets(['ledgerNumber', 'month', 'income', 'money', 'paidout', 'transfer', 'date'])
     
     def action(self):
         if self.result:
@@ -89,16 +89,21 @@ class NewThriftDialog(PRMP_Dialog):
             else: PRMP_MsgBox(self, title='Thrift Dialog Error', message='No Thrift or Manager is given.', _type='error', ask=0)
     
     def updateThrift(self, w):
-        pass
+        if w: self.thrift.update(self.result)
+        self.destroyDialog()
     
     def newThrift(self, w):
-        pass
+        if w:
+            thrift = self.manager.createThrift(**self.result)
+            self._setResult(thrift)
+        self.destroyDialog()
+
 
 
 class ThriftDetailsDialog(PRMP_Dialog):
-    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, **kwargs):
+    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, geo=(350, 550), **kwargs):
         self.thrift = thrift
-        super().__init__(master, geo=(300, 550), title=title, **kwargs)
+        super().__init__(master, geo=geo, title=title, **kwargs)
 
     def _setupDialog(self):
         # self.addEditButton()

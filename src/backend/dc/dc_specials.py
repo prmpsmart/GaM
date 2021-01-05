@@ -12,8 +12,9 @@ class Thrifts(Object):
         self.contRecord = None
         self.tranRecord = None
         self.upfrontRepay = 0.
-        self.saved = 0.
+        
         self.updated = False
+        self.money = money
         
         super().__init__(manager, **kwargs)
 
@@ -23,11 +24,13 @@ class Thrifts(Object):
         max_ = 31.0
         contribs = float(self.contributions)
 
+        self.cash = income if not transfer else income - transfer
+
         contributed = income/self.rate if money else income
         new = contribs + contributed
         if new <= max_:
             self.contributed = contributed
-            self.income = contributed * self.rate
+            self.saved = self.income = contributed * self.rate
         else:
             excess = new - max_
             required = max_ - contribs
@@ -77,15 +80,13 @@ class Thrifts(Object):
     def update(self):
         if self.updated: return
 
-        if self.contributed:
+        if self.transfer:
+            if self.tranRecord: pass
+            else: self.tranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
+                
+        if self.cash:
             if self.contRecord: pass
-            else:
-                cont = self.contributed
-                if self.transfer:
-                    cont -= (self.transfer/self.rate)
-                    self.tranRecord = self.clientAccount.addContribution(cont, date=self.date, _type='t')
-
-                if cont > 0.0: self.contRecord = self.clientAccount.addContribution(cont, date=self.date)
+            else: self.contRecord = self.clientAccount.addContribution(self.cash/self.rate, date=self.date)
 
         if self.paidout:
             if self.debRecord: pass
@@ -94,6 +95,7 @@ class Thrifts(Object):
     
     def delete(self):
         if self.contRecord: self.contRecord.delete()
+        if self.tranRecord: self.tranRecord.delete()
         if self.debRecord: self.debRecord.delete()
         self.manager.removeSub(self)
 
@@ -158,7 +160,7 @@ class DailyContribution(ObjectsManager):
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
-    def addIncome(self, number, month=None, income=0, money=False, paidout=0, transfer=0): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
+    def createThrift(self, number, month=None, income=0, money=False, paidout=0, transfer=0): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
     
     def getClientAccount(self, number, month=None):
         month = self.getDate(month)

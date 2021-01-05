@@ -244,10 +244,12 @@ class PRMP_DateWidget:
 
     def set(self, date):
         if isinstance(date, str):
-            if '-' in date: d, m, y = date.split('-')
-            elif '/' in date: d, m, y = date.split('/')
-            else: return
-            self.date = self.DT.createDateTime(int(y), int(m), int(d))
+            try:
+                if '-' in date: d, m, y = date.split('-')
+                elif '/' in date: d, m, y = date.split('/')
+                else: return
+                self.date = self.DT.createDateTime(int(y), int(m), int(d))
+            except: return
         elif isinstance(date, self.DT): self.date = date
         self.show()
         
