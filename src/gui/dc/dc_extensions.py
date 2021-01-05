@@ -215,11 +215,10 @@ class NewThrift(PRMP_FillWidgets, Frame):
         self.monthYear = LabelMonthYearButton(self, topKwargs=dict(text='Month-Year'), place=dict(relx=.005, rely=.18, relh=.18, relw=.99), orient='h', longent=.46)
 
         self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.18, relw=.5), orient='h', longent=.5)
-        self.money = Checkbutton(self, text='Money?', place=dict(relx=.52, rely=.37, relh=.13, relw=.23))
-        self.transfer = Checkbutton(self, text='Transfer?', place=dict(relx=.76, rely=.37, relh=.13, relw=.24))
+        self.money = Checkbutton(self, text='Money?', place=dict(relx=.76, rely=.37, relh=.13, relw=.23))
+        self.transfer = Checkbutton(self, text='Transfer?', place=dict(relx=.76, rely=.52, relh=.13, relw=.24))
 
-        self.debit = LabelEntry(self, topKwargs=dict(text='Debit'), bottomKwargs=dict(_type='money', default=0), orient='h', place=dict(relx=.005, rely=.54, relh=.18, relw=.6))
-        self.paidout = Checkbutton(self, text='Paidout?', place=dict(relx=.62, rely=.555, relh=.13, relw=.235))
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money', default=0), orient='h', place=dict(relx=.005, rely=.54, relh=.18, relw=.6))
 
         self.date = LabelDateButton(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46)
 
@@ -233,21 +232,22 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.thrift = thrift
 
         self.manager = LabelButton(self, topKwargs=dict(text='Manager'), place=dict(), orient='h')
-        self.clientAccount = LabelButton(self topKwargs=dict(text='Manager'), place=dict(), orient='h')
+        self.clientAccount = LabelButton(self, topKwargs=dict(text='Manager'), place=dict(), orient='h')
 
         self.contributed = None
         self.income = None
-        self.saved = None
-        self.debit = None
         self.paidout = None
+
+        self.saved = None
+        self.upfrontRepay = None
+
         self.transfer = None
 
-        self.upfrontRepay = None
-        self.debRecord = LabelButton(self topKwargs=dict(text='Manager'), place=dict(), orient='h')
-        self.contRecord = LabelButton(self topKwargs=dict(text='Manager'), place=dict(), orient='h')
-        self.updateBtn = LabelButton(self topKwargs=dict(text='Manager'), place=dict(), orient='h')
+        self.debRecord = LabelButton(self, topKwargs=dict(text='Manager'), place=dict(), orient='h')
+        self.contRecord = LabelButton(self, topKwargs=dict(text='Manager'), place=dict(), orient='h')
+        self.updateBtn = LabelButton(self, topKwargs=dict(text='Manager'), place=dict(), orient='h')
 
-        self.date = LabelLabel(self topKwargs=dict(text='Manager'), place=dict(), orient='h')
+        self.date = LabelLabel(self, topKwargs=dict(text='Manager'), place=dict(), orient='h')
 
         self.uniqueID = None
     

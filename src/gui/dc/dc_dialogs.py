@@ -76,12 +76,11 @@ class NewThriftDialog(PRMP_Dialog):
         self.monthYear = self.thrifts.monthYear
         self.income = self.thrifts.income
         self.money = self.thrifts.money
-        self.debit = self.thrifts.debit
         self.paidout = self.thrifts.paidout
         self.transfer = self.thrifts.transfer
         self.date = self.thrifts.date
 
-        self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'debit', 'paidout', 'transfer', 'date'])
+        self.addResultsWidgets(['ledgerNumber', 'monthYear', 'income', 'money', 'paidout', 'transfer', 'date'])
     
     def action(self):
         if self.result:
