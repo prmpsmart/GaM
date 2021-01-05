@@ -96,12 +96,13 @@ class NewThriftDialog(PRMP_Dialog):
 
 
 class ThriftDetailsDialog(PRMP_Dialog):
-    def __init__(self, master=None, title='Thrift Details Dialog', **kwargs):
+    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, **kwargs):
+        self.thrift = thrift
         super().__init__(master, geo=(300, 550), title=title, **kwargs)
 
     def _setupDialog(self):
         # self.addEditButton()
-        self.thriftDetail = ThriftDetail(self.container, background='orange', place=dict(relx=.02, rely=.005, relh=.99, relw=.96))
+        self.thriftDetail = ThriftDetail(self.container, place=dict(relx=.02, rely=.005, relh=.99, relw=.96), thrift=self.thrift)
 
 
 class DailyContributionDailog(PRMP_Dialog):
