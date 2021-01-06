@@ -46,7 +46,7 @@ class Thrift(Object):
     
     def update(self, transfer=0, income=0, money=False, paidout=0, reload_=0):
         self.deleteRecords()
-        
+
         self.updated = False
         self.upfrontRepay = 0.
 
@@ -164,27 +164,13 @@ class DailyContribution(ObjectsManager):
     col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
-        super().__init__(manager)
+        super().__init__(manager, date=date, previous=previous)
 
-        self._date = date
-        self._previous = previous
         self.number = number
         self._bto = 0
-        self._next = None
 
     @property
     def thrifts(self): return self.subs
-
-    @property
-    def previous(self): return self._previous
-    
-    @property
-    def next(self): return self._next
-    
-    @next.setter
-    def next(self, next_):
-        if self._next == None: self._next = next_
-        else: raise self.Errors('A next is already set.')
     
     @property
     def manager(self): return self.master

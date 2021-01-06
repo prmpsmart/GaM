@@ -234,18 +234,25 @@ class ObjectSort(Mixins):
 
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
-
-    def __init__(self, date):
+    
+    def __init__(self, date=None, previous=None):
         self.__editableValues = []
         self._date = self.getDate(date)
         self.objectSort = ObjectSort(self)
+        
+        self.previous = previous
+        self.next = None
         
         self._uniqueID = sha224(str(self).encode()).hexdigest()
     
     @property
     def uniqueID(self): return self._uniqueID
     
-    def delete(self): self.manager.removeSub(self, called)
+    def delete(self):
+        if self.next: self.next.previous = self.previous
+        if self.previous: self.previous.next = self.next
+
+        self.manager.removeSub(self, called)
     
     @property
     def sort(self): return self.objectSort.sort
@@ -403,7 +410,7 @@ class Object(CompareByNumber, ObjectsMixins):
         if other == None: return False
         return self is other
     
-    def __init__(self, manager=None, number=None, previous=None, date=None, name=None, nameFromNumber=False, sup=None, **kwargs):
+    def __init__(self, manager=None, number=None, name=None, nameFromNumber=False, sup=None, date=None, previous=None, **kwargs):
         
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
         
@@ -412,10 +419,8 @@ class Object(CompareByNumber, ObjectsMixins):
         
         self._name = name if not nameFromNumber else f'{self.className} {self.number}'
         self._manager = manager
-        self._previous = previous
-        self._next = None
 
-        ObjectsMixins.__init__(self, date)
+        ObjectsMixins.__init__(self, date=date, previous=previous)
         
         # self._uniqueID = sha224(self.id.encode()).hexdigest()
 
@@ -452,17 +457,7 @@ class Object(CompareByNumber, ObjectsMixins):
     
     @property
     def number(self): return self._number
-    
-    @property
-    def previous(self): return self._previous
-    
-    @property
-    def next(self): return self._next
-    
-    @next.setter
-    def next(self, next_):
-        if self._next == None: self._next = next_
-        else: raise self.Errors('A next is already set.')
+
 
 
 class ObjectsManager(ObjectsMixins):
@@ -472,11 +467,11 @@ class ObjectsManager(ObjectsMixins):
     @property
     def objectName(self): return self.ObjectType.__name__
     
-    def __init__(self, master=None):
+    def __init__(self, master=None, date=None, previous=None):
         assert master != None, 'Master can not be None.'
         self._master = master
         self._subs = []
-        super().__init__(master.date)
+        ObjectsMixins.__init__(self, date=date or master.date, previous=previous)
     
     def __len__(self): return len(self.subs)
     

@@ -167,7 +167,10 @@ class PRMP_MsgBox(PRMP_Dialog):
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
-        self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250), font=self.msgFont)
+        self.label = PRMP_Text(self.container, state='disabled')
+        self.label.set(self.message)
+        # self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250), font='MENU_FONT')
+#
         
         self.label.place(x=0, y=0, relh=1, relw=.85)
         
