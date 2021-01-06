@@ -13,8 +13,13 @@ class DCRecord(Record):
 
 
 
-class DCRepayment(Repayment): pass
-    # Managers = ('Upfronts', )
+class DCRepayment(Repayment):
+    
+    def delete(self, called=0):
+        if called == 0:
+            for a in self: a.delete(1)
+        self.manager.removeRecord(self, called)
+
 
 
 
@@ -75,9 +80,14 @@ class Income(DCRecord): pass
 
 class Saving(DCRecord): pass
 
-class UpfrontRepayment(Record): Manager = 'UpfrontRepaymentsManager'
+class UpfrontRepayment(DCRecord): Manager = 'UpfrontRepaymentsManager'
 
-class UpfrontRepaymentsManager(RecordsManager): ObjectType = UpfrontRepayment
+class UpfrontRepaymentsManager(RecordsManager):
+    ObjectType = UpfrontRepayment
+
+    def removeRecord(self, rec, called=0):
+        super().removeRecord(rec)
+        if called == 0: self.balance()
 
 
 class Upfront(DCRepayment):

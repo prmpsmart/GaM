@@ -245,6 +245,7 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def uniqueID(self): return self._uniqueID
     
+    def delete(self): self.manager.removeSub(self, called)
     
     @property
     def sort(self): return self.objectSort.sort

@@ -45,6 +45,8 @@ class Thrift(Object):
         return self._subs
     
     def update(self, transfer=0, income=0, money=False, paidout=0, reload_=0):
+        self.deleteRecords()
+        
         self.updated = False
         self.upfrontRepay = 0.
 
@@ -89,6 +91,7 @@ class Thrift(Object):
         self.tranRecord = None
         self.debRecord = None
         self.conTranRecord = None
+        self.account.balanceAccount()
 
     def isUpfrontRepay(self):
         if not self.clientAccount.upfronts.paid:
