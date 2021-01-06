@@ -265,7 +265,7 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
 
         self.contributed = LabelEntry(self, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.16, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
         self.cash = LabelEntry(self, topKwargs=dict(text='Cash'), place=dict(relx=.005, rely=.23, relh=.07, relw=.43), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
-        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), place=dict(relx=.51, rely=.23, relh=.07, relw=.48), orient='h', longent=.47, bottomKwargs=dict(state='readonly'))
+        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), place=dict(relx=.45, rely=.23, relh=.07, relw=.54), orient='h', longent=.42, bottomKwargs=dict(state='readonly'))
         self.income = LabelEntry(self, topKwargs=dict(text='Income'), place=dict(relx=.005, rely=.3, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
         self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), place=dict(relx=.005, rely=.37, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
 

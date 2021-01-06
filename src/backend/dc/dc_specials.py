@@ -39,13 +39,15 @@ class Thrifts(Object):
         max_ = 31.0
         contribs = float(self.contributions)
 
-        self.cash = income if not transfer else income - transfer
 
         contributed = income/self.rate if money else income
+
         new = contribs + contributed
         if new <= max_:
             self.contributed = contributed
             self.saved = self.income = contributed * self.rate
+            self.cash = self.saved if not transfer else self.saved - transfer
+
         else:
             excess = new - max_
             required = max_ - contribs
@@ -116,7 +118,8 @@ class Thrifts(Object):
             if self.tranRecord: pass
             else:
                 self.conTranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
-                self.tranRecord = self.conTranRecord.type
+                for rec in self.conTranRecord:
+                    if rec.className == 'Transfer': self.tranRecord = rec
 
             self.account.balanceAccount()
                 
