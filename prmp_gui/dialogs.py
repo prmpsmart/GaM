@@ -145,7 +145,7 @@ class PRMP_CalendarDialog(PRMP_Dialog):
         self._setResult(date)
         if self._return:
             PRMP_Calendar.choosen = None
-            self.destroy()
+            self.destroyDialog()
 CD = PRMP_CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):
