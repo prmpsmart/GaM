@@ -41,15 +41,15 @@ class Thrifts(Object):
             print(excess, required, contribs)
             raise ValueError(f'Excess of {excess}, Required [contribution={required}, money={required*self.rate}], current contributions is {contribs}.')
 
-        bal = float(self.clientAccount.balances)
-        paidout = float(paidout)
-        if paidout <= bal or paidout == 0.0: self.paidout = paidout
-        else: raise ValueError(f'Balance is {bal}, but incamountome to be paidout is {paidout}')
-
         self.isUpfrontRepay()
 
-        if reload_: self.updateRecords()
+        bal = float(self.clientAccount.balances) + self.saved
+        paidout = float(paidout)
+        if paidout <= bal or paidout == 0.0: self.paidout = paidout
+        else: raise ValueError(f'Balance is {bal}, but amount to be paidout is {paidout}')
 
+
+        if reload_: self.updateRecords()
 
     def deleteRecords(self):
         for rec in [self.debRecord, self.contRecord, self.tranRecord]:

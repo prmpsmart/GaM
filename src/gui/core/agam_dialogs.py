@@ -15,7 +15,7 @@ class PersonDialog(PRMP_Dialog):
         name = self.values.get('name')
         if name: self.addTitleBar(name)
         
-        self.addEditButton(self.action)
+        self.addEditButton()
         
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
         
@@ -56,13 +56,13 @@ PerD = PersonDialog
 
 class RecordDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Record Dialog', geo=(350, 350), manager=None,  record=None, values={}, **kwargs):
+    def __init__(self, master=None, title='Record Dialog', geo=(350, 350), manager=None, record=None, values={}, **kwargs):
         
         self.manager = manager
         self.record = record
         if record: title = f'{record.className} Record'
 
-        super().__init__(master=master, title=title, geo=geo, values=record if record else values, **kwargs)
+        super().__init__(master=master, title=title, geo=geo, values=record or values, **kwargs)
     
     def _setupDialog(self):
         self.addEditButton()

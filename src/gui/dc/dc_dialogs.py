@@ -61,17 +61,22 @@ class ClientAccountDialog(AccountDialog):
         self.addResultsWidgets('rate')
 
 
+class AccountDetailsDailog: pass
+
+
 class ThriftDialog(PRMP_Dialog):
-    def __init__(self, master=None, thrift=None, title='Thrift Dialog', manager=None, **kwargs):
+    def __init__(self, master=None, thrift=None, title='Thrift Dialog', values={}, manager=None, **kwargs):
         self.thrift = thrift
+        self.values = values
         self.manager = manager
         super().__init__(master, geo=(350, 300), title=title, **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
-        self.thrifts = Thrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, manager=self.manager)
+        self.thrifts = Thrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, values=self.values, manager=self.manager)
 
         self.get = self.thrifts.get
+        self.set = self.thrifts.set
     
     def action(self):
         if self.result:
@@ -82,31 +87,40 @@ class ThriftDialog(PRMP_Dialog):
     
     def updateThrift(self, w):
         if w:
-            self.thrift.update(**self.result, reload_=1)
-            self._setResult(self.thrift)
+            try:
+                self.thrift.update(**self.result, reload_=1)
+                self._setResult(self.thrift)
+
+            except Exception as error: PRMP_MsgBox(self, title='Thrift Update Error', message=error, _type='error', ask=0)
         self.destroyDialog()
     
     def newThrift(self, w):
         if w:
-            thrift = self.manager.createThrift(**self.result)
-            self._setResult(thrift)
+            try:
+                thrift = self.manager.createThrift(**self.result)
+                self._setResult(thrift)
+            except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, _type='error', ask=0)
         self.destroyDialog()
 
 
-
 class ThriftDetailsDialog(PRMP_Dialog):
-    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, geo=(350, 550), **kwargs):
+    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, geo=(350, 550), values={}, **kwargs):
         self.thrift = thrift
+        self.values = values
         super().__init__(master, geo=geo, title=title, **kwargs)
 
     def _setupDialog(self):
-        # self.addEditButton()
-        self.thriftDetail = ThriftDetail(self.container, place=dict(relx=.02, rely=.005, relh=.99, relw=.96), thrift=self.thrift)
+        self.thriftDetail = ThriftDetail(self.container, place=dict(relx=.02, rely=.005, relh=.99, relw=.96), thrift=self.thrift, values=self.values)
+        
+        self.get = self.thriftDetail.get
+        self.set = self.thriftDetail.set
 
 
 class DailyContributionDailog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Area 1 Daily Contribution', area=None, **kwargs):
+    def __init__(self, master=None, title='Area 1 Daily Contribution', dailyContribution=None, **kwargs):
+        
+        self.dailyContribution = dailyContribution
         super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):

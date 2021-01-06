@@ -236,5 +236,5 @@ class PRMP_ImageDialog(PRMP_Dialog):
 
     def getImage(self, imageFile):
         self._setResult(imageFile)
-        if self._return: self.destroy()
+        self.destroyDialog()
 

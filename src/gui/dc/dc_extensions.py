@@ -203,11 +203,11 @@ class DC_Overview(Frame):
 
 
 class Thrift(PRMP_FillWidgets, Frame):
-    def __init__(self, master=None, thrift=None, manager=None, callback=None, **kwargs):
+    def __init__(self, master=None, thrift=None, values={}, manager=None, callback=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
 
         self.thrift = thrift
-        PRMP_FillWidgets.__init__(self)
+        PRMP_FillWidgets.__init__(self, thrift or values)
         self.manager = manager
         
         _date = ''
@@ -230,8 +230,6 @@ class Thrift(PRMP_FillWidgets, Frame):
         self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46, bottomKwargs=dict(state='readonly', placeholder=_date))
         
         self.addResultsWidgets(['ledgerNumber', 'month', 'income', 'money', 'paidout', 'transfer'])
-
-        self.set(thrift)
     
     def get(self):
         res = super().get()
@@ -240,13 +238,26 @@ class Thrift(PRMP_FillWidgets, Frame):
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
     
-    def __init__(self, master=None, thrift=None, **kwargs):
+    def __init__(self, master=None, thrift=None, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
-        PRMP_FillWidgets.__init__(self)
+        PRMP_FillWidgets.__init__(self, thrift or values)
 
         self.thrift = thrift
+        
+        self.account = None
+        self.manager = None
+        self.debRecord = None
+        self.contRecord = None
+        self.tranRecord = None
+        
         _date = ''
-        if thrift:_date = thrift.date.date
+        if thrift:
+            _date = thrift.date.date
+            self.account = thrift.account
+            self.manager = thrift.manager
+            self.debRecord = thrift.debRecord
+            self.contRecord = thrift.contRecord
+            self.tranRecord = thrift.tranRecord
 
         self.manager = Button(self, text='Manager', place=dict(relx=.005, rely=.01, relh=.06, relw=.35), command=self.openManager)
         self.clientAccount = Button(self, text='Client Account', place=dict(relx=.4, rely=.01, relh=.06, relw=.55), command=self.openAccount)
@@ -276,19 +287,27 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.updateBtn = Button(self, text='Update', place=dict(relx=.56, rely=.93, relh=.06, relw=.4), command=self.openThrift)
 
         self.addResultsWidgets(['contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'uniqueID', 'cash'])
-        
-        self.set(thrift)
-
+    
     def openManager(self):
-        pass
+        if self.manager:
+            from .dc_dialogs import DailyContributionDailog
+            DailyContributionDailog(self, dailyContribution=self.manager)
     def openAccount(self):
-        pass
+        if self.account:
+            from .dc_dialogs import AccountDetailsDailog
+            AccountDetailsDailog(self, dailyContribution=self.account)
     def openContRecord(self):
-        pass
+        if self.contRecord:
+            from .dc_dialogs import RecordDialog
+            RecordDialog(self, record=self.contRecord)
     def openDebRecord(self):
-        pass
+        if self.debRecord:
+            from .dc_dialogs import RecordDialog
+            RecordDialog(self, record=self.debRecord)
     def openTranRecord(self):
-        pass
+        if self.tranRecord:
+            from .dc_dialogs import RecordDialog
+            RecordDialog(self, record=self.tranRecord)
     def openThrift(self):
         from .dc_dialogs import ThriftDialog
         self.thriftDialog = ThriftDialog(self, thrift=self.thrift, callback=self.update)
@@ -301,7 +320,7 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.changeStates()
         self.set(thrift)
         self.changeStates(1)
-        
+
 
 
 

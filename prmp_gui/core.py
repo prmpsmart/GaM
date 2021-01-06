@@ -2331,7 +2331,7 @@ class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
     def __init__(self, master=None, _ttk_=False, **kwargs):
         tk.Toplevel.__init__(self, master)
         if master:
-            try: kwargs['side'] = kwargs.get('side') or master.topest.side
+            try: kwargs['side'] = kwargs.get('side') or master.toplevel.side
             except AttributeError as y: print(y)
         
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
