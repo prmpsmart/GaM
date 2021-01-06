@@ -157,9 +157,6 @@ class AccountDialog(PRMP_Dialog):
             try:
                 account = self.manager.createAccount(**self.result)
                 self._setResult(account)
-                print(account)
-                print(self.manager[:])
-                print()
             except Exception as error:
                 print(error)
                 font = self.DEFAULT_FONT.copy()

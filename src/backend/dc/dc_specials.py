@@ -16,7 +16,6 @@ class Records(Object, list):
 
 class Thrift(Object):
     Manager = 'DailyContribution'
-    H = 0
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=0, **kwargs):
         assert clientAccount, 'Account must be given'
@@ -46,7 +45,7 @@ class Thrift(Object):
         return self._subs
     
     def update(self, transfer=0, income=0, money=False, paidout=0, reload_=1):
-        self.deleteRecords()
+        # self.deleteRecords()
 
         self.updated = False
         self.upfrontRepay = 0.
@@ -57,10 +56,6 @@ class Thrift(Object):
         
         max_ = 31.0
         contribs = float(self.contributions)
-
-        if Thrift.H:
-            print(contribs)
-            print(self.account[-1])
 
         contributed = income/self.rate if money else income
 
@@ -73,7 +68,6 @@ class Thrift(Object):
         else:
             excess = new - max_
             required = max_ - contribs
-            print(excess, required, contribs)
             raise ValueError(f'Excess of {excess}, Required [contribution={required}, money={required*self.rate}], current contributions is {contribs}.')
 
         self.isUpfrontRepay()
@@ -131,27 +125,23 @@ class Thrift(Object):
     def updateRecords(self):
         
         if self.updated: return
+        self.deleteRecords()
 
         if self.contributed:
             if self.cash:
-                if self.contRecord: pass
-                else: self.contRecord = self.clientAccount.addContribution(self.cash/self.rate, date=self.date)
+                self.contRecord = self.clientAccount.addContribution(self.cash/self.rate, date=self.date)
                 self.account.balanceAccount()
 
             if self.transfer:
-                if self.tranRecord: pass
-                else:
-                    self.conTranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
-                    for rec in self.conTranRecord:
-                        if rec.className == 'Transfer': self.tranRecord = rec
+                self.conTranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
+                for rec in self.conTranRecord:
+                    if rec.className == 'Transfer': self.tranRecord = rec
 
                 self.account.balanceAccount()
                     
         if self.paidout:
-            if self.paidoutRecord: pass
-            else:
-                self.debRecord = self.clientAccount.addDebit(self.paidout, date=self.date, _type='p')
-                self.paidoutRecord = self.debRecord.type
+            self.debRecord = self.clientAccount.addDebit(self.paidout, date=self.date, _type='p')
+            self.paidoutRecord = self.debRecord.type
             self.account.balanceAccount()
         self.updated = True
     

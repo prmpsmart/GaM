@@ -192,7 +192,6 @@ class DC_Overview(Frame):
 
     def next(self):
         if not self.account: return
-        print(self.account)
         _next = self.account.next
         if _next: self.updateDCDigits(_next)
 
@@ -233,7 +232,7 @@ class ThriftFrame(PRMP_FillWidgets, Frame):
     
     def get(self):
         res = super().get()
-        
+
         res['income'] = res['_income']
         del res['_income']
         
@@ -241,6 +240,35 @@ class ThriftFrame(PRMP_FillWidgets, Frame):
 
         return res
 
+
+class ThriftDetailPart(PRMP_FillWidgets, Frame):
+    
+    def __init__(self, master=None, dc=None, values={}, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self, dc or values)
+        
+        _date = ''
+        if dc: _date = dc.date.date
+        self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.005, relh=.1, relw=.7), orient='h', bottomKwargs=dict(state='readonly', placeholder=_date))
+
+        PRMP_Separator(self, place=dict(relx=.005, rely=.11, relh=.005, relw=.99))
+
+        self.contributed = LabelEntry(self, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.12, relh=.1, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+        self.cash = LabelEntry(self, topKwargs=dict(text='Cash'), place=dict(relx=.005, rely=.23, relh=.1, relw=.43), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
+        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), place=dict(relx=.45, rely=.23, relh=.1, relw=.54), orient='h', longent=.42, bottomKwargs=dict(state='readonly'))
+        self.income = LabelEntry(self, topKwargs=dict(text='Income'), place=dict(relx=.005, rely=.34, relh=.1, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), place=dict(relx=.005, rely=.45, relh=.1, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+
+        PRMP_Separator(self, place=dict(relx=.005, rely=.555, relh=.005, relw=.99))
+
+        self.saved = LabelEntry(self, topKwargs=dict(text='Saved'), place=dict(relx=.005, rely=.57, relh=.1, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+        self.upfrontRepay = LabelEntry(self, topKwargs=dict(text='Upfront Repay'), place=dict(relx=.005, rely=.677, relh=.1, relw=.99), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
+
+        PRMP_Separator(self, place=dict(relx=.005, rely=.785, relh=.005, relw=.99))
+
+        self.uniqueID = LabelEntry(self, topKwargs=dict(text='Unique ID'), place=dict(relx=.005, rely=.799, relh=.2, relw=.99), bottomKwargs=dict(state='readonly', placeholder='Unique ID here.'))
+
+        self.addResultsWidgets(['contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'uniqueID', 'cash'])
 
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
@@ -260,31 +288,12 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self._conTranRecord = None
 
         self.loadOtherObjects()
-        
-        _date = ''
-        if thrift: _date = thrift.date.date
 
         self.manager = Button(self, text='Manager', place=dict(relx=.005, rely=.01, relh=.06, relw=.35), command=self.openManager)
         self.clientAccount = Button(self, text='Client Account', place=dict(relx=.4, rely=.01, relh=.06, relw=.55), command=self.openAccount)
-        self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.075, relh=.07, relw=.7), orient='h', bottomKwargs=dict(state='readonly', placeholder=_date))
 
-        PRMP_Separator(self, place=dict(relx=.005, rely=.15, relh=.004, relw=.99))
+        self.detailsPart = ThriftDetailPart(self, place=dict(relx=.002, rely=.075, relh=.67, relw=.996), background='red')
 
-        self.contributed = LabelEntry(self, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.16, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
-        self.cash = LabelEntry(self, topKwargs=dict(text='Cash'), place=dict(relx=.005, rely=.23, relh=.07, relw=.43), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
-        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), place=dict(relx=.45, rely=.23, relh=.07, relw=.54), orient='h', longent=.42, bottomKwargs=dict(state='readonly'))
-        self.income = LabelEntry(self, topKwargs=dict(text='Income'), place=dict(relx=.005, rely=.3, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
-        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), place=dict(relx=.005, rely=.37, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
-
-        PRMP_Separator(self, place=dict(relx=.005, rely=.45, relh=.005, relw=.99))
-
-        self.saved = LabelEntry(self, topKwargs=dict(text='Saved'), place=dict(relx=.005, rely=.46, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
-        self.upfrontRepay = LabelEntry(self, topKwargs=dict(text='Upfront Repay'), place=dict(relx=.005, rely=.53, relh=.07, relw=.99), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
-
-        PRMP_Separator(self, place=dict(relx=.005, rely=.61, relh=.005, relw=.99))
-
-        self.uniqueID = LabelEntry(self, topKwargs=dict(text='Unique ID'), place=dict(relx=.005, rely=.62, relh=.13, relw=.99), bottomKwargs=dict(state='readonly', placeholder='Unique ID here.'))
-        
         PRMP_Separator(self, place=dict(relx=.005, rely=.755, relh=.005, relw=.99))
 
         records = LabelFrame(self, text='Records', place=dict(relx=.005, rely=.765, relw=.99, relh=.23))
@@ -297,11 +306,11 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
 
         self.updateBtn = Button(records, text='Update', place=dict(relx=.56, rely=.6, relh=.25, relw=.4), command=self.openThrift)
 
-        self.addResultsWidgets(['contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'uniqueID', 'cash'])
+        self.get = self.detailsPart.get
+        self.set = self.detailsPart.set
     
     def loadOtherObjects(self):
         if self.thrift:
-            print(self.thrift.paidoutRecord)
             self._account = self.thrift.account
             self._manager = self.thrift.manager
             
