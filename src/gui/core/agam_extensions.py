@@ -9,6 +9,7 @@ from ...backend.dc.dc_regions import Client
 from ...backend.core.regions_managers import Person, Region, RegionsManager, ObjectsMixins
 from ...backend.core.records_managers import Record, RecordsManager
 from ...backend.core.accounts import Account, AccountsManager
+from ...backend.dc.dc_specials import Thrift
 
 
 class RegionRadioCombo(RadioCombo):
@@ -95,11 +96,13 @@ class Hierachy(PRMP_TreeView):
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, columns=columns, **kwargs)
         
-        from .agam_apps import RegionDetails, PersonDialog, RecordDialog, ObjectDetails
+        # from .agam_apps import RegionDetails, PersonDialog, RecordDialog, ObjectDetails
+        from ..dc.dc_apps import RegionDetails, PersonDialog, RecordDialog, ObjectDetails, ThriftDetailsDialog
         self.OD = ObjectDetails
         self.RD = RegionDetails
         self.RecD = RecordDialog
         self.PD = PersonDialog
+        self.TD = ThriftDetailsDialog
     
     def bindings(self):
         super().bindings()
@@ -110,6 +113,7 @@ class Hierachy(PRMP_TreeView):
         if current:
             if isinstance(current, Person): self.PD(self, title=current, person=current)
             elif isinstance(current, Record): self.RecD(self, title=current, record=current)
+            elif isinstance(current, Thrift): self.TD(self, title=current, thrift=current)
             else: self.OD(self, title=current, sup=current)
 
     def viewAll(self, obj, parent=''):
@@ -340,9 +344,10 @@ class SubsList(LabelFrame):
 
         if self.dialog.get():
             from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
-            from ..dc.dc_apps import DC_Home, DCRegion
+            from ..dc.dc_apps import DC_Home, DCRegion, ThriftDetailsDialog
             if isinstance(selected, DCRegion): DC_Home(self.topest, region=selected)
             elif isinstance(selected, Record): RecordDialog(self, record=selected)
+            elif isinstance(selected, Thrift): ThriftDetailsDialog(self, thrift=selected)
             elif isinstance(selected, Person): PersonDialog(self, person=selected)
             elif isinstance(selected, RecordsManager): ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
             else: ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)

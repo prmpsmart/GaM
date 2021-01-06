@@ -1,6 +1,20 @@
 from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 
-class Thrifts(Object):
+class Records(Object, list):
+    Manager = 'Thrift'
+
+
+    def __init__(self, thrift):
+        list.__init__(self)
+        Object.__init__(self, thrift)
+        self.thrift = thrift
+
+
+    @property
+    def subs(self): return self[:]
+
+
+class Thrift(Object):
     Manager = 'DailyContribution'
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=0, **kwargs):
@@ -15,6 +29,8 @@ class Thrifts(Object):
         self.debRecord = None
         self.conTranRecord = None
         
+        self._subs = None
+        
         super().__init__(manager, **kwargs)
         del self.objectSort
 
@@ -22,11 +38,11 @@ class Thrifts(Object):
     
     @property
     def subs(self):
-        s = []
+        self._subs = Records(self)
         for r in [self.contRecord, self.conTranRecord, self.tranRecord, self.debRecord, self.paidoutRecord]:
-            if r: s.append(r)
+            if r: self._subs.append(r)
 
-        return s
+        return self._subs
     
     def update(self, transfer=0, income=0, money=False, paidout=0, reload_=0):
         self.updated = False
@@ -138,11 +154,10 @@ class Thrifts(Object):
 
 class DailyContribution(ObjectsManager):
     Manager = 'DailyContributionsManager'
-    ObjectType = Thrifts
+    ObjectType = Thrift
     MultipleSubsPerMonth = True
     subTypes = ['Thrifts']
     
-    columns = ['Month', 'Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
     col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):

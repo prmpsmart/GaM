@@ -112,9 +112,12 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     
     def processInput(self, e=0):
         result = self.get()
-        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': PRMP_DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
-        self._setResult(result)
-        self.action()
+        # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': PRMP_DateTime(2020, 12, 30, 0, 54, 19)}
+        if result:
+            self._setResult(result)
+            self.action()
+        
+        else: PRMP_MsgBox(self, title='No Input Error', message='No input whatsoever is given.', _type='error', ask=0)
 
     def action(self): print('redefine this method for functionality')
         

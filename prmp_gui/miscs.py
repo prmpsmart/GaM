@@ -84,6 +84,8 @@ class Column(Col_Mixins):
         self.index = '#%d'%index
         self.type = None
         value, width = '', 20
+        self._attr = None
+
         if isinstance(column, (list, tuple)):
             l = len(column)
             self.text = column[0]
@@ -94,6 +96,9 @@ class Column(Col_Mixins):
         elif isinstance(column, dict):
             self.text = column.get('text', value)
             self.attr = column.get('attr', self.propertize(self.text))
+            if isinstance(self.attr, list):
+                self._attr = self.attr
+                self.attr = self.attr[0]
             self.value = column.get('value', value)
             self.width = column.get('width', width)
             self.type = column.get('type')
@@ -114,8 +119,17 @@ class Column(Col_Mixins):
             if self.type:
                 try: return self.type(obj)
                 except: pass
-            try: return obj[self.attr]
-            except: return ''
+            try:
+                val = ''
+                if self._attr:
+                    for attr in self._attr:
+                        try:
+                            val = obj[attr]
+                            if val != None: return val
+                        except: pass
+                    return val
+                else: return obj[self.attr] or val
+            except Exception as e: return ''
 
     def proof(self, obj): return self.get(obj) == self.value
 
@@ -125,7 +139,6 @@ class Columns(Col_Mixins):
         self.process(columns)
     
     def process(self, columns):
-        del self.columns
         self.columns = []
         index = 0
         for col in columns:

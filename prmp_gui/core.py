@@ -2549,7 +2549,6 @@ class PRMP_TreeView(PRMP_Frame):
             self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
     def _set(self, obj=None, parent='', subs='subs', op=False):
-        
         name, *columns = self.columns.get(obj)
         tag = 'prmp'
         

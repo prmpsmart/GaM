@@ -5,10 +5,10 @@ from ...backend.dc.dc_specials import *
 class TreeColumns:
     def columns(self, sup):
         if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-        
-        elif isinstance(sup, (DailyContribution)): return [{'month': 'monthYear'}, 'regName', {'account': 'ledgerNumber'}, 'Rate', 'Contributed', 'Income', 'Transfer', 'Debit', 'Paidout', 'Upfront Repay', 'Saved']
-        
+                
         elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        
+        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name']}, {'text': 'Name', 'attr': 'regionName'}, 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
         
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
@@ -247,6 +247,9 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
         if self.c_or_m and st == 'Accounts':
             from ..dc.dc_dialogs import ClientAccountDialog
             return ClientAccountDialog
+        elif st == 'Thrifts':
+            from ..dc.dc_dialogs import ThriftDialog
+            return ThriftDialog
     
         return creations[st]
 
@@ -276,7 +279,9 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
         else:
             subs = self.getSubs()
             if subs: self.subsList.set(subs)
-            self.subs.setColumns(self.columns(self._sup))
+            columns = self.columns(self._sup)
+            # print(columns)
+            self.subs.setColumns(columns)
             self.subs.viewAll(self._sup)
 
     def openSup(self):

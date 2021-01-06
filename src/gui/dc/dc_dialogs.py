@@ -73,12 +73,17 @@ class ThriftDialog(PRMP_Dialog):
 
     def _setupDialog(self):
         self.addEditButton()
-        self.thrifts = Thrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, values=self.values, manager=self.manager)
+        self.thrifts = ThriftFrame(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, values=self.values, manager=self.manager)
 
         self.get = self.thrifts.get
         self.set = self.thrifts.set
+        # self.after(1000, self.test)
+    
+    def test(self):
+        print(self.get())
     
     def action(self):
+        print(self.result)
         if self.result:
             if self.thrift: PRMP_MsgBox(self, title='Edit thrift Details', message='Are you sure to edit the details of this thrift?', _type='question', callback=self.updateThrift)
             
