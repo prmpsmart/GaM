@@ -820,7 +820,7 @@ class PRMP_Input:
             self.verify = self.checkingNumber
             self.returnType = float
         elif _type == 'money':
-            self.placeholder = self._moneySign
+            self.placeholder = f'{self._moneySign} 0'
             if default != None: self.placeholder = f'{self._moneySign}{default}'
             self.set = self.setMoney
             self.get = self.getMoney
@@ -1994,7 +1994,7 @@ class PRMP_Window(PRMP_Widget):
                 funcs = {self._top: self.topOfScreen, self._left: self.leftOfScreen, self._right: self.rightOfScreen, self._bottom: self.bottomOfScreen, self._center: self.centerOfScreen}
             funcs[main_side]()
         else:
-            if geometry: self.setGeometry(self._geometry)
+            if geometry: self.setGeometry(geometry)
         
         self.setGeometry(self.lastPoints)
     
@@ -2330,6 +2330,10 @@ Tk = PT = PRMP_Tk
 class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
     def __init__(self, master=None, _ttk_=False, **kwargs):
         tk.Toplevel.__init__(self, master)
+        if master:
+            try: kwargs['side'] = kwargs.get('side') or master.topest.side
+            except AttributeError as y: print(y)
+        
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
 Toplevel = PTl = PRMP_Toplevel
 

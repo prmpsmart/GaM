@@ -78,14 +78,14 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         pass
 
     def destroyDialog(self):
+        if self.callback: self.callback(self.result)
+
         if self._return: self.destroy()
 
     @property
     def result(self): return self.__result
     
-    def _setResult(self, result):
-        self.__result = result
-        if self.callback: self.callback(result)
+    def _setResult(self, result): self.__result = result
     
     def addSubmitButton(self):
         self.submitBtn = PRMP_Button(self.container, config=dict(text='Submit', command=self.processInput))
@@ -115,7 +115,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         # result = {'address': 'lklk', 'email': 'awa.@asd.asa', 'gender': 'Male', 'name': 'Aderemi Goodness', 'phone': '2121', 'regDate': PRMP_DateTime(2020, 12, 30, 0, 54, 19), 'image': self.image.get()}
         self._setResult(result)
         self.action()
-            
+
     def action(self): print('redefine this method for functionality')
         
     def editInput(self, e=0):
@@ -194,15 +194,15 @@ class PRMP_MsgBox(PRMP_Dialog):
 
     def yesCom(self):
         if self.ask: self._setResult(True)
-        self.destroy()
+        self.destroyDialog()
 
     def cancelCom(self):
         self._setResult(None)
-        self.destroy()
+        self.destroyDialog()
 
     def noCom(self):
         self._setResult(False)
-        self.destroy()
+        self.destroyDialog()
 PMB = PRMP_MsgBox
 
 class PRMP_CameraDialog(PRMP_Dialog):

@@ -49,7 +49,7 @@ class TwoWidgets(PRMP_Frame):
             bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
             if self._ttk_: bottomKw['style'] = 'entry.Label'
         else:
-            if bottomKwargs.get('placeholder'): bottomKw = dict(**bottomKwargs)
+            if bottomKwargs.get('placeholder', None) != None: bottomKw = dict(**bottomKwargs)
             else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
         
         if bottom == 'datebutton': placeholder = 'Choose Date'

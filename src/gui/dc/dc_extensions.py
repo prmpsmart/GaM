@@ -205,26 +205,37 @@ class DC_Overview(Frame):
 class Thrift(PRMP_FillWidgets, Frame):
     def __init__(self, master=None, thrift=None, manager=None, callback=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
-        PRMP_FillWidgets.__init__(self)
 
         self.thrift = thrift
+        PRMP_FillWidgets.__init__(self)
         self.manager = manager
+        
+        _date = ''
+        if thrift:_date = thrift.date.date
+        elif manager:_date = manager.date.date
+        
+        state = (None, None)
+        if thrift: state = 'readonly', 'disabled'
 
-        self.ledgerNumber = LabelEntry(self, topKwargs=dict(text='Ledger Number'), bottomKwargs=dict(_type='number'), place=dict(relx=.005, rely=.005, relh=.18, relw=.99), orient='h', longent=.46)
+        self.ledgerNumber = LabelEntry(self, topKwargs=dict(text='Ledger Number'), bottomKwargs=dict(_type='number', state=state[0]), place=dict(relx=.005, rely=.005, relh=.18, relw=.99), orient='h', longent=.46)
 
-        self.month = LabelMonthYearButton(self, topKwargs=dict(text='Month-Year'), place=dict(relx=.005, rely=.18, relh=.18, relw=.99), orient='h', longent=.46)
+        self.month = LabelMonthYearButton(self, topKwargs=dict(text='Month-Year'), place=dict(relx=.005, rely=.18, relh=.18, relw=.99), orient='h', longent=.46, bottomKwargs=dict(state=state[1]))
 
         self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.18, relw=.47), orient='h', longent=.4)
         self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer?'), place=dict(relx=.48, rely=.36, relh=.18, relw=.515), orient='h', longent=.48, bottomKwargs=dict(_type='money'))
         self.money = Checkbutton(self, text='Money?', place=dict(relx=.76, rely=.545, relh=.13, relw=.24))
 
-        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money', default=0), orient='h', place=dict(relx=.005, rely=.54, relh=.18, relw=.6))
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.54, relh=.18, relw=.6))
 
-        self.date = LabelDateButton(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46)
+        self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46, bottomKwargs=dict(state='readonly', placeholder=_date))
         
-        self.addResultsWidgets(['ledgerNumber', 'month', 'income', 'money', 'paidout', 'transfer', 'date'])
+        self.addResultsWidgets(['ledgerNumber', 'month', 'income', 'money', 'paidout', 'transfer'])
 
         self.set(thrift)
+    
+    def get(self):
+        res = super().get()
+        if self.thrift: return {k: v for k, v in res.items() if k not in ['ledgerNumber', 'month']}
 
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
@@ -234,25 +245,25 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         PRMP_FillWidgets.__init__(self)
 
         self.thrift = thrift
+        _date = ''
+        if thrift:_date = thrift.date.date
 
         self.manager = Button(self, text='Manager', place=dict(relx=.005, rely=.01, relh=.06, relw=.35), command=self.openManager)
         self.clientAccount = Button(self, text='Client Account', place=dict(relx=.4, rely=.01, relh=.06, relw=.55), command=self.openAccount)
-        self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.075, relh=.07, relw=.7), orient='h')
-        def setDate(u): self.date.B['text'] = u.strDate
-        self.date.set = setDate
+        self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.075, relh=.07, relw=.7), orient='h', bottomKwargs=dict(state='readonly', placeholder=_date))
 
         PRMP_Separator(self, place=dict(relx=.005, rely=.15, relh=.004, relw=.99))
 
-        self.contributed = LabelLabel(self, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.16, relh=.07, relw=.8), orient='h')
-        self.cash = LabelLabel(self, topKwargs=dict(text='Cash'), place=dict(relx=.005, rely=.23, relh=.07, relw=.43), orient='h', longent=.4)
-        self.transfer = LabelLabel(self, topKwargs=dict(text='Transfer'), place=dict(relx=.51, rely=.23, relh=.07, relw=.48), orient='h', longent=.47)
-        self.income = LabelLabel(self, topKwargs=dict(text='Income'), place=dict(relx=.005, rely=.3, relh=.07, relw=.8), orient='h')
-        self.paidout = LabelLabel(self, topKwargs=dict(text='Paidout'), place=dict(relx=.005, rely=.37, relh=.07, relw=.8), orient='h')
+        self.contributed = LabelEntry(self, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.16, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+        self.cash = LabelEntry(self, topKwargs=dict(text='Cash'), place=dict(relx=.005, rely=.23, relh=.07, relw=.43), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
+        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), place=dict(relx=.51, rely=.23, relh=.07, relw=.48), orient='h', longent=.47, bottomKwargs=dict(state='readonly'))
+        self.income = LabelEntry(self, topKwargs=dict(text='Income'), place=dict(relx=.005, rely=.3, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), place=dict(relx=.005, rely=.37, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
 
         PRMP_Separator(self, place=dict(relx=.005, rely=.45, relh=.005, relw=.99))
 
-        self.saved = LabelLabel(self, topKwargs=dict(text='Saved'), place=dict(relx=.005, rely=.46, relh=.07, relw=.8), orient='h')
-        self.upfrontRepay = LabelLabel(self, topKwargs=dict(text='Upfront Repay'), place=dict(relx=.005, rely=.53, relh=.07, relw=.8), orient='h', longent=.6)
+        self.saved = LabelEntry(self, topKwargs=dict(text='Saved'), place=dict(relx=.005, rely=.46, relh=.07, relw=.8), orient='h', bottomKwargs=dict(state='readonly'))
+        self.upfrontRepay = LabelEntry(self, topKwargs=dict(text='Upfront Repay'), place=dict(relx=.005, rely=.53, relh=.07, relw=.99), orient='h', longent=.4, bottomKwargs=dict(state='readonly'))
 
         PRMP_Separator(self, place=dict(relx=.005, rely=.61, relh=.005, relw=.99))
 
@@ -264,7 +275,7 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
 
         self.updateBtn = Button(self, text='Update', place=dict(relx=.56, rely=.93, relh=.06, relw=.4), command=self.openThrift)
 
-        self.addResultsWidgets(['date', 'contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'uniqueID', 'cash'])
+        self.addResultsWidgets(['contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'uniqueID', 'cash'])
         
         self.set(thrift)
 
@@ -280,8 +291,17 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         pass
     def openThrift(self):
         from .dc_dialogs import ThriftDialog
-        ThriftDialog(self, thrift=self.thrift, callback=self.update)
-    def update(self, result): self.set()
+        self.thriftDialog = ThriftDialog(self, thrift=self.thrift, callback=self.update)
+    def changeStates(self, r=0):
+        for rw in [self.getFromSelf(w) for w in self.resultsWidgets]:
+            if r: rw.readonly()
+            else: rw.normal()
+    def update(self, thrift):
+        assert thrift == self.thrift
+        self.changeStates()
+        self.set(thrift)
+        self.changeStates(1)
+        
 
 
 

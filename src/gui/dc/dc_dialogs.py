@@ -71,15 +71,7 @@ class ThriftDialog(PRMP_Dialog):
         self.addEditButton()
         self.thrifts = Thrift(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, manager=self.manager)
 
-        self.ledgerNumber = self.thrifts.ledgerNumber
-        self.month = self.thrifts.month
-        self.income = self.thrifts.income
-        self.money = self.thrifts.money
-        self.paidout = self.thrifts.paidout
-        self.transfer = self.thrifts.transfer
-        self.date = self.thrifts.date
-
-        self.addResultsWidgets(['ledgerNumber', 'month', 'income', 'money', 'paidout', 'transfer', 'date'])
+        self.get = self.thrifts.get
     
     def action(self):
         if self.result:
@@ -89,7 +81,9 @@ class ThriftDialog(PRMP_Dialog):
             else: PRMP_MsgBox(self, title='Thrift Dialog Error', message='No Thrift or Manager is given.', _type='error', ask=0)
     
     def updateThrift(self, w):
-        if w: self.thrift.update(self.result)
+        if w:
+            self.thrift.update(**self.result, reload_=1)
+            self._setResult(self.thrift)
         self.destroyDialog()
     
     def newThrift(self, w):
