@@ -294,9 +294,7 @@ class RecordsManager(ObjectsManager):
         total = sum([float(manager) for manager in managers])
         self.createRecord(total, newRecord=False, notAdd=True)
     
-    def removeRecord(self, rec):
-        self.removeSub(rec)
-        # del rec
+    def removeRecord(self, rec): self.removeSub(rec)
     
     def removeRecordByIndex(self, index):
         if len(self.records) >= index:

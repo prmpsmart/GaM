@@ -248,13 +248,13 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def uniqueID(self): return self._uniqueID
     
-    def delete(self):
+    def delete(self, called=0):
         if self.next:
             self.next.previous = self.previous
             # self.previous = None
         if self.previous: self.previous.next = self.next
 
-        self.manager.removeSub(self, called)
+        self.manager.removeSub(self)
     
     @property
     def sort(self): return self.objectSort.sort
@@ -551,9 +551,7 @@ class ObjectsManager(ObjectsMixins):
     def deleteSubs(self): self._subs = []
     
     def removeSub(self, sub):
-        if sub in self:
-            self._subs.remove(sub)
-            # print('removed')
+        if sub in self: self._subs.remove(sub)
     
  ########## Sorting
 

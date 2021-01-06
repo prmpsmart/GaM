@@ -9,7 +9,7 @@ class DCRecord(Record):
     def delete(self, called=0):
         if called == 0:
             for a in self: a.delete(1)
-        self.manager.removeRecord(self, called)
+        super().delete(called)
 
 
 
