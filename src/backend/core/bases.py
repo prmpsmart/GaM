@@ -249,7 +249,9 @@ class ObjectsMixins(Mixins, CompareByDate):
     def uniqueID(self): return self._uniqueID
     
     def delete(self):
-        if self.next: self.next.previous = self.previous
+        if self.next:
+            self.next.previous = self.previous
+            # self.previous = None
         if self.previous: self.previous.next = self.next
 
         self.manager.removeSub(self, called)
@@ -549,8 +551,9 @@ class ObjectsManager(ObjectsMixins):
     def deleteSubs(self): self._subs = []
     
     def removeSub(self, sub):
-        # print(sub)
-        if sub in self: self._subs.remove(sub)
+        if sub in self:
+            self._subs.remove(sub)
+            # print('removed')
     
  ########## Sorting
 

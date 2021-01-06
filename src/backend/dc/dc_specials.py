@@ -34,7 +34,7 @@ class Thrift(Object):
         super().__init__(manager, **kwargs)
         del self.objectSort
 
-        self.update(transfer=transfer, income=income, money=money, paidout=paidout)
+        self.update(transfer=transfer, income=income, money=money, paidout=paidout, reload_=0)
     
     @property
     def subs(self):
@@ -44,7 +44,7 @@ class Thrift(Object):
 
         return self._subs
     
-    def update(self, transfer=0, income=0, money=False, paidout=0, reload_=0):
+    def update(self, transfer=0, income=0, money=False, paidout=0, reload_=1):
         self.deleteRecords()
 
         self.updated = False
