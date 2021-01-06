@@ -8,14 +8,25 @@ class Thrifts(Object):
 
         self.account = self.clientAccount = clientAccount
         self.ledgerNumber = clientAccount.ledgerNumber
-        self.debRecord = None
+        
+        self.paidoutRecord = None
         self.contRecord = None
         self.tranRecord = None
+        self.debRecord = None
+        self.conTranRecord = None
         
         super().__init__(manager, **kwargs)
         del self.objectSort
 
         self.update(transfer=transfer, income=income, money=money, paidout=paidout)
+    
+    @property
+    def subs(self):
+        s = []
+        for r in [self.contRecord, self.conTranRecord, self.tranRecord, self.debRecord, self.paidoutRecord]:
+            if r: s.append(r)
+
+        return s
     
     def update(self, transfer=0, income=0, money=False, paidout=0, reload_=0):
         self.updated = False
@@ -52,12 +63,14 @@ class Thrifts(Object):
         if reload_: self.updateRecords()
 
     def deleteRecords(self):
-        for rec in [self.debRecord, self.contRecord, self.tranRecord]:
+        for rec in [self.debRecord, self.contRecord, self.conTranRecord]:
             if rec: rec.delete()
 
-        self.debRecord = None
+        self.paidoutRecord = None
         self.contRecord = None
         self.tranRecord = None
+        self.debRecord = None
+        self.conTranRecord = None
 
     def isUpfrontRepay(self):
         if not self.clientAccount.upfronts.paid:
@@ -101,12 +114,17 @@ class Thrifts(Object):
 
         if self.transfer:
             if self.tranRecord: pass
-            else: self.tranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
+            else:
+                self.conTranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
+                self.tranRecord = self.conTranRecord.type
+
             self.account.balanceAccount()
                 
         if self.paidout:
-            if self.debRecord: pass
-            else: self.debRecord = self.clientAccount.addDebit(self.paidout, date=self.date, _type='p')
+            if self.paidoutRecord: pass
+            else:
+                self.debRecord = self.clientAccount.addDebit(self.paidout, date=self.date, _type='p')
+                self.paidoutRecord = self.debRecord.type
             self.account.balanceAccount()
         self.updated = True
     

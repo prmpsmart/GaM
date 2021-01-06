@@ -179,6 +179,7 @@ class Incomes(DCRecordsManager):
 
         if _type == 'n': incRec.type = self.account.normalIncomes.createRecord(income, coRecord=incRec, **kwargs)
         else: incRec.type = self.account.transfers.createRecord(income, coRecord=incRec, **kwargs)
+        
         return incRec
 
 class Savings(DCRecordsManager):
