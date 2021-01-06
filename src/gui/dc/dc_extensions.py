@@ -221,7 +221,7 @@ class ThriftFrame(PRMP_FillWidgets, Frame):
 
         self.month = LabelMonthYearButton(self, topKwargs=dict(text='Month-Year'), place=dict(relx=.005, rely=.18, relh=.18, relw=.99), orient='h', longent=.46, bottomKwargs=dict(state=state[1]))
 
-        self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.18, relw=.47), orient='h', longent=.4)
+        self._income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.18, relw=.47), orient='h', longent=.4)
         self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer?'), place=dict(relx=.48, rely=.36, relh=.18, relw=.515), orient='h', longent=.48, bottomKwargs=dict(_type='money'))
         self.money = Checkbutton(self, text='Money?', place=dict(relx=.76, rely=.545, relh=.13, relw=.24))
 
@@ -229,11 +229,18 @@ class ThriftFrame(PRMP_FillWidgets, Frame):
 
         self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46, bottomKwargs=dict(state='readonly', placeholder=_date))
         
-        self.addResultsWidgets(['ledgerNumber', 'month', 'income', 'money', 'paidout', 'transfer'])
+        self.addResultsWidgets(['ledgerNumber', 'month', '_income', 'money', 'paidout', 'transfer'])
     
     def get(self):
         res = super().get()
-        if self.thrift: return {k: v for k, v in res.items() if k not in ['ledgerNumber', 'month']}
+        
+        res['income'] = res['_income']
+        del res['_income']
+        
+        if self.thrift: del res['ledgerNumber'], res['month']
+
+        return res
+
 
 
 class ThriftDetail(PRMP_FillWidgets, Frame):

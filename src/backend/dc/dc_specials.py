@@ -16,6 +16,7 @@ class Records(Object, list):
 
 class Thrift(Object):
     Manager = 'DailyContribution'
+    H = 0
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=0, **kwargs):
         assert clientAccount, 'Account must be given'
@@ -52,11 +53,14 @@ class Thrift(Object):
 
         self.money = money
         self.transfer = float(transfer)
-        income = float(income)
+        self._income = float(income)
         
         max_ = 31.0
         contribs = float(self.contributions)
 
+        if Thrift.H:
+            print(contribs)
+            print(self.account[-1])
 
         contributed = income/self.rate if money else income
 
@@ -83,7 +87,7 @@ class Thrift(Object):
         if reload_: self.updateRecords()
 
     def deleteRecords(self):
-        for rec in [self.debRecord, self.contRecord, self.conTranRecord]:
+        for rec in self.subs:
             if rec: rec.delete()
 
         self.paidoutRecord = None
@@ -128,20 +132,21 @@ class Thrift(Object):
         
         if self.updated: return
 
-        if self.cash:
-            if self.contRecord: pass
-            else: self.contRecord = self.clientAccount.addContribution(self.cash/self.rate, date=self.date)
-            self.account.balanceAccount()
+        if self.contributed:
+            if self.cash:
+                if self.contRecord: pass
+                else: self.contRecord = self.clientAccount.addContribution(self.cash/self.rate, date=self.date)
+                self.account.balanceAccount()
 
-        if self.transfer:
-            if self.tranRecord: pass
-            else:
-                self.conTranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
-                for rec in self.conTranRecord:
-                    if rec.className == 'Transfer': self.tranRecord = rec
+            if self.transfer:
+                if self.tranRecord: pass
+                else:
+                    self.conTranRecord = self.clientAccount.addContribution(self.transfer/self.rate, date=self.date, _type='t')
+                    for rec in self.conTranRecord:
+                        if rec.className == 'Transfer': self.tranRecord = rec
 
-            self.account.balanceAccount()
-                
+                self.account.balanceAccount()
+                    
         if self.paidout:
             if self.paidoutRecord: pass
             else:

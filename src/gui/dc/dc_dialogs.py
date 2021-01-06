@@ -77,7 +77,20 @@ class ThriftDialog(PRMP_Dialog):
 
         self.get = self.thrifts.get
         self.set = self.thrifts.set
-    
+        
+        for k in self.thrifts.resultsWidgets: self.__dict__[k] = self.thrifts.__dict__[k]
+
+        self.addResultsWidgets(self.thrifts.resultsWidgets)
+
+    # def set(self, values={}):
+    #     if values:
+    #         if isinstance(values, Thrift):
+    #             values.get('money')
+    #             values['income'] = values
+    #         elif isinstance(values, dict):
+    #             if values.get('money'): values.
+
+
     def action(self):
         if self.result:
             if self.thrift: PRMP_MsgBox(self, title='Edit thrift Details', message='Are you sure to edit the details of this thrift?', _type='question', callback=self.updateThrift)
