@@ -9,9 +9,8 @@ class Records(Object, list):
         Object.__init__(self, thrift)
         self.thrift = thrift
 
-
     @property
-    def subs(self): return self[:]
+    def subs(self): return list(self)
 
 
 class Thrift(Object):

@@ -292,7 +292,13 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.manager = Button(self, text='Manager', place=dict(relx=.005, rely=.01, relh=.06, relw=.35), command=self.openManager)
         self.clientAccount = Button(self, text='Client Account', place=dict(relx=.4, rely=.01, relh=.06, relw=.55), command=self.openAccount)
 
-        self.detailsPart = ThriftDetailPart(self, place=dict(relx=.002, rely=.075, relh=.67, relw=.996), background='red')
+        self.detailsPart = ThriftDetailPart(self, place=dict(relx=.002, rely=.075, relh=.67, relw=.996), dc=thrift)
+        
+        for k in self.detailsPart.resultsWidgets: self.__dict__[k] = self.detailsPart.__dict__[k]
+        
+        self.get = self.detailsPart.get
+        self.set = self.detailsPart.set
+
 
         PRMP_Separator(self, place=dict(relx=.005, rely=.755, relh=.005, relw=.99))
 
@@ -305,9 +311,6 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.paidoutRecord = Button(records, text='Paidout', place=dict(relx=.55, rely=.3, relh=.25, relw=.4), command=self.openPaidoutRecord)
 
         self.updateBtn = Button(records, text='Update', place=dict(relx=.56, rely=.6, relh=.25, relw=.4), command=self.openThrift)
-
-        self.get = self.detailsPart.get
-        self.set = self.detailsPart.set
     
     def loadOtherObjects(self):
         if self.thrift:
@@ -356,11 +359,11 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
             if r: rw.readonly()
             else: rw.normal()
     def update(self, thrift):
-        assert thrift == self.thrift
-        self.changeStates()
-        self.set(thrift)
-        self.changeStates(1)
-        self.loadOtherObjects()
+        if thrift is self.thrift:
+            self.changeStates()
+            self.set(thrift)
+            self.changeStates(1)
+            self.loadOtherObjects()
 
 
 
