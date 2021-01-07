@@ -6,6 +6,112 @@ import zlib, pickle, os, imghdr
 from base64 import b64encode, b64decode
 from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
 
+class ImageType:
+    
+    tests = []
+
+    @classmethod
+    def get(cls, file=None, data=None, ):
+        _needed = None
+        if file:
+            if isinstance(file, (str, bytes)):
+                fi = open(file, 'rb')
+                _needed = fi.read(32)
+        elif data: _needed = data[:32]
+
+
+    
+        
+
+    def test_jpeg(h, f):
+        """JPEG data in JFIF or Exif format"""
+        if h[6:10] in (b'JFIF', b'Exif'):
+            return 'jpeg'
+
+    tests.append(test_jpeg)
+
+    def test_png(h, f):
+        if h.startswith(b'\211PNG\r\n\032\n'):
+            return 'png'
+
+    tests.append(test_png)
+
+    def test_gif(h, f):
+        """GIF ('87 and '89 variants)"""
+        if h[:6] in (b'GIF87a', b'GIF89a'):
+            return 'gif'
+
+    tests.append(test_gif)
+
+    def test_tiff(h, f):
+        """TIFF (can be in Motorola or Intel byte order)"""
+        if h[:2] in (b'MM', b'II'):
+            return 'tiff'
+
+    tests.append(test_tiff)
+
+    def test_rgb(h, f):
+        """SGI image library"""
+        if h.startswith(b'\001\332'):
+            return 'rgb'
+
+    tests.append(test_rgb)
+
+    def test_pbm(h, f):
+        """PBM (portable bitmap)"""
+        if len(h) >= 3 and \
+            h[0] == ord(b'P') and h[1] in b'14' and h[2] in b' \t\n\r':
+            return 'pbm'
+
+    tests.append(test_pbm)
+
+    def test_pgm(h, f):
+        """PGM (portable graymap)"""
+        if len(h) >= 3 and \
+            h[0] == ord(b'P') and h[1] in b'25' and h[2] in b' \t\n\r':
+            return 'pgm'
+
+    tests.append(test_pgm)
+
+    def test_ppm(h, f):
+        """PPM (portable pixmap)"""
+        if len(h) >= 3 and \
+            h[0] == ord(b'P') and h[1] in b'36' and h[2] in b' \t\n\r':
+            return 'ppm'
+
+    tests.append(test_ppm)
+
+    def test_rast(h, f):
+        """Sun raster file"""
+        if h.startswith(b'\x59\xA6\x6A\x95'):
+            return 'rast'
+
+    tests.append(test_rast)
+
+    def test_xbm(h, f):
+        """X bitmap (X10 or X11)"""
+        if h.startswith(b'#define '):
+            return 'xbm'
+
+    tests.append(test_xbm)
+
+    def test_bmp(h, f):
+        if h.startswith(b'BM'):
+            return 'bmp'
+
+    tests.append(test_bmp)
+
+    def test_webp(h, f):
+        if h.startswith(b'RIFF') and h[8:12] == b'WEBP':
+            return 'webp'
+
+    tests.append(test_webp)
+
+    def test_exr(h, f):
+        if h.startswith(b'\x76\x2f\x31\x01'):
+            return 'exr'
+
+    tests.append(test_exr)
 
 
 class PRMP_Pics:
@@ -106,7 +212,7 @@ class PRMP_ImageFile(BytesIO):
 
     def __init__(self, filename='', inbuilt=False, inExt='png', base64=b'', image=None, data=b''):
         passed = [bool(a) for a in [filename, base64, image]].count(True)
-        assert passed == 1, 'Only one is required in [filename, base64, image]'
+        assert passed <= 1, 'Only one is required in [filename, base64, image]'
 
         self.name = None
         self._data = data
@@ -123,9 +229,8 @@ class PRMP_ImageFile(BytesIO):
             self.name = f'base64_{PRMP_ImageFile.count}'
 
         super().__init__(self._data)
-
-        self.ext = imghdr.what(image or self)
-        if image: image.save(self, self.ext)
+        
+        if image: image.save(self, inExt)
 
         PRMP_ImageFile.count += 1
 
@@ -134,6 +239,9 @@ class PRMP_ImageFile(BytesIO):
         else: return f'PRMP_ImageFile({PRMP_ImageFile.count})'
 
     def __len__(self): return self.size
+    
+    @property
+    def ext(self): return imghdr.what(self.data, self.data[:33])
 
     @property
     def data(self): return self.getvalue()
@@ -180,7 +288,7 @@ class PRMP_Image:
         self.tkImage = None
         self.name = ''
         self.animatedFrames = []
-        self.interframe_duration = None
+        self.interframe_duration = 0
 
         if filename or image:
             if isinstance(filename, (str, bytes)): self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
@@ -200,8 +308,9 @@ class PRMP_Image:
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
             
-            self.animatedFrames = [img for img in ImageSequence.Iterator(img)]
-            self.interframe_duration = self.info.get('duration', 0)
+            if self.ext == 'gif':
+                self.animatedFrames = [img for img in ImageSequence.Iterator(img)]
+                self.interframe_duration = self.info.get('duration', 0)
             
             self.tkImage = self.imgClass(img, name=self.basename)
 

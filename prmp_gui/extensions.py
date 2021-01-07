@@ -128,11 +128,11 @@ class PRMP_ImageWidget:
         self.PMB = PRMP_MsgBox
         self.CD = PRMP_CameraDialog
         
-        self.default_dp = PRMP_Image('profile_pix', thumb=self.thumb, db=1)
-        
+        self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
         self.bindMenu()
+        
         self.loadImage(prmpImage)
-        self.bindEntryHighlight()
+        # self.bindEntryHighlight()
             
     def disabled(self):
         self.unBindMenu()
@@ -142,7 +142,7 @@ class PRMP_ImageWidget:
         self.bindMenu()
         super().normal()
     
-    def loadImage(self, prmpImage=None):
+    def loadImage(self, prmpImage=None, **kwargs):
         self.delMenu()
         dif = 20
         w = self.width-dif, self.height-dif
@@ -150,7 +150,7 @@ class PRMP_ImageWidget:
 
         if prmpImage:
             if not isinstance(prmpImage, PRMP_Image):
-                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb)
+                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
             if isinstance(prmpImage, PRMP_Image):
                 self._image = prmpImage
                 self.imageFile = prmpImage.imageFile
