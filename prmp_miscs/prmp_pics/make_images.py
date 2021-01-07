@@ -9,8 +9,6 @@ def makeImage(cat):
     
 
     file = f'{_dir_}.py'
-    di = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\Test_GUI\Test_Gui\PySimpleGUI-master\GIFs'
-    if cat == 'gif': dir_ = di
     
     opn = open(file, 'w')
     # return

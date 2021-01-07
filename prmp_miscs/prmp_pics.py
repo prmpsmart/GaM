@@ -52,11 +52,36 @@ class PRMP_Pics:
             try: return files[bitmap]
             except: filesL[0]
 
+    @classmethod
+    def get(cls, bitmap):
+        filesL = cls.files()
+        
+        if isinstance(bitmap, int):
+            try: return filesL[bitmap]
+            except: filesL[0]
+        elif isinstance(bitmap, str):
+            files = cls.filesDict()
+            try: return files[bitmap]
+            except: filesL[0]
+
 class PRMP_Xbms(PRMP_Pics): subDir = 'prmp_xbms'
     
 class PRMP_Pngs(PRMP_Pics): subDir = 'prmp_pngs'
     
 class PRMP_Gifs(PRMP_Pics): subDir = 'prmp_gifs'
+
+class PRMP_Images:
+    @classmethod
+    def get(cls, inbuilt, ext):
+        base64 = cls.getBase64(inbuilt, ext)
+        return b64decode(base64)
+    
+    @classmethod
+    def getBase64(cls,  inbuilt, ext):
+        if ext == 'png': return PRMP_PNGS[inbuilt]
+        elif ext == 'gif': return PRMP_GIFS[inbuilt]
+        elif ext == 'xbm': return PRMP_XBMS[inbuilt]
+
 
 class PRMP_ImageFile(BytesIO):
     count = 0
@@ -92,8 +117,7 @@ class PRMP_ImageFile(BytesIO):
             if e: self.ext = e[1:]
 
         elif inbuilt:
-            data = self.getImageFile(inbuilt, ext=ext)
-            self._data = b64decode(data)
+            self._data = PRMP_Images.get(inbuilt, ext)
             self.name = inbuilt
 
         elif base64:
