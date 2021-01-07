@@ -2,6 +2,10 @@
 from io import BytesIO
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
 import zlib, pickle, os
+from base64 import b64encode, b64decode
+from .prmp_images import *
+
+
 
 class PRMP_Pics:
     _dir = 'prmp_pics'
@@ -73,25 +77,37 @@ class PRMP_ImageFile(BytesIO):
             self.basename = os.path.basename(pic)
             return pic
 
-    def __init__(self, fp=None, ext='.png', db=0, image=None):
-        self.name = None
-        self.basename = None
-        self.ext = ext
-        self._data = b''
+    def __init__(self, filename='', inbuilt='', ext='png', base64=b'', image=None):
+        passed = [bool(a) for a in [filename, inbuilt, base64, image]].count(True)
+        assert passed == 1, 'Only one is required in [filename, inbuilt, base64, image]'
 
-        if isinstance(fp, str):
-            file = self.getImageFile(fp, ext=ext, db=db)
-            self._data = open(file, 'rb').read()
-        elif isinstance(fp, bytes): self._data = fp
+        self.name = None
+        self._data = b''
+        self.ext = ext
+
+        if filename:
+            self._data = open(filename, 'rb').read()
+            self.name = os.path.basename(filename)
+            e = os.path.splitext(filename)[-1]
+            if e: self.ext = e[1:]
+
+        elif inbuilt:
+            data = self.getImageFile(inbuilt, ext=ext)
+            self._data = b64decode(data)
+            self.name = inbuilt
+
+        elif base64:
+            self._data = b64decode(base64)
+            self.name = f'base64_{PRMP_ImageFile.count}'
 
         super().__init__(self._data)
 
-        if image: image.save(self, 'png')
+        if image: image.save(self, ext)
 
         PRMP_ImageFile.count += 1
 
     def __str__(self):
-        if self.name:return f'PRMP_ImageFile({self.name})'
+        if self.name: return f'PRMP_ImageFile({self.name})'
         else: return f'PRMP_ImageFile({PRMP_ImageFile.count})'
 
     def __len__(self): return self.size
@@ -103,17 +119,15 @@ class PRMP_ImageFile(BytesIO):
     @property
     def cdata(self): return self.compressedData
     @property
+    def base64Data(self): return b54encode(self.data)
+    @property
     def size(self): return len(self.data)
-
     def get(self): return self.data
 
-    def setCompressedData(self, compressedData):
-        decomData = zlib.decompress(compressedData)
-        self.write(decomData)
-    
-    def pickle(self, file):
+    def pickle(self, file   ):
         try: f = open(file, 'wb')
         except: f = file
+        obj = None
         pickle.dump(self, f)
 
     def save(self, file):
