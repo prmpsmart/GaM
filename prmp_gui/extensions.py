@@ -160,6 +160,9 @@ class PRMP_ImageWidget:
 
             if prmpImage.ext == 'xbm': self._image = prmpImage.resizeTk(self.resize)
             self.configure(image=self._image)
+
+            print(self.image.ext)
+
         else: self.loadImage(self.default_dp)
     
     def removeImage(self):
@@ -199,6 +202,7 @@ class PRMP_ImageWidget:
         self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
     
     def saveImage(self):
+        self.delMenu()
         if self.imageFile:
             file = asksaveasfilename(filetypes=picTypes)
             if file: self.imageFile.save(file)
@@ -208,7 +212,7 @@ class PRMP_ImageWidget:
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
         self.rt = rt = PRMP_Toplevel(self, geo=(50, 75, x, y), tm=1, asb=0, atb=0)
-        PRMP_Button(rt, text='PRMP_Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.25, relw=1))
+        PRMP_Button(rt, text='Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.25, relw=1))
         PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.25, relh=.25, relw=1))
         PRMP_Button(rt, config=dict(text='Save', command=self.saveImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.5, relh=.25, relw=1))
         PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.75, relh=.25, relw=1))

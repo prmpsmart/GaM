@@ -136,12 +136,14 @@ class PRMP_Image:
         self.name = ''
         self.animatedFrames = []
         self.animatedTksImages = []
+        self.interframe_duration = None
 
         if imageFile or image:
             if isinstance(imageFile, (str, bytes)): self.imageFile = PRMP_ImageFile(imageFile, ext=ext, db=db)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
             
             self.name = self.imageFile.name
+            print(self.name, end=', ')
             self.ext = self.imageFile.ext
             
             if self.ext in ['xbm', '.xbm']: self.imgClass = BitmapImage
@@ -153,9 +155,13 @@ class PRMP_Image:
                 img = self.resizedImage
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
-
             
-            if self.ext == 'gifs': sequence = [self.imgClass(img) for img in ImageSequence.Iterator(img)]
+            try:
+                self.info = img.info
+                print(img.__dict__['tile'][0][0], '\n')
+                sequence = [self.imgClass(img) for img in ImageSequence.Iterator(img)]
+                self.interframe_duration = 0
+            except: pass
             
             self.tkImage = self.imgClass(img, name=self.basename)
 
