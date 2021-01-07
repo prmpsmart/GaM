@@ -1,9 +1,12 @@
-from os import listdir, path, chdir
+from os import listdir, path, chdir, getcwd
 from base64 import b64encode, b64decode
+
+cwd = getcwd()
+
 
 def makeImage(cat):
     _dir_ = dir_ = f'prmp_{cat}s'
-    print(listdir(dir_))
+    
 
     file = f'{_dir_}.py'
     di = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\Test_GUI\Test_Gui\PySimpleGUI-master\GIFs'
@@ -18,12 +21,13 @@ def makeImage(cat):
 
     chdir(dir_)
 
-
     for name, file in names.items():
         data = open(file, 'rb').read()
         enc  = b64encode(data)
         strf = f"{name} = {enc} \n\n"
         opn.write(strf)
+    
+    chdir(cwd)
 
     img = ', '.join(lnames)
 
@@ -46,7 +50,7 @@ def makeImage(cat):
 
 
 cats = 'xbm', 'gif', 'png'
-cats = 'xbm', 'png'
+# cats = 'xbm', 'png'
 
 for cat in cats: makeImage(cat)
 
