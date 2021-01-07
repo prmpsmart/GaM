@@ -137,15 +137,24 @@ class PRMP_ImageFile(BytesIO):
 
     @property
     def data(self): return self.getvalue()
-    @property
-    def compressedData(self): return zlib.compress(self.data)
-    @property
-    def cdata(self): return self.compressedData
-    @property
-    def base64Data(self): return b64encode(self.data)
+
     @property
     def size(self): return len(self.data)
+
     def get(self): return self.data
+
+    @property
+    def compressedData(self): return zlib.compress(self.data)
+
+    @property
+    def cdata(self): return self.compressedData
+    
+    @property
+    def base64Data(self): return b64encode(self.data)
+
+
+    @property
+    def image(self): return Image.open(self)
 
     def pickle(self, file   ):
         try: f = open(file, 'wb')
@@ -171,7 +180,6 @@ class PRMP_Image:
         self.tkImage = None
         self.name = ''
         self.animatedFrames = []
-        self.animatedTksImages = []
         self.interframe_duration = None
 
         if filename or image:
@@ -184,6 +192,7 @@ class PRMP_Image:
             if self.ext == 'xbm': self.imgClass = BitmapImage
 
             img = self.image = Image.open(self.imageFile)
+            self.info = img.info
 
             if resize and len(resize) == 2:
                 self.resizedImage = self.image.resize(resize)
@@ -191,12 +200,8 @@ class PRMP_Image:
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
             
-            try:
-                self.info = img.info
-                print(img.__dict__['tile'][0][0], '\n')
-                sequence = [self.imgClass(img) for img in ImageSequence.Iterator(img)]
-                self.interframe_duration = 0
-            except: pass
+            self.animatedFrames = [img for img in ImageSequence.Iterator(img)]
+            self.interframe_duration = self.info.get('duration', 0)
             
             self.tkImage = self.imgClass(img, name=self.basename)
 
@@ -205,6 +210,9 @@ class PRMP_Image:
         else: raise ValueError('imageFile is None')
 
     def __str__(self): return str(self.tkImage)
+
+    @property
+    def animatedTksImages(self): return [self.imgClass(img) for img in self.animatedFrames]
 
     @property
     def basename(self):
