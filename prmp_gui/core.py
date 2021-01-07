@@ -278,19 +278,19 @@ class PRMP_Theme(PRMP_Mixins):
     @classmethod
     def setOptions(cls, button_color=None, progress_meter_color=None, background_color=None, input_elements_background_color=None, input_text_color=None, scrollbar_color=None, text_color=None):
 
-        if button_color != None: cls.DEFAULT_BUTTON_COLOR = button_color
+        if button_color != None: PRMP_Theme.DEFAULT_BUTTON_COLOR = button_color
 
-        if progress_meter_color != None: cls.DEFAULT_PROGRESS_BAR_COLOR = progress_meter_color
+        if progress_meter_color != None: PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR = progress_meter_color
 
-        if background_color != None: cls.DEFAULT_BACKGROUND_COLOR = background_color
+        if background_color != None: PRMP_Theme.DEFAULT_BACKGROUND_COLOR = background_color
 
-        if input_elements_background_color != None: cls.DEFAULT_INPUT_ELEMENTS_COLOR = input_elements_background_color
+        if input_elements_background_color != None: PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR = input_elements_background_color
 
-        if text_color != None: cls.DEFAULT_FOREGROUND_COLOR = text_color
+        if text_color != None: PRMP_Theme.DEFAULT_FOREGROUND_COLOR = text_color
 
-        if scrollbar_color != None: cls.DEFAULT_SCROLLBAR_COLOR = scrollbar_color
+        if scrollbar_color != None: PRMP_Theme.DEFAULT_SCROLLBAR_COLOR = scrollbar_color
 
-        if input_text_color is not None: cls.DEFAULT_INPUT_TEXT_COLOR = input_text_color
+        if input_text_color is not None: PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR = input_text_color
         
         return True
 
@@ -303,6 +303,7 @@ class PRMP_Theme(PRMP_Mixins):
         total = len(themes)
         if 0 < num < total: cls.setTheme(themes[num])
         else: cls.setTheme(themes[0])
+    
     @property
     def fontsNames(self): return self.tk.splitlist(self.tk.call("font", "names"))
     
@@ -328,7 +329,6 @@ class PRMP_Theme(PRMP_Mixins):
             font = PRMP_Theme.__dict__[df]
             fo = Font(name=df, **font)
             PRMP_Theme.PRMP_FONTS.append(fo)
-
 
     def _prevTheme(self):
         cur = PRMP_Theme.CURRENT_THEME

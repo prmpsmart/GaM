@@ -134,6 +134,8 @@ class PRMP_Image:
         self.image = None
         self.tkImage = None
         self.name = ''
+        self.animatedFrames = []
+        self.animatedTksImages = []
 
         if imageFile or image:
             if isinstance(imageFile, (str, bytes)): self.imageFile = PRMP_ImageFile(imageFile, ext=ext, db=db)
@@ -151,6 +153,9 @@ class PRMP_Image:
                 img = self.resizedImage
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
+
+            
+            if self.ext == 'gifs': sequence = [self.imgClass(img) for img in ImageSequence.Iterator(img)]
             
             self.tkImage = self.imgClass(img, name=self.basename)
 

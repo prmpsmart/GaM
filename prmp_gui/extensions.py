@@ -146,6 +146,8 @@ class PRMP_ImageWidget:
         self.delMenu()
         dif = 20
         w = self.width-dif, self.height-dif
+        if w[0] < 0 and w[1] < 0: return
+
         if prmpImage:
             if not isinstance(prmpImage, PRMP_Image):
                 prmpImage = PRMP_Image(prmpImage, thumb=self.thumb)
@@ -301,7 +303,6 @@ class ScrollableFrame(PRMP_Frame):
         self.canvas.configure(scrollregion=p)
 SF = ScrollableFrame
 
-
 class Test_PRMP_ToolTip:
     def __init__(self, master, msg='', delay=.01, follow=True, root=None):
 
@@ -366,7 +367,6 @@ class Test_PRMP_ToolTip:
         self.hidden = time.time()
         self.visible = 0
         if self.tip: self.tip.withdraw()
-
 TT = PRMP_ToolTip
 
 class PRMP_SolidScreen(PRMP_MainWindow):
@@ -629,7 +629,6 @@ class PRMP_Calendar(Frame):
         new = self.month - 1
         if self.min and (new.ymdToOrd < self.min.ymdToOrd): return
         self.month = new
-        # print(new, self.month, self.min)
         self.updateDays()
     
     def updateDays(self):
@@ -659,7 +658,6 @@ class PRMP_Calendar(Frame):
     def choosenDay(self, date):
         self.__date = date
         if self.callback: self.callback(date)
-
 
 class RPMP_Entry_Label(Label):
 
@@ -744,8 +742,6 @@ class PRMP_Camera(PRMP_Frame):
             image.thumbnail(w_h)
             self.image = PhotoImage(image=image)
         
-        # else: print('Read Error')
-
     def getFrame(self):
         if self.cam and self.cam.isOpened():
             success, frame = self.cam.read()
