@@ -1,9 +1,10 @@
 
 from io import BytesIO
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
-import zlib, pickle, os
+from PIL import ImageSequence
+import zlib, pickle, os, imghdr
 from base64 import b64encode, b64decode
-from .prmp_images import *
+from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
 
 
 
@@ -71,6 +72,7 @@ class PRMP_Pngs(PRMP_Pics): subDir = 'prmp_pngs'
 class PRMP_Gifs(PRMP_Pics): subDir = 'prmp_gifs'
 
 class PRMP_Images:
+    
     @classmethod
     def get(cls, inbuilt, ext):
         base64 = cls.getBase64(inbuilt, ext)
@@ -102,23 +104,19 @@ class PRMP_ImageFile(BytesIO):
             self.basename = os.path.basename(pic)
             return pic
 
-    def __init__(self, filename='', inbuilt='', ext='png', base64=b'', image=None):
-        passed = [bool(a) for a in [filename, inbuilt, base64, image]].count(True)
-        assert passed == 1, 'Only one is required in [filename, inbuilt, base64, image]'
+    def __init__(self, filename='', inbuilt=False, inExt='png', base64=b'', image=None, data=b''):
+        passed = [bool(a) for a in [filename, base64, image]].count(True)
+        assert passed == 1, 'Only one is required in [filename, base64, image]'
 
         self.name = None
-        self._data = b''
-        self.ext = ext
+        self._data = data
+        
+        if data: self.name = f'data_{PRMP_ImageFile.count}'
 
-        if filename:
-            self._data = open(filename, 'rb').read()
+        elif filename:
             self.name = os.path.basename(filename)
-            e = os.path.splitext(filename)[-1]
-            if e: self.ext = e[1:]
-
-        elif inbuilt:
-            self._data = PRMP_Images.get(inbuilt, ext)
-            self.name = inbuilt
+            if inbuilt: self._data = PRMP_Images.get(filename, inExt)
+            else: self._data = open(filename, 'rb').read()
 
         elif base64:
             self._data = b64decode(base64)
@@ -126,7 +124,8 @@ class PRMP_ImageFile(BytesIO):
 
         super().__init__(self._data)
 
-        if image: image.save(self, ext)
+        self.ext = imghdr.what(image or self)
+        if image: image.save(self, self.ext)
 
         PRMP_ImageFile.count += 1
 
@@ -143,7 +142,7 @@ class PRMP_ImageFile(BytesIO):
     @property
     def cdata(self): return self.compressedData
     @property
-    def base64Data(self): return b54encode(self.data)
+    def base64Data(self): return b64encode(self.data)
     @property
     def size(self): return len(self.data)
     def get(self): return self.data
@@ -162,11 +161,10 @@ class PRMP_ImageFile(BytesIO):
 
 class PRMP_Image:
     count = 0
-    def __init__(self, imageFile=None, ext='png', resize=(), thumb=(), db=0, image=None):
+    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None):
         
         pic = None
-        self.ext = 'jpg'
-        self.imageFile = imageFile
+        self.imageFile = None
         self.imgClass = PhotoImage
         self.resizedImage = None
         self.image = None
@@ -176,15 +174,14 @@ class PRMP_Image:
         self.animatedTksImages = []
         self.interframe_duration = None
 
-        if imageFile or image:
-            if isinstance(imageFile, (str, bytes)): self.imageFile = PRMP_ImageFile(imageFile, ext=ext, db=db)
+        if filename or image:
+            if isinstance(filename, (str, bytes)): self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
             
             self.name = self.imageFile.name
-            print(self.name, end=', ')
             self.ext = self.imageFile.ext
             
-            if self.ext in ['xbm', '.xbm']: self.imgClass = BitmapImage
+            if self.ext == 'xbm': self.imgClass = BitmapImage
 
             img = self.image = Image.open(self.imageFile)
 
@@ -211,7 +208,7 @@ class PRMP_Image:
 
     @property
     def basename(self):
-        if self.imageFile and self.imageFile.basename: return self.imageFile.basename
+        if self.imageFile: return self.imageFile.name
         return f'PRMP_Image({PRMP_Image.count})'
 
     def resize(self, rz): return self.image.resize(rz)

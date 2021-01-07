@@ -2212,13 +2212,13 @@ class PRMP_Window(PRMP_Widget):
         fr = F(self)
 
         if not self.__r:
-            self.imgMin = PRMP_Image('green', resize=(20, 20), db=1)
+            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20))
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', resize=(20, 20), db=1)
+            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20))
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), tip='Maximize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-        self.imgExit = PRMP_Image('red', resize=(20, 20), db=1)
+        self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20))
         self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), tip='Exit', font='DEFAULT_SMALL_BUTTON_FONT')
 
         self._icon = L(fr)
