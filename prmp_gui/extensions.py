@@ -169,6 +169,7 @@ class PRMP_ImageWidget:
                 self.frame = self.frames[self.frame_counter]
                 self.durations = self.prmpImage.interframe_durations
                 self.__renderGif()
+                # print(self.prmpImage.animatedFrames)
             
             self.configure(image=self.frame)
 
@@ -177,13 +178,12 @@ class PRMP_ImageWidget:
     def __renderGif(self):
         # Update Frame
         self.frame = self.frames[self.frame_counter]
-        self.config(image=self.frame)
-        duration = self.durations[self.frame_counter]
+        self.config(image=self.frames[self.frame_counter])
 
         # Loop Counter
         self.frame_counter += 1
         if self.frame_counter >= len(self.frames): self.frame_counter = 0
-        self.after(duration, self.__renderGif)
+        self.after(self.durations[self.frame_counter], self.__renderGif)
     
     def removeImage(self):
         self.delMenu()
