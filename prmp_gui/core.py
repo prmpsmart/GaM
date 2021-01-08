@@ -565,11 +565,13 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def width(self):
         self.update()
-        return int(self.winfo_width())
+        try: return int(self.winfo_width())
+        except: return -1
     @property
     def height(self):
         self.update()
-        return int(self.winfo_height())
+        try: return int(self.winfo_height())
+        except: return -1
     
     @property
     def winfos(self):

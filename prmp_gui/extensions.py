@@ -166,6 +166,7 @@ class PRMP_ImageWidget:
             self.prmpImage =  prmpImage
 
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
+            
             self.image = self.prmpImage.image
             
             if self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
@@ -177,12 +178,9 @@ class PRMP_ImageWidget:
                 self.frames = []
                 self.durations = []
                 for frame in ImageSequence.Iterator(self.image):
-                    if self.resize: img = frame.resize(self.resize)
-                    if self.thumb:
-                        frame.thumbnail(self.thumb)
-                        img = frame
-                    else: img = frame
-                    tkimg = PhotoImage(img)
+                    if self.resize: frame = frame.resize(self.resize)
+                    elif self.thumb: frame.thumbnail(self.thumb)
+                    tkimg = PhotoImage(frame)
                     self.frames.append(tkimg)
                     self.durations.append(frame.info['duration'])
                 self.frame = self.frames[self.frame_counter]
@@ -269,6 +267,12 @@ class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center'), **kwargs)
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **inbuiltKwargs)
 IL = PRMP_ImageLabel
+
+class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={}, **kwargs):
+        PRMP_Button.__init__(self, master, config=dict(anchor='center'), **kwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **inbuiltKwargs)
+IL = PRMP_ImageButton
 
 class PRMP_DateWidget:
     attr = 'strDate'
