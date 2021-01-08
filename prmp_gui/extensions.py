@@ -119,21 +119,22 @@ class PRMP_FillWidgets(PRMP_Mixins):
 FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, **inbuiltKwargs):
         self.rt = None
         self.prmpImage = prmpImage
         self.thumb = thumb or (200, 170)
-        self.resize = resize or (100, 100)
+        self.resize = resize
         
         self.frame_counter = 0
         self.frame = None
         self.frames = None
         self.durations = None
+        self.isGif = False
 
         self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
         self.bindMenu()
         
-        self.loadImage(self.prmpImage)
+        self.loadImage(self.prmpImage, **inbuiltKwargs)
             
     def disabled(self):
         self.unBindMenu()
@@ -145,12 +146,16 @@ class PRMP_ImageWidget:
     
     def loadImage(self, prmpImage=None, **kwargs):
         self.delMenu()
+        self.isGif = False
+
         dif = 20
-        w = self.width-dif, self.height-dif
-        if w[0] < 0 and w[1] < 0: 
-            w = (250, 200)
-            self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
-            return
+        w = self.resize or self.thumb
+        if not self.resize and self.thumb:
+            w = self.width-dif, self.height-dif
+            if w[0] < 0 and w[1] < 0: 
+                w = (250, 200)
+                self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
+                return
 
         if prmpImage:
             if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=w, **kwargs)
@@ -168,6 +173,7 @@ class PRMP_ImageWidget:
                 self.frames = self.prmpImage.animatedTkFrames
                 self.frame = self.frames[self.frame_counter]
                 self.durations = self.prmpImage.interframe_durations
+                self.isGif = True
                 self.__renderGif()
                 # print(self.prmpImage.animatedFrames)
             
@@ -176,6 +182,7 @@ class PRMP_ImageWidget:
         else: self.loadImage(self.default_dp)
     
     def __renderGif(self):
+        if not self.isGif: return
         # Update Frame
         self.frame = self.frames[self.frame_counter]
         self.config(image=self.frames[self.frame_counter])
@@ -245,9 +252,9 @@ class PRMP_ImageWidget:
 IW = PRMP_ImageWidget
 
 class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={}, **kwargs):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center'), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **inbuiltKwargs)
 IL = PRMP_ImageLabel
 
 class PRMP_DateWidget:

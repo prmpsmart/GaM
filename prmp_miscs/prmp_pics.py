@@ -295,11 +295,14 @@ class PRMP_Image:
         self.tkImage = None
         self.name = ''
         self._animatedTkFrames = []
+        self._animatedFrames = []
 
         if filename or image:
             if isinstance(filename, (str, bytes)): self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
-            else: raise ValueError(f'{filename} or {image} is not a valid value. ')
+            else: self.imageFile = filename or image
+
+            if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError(f'{filename} or {image} is not a valid value. ')
             
             self.name = self.imageFile.name
             self.ext = self.imageFile.ext
@@ -329,7 +332,6 @@ class PRMP_Image:
     def animatedTkFrames(self):
         if self._animatedTkFrames: return self._animatedTkFrames
         else:
-            # self.__animatedTkFrames = [self.imgClass(frame) for frame in self.animatedFrames]
             for frame in ImageSequence.Iterator(self.img): self._animatedTkFrames.append(self.imgClass(frame))
         return self._animatedTkFrames
 
@@ -337,7 +339,11 @@ class PRMP_Image:
     def interframe_durations(self): return [anf.info.get('duration', 0) for anf in self.animatedFrames]
 
     @property
-    def animatedFrames(self): return [img for img in ImageSequence.Iterator(self.img)]
+    def animatedFrames(self):
+        if self._animatedFrames: return self._animatedFrames
+        else:
+            for img in ImageSequence.Iterator(self.img): self._animatedFrames.append(img)
+        return self._animatedFrames
 
     @property
     def basename(self):
