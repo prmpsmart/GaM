@@ -121,17 +121,19 @@ FW = PRMP_FillWidgets
 class PRMP_ImageWidget:
     def __init__(self, prmpImage=None, thumb=None, resize=None):
         self.rt = None
-        self.__image = None
+        self.prmpImage = prmpImage
         self.thumb = thumb or (200, 170)
         self.resize = resize or (100, 100)
-        from .dialogs import PRMP_MsgBox, PRMP_CameraDialog
-        self.PMB = PRMP_MsgBox
-        self.CD = PRMP_CameraDialog
         
+        self.frame_counter = 0
+        self.frame = None
+        self.frames = None
+        self.durations = None
+
         self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
         self.bindMenu()
         
-        self.loadImage(prmpImage)
+        self.loadImage(self.prmpImage)
             
     def disabled(self):
         self.unBindMenu()
@@ -152,26 +154,45 @@ class PRMP_ImageWidget:
             if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image):
-                self._image = prmpImage
                 self.imageFile = prmpImage.imageFile
-                self._image = prmpImage.resizeTk(w)
+                self.frame = prmpImage.resizeTk(w)
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
             
-            self.image =  prmpImage
+            self.prmpImage =  prmpImage
 
-            if prmpImage.ext == 'xbm': self._image = prmpImage.resizeTk(self.resize)
-            self.configure(image=self._image)
+            if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
 
-            if self.image.ext == 'gif': self.renderGif()
+            if self.prmpImage.ext == 'gif':
+                self.frames = self.prmpImage.animatedTksImages
+                self.frame = self.frames[self.frame_counter]
+                self.durations = self.prmpImage.interframe_durations
+                self.__renderGif()
+            
+            self.configure(image=self.frame)
 
         else: self.loadImage(self.default_dp)
     
-    def renderGif(self):
-        print('called')
+    def __renderGif(self):
+        # print('called')
+        
+        # Update Frame
+        self.config(image=self.frames[self.frame_counter])
+        self.image = self.frames[self.frame_counter]
+
+        # Loop Counter
+        self.frame_counter += 1
+        if self.frame_counter >= len(self.frames):
+            self.frame_counter = 0
+
+        # Queue Frame Update
+        # self.toplevel.after(self.durations[self.frame_counter], self.__renderGif)
+        self.toplevel.after(self.durations[self.frame_counter], lambda: self.__renderGif())
     
     def removeImage(self):
         self.delMenu()
-        self.PMB(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ', callback=self._removeImage)
+        from .dialogs import PRMP_MsgBox
+
+        PRMP_MsgBox(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ', callback=self._removeImage)
     
     def _removeImage(self, val):
         if val: self.loadImage()
@@ -203,7 +224,9 @@ class PRMP_ImageWidget:
         
     def camera(self, e=0):
         self.delMenu()
-        self.CD(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
+        from .dialogs import PRMP_CameraDialog
+
+        PRMP_CameraDialog(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
     
     def saveImage(self):
         self.delMenu()
