@@ -291,6 +291,10 @@ class PRMP_Image:
         self.imageFile = None
         self.imgClass = PhotoImage
         self.resizedImage = None
+        
+        self._thumb = thumb
+        self._resize = resize
+
         self.image = None
         self.tkImage = None
         self.name = ''
@@ -312,9 +316,7 @@ class PRMP_Image:
             img = self.image = Image.open(self.imageFile)
             self.info = img.info
 
-            if resize and len(resize) == 2:
-                self.resizedImage = self.image.resize(resize)
-                img = self.resizedImage
+            if resize and len(resize) == 2: img = self.resizedImage = self.image.resize(resize)
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
             
@@ -332,18 +334,37 @@ class PRMP_Image:
     def animatedTkFrames(self):
         if self._animatedTkFrames: return self._animatedTkFrames
         else:
-            for frame in ImageSequence.Iterator(self.img): self._animatedTkFrames.append(self.imgClass(frame))
-        return self._animatedTkFrames
+            for frame in ImageSequence.Iterator(self.img):
+                if self._resize: img = frame.resize(self._resize)
+                if self._thumb:
+                    frame.thumbnail(self._thumb)
+                    img = frame
+                else: img = frame
+                tkimg = self.imgClass(img)
+                self._animatedTkFrames.append(tkimg)
 
-    @property
-    def interframe_durations(self): return [anf.info.get('duration', 0) for anf in self.animatedFrames]
+            # for img in self.animatedFrames:
+            #     tkimg = self.imgClass(img)
+            #     self._animatedTkFrames.append(tkimg)
+        return self._animatedTkFrames
 
     @property
     def animatedFrames(self):
         if self._animatedFrames: return self._animatedFrames
         else:
-            for img in ImageSequence.Iterator(self.img): self._animatedFrames.append(img)
+            for frame in ImageSequence.Iterator(self.img):
+                print(99)
+                if self._resize: img = frame.resize(self._resize)
+                elif self._thumb:
+                    frame.thumbnail(self._thumb)
+                    img = frame
+                else: img = frame
+                self._animatedFrames.append(img)
+            print(self._animatedFrames)
         return self._animatedFrames
+
+    @property
+    def interframe_durations(self): return [anf.info.get('duration', 0) for anf in self.animatedFrames]
 
     @property
     def basename(self):

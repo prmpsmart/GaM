@@ -168,14 +168,27 @@ class PRMP_ImageWidget:
             self.prmpImage =  prmpImage
 
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
+            self.image = self.prmpImage.image
 
             if self.prmpImage.ext == 'gif':
-                self.frames = self.prmpImage.animatedTkFrames
+                # self.frames = self.prmpImage.animatedTkFrames
+                # self.durations = self.prmpImage.interframe_durations
+                self.frames = []
+                self.durations = []
+                for frame in ImageSequence.Iterator(self.image):
+                    if self.resize: img = frame.resize(self.resize)
+                    if self.thumb:
+                        frame.thumbnail(self.thumb)
+                        img = frame
+                    else: img = frame
+                    tkimg = PhotoImage(img)
+                    self.frames.append(tkimg)
+                    self.durations.append(frame.info['duration'])
+                print(self.frames)
                 self.frame = self.frames[self.frame_counter]
-                self.durations = self.prmpImage.interframe_durations
+                
                 self.isGif = True
                 self.__renderGif()
-                # print(self.prmpImage.animatedFrames)
             
             self.configure(image=self.frame)
 
