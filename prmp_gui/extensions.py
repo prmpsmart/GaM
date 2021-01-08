@@ -132,7 +132,6 @@ class PRMP_ImageWidget:
         self.bindMenu()
         
         self.loadImage(prmpImage)
-        # self.bindEntryHighlight()
             
     def disabled(self):
         self.unBindMenu()
@@ -146,17 +145,20 @@ class PRMP_ImageWidget:
         self.delMenu()
         dif = 20
         w = self.width-dif, self.height-dif
-        if w[0] < 0 and w[1] < 0: return
+        if w[0] < 0 and w[1] < 0: 
+            w = (250, 200) 
 
         if prmpImage:
-            if not isinstance(prmpImage, PRMP_Image):
-                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
+            if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
+
             if isinstance(prmpImage, PRMP_Image):
                 self._image = prmpImage
                 self.imageFile = prmpImage.imageFile
                 self._image = prmpImage.resizeTk(w)
+            else: raise ValueError('prmpImage must be an instance of PRMP_Image')
             
             self.image =  prmpImage
+            print(self._image)
 
             if prmpImage.ext == 'xbm': self._image = prmpImage.resizeTk(self.resize)
             self.configure(image=self._image)

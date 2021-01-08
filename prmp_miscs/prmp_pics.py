@@ -10,47 +10,41 @@ class ImageType:
     
     tests = []
 
-    @classmethod
-    def test_jpeg(cls, data):
+    def test_jpeg(data):
         """JPEG data in JFIF or Exif format"""
         if data[6:10] in (b'JFIF', b'Exif'):
             return 'jpeg'
 
     tests.append(test_jpeg)
 
-    @classmethod
-    def test_png(cls, data):
+    def test_png(data):
         if data.startswith(b'\211PNG\r\n\032\n'):
             return 'png'
 
     tests.append(test_png)
 
-    @classmethod
-    def test_gif(cls, data):
+    def test_gif(data):
         """GIF ('87 and '89 variants)"""
         if data[:6] in (b'GIF87a', b'GIF89a'):
             return 'gif'
 
     tests.append(test_gif)
 
-    @classmethod
-    def test_tiff(cls, data):
+    def test_tiff(data):
         """TIFF (can be in Motorola or Intel byte order)"""
         if data[:2] in (b'MM', b'II'):
             return 'tiff'
 
     tests.append(test_tiff)
 
-    @classmethod
-    def test_rgb(cls, data):
+    def test_rgb(data):
         """SGI image library"""
         if data.startswith(b'\001\332'):
             return 'rgb'
 
     tests.append(test_rgb)
 
-    @classmethod
-    def test_pbm(cls, data):
+    def test_pbm(data):
         """PBM (portable bitmap)"""
         if len(data) >= 3 and \
             data[0] == ord(b'P') and data[1] in b'14' and data[2] in b' \t\n\r':
@@ -58,8 +52,7 @@ class ImageType:
 
     tests.append(test_pbm)
 
-    @classmethod
-    def test_pgm(cls, data):
+    def test_pgm(data):
         """PGM (portable graymap)"""
         if len(data) >= 3 and \
             data[0] == ord(b'P') and data[1] in b'25' and data[2] in b' \t\n\r':
@@ -67,8 +60,7 @@ class ImageType:
 
     tests.append(test_pgm)
 
-    @classmethod
-    def test_ppm(cls, data):
+    def test_ppm(data):
         """PPM (portable pixmap)"""
         if len(data) >= 3 and \
             data[0] == ord(b'P') and data[1] in b'36' and data[2] in b' \t\n\r':
@@ -76,38 +68,33 @@ class ImageType:
 
     tests.append(test_ppm)
 
-    @classmethod
-    def test_rast(cls, data):
+    def test_rast(data):
         """Sun raster file"""
         if data.startswith(b'\x59\xA6\x6A\x95'):
             return 'rast'
 
     tests.append(test_rast)
 
-    @classmethod
-    def test_xbm(cls, data):
+    def test_xbm(data):
         """X bitmap (X10 or X11)"""
         if data.startswith(b'#define '):
             return 'xbm'
 
     tests.append(test_xbm)
 
-    @classmethod
-    def test_bmp(cls, data):
+    def test_bmp(data):
         if data.startswith(b'BM'):
             return 'bmp'
 
     tests.append(test_bmp)
 
-    @classmethod
-    def test_webp(cls, data):
+    def test_webp(data):
         if data.startswith(b'RIFF') and data[8:12] == b'WEBP':
             return 'webp'
 
     tests.append(test_webp)
 
-    @classmethod
-    def test_exr(cls, data):
+    def test_exr(data):
         if data.startswith(b'\x76\x2f\x31\x01'):
             return 'exr'
 
@@ -130,7 +117,6 @@ class ImageType:
     
     @classmethod
     def _get(cls, data):
-        
         for test in cls.tests:
             ext = test(data)
             if ext: return ext
@@ -212,7 +198,6 @@ class PRMP_Images:
         elif ext == 'gif': return PRMP_GIFS[inbuilt]
         elif ext == 'xbm': return PRMP_XBMS[inbuilt]
 
-
 class PRMP_ImageFile(BytesIO):
     count = 0
 
@@ -266,7 +251,7 @@ class PRMP_ImageFile(BytesIO):
     def data(self): return self.getvalue()
     
     @property
-    def ext(self): return ImageType.get()
+    def ext(self): return ImageType.get(self)
 
     @property
     def size(self): return len(self.data)
@@ -315,6 +300,7 @@ class PRMP_Image:
         if filename or image:
             if isinstance(filename, (str, bytes)): self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
+            else: raise ValueError(f'{filename} or {image} is not a valid value. ')
             
             self.name = self.imageFile.name
             self.ext = self.imageFile.ext
