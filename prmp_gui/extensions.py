@@ -158,14 +158,16 @@ class PRMP_ImageWidget:
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
             
             self.image =  prmpImage
-            print(self._image)
 
             if prmpImage.ext == 'xbm': self._image = prmpImage.resizeTk(self.resize)
             self.configure(image=self._image)
 
-            print(self.image.ext)
+            if self.image.ext == 'gif': self.renderGif()
 
         else: self.loadImage(self.default_dp)
+    
+    def renderGif(self):
+        print('called')
     
     def removeImage(self):
         self.delMenu()

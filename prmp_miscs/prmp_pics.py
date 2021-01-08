@@ -294,8 +294,6 @@ class PRMP_Image:
         self.image = None
         self.tkImage = None
         self.name = ''
-        self.animatedFrames = []
-        self.interframe_duration = 0
 
         if filename or image:
             if isinstance(filename, (str, bytes)): self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
@@ -316,9 +314,7 @@ class PRMP_Image:
             
             if thumb and len(thumb) == 2: img.thumbnail(thumb)
             
-            if self.ext == 'gif':
-                self.animatedFrames = [img for img in ImageSequence.Iterator(img)]
-                self.interframe_duration = self.info.get('duration', 0)
+            self.img = img
             
             self.tkImage = self.imgClass(img, name=self.basename)
 
@@ -330,6 +326,12 @@ class PRMP_Image:
 
     @property
     def animatedTksImages(self): return [self.imgClass(img) for img in self.animatedFrames]
+
+    @property
+    def interframe_durations(self): return [anf.info.get('duration', 0) for anf in self.animatedFrames]
+
+    @property
+    def animatedFrames(self): return [img for img in ImageSequence.Iterator(self.img)]
 
     @property
     def basename(self):
@@ -353,3 +355,4 @@ class PRMP_Image:
 
 
 
+# tranxfer_c2 -D -A192.168.43.1 -P7767
