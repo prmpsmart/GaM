@@ -122,7 +122,7 @@ class PRMP_ImageWidget:
     def __init__(self, prmpImage=None, thumb=None, resize=None, **inbuiltKwargs):
         self.rt = None
         self.prmpImage = prmpImage
-        self.thumb = thumb or (200, 170)
+        self.thumb = thumb
         self.resize = resize
         
         self.frame_counter = 0
@@ -149,26 +149,27 @@ class PRMP_ImageWidget:
         self.isGif = False
 
         dif = 20
-        w = self.resize or self.thumb
-        if not self.resize and self.thumb:
-            w = self.width-dif, self.height-dif
-            if w[0] < 0 and w[1] < 0: 
-                w = (250, 200)
+        # self.thumb = self.resize or self.thumb
+        if not (self.resize and self.thumb):
+            self.thumb = self.width-dif, self.height-dif
+            if self.thumb[0] < 0 and self.thumb[1] < 0: 
+                # self.thumb = (250, 200)
                 self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
                 return
 
         if prmpImage:
-            if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=w, **kwargs)
+            if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
 
-            if isinstance(prmpImage, PRMP_Image):
-                self.imageFile = prmpImage.imageFile
-                self.frame = prmpImage.resizeTk(w)
+            if isinstance(prmpImage, PRMP_Image): self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
             
             self.prmpImage =  prmpImage
 
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
             self.image = self.prmpImage.image
+            
+            if self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
+            else: self.frame = self.prmpImage.thumbnailTk(self.thumb)
 
             if self.prmpImage.ext == 'gif':
                 # self.frames = self.prmpImage.animatedTkFrames
@@ -184,7 +185,6 @@ class PRMP_ImageWidget:
                     tkimg = PhotoImage(img)
                     self.frames.append(tkimg)
                     self.durations.append(frame.info['duration'])
-                print(self.frames)
                 self.frame = self.frames[self.frame_counter]
                 
                 self.isGif = True
