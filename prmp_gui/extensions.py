@@ -148,10 +148,12 @@ class PRMP_ImageWidget:
         dif = 20
         w = self.width-dif, self.height-dif
         if w[0] < 0 and w[1] < 0: 
-            w = (250, 200) 
+            w = (250, 200)
+            self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
+            return
 
         if prmpImage:
-            if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
+            if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=w, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image):
                 self.imageFile = prmpImage.imageFile
@@ -163,7 +165,7 @@ class PRMP_ImageWidget:
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
 
             if self.prmpImage.ext == 'gif':
-                self.frames = self.prmpImage.animatedTksImages
+                self.frames = self.prmpImage.animatedTkFrames
                 self.frame = self.frames[self.frame_counter]
                 self.durations = self.prmpImage.interframe_durations
                 self.__renderGif()
@@ -173,20 +175,15 @@ class PRMP_ImageWidget:
         else: self.loadImage(self.default_dp)
     
     def __renderGif(self):
-        # print('called')
-        
         # Update Frame
-        self.config(image=self.frames[self.frame_counter])
-        self.image = self.frames[self.frame_counter]
+        self.frame = self.frames[self.frame_counter]
+        self.config(image=self.frame)
+        duration = self.durations[self.frame_counter]
 
         # Loop Counter
         self.frame_counter += 1
-        if self.frame_counter >= len(self.frames):
-            self.frame_counter = 0
-
-        # Queue Frame Update
-        # self.toplevel.after(self.durations[self.frame_counter], self.__renderGif)
-        self.toplevel.after(self.durations[self.frame_counter], lambda: self.__renderGif())
+        if self.frame_counter >= len(self.frames): self.frame_counter = 0
+        self.after(duration, self.__renderGif)
     
     def removeImage(self):
         self.delMenu()
