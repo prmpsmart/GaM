@@ -64,6 +64,7 @@ class Plots(PRMP_Mixins):
         self.subplot = self.figure.add_subplot(self.big,1,1)
         
         self._pie = None
+        self._grid = None
 
         self.chart = 'plot'
         self.annotation = {}
@@ -117,6 +118,7 @@ class Plots(PRMP_Mixins):
     
     def set_grid(self, grid):
         if not grid: return
+        self._grid = grid
         lw, ls, c = grid['lw'], grid['ls'], grid['c']
         self.subplot.grid(lw=lw, ls=ls, c=c)
 
@@ -291,11 +293,9 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
         self.chart_datas = dict(explode=explode, labels=labels, **kwargs)
         super().pie(**self.chart_datas)
 
-    def set_grid(self, grid):
-        self.grid = grid
-        super().set_grid(grid)
+    def set_grid(self, grid): super().set_grid(grid)
 
-    def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self.grid, **self.chart_datas)
+    def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self._grid, **self.chart_datas)
 
 
 class _ChartSort:

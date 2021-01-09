@@ -32,8 +32,8 @@ class Person(Object):
         
         self.image = image
 
-        self.email = None
-        if self.checkEmail(email): self.email = email
+        self.__email = None
+        self.email = email
         
         self.address = address
 
@@ -46,6 +46,15 @@ class Person(Object):
         vals = super().values
         vals.update({'manager': self.manager})
         return vals
+
+    @property
+    def email(self): return self.__email
+
+    @email.setter
+    def email(self, email):
+        if email:
+            if self.checkEmail(email): self.__email = email
+            else: raise ValueError(f'{email} is not a valid emeail.')
 
 class Region(Object):
     AccountsManager = AccountsManager

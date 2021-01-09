@@ -3,10 +3,10 @@ from prmp_gui.two_widgets import *
 from prmp_gui.dialogs import *
 from prmp_miscs.prmp_datetime import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
 from ...backend.agam.agam import AGAM
-from ...backend.dc.dc_regions import Client
+from ...backend.dc.dc_regions import *
 
 
-from ...backend.core.regions_managers import Person, Region, RegionsManager, ObjectsMixins
+from ...backend.core.regions_managers import Person, Region, RegionsManager, ObjectsMixins, ObjectsManager
 from ...backend.core.records_managers import Record, RecordsManager
 from ...backend.core.accounts import Account, AccountsManager
 from ...backend.dc.dc_specials import Thrift
@@ -344,11 +344,14 @@ class SubsList(LabelFrame):
 
         if self.dialog.get():
             from .agam_apps import RecordDialog, PersonDialog, ManagerHome
-            from ..dc.dc_apps import DC_Home, DCRegion, ThriftDetailsDialog
-            if isinstance(selected, DCRegion): DC_Home(self.topest, region=selected)
+            from ..dc.dc_apps import DC_RegionHome, DCRegion, ThriftDetailsDialog
+            if isinstance(selected, DCRegion): DC_RegionHome(self.topest, region=selected)
             elif isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Thrift): ThriftDetailsDialog(self, thrift=selected)
-            elif isinstance(selected, Person): PersonDialog(self, person=selected)
+            elif isinstance(selected, Person):
+                print(selected.__dict__)
+                PersonDialog(self, person=selected)
+            # elif isinstance(selected, DCAccount): PersonDialog(self, person=selected)
             elif isinstance(selected, ObjectsManager): ManagerHome(self, title=f'{selected.name} Subscripts Details', sup=selected)
         elif self.callback: self.callback(selected)
 

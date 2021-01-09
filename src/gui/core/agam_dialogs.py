@@ -43,7 +43,7 @@ class PersonDialog(GaM_Dialog):
         if self.result:
             if self.person: PRMP_MsgBox(self, title='Edit Person Details', message='Are you sure to edit the details of this person?', _type='question', callback=self.updatePerson)
             
-            elif self.manager: PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', callback=newPerson)
+            elif self.manager: PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', callback=self.newPerson)
             else: PRMP_MsgBox(self, title='Person Dialog Error', message='No Person or Manager is given.', _type='error', ask=0)
 
 

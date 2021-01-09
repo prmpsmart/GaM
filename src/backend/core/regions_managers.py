@@ -95,6 +95,7 @@ class RegionsManager(ObjectsManager):
 class PersonsManager(ObjectsManager):
     ObjectType = Person
     subTypes = ['Persons']
+    MultipleSubsPerMonth = True
 
     
     def __init__(self, master, **kwargs):

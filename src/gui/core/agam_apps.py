@@ -303,7 +303,7 @@ class ManagerHome(TreeColumns, GaM_App):
 
         self.new = Checkbutton(sups, text='New?', place=dict(relx=.77, rely=.09, relh=.05, relw=.22))
 
-        self.month = TwoWidgets(sups, topKwargs=dict(text='Month'), place=dict(relx=.005, rely=.16, relh=.07, relw=.85), orient='h', bottom='monthyearbutton', top='checkbutton', bottomKwargs=dict(font='PRMP_FONT'), longent=.4)
+        Button(sups, text='Superscript', place=dict(relx=.009, rely=.16, relh=.07, relw=.9), font='PRMP_FONT')
 
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
@@ -344,7 +344,7 @@ class ManagerHome(TreeColumns, GaM_App):
 
             try:
                 dialog = self.getNewObjectDialog(st)
-                if dialog: dialog(self, manager=self._sup)
+                if dialog: dialog(self, manager=self._sup[st])
             except: PRMP_MsgBox(self, title='Creation Error ', message=f'A new one cannot be created for {st}.', _type='error', ask=0)
         else:
             subs = self.getSubs()
