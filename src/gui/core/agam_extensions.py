@@ -96,9 +96,9 @@ class Hierachy(PRMP_TreeView):
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, columns=columns, **kwargs)
         
-        # from .agam_apps import RegionDetails, PersonDialog, RecordDialog, ObjectDetails
-        from ..dc.dc_apps import RegionDetails, PersonDialog, RecordDialog, ObjectDetails, ThriftDetailsDialog
-        self.OD = ObjectDetails
+        # from .agam_apps import RegionDetails, PersonDialog, RecordDialog, ManagerHome
+        from ..dc.dc_apps import RegionDetails, PersonDialog, RecordDialog, ManagerHome, ThriftDetailsDialog
+        self.MAN = ManagerHome
         self.RD = RegionDetails
         self.RecD = RecordDialog
         self.PD = PersonDialog
@@ -114,7 +114,7 @@ class Hierachy(PRMP_TreeView):
             if isinstance(current, Person): self.PD(self, title=current, person=current)
             elif isinstance(current, Record): self.RecD(self, title=current, record=current)
             elif isinstance(current, Thrift): self.TD(self, title=current, thrift=current)
-            else: self.OD(self, title=current, sup=current)
+            else: self.MAN(self, title=current, sup=current)
 
     def viewAll(self, obj, parent=''):
         if not obj: return
@@ -343,14 +343,13 @@ class SubsList(LabelFrame):
         selected = selected[0]
 
         if self.dialog.get():
-            from .agam_apps import RecordDialog, PersonDialog, ObjectDetails
+            from .agam_apps import RecordDialog, PersonDialog, ManagerHome
             from ..dc.dc_apps import DC_Home, DCRegion, ThriftDetailsDialog
             if isinstance(selected, DCRegion): DC_Home(self.topest, region=selected)
             elif isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Thrift): ThriftDetailsDialog(self, thrift=selected)
             elif isinstance(selected, Person): PersonDialog(self, person=selected)
-            elif isinstance(selected, RecordsManager): ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
-            else: ObjectDetails(self, title=f'{selected.name} Subscripts Details', sup=selected)
+            elif isinstance(selected, ObjectsManager): ManagerHome(self, title=f'{selected.name} Subscripts Details', sup=selected)
         elif self.callback: self.callback(selected)
 
 
@@ -414,10 +413,10 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
         self.sns = None
         self.objdet = None
 
-        from .agam_apps import SortNSearch, ObjectDetails
+        from .agam_apps import SortNSearch, ManagerHome
 
         self.SNS = SortNSearch
-        self.OBJDET = ObjectDetails
+        self.MAN = ManagerHome
 
         self.addResultsWidgets(['persons', 'subs', 'actSubs', 'accounts', 'actSubsAccs'])
 
@@ -452,7 +451,7 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
     def openObjDet(self):
         if self.objdet:
             self.objdet.destroy()
-        self.objdet = self.OBJDET(self, sup=self.region)
+        self.objdet = self.MAN(self, sup=self.region)
         self.objdet.mainloop()
 
 

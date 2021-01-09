@@ -711,9 +711,10 @@ class PRMP_Calendar(Frame):
         self.__date = date
         if self.callback: self.callback(date)
 
-class RPMP_Entry_Label(Label):
+class PRMP_Entry_Label(Label):
 
     def __init__(self, master, font='DEFAULT_FONT', **kwargs): super().__init__(master, asEntry=True, font=font, **kwargs)
+Entry_Label = PRMP_Entry_Label
 
 class PRMP_Camera(PRMP_Frame):
 

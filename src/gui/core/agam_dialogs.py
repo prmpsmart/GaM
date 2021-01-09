@@ -4,7 +4,6 @@ from .agam_extensions import *
 class GaM_Dialog(PRMP_Dialog):
     pass
 
-
 class PersonDialog(GaM_Dialog):
 
     def __init__(self, master=None, title='Person Dialog', person=None, manager=None, geo=(550, 390), values={}, **kwargs):
