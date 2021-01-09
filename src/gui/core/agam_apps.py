@@ -248,6 +248,8 @@ class RegionHome(GaM_App):
 
     def __init__(self, master=None, geo=(1500, 800), title='Home 1', region=None, **kwargs):
         self.region = region
+        self.sns = None
+        self.objdet = None
 
         super().__init__(master, geo=geo, title=title, **kwargs)
 
@@ -258,15 +260,32 @@ class RegionHome(GaM_App):
         self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
 
         subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
-        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.35, relw=.24))
-        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.62, relh=.35, relw=.24))
+        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
+        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
+
+        self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=region.date.date if region else ''))
+
+        
+        Button(self.container, place=dict(relx=.005, rely=.94, relh=.04, relw=.08), text='Object Details', command=self.openObjDet)
+
+        Button(self.container, place=dict(relx=.1, rely=.94, relh=.04, relw=.1), text='Sort and Search', command=self.openSNS)
 
         if region:
             self.subRegions.set(region.subRegions)
             self.accounts.set(region.accounts)
         
         self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
-
+    
+    def openSNS(self):
+        if self.sns: self.sns.destroy()
+        self.sns = SortNSearch(self, sup=self.region)
+        self.sns.mainloop()
+    
+    def openObjDet(self):
+        if self.objdet:
+            self.objdet.destroy()
+        self.objdet = ManagerHome(self, sup=self.region)
+        self.objdet.mainloop()
 
 class ManagerHome(TreeColumns, GaM_App):
     
@@ -353,8 +372,6 @@ class AccountHome(ObjectHome):
 class PersonHome(ObjectHome):
     pass
 
-class AccountHome(ObjectHome):
-    pass
 
 
 
