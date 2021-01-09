@@ -925,7 +925,7 @@ class PRMP_Input:
 
     def set(self, values):
         self.clear()
-        self.insert(0, values)
+        self.insert(0, str(values))
         self.verify()
     
     def _clear_placeholder(self, e=0):
@@ -983,7 +983,7 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
         
     def _get(self): return tk.Text.get(self, '0.0', 'end').strip('\n')
     
-    def set(self, values): self.clear(); self.insert('0.0', values)
+    def set(self, values): self.clear(); self.insert('0.0', str(values))
     
     def clear(self): self.delete('0.0', 'end')
 
@@ -2447,7 +2447,9 @@ class PRMP_ListBox(PRMP_Frame):
     def set(self, values, showAttr='name'):
         self.clear()
         self.last = len(values)
-        for val in values: self.listbox.insert('end', getattr(val, showAttr, None) or str(val))
+        for val in values:
+            value = getattr(val, showAttr, None) or str(val)
+            self.listbox.insert('end', value)
         self.values = values
     
     def clicked(self, e=0):

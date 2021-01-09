@@ -75,7 +75,14 @@ class PRMP_Mixins:
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
     
-    def checkNumber(self, number): return str(number).isdigit()
+    def checkNumber(self, number):
+        strNum = str(number)
+        dot = '.'
+        if dot in strNum:
+            if strNum.count(dot) > 1: return False
+            strNum = strNum.replace(dot, '')
+        test = strNum.isdigit()
+        return test
     
     def checkMoney(self, money):
         try:
