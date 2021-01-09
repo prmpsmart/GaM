@@ -13,13 +13,28 @@ class TreeColumns:
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
 
-class RegionLookUp(PRMP_MainWindow, PRMP_FillWidgets):
+class GaM_App(PRMP_MainWindow):
+
+    def __init__(self, master=None, title='Goodness and Mercy', **kwargs):
+        super().__init__(master, title=title, **kwargs)
+        
+        
+        self._setupApp()
+
+        self.default()
+
+        self.paint()
+    
+    def _setupApp(self):
+        pass
+
+    def default(self):
+        pass
+
+
+class RegionLookUp(GaM_App, PRMP_FillWidgets):
     
     def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, tm=1, gaw=1, **kwargs):
-        
-        PRMP_MainWindow.__init__(self, master, title=title, geo=geo, gaw=gaw, ntb=1, tm=tm, atb=1, asb=1, **kwargs)
-        
-        PRMP_FillWidgets.__init__(self, values=values)
         
         self.region = region
         self.personDialog = None
@@ -27,15 +42,16 @@ class RegionLookUp(PRMP_MainWindow, PRMP_FillWidgets):
         self._sub = None
         self.geo_ = geo
         self.expandGeo = expandGeo
+
+        GaM_App.__init__(self, master, title=title, geo=geo, gaw=gaw, ntb=1, tm=tm, atb=1, asb=1, **kwargs)
+        
+        PRMP_FillWidgets.__init__(self, values=values)
+        
         
         self._setupApp()
 
         self.set()
         self.paint()
-        
-        if self.region:
-            for wid in [self.office, self.department, self.sub, self.sup]:
-                if self.region.level == wid.regionLevel: wid.set(self.region)
         
     def regionChanged(self, region):
         region = region[1]
@@ -99,6 +115,12 @@ class RegionLookUp(PRMP_MainWindow, PRMP_FillWidgets):
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
         
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
+
+        
+        if self.region:
+            for wid in [self.office, self.department, self.sub, self.sup]:
+                if self.region.level == wid.regionLevel: wid.set(self.region)
+        
         
     def showPersons(self, e=0):
         if self.personDialog: self.personDialog.destroy()
@@ -188,7 +210,7 @@ class RegionLookUp(PRMP_MainWindow, PRMP_FillWidgets):
 RLU = RegionLookUp
 
 
-class SortNSearch(PRMP_MainWindow):
+class SortNSearch(GaM_App):
     def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.31, sup=None):
         super().__init__(master, title=title, geo=geo, tw=1)
 
@@ -217,7 +239,7 @@ class SortNSearch(PRMP_MainWindow):
         pass
 
 
-class ObjectDetails(TreeColumns, PRMP_MainWindow):
+class ObjectDetails(TreeColumns, GaM_App):
     
     def __init__(self, master=None, geo=(1000, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
@@ -292,7 +314,7 @@ class ObjectDetails(TreeColumns, PRMP_MainWindow):
         self.subs.viewAll(obj=sub)
 
 
-class Home1(PRMP_MainWindow):
+class Home1(GaM_App):
 
     def __init__(self, master=None, geo=(1500, 800), title='Home 1', region=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
@@ -318,10 +340,25 @@ class Home1(PRMP_MainWindow):
         self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
 
 
+class ManagerHome(GaM_App):
+    pass
+
+class RegionHome(GaM_App):
+    pass
 
 
+class ObjectHome(GaM_App):
+    pass
 
 
+class AccountHome(ObjectHome):
+    pass
+
+class PersonHome(ObjectHome):
+    pass
+
+class AccountHome(ObjectHome):
+    pass
 
 
 

@@ -1,6 +1,11 @@
 from .agam_extensions import *
 
-class PersonDialog(PRMP_Dialog):
+
+class GaM_Dialog(PRMP_Dialog):
+    pass
+
+
+class PersonDialog(GaM_Dialog):
 
     def __init__(self, master=None, title='Person Dialog', person=None, manager=None, geo=(550, 390), values={}, **kwargs):
 
@@ -54,7 +59,7 @@ class PersonDialog(PRMP_Dialog):
         self.destroyDialog()
 PerD = PersonDialog
 
-class RecordDialog(PRMP_Dialog):
+class RecordDialog(GaM_Dialog):
     
     def __init__(self, master=None, title='Record Dialog', geo=(350, 350), manager=None, record=None, values={}, **kwargs):
         
@@ -113,7 +118,7 @@ class RecordDialog(PRMP_Dialog):
         self.destroyDialog()
 RecD = RecordDialog
 
-class AccountDialog(PRMP_Dialog):
+class AccountDialog(GaM_Dialog):
 
     def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(300, 300), values={}, **kwargs):
 
