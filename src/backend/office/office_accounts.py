@@ -42,8 +42,6 @@ class DCOfficeAccount(AreaAccount):
 
             self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in areasAccounts])
 
-        
-
 
 class DCOfficeAccountsManager(AreaAccountsManager):
     ObjectType = DCOfficeAccount

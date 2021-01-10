@@ -240,39 +240,26 @@ class SortNSearch(GaM_App):
 
 
 
-
-
-
-
-class RegionHome(GaM_App):
-
-    def __init__(self, master=None, geo=(1500, 800), title='Home 1', region=None, **kwargs):
-        self.region = region
+class Home(GaM_App):
+    
+    def __init__(self, master=None, geo=(1500, 800), title='Home', obj=None, **kwargs):
+        self.obj = obj
         self.sns = None
         self.objdet = None
 
         super().__init__(master, geo=geo, title=title, **kwargs)
-
+    
     def _setupApp(self):
-        region = self.region
-        self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
+        obj = self.obj
 
-        subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
-        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
-        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
-
-        self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=region.date.date if region else ''))
+        self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=obj.date.date if obj else ''))
         
-        IdNDate(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=region)
+        IdNDate(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=obj)
 
         Button(self.container, place=dict(relx=.005, rely=.94, relh=.04, relw=.08), text='Object Details', command=self.openObjDet)
 
         Button(self.container, place=dict(relx=.1, rely=.94, relh=.04, relw=.1), text='Sort and Search', command=self.openSNS)
 
-        if region:
-            self.subRegions.set(region.subRegions)
-            self.accounts.set(region.accounts)
-        
         self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
     
     def openSNS(self):
@@ -285,6 +272,51 @@ class RegionHome(GaM_App):
             self.objdet.destroy()
         self.objdet = ManagerHome(self, sup=self.region)
         self.objdet.mainloop()
+    
+
+
+
+class RegionHome(Home):
+
+    def __init__(self, master=None, title='Region Home', region=None, **kwargs):
+
+        super().__init__(master, title=title, obj=region, **kwargs)
+
+    def _setupApp(self):
+        super()._setupApp()
+        
+        region = self.region = self.obj
+
+        self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
+
+        subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
+        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
+        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
+
+        if region:
+            self.subRegions.set(region.subRegions)
+            self.accounts.set(region.accounts)
+
+
+class AccountHome(Home):
+    
+    def __init__(self, master=None, title='Account Home', account=None, **kwargs):
+
+        super().__init__(master, title=title, obj=account, **kwargs)
+
+    def _setupApp(self):
+        super()._setupApp()
+        
+        account = self.account = self.obj
+
+        self.region = LabelButton(self.container, text='Region', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), bottomKwargs=dict(command=self.openRegion))
+
+        self.recordsManagers = SubsList(self.container, text='Records Managers', place=dict(relx=.005, rely=.25, relh=.6, relw=.24))
+
+        if region: self.recordsManagers.set(account)
+    def openRegion(self):
+        pass
+
 
 class ManagerHome(TreeColumns, GaM_App):
     
@@ -361,15 +393,7 @@ class ManagerHome(TreeColumns, GaM_App):
         self.subs.viewAll(obj=sub)
 
 
-class ObjectHome(GaM_App):
-    pass
 
-
-class AccountHome(ObjectHome):
-    pass
-
-class PersonHome(ObjectHome):
-    pass
 
 
 

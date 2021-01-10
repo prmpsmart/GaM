@@ -299,9 +299,7 @@ class SubsList(LabelFrame):
             if isinstance(selected, DCRegion): DC_RegionHome(self.topest, region=selected)
             elif isinstance(selected, Record): RecordDialog(self, record=selected)
             elif isinstance(selected, Thrift): ThriftDetailsDialog(self, thrift=selected)
-            elif isinstance(selected, Person):
-                print(selected.__dict__)
-                PersonDialog(self, person=selected)
+            elif isinstance(selected, Person): PersonDialog(self, person=selected)
             # elif isinstance(selected, DCAccount): PersonDialog(self, person=selected)
             elif isinstance(selected, ObjectsManager): ManagerHome(self, title=f'{selected.name} Subscripts Details', sup=selected)
         elif self.callback: self.callback(selected)
