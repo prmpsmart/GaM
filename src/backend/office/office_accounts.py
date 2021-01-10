@@ -39,6 +39,9 @@ class DCOfficeAccount(AreaAccount):
             self.withdrawals.updateWithOtherManagers([account.withdrawals for account in areasAccounts])
             
             self.transfers.updateWithOtherManagers([account.transfers for account in areasAccounts])
+
+            self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in areasAccounts])
+
         
 
 

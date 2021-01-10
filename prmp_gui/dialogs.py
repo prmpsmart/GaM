@@ -42,7 +42,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, **kwargs):
 
-        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, **kwargs)
+        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, grab=grab, **kwargs)
         PRMP_FillWidgets.__init__(self, values=values)
 
         self.__result = None
@@ -61,9 +61,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         if editable:
             if values: self.editInput(0)
             else: self.editInput(1)
-        
-        if grab: self.grab_set()
-        
+                
         self.mainloop()
         # if show: self.mainloop()
         # else: self.wait_window()

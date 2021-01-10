@@ -253,8 +253,6 @@ class RegionHome(GaM_App):
 
         super().__init__(master, geo=geo, title=title, **kwargs)
 
-
-
     def _setupApp(self):
         region = self.region
         self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
@@ -264,8 +262,9 @@ class RegionHome(GaM_App):
         self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
 
         self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=region.date.date if region else ''))
-
         
+        IdNDate(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=region)
+
         Button(self.container, place=dict(relx=.005, rely=.94, relh=.04, relw=.08), text='Object Details', command=self.openObjDet)
 
         Button(self.container, place=dict(relx=.1, rely=.94, relh=.04, relw=.1), text='Sort and Search', command=self.openSNS)
