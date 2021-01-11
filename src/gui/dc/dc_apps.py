@@ -20,7 +20,9 @@ class DC_RegionHome(TreeColumns, RegionHome):
         self.subRegions.callback = self.selectedSubRegion
         self.accounts.callback = self.selectedAccount
         addNote(self)
-        self.selected(self.region)
+        if self.region:
+            self.selected(self.region)
+            self.overview.updateDCDigits(self.region.lastAccount)
 
     def selectedSubRegion(self, region):
         self.selected(region)
@@ -39,16 +41,15 @@ class DC_AccountHome(TreeColumns, AccountHome):
     def _setupApp(self):
         super()._setupApp()
         
-        self.addTitleBar('DC Account Home')
-
         self.recordsManagers.callback = self.selectedRecordsManager
         addNote(self)
         self.selected(self.account)
 
     def selectedRecordsManager(self, rm):
-        self.selected(rm)
+        self.selected(rm, 9)
 
-    def selected(self, sub):
+    def selected(self, sub, rm=0):
+        if not rm: self.overview.updateDCDigits(sub)
         self.tree.setColumns(self.columns(sub))
         self.tree.viewAll(sub)
 

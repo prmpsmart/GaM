@@ -216,7 +216,7 @@ class SortNSearch(GaM_App):
 
         self._sup = sup
 
-        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=sup), command=self.openSup)
+        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=sup.name if sup else ''), command=self.openSup)
 
         
         self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.05, relh=.99-.04-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
@@ -272,7 +272,6 @@ class Home(GaM_App):
             self.objdet.destroy()
         self.objdet = ManagerHome(self, sup=self.obj)
         self.objdet.mainloop()
-    
 
 
 
@@ -308,15 +307,15 @@ class AccountHome(Home):
         super()._setupApp()
         
         account = self.account = self.obj
-        manager = account.manager.name if account else ''
+        name, self._manager = (account.manager.name, account.manager) if account else ('', None)
 
-        self.region = LabelButton(self.container, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.12, relw=.24), bottomKwargs=dict(command=self.openRegion, text=manager))
+        self.manager = LabelButton(self.container, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.12, relw=.24), bottomKwargs=dict(command=self.openManager, text=name))
 
         self.recordsManagers = SubsList(self.container, text='Records Managers', place=dict(relx=.005, rely=.15, relh=.6, relw=.24))
 
         if account: self.recordsManagers.set(account)
-    def openRegion(self):
-        pass
+    def openManager(self):
+        if self._manager: openCores(self._manager, edit=0)
 
 
 class ManagerHome(TreeColumns, GaM_App):
@@ -325,7 +324,7 @@ class ManagerHome(TreeColumns, GaM_App):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self._sup = sup
-        if sup: self.addTitleBar(sup)
+        if sup: self.addTitleBar(sup.name)
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         

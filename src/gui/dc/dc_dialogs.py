@@ -61,9 +61,6 @@ class ClientAccountDialog(AccountDialog):
         self.addResultsWidgets('rate')
 
 
-class AccountDetailsDailog: pass
-
-
 class ThriftDialog(PRMP_Dialog):
     def __init__(self, master=None, thrift=None, title='Thrift Dialog', values={}, manager=None, **kwargs):
         self.thrift = thrift
@@ -138,7 +135,6 @@ class DailyContributionDailog(PRMP_Dialog):
 
     def _setupDialog(self):
         self.area = area
-        # self.addTitleBar(self.dumTitle)
 
         self.showAccount = Button
         self.subs = SubsList

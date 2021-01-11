@@ -12,6 +12,52 @@ from ...backend.core.accounts import Account, AccountsManager
 from ...backend.dc.dc_specials import Thrift
 
 
+def openCores(self, obj=None, create=0, edit=0):
+    from ...backend.core.records_managers import Record, RecordsManager, Object, ObjectsManager
+    from ...backend.core.accounts import Account, AccountsManager
+    from ...backend.dc.dc_specials import Thrift, DailyContribution
+    from ...backend.dc.dc_accounts import DCAccount
+    
+
+    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, Client, Area, RecordsManager, DailyContribution
+
+    from .agam_apps import RegionHome, AccountHome, ManagerHome
+
+    print(obj)
+
+    
+    if obj:
+        window = ManagerHome
+        kwargs = dict(title=obj.name)
+
+        if isinstance(obj, DCRegion):
+            window = DC_RegionHome
+            if not create: kwargs.update(region=obj)
+
+        elif isinstance(obj, DCAccount):
+            window = DC_AccountHome
+            if not create: kwargs.update(account=obj)
+        elif isinstance(obj, Record):
+            window = RecordDialog
+            if not create: kwargs.update(title=obj.name, record=obj)
+        elif isinstance(obj, Person):
+            window = PersonDialog
+            if not create: kwargs.update(person=obj)
+        elif isinstance(obj, ObjectsManager):
+            window = ManagerHome
+            if not create: kwargs.update(title=f'{obj.name} Subscripts Details', sup=obj)
+        elif isinstance(obj, Thrift):
+            if not create:
+                window = ThriftDetailsDialog if not edit else ThriftDialog
+                kwargs.update(title=obj.name, thrift=obj)
+            else: window = ThriftDialog
+        
+        else: _kwargs.update(sup=obj)
+
+        window(self, **kwargs)
+
+
+
 class RegionRadioCombo(RadioCombo):
     
     def __init__(self, master=None, region=None, regionLevel=5, recievers=[], **kwargs):
@@ -91,18 +137,11 @@ class RegionRadioCombo(RadioCombo):
         return keys
 RRC = RegionRadioCombo
 
+
 class Hierachy(PRMP_TreeView):
     
-    def __init__(self, master=None, columns=[], **kwargs):
-        super().__init__(master=master, columns=columns, **kwargs)
-        
-        # from .agam_apps import RegionDetails, PersonDialog, RecordDialog, ManagerHome
-        from ..dc.dc_apps import RegionDetails, PersonDialog, RecordDialog, ManagerHome, ThriftDetailsDialog
-        self.MAN = ManagerHome
-        self.RD = RegionDetails
-        self.RecD = RecordDialog
-        self.PD = PersonDialog
-        self.TD = ThriftDetailsDialog
+    # def __init__(self, master=None, columns=[], **kwargs):
+    #     super().__init__(master=master, columns=columns, **kwargs)
     
     def bindings(self):
         super().bindings()
@@ -110,11 +149,7 @@ class Hierachy(PRMP_TreeView):
 
     def viewRegion(self, e=0):
         current = self.selected()
-        if current:
-            if isinstance(current, Person): self.PD(self, title=current, person=current)
-            elif isinstance(current, Record): self.RecD(self, title=current, record=current)
-            elif isinstance(current, Thrift): self.TD(self, title=current, thrift=current)
-            else: self.MAN(self, title=current, sup=current)
+        if current: openCores(self, current)
 
     def viewAll(self, obj, parent=''):
         if not obj: return
@@ -145,7 +180,7 @@ H = Hierachy
 
 
 class UniqueID(Button):
-    def __init__(self, master=None, text='ID and Date', obj=None, **kwargs):
+    def __init__(self, master=None, text='Unique ID', obj=None, **kwargs):
         super().__init__(master=master, text=text, command=self.popUp, **kwargs)
 
         self.obj = obj
@@ -291,15 +326,7 @@ class SubsList(LabelFrame):
     def clicked(self, selected=None, event=None):
         selected = selected[0]
 
-        if self.dialog.get():
-            from .agam_apps import RecordDialog, PersonDialog, ManagerHome
-            from ..dc.dc_apps import DC_RegionHome, DCRegion, ThriftDetailsDialog
-            if isinstance(selected, DCRegion): DC_RegionHome(self.topest, region=selected)
-            elif isinstance(selected, Record): RecordDialog(self, record=selected)
-            elif isinstance(selected, Thrift): ThriftDetailsDialog(self, thrift=selected)
-            elif isinstance(selected, Person): PersonDialog(self, person=selected)
-            # elif isinstance(selected, DCAccount): PersonDialog(self, person=selected)
-            elif isinstance(selected, ObjectsManager): ManagerHome(self, title=f'{selected.name} Subscripts Details', sup=selected)
+        if self.dialog.get(): openCores(self, selected)
         elif self.callback: self.callback(selected)
 
 

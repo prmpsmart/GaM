@@ -105,12 +105,15 @@ class Contributions(DCRecordsManager):
             
             contr = contribution * self.rate
             incRec = self.account.incomes.addIncome(contr, note=note, _type=_type, coRecord=conRec,**kwargs)
-
+            print('ereq')
             if not self.upfronts.paid:
 
                 repay, remain = self._toUpfrontRepay(contr)
+                # print('here')
 
-                repRec = self.upfronts.repayUpfront(repay, note=note, coRecord=incRec, **kwargs)
+                # repRec = self.upfrontsrepayUpfront(repay, note=note, coRecord=incRec, **kwargs)
+                repRec = self.upfronts.last.addRepayment(repay, note=note, coRecord=incRec, **kwargs)
+                # print(repRec)
                 
                 note = f'Repay of Upfront Loan. {note}'
                 

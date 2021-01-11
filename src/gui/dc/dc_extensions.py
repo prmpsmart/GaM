@@ -189,15 +189,14 @@ class DC_Overview(Frame):
     
     def updateDCDigits(self, account):
         self.account = account
-        self.month.set(self.formatMonth(account.date))
+        self.month.set(self.account.month.monthYear)
         if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
         self.dcDigits.update(account)
     
-    def formatMonth(self, month): return f'{month.monthName} {month.year}'
-
     def next(self):
         if not self.account: return
         _next = self.account.next
+        print(_next)
         if _next: self.updateDCDigits(_next)
 
     def prev(self):
