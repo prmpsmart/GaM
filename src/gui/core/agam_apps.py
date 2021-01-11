@@ -254,7 +254,7 @@ class Home(GaM_App):
 
         self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=obj.date.date if obj else ''))
         
-        IdNDate(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=obj)
+        UniqueID(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=obj)
 
         Button(self.container, place=dict(relx=.005, rely=.94, relh=.04, relw=.08), text='Object Details', command=self.openObjDet)
 
@@ -264,13 +264,13 @@ class Home(GaM_App):
     
     def openSNS(self):
         if self.sns: self.sns.destroy()
-        self.sns = SortNSearch(self, sup=self.region)
+        self.sns = SortNSearch(self, sup=self.obj)
         self.sns.mainloop()
     
     def openObjDet(self):
         if self.objdet:
             self.objdet.destroy()
-        self.objdet = ManagerHome(self, sup=self.region)
+        self.objdet = ManagerHome(self, sup=self.obj)
         self.objdet.mainloop()
     
 
@@ -308,12 +308,13 @@ class AccountHome(Home):
         super()._setupApp()
         
         account = self.account = self.obj
+        manager = account.manager.name if account else ''
 
-        self.region = LabelButton(self.container, text='Region', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), bottomKwargs=dict(command=self.openRegion))
+        self.region = LabelButton(self.container, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.12, relw=.24), bottomKwargs=dict(command=self.openRegion, text=manager))
 
-        self.recordsManagers = SubsList(self.container, text='Records Managers', place=dict(relx=.005, rely=.25, relh=.6, relw=.24))
+        self.recordsManagers = SubsList(self.container, text='Records Managers', place=dict(relx=.005, rely=.15, relh=.6, relw=.24))
 
-        if region: self.recordsManagers.set(account)
+        if account: self.recordsManagers.set(account)
     def openRegion(self):
         pass
 

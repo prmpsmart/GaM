@@ -117,10 +117,15 @@ class DC_Digits(PRMP_FillWidgets, Frame):
 
 class DC_Overview(Frame):
     
-    def __init__(self, master, title='DC Overview', orient='v', region=None, account=None, **kwargs):
+    def __init__(self, master, title='DC Overview', orient='v', obj=None, account=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
-        self.region = region
-        self.account = region.lastAccount if region else account
+        self.obj = obj
+
+        if not account:
+            if isinstance(obj, AccountsManager): account = obj.lastAccount
+            elif isinstance(obj, Region): account = obj.lastAccount
+        
+        self.account = account
 
         self.month = LabelLabel(self, topKwargs=dict(text='Month'), orient='h', longent=.3)
 

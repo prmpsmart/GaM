@@ -39,7 +39,7 @@ class DC_AccountHome(TreeColumns, AccountHome):
     def _setupApp(self):
         super()._setupApp()
         
-        self.addTitleBar('DC Region Home')
+        self.addTitleBar('DC Account Home')
 
         self.recordsManagers.callback = self.selectedRecordsManager
         addNote(self)

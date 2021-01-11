@@ -144,7 +144,7 @@ class Hierachy(PRMP_TreeView):
 H = Hierachy
 
 
-class IdNDate(Button):
+class UniqueID(Button):
     def __init__(self, master=None, text='ID and Date', obj=None, **kwargs):
         super().__init__(master=master, text=text, command=self.popUp, **kwargs)
 
@@ -155,16 +155,14 @@ class IdNDate(Button):
         if self.view: self.view.destroy()
 
 
-        self.view = PRMP_Toplevel(self, geo=(450, 180), tm=1, tw=1, grab=1)
+        self.view = PRMP_Toplevel(self, geo=(450, 150), tm=1, tw=1, grab=1)
         date = uniqueID = ''
         if self.obj:
             date = self.obj.date.date
             uniqueID = self.obj.uniqueID
             self.view.addTitleBar(self.obj.name)
 
-        LabelLabel(self.view.container, topKwargs=dict(text='Date'), place=dict(relx=.02, rely=.005, relh=.3, relw=.5 ), bottomKwargs=dict(text=date), orient='h')
-
-        LabelEntry(self.view.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.02, rely=.3, relh=.6, relw=.96), bottomKwargs=dict(state='readonly')).set(uniqueID)
+        LabelEntry(self.view.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.02, rely=.02, relh=.96, relw=.96), bottomKwargs=dict(state='readonly')).set(uniqueID)
 
         self.view.paint()
 
