@@ -205,8 +205,8 @@ class DC_Overview(Frame):
         if _prev: self.updateDCDigits(_prev)
 
 
-class ThriftFrame(PRMP_FillWidgets, Frame):
-    def __init__(self, master=None, thrift=None, values={}, manager=None, callback=None, **kwargs):
+class ThriftInput(PRMP_FillWidgets, Frame):
+    def __init__(self, master, thrift=None, values={}, manager=None, callback=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
 
         self.thrift = thrift
@@ -247,7 +247,7 @@ class ThriftFrame(PRMP_FillWidgets, Frame):
 
 class ThriftDetailPart(PRMP_FillWidgets, Frame):
     
-    def __init__(self, master=None, dc=None, values={}, **kwargs):
+    def __init__(self, master, dc=None, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, dc or values)
         
@@ -277,7 +277,7 @@ class ThriftDetailPart(PRMP_FillWidgets, Frame):
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
     
-    def __init__(self, master=None, thrift=None, values={}, **kwargs):
+    def __init__(self, master, thrift=None, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, thrift or values)
 
@@ -370,10 +370,42 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
             self.loadOtherObjects()
 
 
+class DailyContTotal(PRMP_FillWidgets, Frame):
+    
+    def __init__(self, master, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self)
+
+        self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.007, rely=.01, relw=.3, relh=.2), orient='h')
+        
+        PRMP_Separator(self, place=dict(relx=.002, rely=.215, relh=.01, relw=.996))
+
+        self.last = LabelEntry(self, topKwargs=dict(text='Last Month'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.235, relw=.3, relh=.2), orient='h')
+        self.current = LabelEntry(self, topKwargs=dict(text='Current'), bottomKwargs=dict(state='readonly'), place=dict(relx=.32, rely=.235, relw=.3, relh=.2), orient='h')
+        self.next = LabelEntry(self, topKwargs=dict(text='Next'), bottomKwargs=dict(state='readonly'), place=dict(relx=.633, rely=.235, relw=.3, relh=.2), orient='h')
+
+        PRMP_Separator(self, place=dict(relx=.002, rely=.445, relh=.01, relw=.996))
+
+        self.clientsContributed = LabelEntry(self, topKwargs=dict(text='Clients'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.465, relw=.25, relh=.16), orient='h')
+        self.cash = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.transfered = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.paidout = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.income = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.saved = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.upfrontRepay = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+
+        self.bto = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.excess = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.deficit = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        
+
+        self.refresh = Button(self, text='Refresh', place=dict(relx=0, rely=0, relw=0, relh=0))
 
 
+class DailyContInput(Frame):
 
-
+    def __init__(self, master):
+        self.thriftInput = ThriftInput(self)
 
 
 

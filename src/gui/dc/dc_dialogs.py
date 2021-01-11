@@ -70,7 +70,7 @@ class ThriftDialog(PRMP_Dialog):
 
     def _setupDialog(self):
         self.addEditButton()
-        self.thrifts = ThriftFrame(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, values=self.values, manager=self.manager)
+        self.thrifts = ThriftInput(self.container, callback=self.set, place=dict(relx=.01, rely=.01, relh=.82, relw=.96), thrift=self.thrift, values=self.values, manager=self.manager)
 
         self.get = self.thrifts.get
         self.set = self.thrifts.set
@@ -135,7 +135,9 @@ class DailyContributionDailog(PRMP_Dialog):
         super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):
-        pass
+        self.input = DailyContInput(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
+        self.view = Hierachy(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
+        self.totals = DailyContTotal(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
 
 
 
