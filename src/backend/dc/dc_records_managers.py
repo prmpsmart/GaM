@@ -105,7 +105,7 @@ class Contributions(DCRecordsManager):
             
             contr = contribution * self.rate
             incRec = self.account.incomes.addIncome(contr, note=note, _type=_type, coRecord=conRec,**kwargs)
-            print('ereq')
+            # print('ereq')
             if not self.upfronts.paid:
 
                 repay, remain = self._toUpfrontRepay(contr)

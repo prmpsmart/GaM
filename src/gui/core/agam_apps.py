@@ -2,16 +2,6 @@ from .agam_dialogs import *
 # from ...backend.core.bases import ObjectsManager
 from ...backend.dc.dc_specials import *
 
-class TreeColumns:
-    def columns(self, sup):
-        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-                
-        elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
-        
-        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name']}, {'text': 'Name', 'attr': 'regionName'}, 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
-        
-        return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
-
 
 class GaM_App(PRMP_MainWindow):
 
@@ -320,7 +310,7 @@ class AccountHome(Home):
 
 class ManagerHome(TreeColumns, GaM_App):
     
-    def __init__(self, master=None, geo=(1000, 600), title='DC Object Details', sup=None, **kwargs):
+    def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self._sup = sup

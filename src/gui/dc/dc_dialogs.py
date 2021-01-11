@@ -128,18 +128,14 @@ class ThriftDetailsDialog(PRMP_Dialog):
 
 class DailyContributionDailog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Area 1 Daily Contribution', dailyContribution=None, **kwargs):
+    def __init__(self, master=None, title='Area 1 Daily Contribution', dailyContribution=None, manager=None, **kwargs):
         
         self.dailyContribution = dailyContribution
+        self.manager = manager
         super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):
-        self.area = area
-
-        self.showAccount = Button
-        self.subs = SubsList
-        self.date
-
+        pass
 
 
 

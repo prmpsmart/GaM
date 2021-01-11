@@ -6,31 +6,27 @@ from ...backend.agam.agam import AGAM
 from ...backend.dc.dc_regions import *
 
 
-from ...backend.core.regions_managers import Person, Region, RegionsManager, ObjectsMixins, ObjectsManager
-from ...backend.core.records_managers import Record, RecordsManager
-from ...backend.core.accounts import Account, AccountsManager
-from ...backend.dc.dc_specials import Thrift
+from ...backend.core.records_managers import *
+from ...backend.dc.dc_accounts import *
+from ...backend.dc.dc_specials import *
+from ...backend.office.office_regions import *
 
 
-def openCores(self, obj=None, create=0, edit=0):
-    from ...backend.core.records_managers import Record, RecordsManager, Object, ObjectsManager
-    from ...backend.core.accounts import Account, AccountsManager
-    from ...backend.dc.dc_specials import Thrift, DailyContribution
-    from ...backend.dc.dc_accounts import DCAccount
-    
+def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
-    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, Client, Area, RecordsManager, DailyContribution
+    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog
 
     from .agam_apps import RegionHome, AccountHome, ManagerHome
 
-    print(obj)
+    # print(obj)
 
     
     if obj:
         window = ManagerHome
-        kwargs = dict(title=obj.name)
+        if not kwargs.get('title'): kwargs.update(dict(title=obj.name))
+        if create: kwargs.update(dict(manager=obj))
 
-        if isinstance(obj, DCRegion):
+        if isinstance(obj, (DCOffice, DCRegion)):
             window = DC_RegionHome
             if not create: kwargs.update(region=obj)
 
@@ -52,9 +48,28 @@ def openCores(self, obj=None, create=0, edit=0):
                 kwargs.update(title=obj.name, thrift=obj)
             else: window = ThriftDialog
         
-        else: _kwargs.update(sup=obj)
+        elif isinstance(obj, DailyContribution):
+            if not create:
+                window = DailyContributionDailog
+                kwargs.update(title=obj.name, thrift=obj)
+            else: window = ThriftDialog
+        
+        else: kwargs.update(sup=obj)
 
-        window(self, **kwargs)
+        win = window(self, **kwargs)
+        if not self: win.mainloop()
+
+
+
+class TreeColumns:
+    def columns(self, sup):
+        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+                
+        elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        
+        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name']}, {'text': 'Name', 'attr': 'regionName'}, 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
+        
+        return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
 
 
