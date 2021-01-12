@@ -309,12 +309,14 @@ class PRMP_DateWidget:
         
     def show(self):
         if self.date: self.config(text=self.date.getFromSelf(self.attr))
+        if self.callback: self.callback(self.date)
 
 class PRMP_DateButton(PRMP_DateWidget, PRMP_Button):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, **kwargs):
-        
+    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, callback=None, **kwargs):
+
         PRMP_Button.__init__(self, master=master, config=dict(command=self.action, anchor='w'), font=font, asEntry=asEntry,  **kwargs)
-        PRMP_DateWidget.__init__(self, min_=min_, max_=max_)
+        
+        PRMP_DateWidget.__init__(self, min_=min_, max_=max_, callback=callback)
         self['text'] = placeholder
         
 PDB = PRMP_DateButton

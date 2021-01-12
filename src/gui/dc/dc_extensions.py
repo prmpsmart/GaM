@@ -374,7 +374,6 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
     
     def __init__(self, master, dcContrib=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
-        PRMP_FillWidgets.__init__(self, dcContrib)
 
         self.dcContrib = dcContrib
 
@@ -407,11 +406,14 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         self.excess = LabelEntry(self, topKwargs=dict(text='Excess'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.77, relw=.22, relh=.16), orient='h')
         self.deficit = LabelEntry(self, topKwargs=dict(text='Deficit'), bottomKwargs=dict(state='readonly'), place=dict(relx=.75, rely=.77, relw=.22, relh=.16), orient='h')
         
+        PRMP_FillWidgets.__init__(self, dcContrib)
         self.addResultsWidgets(['lastMonths', 'currentMonths', 'nextMonths', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
+
 
         self.refresh()
     
     def refresh(self):
+        if  not self.dcContrib: return
         self.date.set(self.dcContrib.date.date)
         self.set(self.dcContrib)
 
@@ -419,7 +421,9 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
 
 class DailyContInput(Frame):
 
-    def __init__(self, master):
+    def __init__(self, master, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+
         self.thriftInput = ThriftInput(self)
 
 

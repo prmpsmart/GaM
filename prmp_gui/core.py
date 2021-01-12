@@ -1904,17 +1904,12 @@ class PRMP_Window(PRMP_Widget):
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
         
         self.placeOnScreen(side, geometry)
-        self.bind('<Control-z>', self.dest)
-        self.bind('<Control-Z>', self.dest)
+        self.bind('<Control-z>', self.destroySelf)
+        self.bind('<Control-Z>', self.destroySelf)
 
         if grab: self.grab_set()
 
         self.after(100, self.loadAfters)
-    
-    def dest(self, e):
-        self.closing()
-        self.save()
-        self.destroy()
     
     def closing(self): pass
     def save(self): pass
@@ -2244,9 +2239,16 @@ class PRMP_Window(PRMP_Widget):
 
         self.placeTitlebar()
     
-    def destroySelf(self):
-        if self == self.topest: exit()
-        self.destroy()
+    def destroySelf(self, e=0):
+        self.closing()
+        self.save()
+        def out(u):
+            if u: os.sys.exit()
+        
+        if self is self.topest:
+            from .dialogs import PRMP_MsgBox
+            PRMP_MsgBox(title='Exit', message='Are you sure to exit?', callback=out)
+        else: self.destroy()
     
     def setTkIcon(self, icon):
         if icon: self.iconbitmap(icon)
@@ -2334,6 +2336,7 @@ class PRMP_Window(PRMP_Widget):
     def bindExit(self):
         def ex(e=0): os.sys.exit()
         self.bind_all('<Control-/>', ex)
+
 PW = PRMP_Window
 
 class PRMP_Tk(tk.Tk, PRMP_Window):
@@ -2406,6 +2409,9 @@ PTip = PRMP_ToolTip
 class PRMP_MainWindow(PRMP_Mixins):
     
     def __init__(self, master=None, _ttk_=False, **kwargs):
+        
+        master = master or PRMP_Window.TOPEST
+
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, **kwargs)
         # self.root.root = self.root

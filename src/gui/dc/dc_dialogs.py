@@ -128,16 +128,25 @@ class ThriftDetailsDialog(PRMP_Dialog):
 
 class DailyContributionDailog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Area 1 Daily Contribution', dailyContribution=None, manager=None, **kwargs):
+    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, manager=None, geo=(1200, 800), **kwargs):
         
-        self.dailyContribution = dailyContribution
+        self.dcContrib = dcContrib
         self.manager = manager
-        super().__init__(master, title=title, **kwargs)
+        super().__init__(master, title=title, geo=geo, **kwargs)
+    
+    def changeDate(self, date):
+        if date: self.totals.date.set(date.date)
 
     def _setupDialog(self):
+
+        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.005, relw=.2, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate))
+
+
+
+
         self.input = DailyContInput(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
-        self.view = Hierachy(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
-        self.totals = DailyContTotal(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
+        self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
+        self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
 
 
