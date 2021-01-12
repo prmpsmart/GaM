@@ -95,10 +95,7 @@ class Thrift(Object):
             repay, remain = self.contributions._toUpfrontRepay(self.income)
             self.saved = remain
             self.upfrontRepay = repay
-
-    @property
-    def withdraw(self): return
-
+    
     @property
     def month(self): return self.clientAccount.month
 
@@ -161,7 +158,42 @@ class DailyContribution(ObjectsManager):
         super().__init__(manager, date=date, previous=previous)
 
         self.number = number
-        self._bto = 0
+        self.__bto = 0
+
+    @property
+    def lastMonths(self):
+        thrifts = [thf for thf in self if thf.account.date.monthYearTuple < self.date.monthYearTuple]
+        return sum([thrift.income for thrift in thrifts])
+    @property
+    def currentMonths(self):
+        thrifts = [thf for thf in self if thf.account.date.monthYearTuple == self.date.monthYearTuple]
+        return sum([thrift.income for thrift in thrifts])
+    @property
+    def nextMonths(self):
+        thrifts = [thf for thf in self if thf.account.date.monthYearTuple > self.date.monthYearTuple]
+        return sum([thrift.income for thrift in thrifts])
+    
+    @property
+    def accounts(self): return len(self)
+    @property
+    def cash(self): return sum([thrift.cash for thrift in self.thrifts])
+    @property
+    def transfer(self): return sum([thrift.transfer for thrift in self.thrifts])
+    @property
+    def paidout(self): return sum([thrift.paidout for thrift in self.thrifts])
+    @property
+    def income(self): return sum([thrift.income for thrift in self.thrifts])
+    @property
+    def saved(self): return sum([thrift.saved for thrift in self.thrifts])
+    @property
+    def upfrontRepay(self): return sum([thrift.upfrontRepay for thrift in self.thrifts])
+
+    @property
+    def bto(self): return self.__bto
+    @property
+    def excess(self): return self.subs
+    @property
+    def deficit(self): return self.subs
 
     @property
     def thrifts(self): return self.subs

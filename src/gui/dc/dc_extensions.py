@@ -372,34 +372,42 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
 
 class DailyContTotal(PRMP_FillWidgets, Frame):
     
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, dcContrib=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
 
-        self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.007, rely=.01, relw=.3, relh=.2), orient='h')
+        self.dcContrib = dcContrib
+
+        self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.007, rely=.01, relw=.3, relh=.16), orient='h')
         
-        PRMP_Separator(self, place=dict(relx=.002, rely=.215, relh=.01, relw=.996))
+        Button(self, text='Refresh', place=dict(relx=.83, rely=.01, relw=.15, relh=.16))
 
-        self.last = LabelEntry(self, topKwargs=dict(text='Last Month'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.235, relw=.3, relh=.2), orient='h')
-        self.current = LabelEntry(self, topKwargs=dict(text='Current'), bottomKwargs=dict(state='readonly'), place=dict(relx=.32, rely=.235, relw=.3, relh=.2), orient='h')
-        self.next = LabelEntry(self, topKwargs=dict(text='Next'), bottomKwargs=dict(state='readonly'), place=dict(relx=.633, rely=.235, relw=.3, relh=.2), orient='h')
+        PRMP_Separator(self, place=dict(relx=.002, rely=.185, relh=.01, relw=.996))
 
-        PRMP_Separator(self, place=dict(relx=.002, rely=.445, relh=.01, relw=.996))
+        self.lastMonths = LabelEntry(self, topKwargs=dict(text='Last Month'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.21, relw=.3, relh=.16), orient='h')
+        self.currentMonths = LabelEntry(self, topKwargs=dict(text='Current'), bottomKwargs=dict(state='readonly'), place=dict(relx=.32, rely=.21, relw=.3, relh=.16), orient='h')
+        self.nextMonths = LabelEntry(self, topKwargs=dict(text='Next'), bottomKwargs=dict(state='readonly'), place=dict(relx=.633, rely=.21, relw=.3, relh=.16), orient='h')
 
-        self.clientsContributed = LabelEntry(self, topKwargs=dict(text='Clients'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.465, relw=.25, relh=.16), orient='h')
-        self.cash = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.transfered = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.paidout = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.income = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.saved = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.upfrontRepay = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        PRMP_Separator(self, place=dict(relx=.002, rely=.395, relh=.01, relw=.996))
 
-        self.bto = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.excess = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
-        self.deficit = LabelEntry(self, topKwargs=dict(text=''), bottomKwargs=dict(state='readonly'), place=dict(relx=0, rely=0, relw=0, relh=0), orient='h')
+        self.accounts = LabelEntry(self, topKwargs=dict(text='Accounts'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.425, relw=.22, relh=.15), orient='h')
+        self.cash = LabelEntry(self, topKwargs=dict(text='Cash'), bottomKwargs=dict(state='readonly'), place=dict(relx=.26, rely=.425, relw=.22, relh=.15), orient='h')
+        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.425, relw=.22, relh=.15), orient='h')
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(state='readonly'), place=dict(relx=.78, rely=.425, relw=.22, relh=.15), orient='h')
+        self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.585, relw=.22, relh=.15), orient='h')
+        self.saved = LabelEntry(self, topKwargs=dict(text='Saved'), bottomKwargs=dict(state='readonly'), place=dict(relx=.26, rely=.585, relw=.22, relh=.15), orient='h')
+        self.upfrontRepay = LabelEntry(self, topKwargs=dict(text='Upfront Repay'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.585, relw=.32, relh=.15), orient='h')
         
+        PRMP_Separator(self, place=dict(relx=.002, rely=.75, relh=.01, relw=.996))
 
-        self.refresh = Button(self, text='Refresh', place=dict(relx=0, rely=0, relw=0, relh=0))
+
+        self.bto = LabelEntry(self, topKwargs=dict(text='Brought To Office'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.77, relw=.4, relh=.16), orient='h')
+        self.excess = LabelEntry(self, topKwargs=dict(text='Excess'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.77, relw=.22, relh=.16), orient='h')
+        self.deficit = LabelEntry(self, topKwargs=dict(text='Deficit'), bottomKwargs=dict(state='readonly'), place=dict(relx=.75, rely=.77, relw=.22, relh=.16), orient='h')
+    
+    def refresh(self):
+        self.dcContrib
+
 
 
 class DailyContInput(Frame):
