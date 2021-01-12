@@ -141,6 +141,9 @@ class DailyContributionDailog(PRMP_Dialog):
 
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.005, relw=.2, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate))
 
+        PRMP_Combobox  for area accounts
+        PRMP_Spinbox for client number in area account
+
 
 
 
