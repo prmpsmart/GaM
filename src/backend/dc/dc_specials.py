@@ -191,9 +191,13 @@ class DailyContribution(ObjectsManager):
     @property
     def bto(self): return self.__bto
     @property
-    def excess(self): return self.subs
+    def excess(self):
+        if self.bto > self.income: return self.bto - self.income
+        return 0
     @property
-    def deficit(self): return self.subs
+    def deficit(self):
+        if self.bto < self.income: return self.income - self.bto
+        return 0
 
     @property
     def thrifts(self): return self.subs
@@ -237,8 +241,7 @@ class DailyContribution(ObjectsManager):
     def deleteSub(self, number, month=None):
         pass
 
-    def setBto(self, bto):
-        pass
+    def setBto(self, bto): self.__bto = bto
 
     def update(self):
         for sub in self: sub.updateRecords()

@@ -15,7 +15,7 @@ class DC_RegionHome(TreeColumns, RegionHome):
     def _setupApp(self):
         super()._setupApp()
         
-        self.addTitleBar('DC Region Home')
+        self.setTitle('DC Region Home')
 
         self.subRegions.callback = self.selectedSubRegion
         self.accounts.callback = self.selectedAccount

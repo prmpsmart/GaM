@@ -1904,11 +1904,20 @@ class PRMP_Window(PRMP_Widget):
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
         
         self.placeOnScreen(side, geometry)
+        self.bind('<Control-z>', self.dest)
+        self.bind('<Control-Z>', self.dest)
 
         if grab: self.grab_set()
 
         self.after(100, self.loadAfters)
     
+    def dest(self, e):
+        self.closing()
+        self.save()
+        self.destroy()
+    
+    def closing(self): pass
+    def save(self): pass
     
     def withdrawTips(self):
         for tip in self.tips: tip.withdraw()
@@ -1930,7 +1939,7 @@ class PRMP_Window(PRMP_Widget):
         self.noTitleBar = noTitleBar
         self._addStatusBar = addStatusBar
         self._addTitleBar = addTitleBar
-        
+
         if addTitleBar:
             if toolWindow: self.__r = 1
             else: self.__r = 0
@@ -2201,11 +2210,13 @@ class PRMP_Window(PRMP_Widget):
     def isMinimized(self): pass
     
     def isNormal(self): pass
+
+    def setTitle(self, title):
+        self.title(title)
+        if self.titleBar: self.titleBar.set(title or self.titleText)
     
     def addTitleBar(self, title=''):
         if self.titleBar:
-            self.title(title)
-            self.titleBar.set(title or self.titleText)
             self.placeTitlebar()
             return
         F, L, B = PRMP_Style_Frame, PRMP_Style_Label, PRMP_Style_Button

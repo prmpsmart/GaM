@@ -205,12 +205,12 @@ class UniqueID(Button):
         if self.view: self.view.destroy()
 
 
-        self.view = PRMP_Toplevel(self, geo=(450, 150), tm=1, tw=1, grab=1)
+        self.view = PRMP_Toplevel(self, geo=(450, 80), tm=1, tw=1, grab=1, atb=0, asb=0, ntb=1)
         date = uniqueID = ''
         if self.obj:
             date = self.obj.date.date
             uniqueID = self.obj.uniqueID
-            self.view.addTitleBar(self.obj.name)
+            self.view.setTitle(self.obj.name)
 
         LabelEntry(self.view.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.02, rely=.02, relh=.96, relw=.96), bottomKwargs=dict(state='readonly')).set(uniqueID)
 

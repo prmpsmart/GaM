@@ -374,13 +374,15 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
     
     def __init__(self, master, dcContrib=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
-        PRMP_FillWidgets.__init__(self)
+        PRMP_FillWidgets.__init__(self, dcContrib)
 
         self.dcContrib = dcContrib
 
         self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.007, rely=.01, relw=.3, relh=.16), orient='h')
         
-        Button(self, text='Refresh', place=dict(relx=.83, rely=.01, relw=.15, relh=.16))
+        UniqueID(self, place=dict(relx=.63, rely=.01, relw=.15, relh=.16), obj=dcContrib)
+
+        Button(self, text='Refresh', place=dict(relx=.83, rely=.01, relw=.15, relh=.16), command=self.refresh)
 
         PRMP_Separator(self, place=dict(relx=.002, rely=.185, relh=.01, relw=.996))
 
@@ -404,9 +406,14 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         self.bto = LabelEntry(self, topKwargs=dict(text='Brought To Office'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.77, relw=.4, relh=.16), orient='h')
         self.excess = LabelEntry(self, topKwargs=dict(text='Excess'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.77, relw=.22, relh=.16), orient='h')
         self.deficit = LabelEntry(self, topKwargs=dict(text='Deficit'), bottomKwargs=dict(state='readonly'), place=dict(relx=.75, rely=.77, relw=.22, relh=.16), orient='h')
+        
+        self.addResultsWidgets(['lastMonths', 'currentMonths', 'nextMonths', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
+
+        self.refresh()
     
     def refresh(self):
-        self.dcContrib
+        self.date.set(self.dcContrib.date.date)
+        self.set(self.dcContrib)
 
 
 

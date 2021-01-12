@@ -17,7 +17,7 @@ class PersonDialog(GaM_Dialog):
 
     def _setupDialog(self):
         name = self.values.get('name')
-        if name: self.addTitleBar(name)
+        if name: self.setTitle(name)
         
         self.addEditButton()
         
@@ -129,7 +129,7 @@ class AccountDialog(GaM_Dialog):
     
     def _setupDialog(self):
         name = self.values.get('name')
-        if name: self.addTitleBar(name)
+        if name: self.setTitle(name)
         
         self.addEditButton()
         

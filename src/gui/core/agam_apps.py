@@ -48,7 +48,7 @@ class RegionLookUp(GaM_App, PRMP_FillWidgets):
         if not region or (region is self.region): return
     
         self.region = region
-        self.addTitleBar(region.idText)
+        self.setTitle(region.idText)
         
         person = region.person
         if person: self.set(dict(image=person.image))
@@ -314,7 +314,7 @@ class ManagerHome(TreeColumns, GaM_App):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self._sup = sup
-        if sup: self.addTitleBar(sup.name)
+        if sup: self.setTitle(sup.name)
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         
