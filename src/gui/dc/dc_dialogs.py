@@ -192,7 +192,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
-        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready'])
+        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThrift'])
 
     def defaults(self):
 
