@@ -11,14 +11,14 @@ class GaM_App(PRMP_MainWindow):
         
         self._setupApp()
 
-        self.default()
+        self.defaults()
 
         self.paint()
     
     def _setupApp(self):
         pass
 
-    def default(self):
+    def defaults(self):
         pass
 
 

@@ -56,7 +56,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         self.set()
 
         self.paint()
-        self.default()
+        self.defaults()
         
         if editable:
             if values: self.editInput(0)
@@ -70,7 +70,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     def _setupDialog(self):
         'This is to be overrided in subclasses of PRMPDialog to setup the widgets into the dialog.'
 
-    def default(self):
+    def defaults(self):
         # self.grab_set()
         # self.wait_window()
         pass

@@ -1752,10 +1752,10 @@ class PRMP_Scrollbar(PRMP_, tk.Scrollbar):
     def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
 Scrollbar = PSc = PRMP_Scrollbar
 
-class PRMP_Spinbox(PRMP_, ttk.Spinbox):
+class PRMP_Spinbox(PRMP_, tk.Spinbox):
     
     def __init__(self, master=None, config={}, **kwargs):
-        ttk.Spinbox.__init__(self, master, **config)
+        tk.Spinbox.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
 Spinbox = PSp = PRMP_Spinbox
 
@@ -2438,8 +2438,9 @@ class PRMP_MainWindow(PRMP_Mixins):
     def __str__(self): return str(self.root)
     
     def __getitem__(self, name):
-        attr = self.__dict__.get(name, '_prmp_')
-        if attr != '_prmp_': return attr
+        attr = self.getFromSelf(name, self._unget)
+        # print(attr)
+        if attr != self._unget: return attr
         else: return getattr(self.root, name)
 
     def __getattr__(self, name): return getattr(self.root, name)

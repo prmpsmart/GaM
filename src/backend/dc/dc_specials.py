@@ -218,21 +218,21 @@ class DailyContribution(ObjectsManager):
     @property
     def region(self): return self.manager.region
     
-    def createSub(self, number, month=None, **kwargs):
+    def createSub(self, number, month=None, account=None, **kwargs):
         month = self.getDate(month)
 
         prevs = self.getSub(number=number, month=month) or []
 
         if prevs and len(prevs): raise ValueError(f'{prevs.name} already exists.')
 
-        clientAccount = self.getClientAccount(number, month)
+        clientAccount = self.getClientAccount(number, account, month)
         
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
-    def createThrift(self, number, month=None, income=0, money=False, paidout=0, transfer=0): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
+    def createThrift(self, number, month=None, income=0, money=False, paidout=0, transfer=0, account=None): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer, account=account)
     
-    def getClientAccount(self, number, month=None, account=None):
+    def getClientAccount(self, number, account=None, month=None):
         month = self.getDate(month)
         account = account or self.accountsManager.getAccount(month=month)
         
