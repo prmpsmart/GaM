@@ -1752,11 +1752,12 @@ class PRMP_Scrollbar(PRMP_, tk.Scrollbar):
     def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
 Scrollbar = PSc = PRMP_Scrollbar
 
-class PRMP_Spinbox(PRMP_, tk.Spinbox):
+class PRMP_Spinbox(PRMP_Input, PRMP_, tk.Spinbox):
     
     def __init__(self, master=None, config={}, **kwargs):
         tk.Spinbox.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
+        PRMP_Input.__init__(self, **kwargs)
 Spinbox = PSp = PRMP_Spinbox
 
 #   from ttk widgets --> PRMP_Style_
@@ -1852,11 +1853,12 @@ class PRMP_Style_Scrollbar(PRMP_Style_, ttk.Scrollbar):
     def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
 SScrollbar = PSSc = PRMP_Style_Scrollbar
 
-class PRMP_Style_Spinbox(PRMP_Style_, ttk.Spinbox):
+class PRMP_Style_Spinbox(PRMP_Input, PRMP_Style_, ttk.Spinbox):
     
     def __init__(self, master=None, config={}, **kwargs):
         ttk.Spinbox.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
+        PRMP_Input.__init__(self, **kwargs)
 SSpinbox = PSSp = PRMP_Style_Spinbox
 
 #  windows

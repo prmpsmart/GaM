@@ -419,16 +419,6 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
 
 
 
-class DailyContInput(Frame):
-
-    def __init__(self, master, **kwargs):
-        Frame.__init__(self, master, **kwargs)
-
-        self.thriftInput = ThriftInput(self)
-
-
-
-
 
 
 

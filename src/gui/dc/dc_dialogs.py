@@ -155,25 +155,33 @@ class DailyContributionDailog(PRMP_Dialog):
         self.newClient = Button(self.container, text='New Client', place=dict(relx=.005, rely=.17, relw=.1, relh=.05))
         self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.17, relw=.15, relh=.05))
 
-        self.clientNumber = LabelSpin(self.container, topKwargs=dict(text='Client Number'), place=dict(relx=.005, rely=.225, relw=.16, relh=.05), longent=.7, orient='h')
+        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.225, relw=.24, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged)
         
         self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.28, relw=.29, relh=.05), longent=.32, orient='h')
 
 
-        self.input = DailyContInput(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
+        self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.05, relw=.14), orient='h')
+        self.money = Checkbutton(self, text='Money?', place=dict(relx=.18, rely=.367, relh=.03, relw=.065))
+
+        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer?'), place=dict(relx=.005, rely=.415, relh=.05, relw=.14), orient='h', bottomKwargs=dict(_type='money'))
+
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.47, relh=.05, relw=.14))
 
 
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
-        self.addResultsWidgets(['area', 'date', 'clientNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts'])
+        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts', 'income', 'money', 'paidout', 'transfer'])
 
     def defaults(self):
 
         self.bind('<Up>', self.increaseClientNumber)
         self.bind('<Down>', self.decreaseClientNumber)
+        
+        self.container.bind('<1>', lambda e: self.focus())
 
         self._account = None
+        self._clientAccount = None
         
         if self.manager: self._area = self.manager.master
         elif self.dcContrib: self._area = self.dcContrib.manager.master
@@ -197,38 +205,55 @@ class DailyContributionDailog(PRMP_Dialog):
         self._account = self.areaAccounts.B.getObj()
         self.setClientNumbers()
 
-        print(self._account)
-    
-    # @property
     def maxNum(self): return len(self.clientsAccounts())
 
     def setClientNumbers(self):
-        print(self.maxNum())
-        self.clientNumber.B.configure(from_=1, to=self.maxNum())
+        max_ = self.maxNum()
+        
+        self.ledgerNumber.B.configure(from_=0, to=max_, increment=1)
     
     def decreaseClientNumber(self, e=0):
-        get = self.clientNumber.get() or 0
-        get = int(get)
+        get = self.ledgerNumber.get() or 0
+        get = int(float(get))
         
         if get == 0: val = self.maxNum()
-        elif get: val = f'{get-1}'
+        elif get: val = get - 1
+        else: val = 0
         
-        self.clientNumber.set(val)
+        if e.widget != self.ledgerNumber.B: self.ledgerNumber.B.set(val)
+        self.ledgerNumber.B.event_generate('<<Decrement>>')
 
     def increaseClientNumber(self, e=0):
         maxNum = self.maxNum()
-        get = self.clientNumber.get() or maxNum
-        get = int(get)
-        
-        if get == maxNum: val = '0'
-        elif get: val = f'{get+1}'
-        # else: val = f'{maxNum}'
-        
-        self.clientNumber.set(val)
+        get = self.ledgerNumber.get() or maxNum
+        get = int(float(get))
+        val = maxNum
 
-    
+        if get == maxNum: val = 0
+        else: val = get + 1
+        
+        if e.widget != self.ledgerNumber.B: self.ledgerNumber.B.set(val)
+
+        self.ledgerNumber.B.event_generate('<<Increment>>')
+
     def clientNumberChanged(self, e=None):
-        print(self.clientNumber.get())
+        num = self.ledgerNumber.get()
+        if num == None: return
+        if not self._account:
+            PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
+
+            return
+
+        num = int(num)
+        clientAccount = self._account.getClientAccount(num)
+        
+        if clientAccount:
+            self._clientAccount = clientAccount
+            self.clientName.set(self._clientAccount.region.name)
+        else:
+            self._clientAccount = None
+            PRMP_MsgBox(self, title='Not Found', message=f'No Client with account\'s ledger number = {num}.', ask=0, _type='error')
+
 
 
 

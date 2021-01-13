@@ -202,7 +202,9 @@ class AreaAccount(DCAccount):
         if bto > contributed: self.excesses.createRecord(bto - contributed, date, coRecord=btoRec)
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date, coRecord=btoRec)
 
-    def clientsAccounts(self, month=None): return sorted(self.manager.sortClientsAccountsByMonth(month or self.month))
+    def clientsAccounts(self, month=None):
+        acs = self.manager.sortClientsAccountsByMonth(month or self.month)
+        return sorted(acs)
 
     def getClientAccount(self, number, month=None):
         clientsAccounts = self.clientsAccounts(month)
