@@ -144,7 +144,7 @@ class DailyContributionDailog(PRMP_Dialog):
     def _setupDialog(self):
         self.addEditButton()
 
-        self.area = Button(self.container, command=self.openArea, text='Area', place=dict(relx=.005, rely=.005, relw=.17, relh=.05))
+        self.area = Button(self.container, command=self.openArea, text='Area', place=dict(relx=.007, rely=.005, relw=.17, relh=.05))
 
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate), longent=.37)
 
@@ -152,26 +152,47 @@ class DailyContributionDailog(PRMP_Dialog):
         
         self.month = LabelMonthYearButton(self.container, topKwargs=dict(text='Month'), place=dict(relx=.21, rely=.06, relw=.08, relh=.1), longent=.4)
 
-        self.newClient = Button(self.container, text='New Client', place=dict(relx=.005, rely=.17, relw=.1, relh=.05))
-        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.17, relw=.15, relh=.05))
+        PRMP_Separator(self.container, place=dict(relx=.005, rely=.19, relh=.005, relw=.29))
 
-        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.225, relw=.24, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged)
+        self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.225, relw=.1, relh=.04))
+        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.225, relw=.15, relh=.04))
+
+        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.275, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged)
         
-        self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.28, relw=.29, relh=.05), longent=.32, orient='h')
+        self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.33, relw=.29, relh=.05), longent=.32, orient='h')
 
+        PRMP_Separator(self.container, place=dict(relx=.005, rely=.412, relh=.005, relw=.29))
 
-        self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.36, relh=.05, relw=.14), orient='h')
-        self.money = Checkbutton(self, text='Money?', place=dict(relx=.18, rely=.367, relh=.03, relw=.065))
+        self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(_type='money'), place=dict(relx=.005, rely=.46, relh=.05, relw=.14), orient='h')
+        self.money = Checkbutton(self, text='Money?', place=dict(relx=.18, rely=.467, relh=.03, relw=.065))
 
-        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer?'), place=dict(relx=.005, rely=.415, relh=.05, relw=.14), orient='h', bottomKwargs=dict(_type='money'))
+        self.transfer = LabelEntry(self, topKwargs=dict(text='Transfer'), place=dict(relx=.005, rely=.515, relh=.05, relw=.14), orient='h', bottomKwargs=dict(_type='money'))
 
-        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.47, relh=.05, relw=.14))
+        self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.57, relh=.05, relw=.14))
+
+        self.ready = Checkbutton(self.container, text='Ready?', place=dict(relx=.2, rely=.525, relh=.04, relw=.07))
+        self.addThrift = Button(self.container, text='Add Thrift', place=dict(relx=.18, rely=.575, relh=.04, relw=.09))
+
+        PRMP_Separator(self.container, place=dict(relx=.005, rely=.663, relh=.005, relw=.29))
+
+        self.contributed = LabelSpin(self.container, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.685, relw=.22, relh=.05), orient='h', longent=.4)
+
+        self.delete = Button(self.container, text='Delete', place=dict(relx=.23, rely=.685, relw=.06, relh=.04))
+
+        PRMP_Separator(self.container, place=dict(relx=.005, rely=.765, relh=.005, relw=.29))
+
+        self.bto = LabelEntry(self.container, topKwargs=dict(text='Brought To Office'), place=dict(relx=.005, rely=.8, relw=.2, relh=.05), orient='h', longent=.6, bottomKwargs=dict(placeholder='Enter B-T-O', _type='money'))
+
+        self.addBto = Button(self.container, text='Add B-T-O', place=dict(relx=.21, rely=.805, relw=.08, relh=.04))
+
+        PRMP_Separator(self.container, place=dict(relx=.005, rely=.882, relh=.005, relw=.29))
+
 
 
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
-        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts', 'income', 'money', 'paidout', 'transfer'])
+        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready'])
 
     def defaults(self):
 
