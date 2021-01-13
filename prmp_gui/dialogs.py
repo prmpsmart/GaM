@@ -90,14 +90,16 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     
     def bindCR(self): self.bind('<Control-Return>', self.processInput)
     def unbindCR(self): self.unbind('<Control-Return>')
-    
+
+    def _placeSubmitButton(self):
+        x, y = self.containerGeo
+        self.submitBtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
     def placeSubmitBtn(self, wh=0):
         if wh:
             self.bindCR()
             self.container.paint()
             geo = self.kwargs.get('geo')
-            x, y = self.containerGeo
-            self.submitBtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
+            self._placeSubmitButton()
         else:
             self.unbindCR()
             self.submitBtn.place_forget()
@@ -105,8 +107,8 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     def addEditButton(self):
         if self.submitBtn == None: self.addSubmitButton()
         x, y = self.containerGeo
-        self.editBtn = xbtn = PRMP_Style_Checkbutton(self.container, config=dict(text='Edit', command=self.editInput))
-        xbtn.place(x=10 , y=y-40, h=30, w=60)
+        self.editBtn = PRMP_Style_Checkbutton(self.container, config=dict(text='Edit', command=self.editInput))
+        self.editBtn.place(x=10 , y=y-40, h=30, w=60)
     
     def processInput(self, e=0):
         result = self.get()

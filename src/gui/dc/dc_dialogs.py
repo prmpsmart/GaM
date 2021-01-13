@@ -136,20 +136,41 @@ class DailyContributionDailog(PRMP_Dialog):
     
     def changeDate(self, date):
         if date: self.totals.date.set(date.date)
+    
+    def _placeSubmitButton(self):
+        x, y = self.containerGeo
+        self.submitBtn.place(x=120 , y=y-40, h=30, w=60)
 
     def _setupDialog(self):
+        self.addEditButton()
+        if self.manager: self.area = self.manager.master
+        elif self.dcContrib: self.area = self.dcContrib.manager.master
+        else: self.area = None
 
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.005, relw=.2, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate))
 
-        PRMP_Combobox  for area accounts
-        PRMP_Spinbox for client number in area account
+        # PRMP_Combobox  for area accounts
+        # PRMP_Spinbox for client number in area account
+        Button(self.container, text='New Client', place=dict(relx=.005, rely=.06, relw=.1, relh=.05))
+        Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.06, relw=.15, relh=.05))
 
+        self.areaAccount = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.12, relw=.2, relh=.1), longent=.4)
+        if self.area: self.areaAccount.B.setObjs(self.area, 'name')
+        
+        self.month = LabelMonthYearButton(self.container, topKwargs=dict(text='Month'), place=dict(relx=.21, rely=.12, relw=.08, relh=.1), longent=.4)
 
+        self.clientNumber = LabelSpin(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.225, relw=.29, relh=.05), longent=.32, orient='h')
+        
+        self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.28, relw=.29, relh=.05), longent=.32, orient='h')
 
 
         self.input = DailyContInput(self.container, place=dict(relx=0, rely=0, relw=0, relh=0))
+
+
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
+
+        self.addResultsWidgets(['date'])
 
 
 

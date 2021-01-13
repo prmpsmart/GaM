@@ -1009,9 +1009,23 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
         ttk.Combobox.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)
-        
+        self.objects = {}
         self.changeValues(values)
-
+    
+    def setObjs(self, objs, attr):
+        values = []
+        co = 0
+        for obj in objs:
+            co += 1
+            val = obj[attr]
+            val = f'{co}. {val}'
+            self.objects[val] = obj
+            values.append(val)
+        self.changeValues(values)
+    
+    def getObj(self):
+        get = self.get()
+        if get in self.objects: return self.objects[get]
     
     @property
     def PRMP_WIDGET(self): return 'Combobox'
@@ -1738,10 +1752,10 @@ class PRMP_Scrollbar(PRMP_, tk.Scrollbar):
     def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
 Scrollbar = PSc = PRMP_Scrollbar
 
-class PRMP_Spinbox(PRMP_, tk.Spinbox):
+class PRMP_Spinbox(PRMP_, ttk.Spinbox):
     
     def __init__(self, master=None, config={}, **kwargs):
-        tk.Spinbox.__init__(self, master, **config)
+        ttk.Spinbox.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
 Spinbox = PSp = PRMP_Spinbox
 

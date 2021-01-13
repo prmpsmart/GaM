@@ -232,9 +232,9 @@ class DailyContribution(ObjectsManager):
     
     def createThrift(self, number, month=None, income=0, money=False, paidout=0, transfer=0): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer)
     
-    def getClientAccount(self, number, month=None):
+    def getClientAccount(self, number, month=None, account=None):
         month = self.getDate(month)
-        account = self.accountsManager.getAccount(month=month)
+        account = account or self.accountsManager.getAccount(month=month)
         
         if account: return account.getClientAccount(number)
     
