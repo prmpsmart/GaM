@@ -149,6 +149,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate), longent=.37)
 
         self.account = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.06, relw=.2, relh=.1), longent=.4, func=self.setAreaAccountDependents)
+        self.account.get = self.account.B.getObj
         
         self.month = LabelMonthYearButton(self.container, topKwargs=dict(text='Month'), place=dict(relx=.21, rely=.06, relw=.08, relh=.1), longent=.4)
 
@@ -196,9 +197,9 @@ class DailyContributionDailog(PRMP_Dialog):
         
     def defaults(self):
 
-        self.bind('<Up>', self.increaseClientNumber)
-        self.bind('<Down>', self.decreaseClientNumber)
-        self.bind('<Return>', self.addThrift)
+        self.bind('<Up>', self.increaseClientNumber, '+')
+        self.bind('<Down>', self.decreaseClientNumber, '+')
+        self.bind('<Return>', self.addThrift, '+')
         
         self.container.bind('<1>', lambda e: self.focus())
 
@@ -215,8 +216,8 @@ class DailyContributionDailog(PRMP_Dialog):
         
         self.update()
 
-        self.editBtn.set(False)
-        self.editInput()
+        # self.editBtn.set(False)
+        # self.editInput()
 
     def getThriftDetails(self): return self.get(['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account'])
 
@@ -233,14 +234,21 @@ class DailyContributionDailog(PRMP_Dialog):
         pass
 
     def addThrift(self, e=0):
+        if e and (e.widget == self.ledgerNumber.B): return
+
         if not self.editBtn.get(): return
         thriftDetails = self.getThriftDetails()
         
-        others = dict(number=self.ledger)
+        try: assert self._account == thriftDetails['account'], 'No area account is selected.'
+        except AssertionError:
+            PRMP_MsgBox(self, title='Account Error', message='No area account is selected.', ask=0, _type='error')
+            return
 
 
-        print(thriftDetails)
+        try: self.dcContrib.createThrift(**thriftDetails)
+        except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type=error)
         self.update()
+        print(self.dcContrib[:])
 
     def clientsAccounts(self):
         if self._account: return self._account.clientsAccounts()
@@ -255,7 +263,7 @@ class DailyContributionDailog(PRMP_Dialog):
     def setClientNumbers(self):
         max_ = self.maxNum()
         
-        self.ledgerNumber.B.configure(from_=0, to=max_, increment=1)
+        self.ledgerNumber.B.configure(from_=1, to=max_ or 1, increment=1)
     
     def decreaseClientNumber(self, e=0):
         get = self.ledgerNumber.get() or 0
@@ -263,7 +271,7 @@ class DailyContributionDailog(PRMP_Dialog):
         
         if get == 0: val = self.maxNum()
         elif get: val = get - 1
-        else: val = 0
+        else: val = 1
         
         if e.widget != self.ledgerNumber.B: self.ledgerNumber.B.set(val)
         self.ledgerNumber.B.event_generate('<<Decrement>>')
@@ -274,7 +282,7 @@ class DailyContributionDailog(PRMP_Dialog):
         get = int(float(get))
         val = maxNum
 
-        if get == maxNum: val = 0
+        if get == maxNum: val = 1
         else: val = get + 1
         
         if e.widget != self.ledgerNumber.B: self.ledgerNumber.B.set(val)
@@ -286,7 +294,6 @@ class DailyContributionDailog(PRMP_Dialog):
         if num == None: return
         if not self._account:
             PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
-
             return
 
         num = int(num)

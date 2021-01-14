@@ -1,5 +1,6 @@
 
 from prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp_miscs.prmp_pics import PRMP_Xbms
 from .extensions import *
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
@@ -154,7 +155,9 @@ CD = PRMP_CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', msgFont='DEFAULT_FONT', **kwargs):
+    def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=1, okText='', msgFont='DEFAULT_FONT', plenty=0, **kwargs):
+
+        self.plenty = plenty
         self.message = message
         self.msgFont = msgFont
         self._type = _type
@@ -168,11 +171,10 @@ class PRMP_MsgBox(PRMP_Dialog):
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)
-        self.label = PRMP_Text(self.container, state='disabled')
-        self.label.set(self.message)
-        # self.label = PRMP_Label(self.container, config=dict(text=self.message, bitmap='', wraplength=250), font='MENU_FONT')
+        if self.plenty: self.label = PRMP_Text(self.container, state='disabled')
+        else: self.label = PRMP_Label(self.container, config=dict(bitmap='', wraplength=250), font='PRMP_FONT')
 
-        
+        self.label.set(self.message)
         self.label.place(x=0, y=0, relh=1, relw=.85)
         
         self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)))
@@ -185,19 +187,20 @@ class PRMP_MsgBox(PRMP_Dialog):
             self.bind('<Return>', lambda e: self.yes.invoke())
         else:
             self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)
-            self.no = PRMP_Button(self, config=dict(text='No', command=self.noCom))
-            self.no.place(relx=.63, rely=.83, relh=.15, relw=.17)
+            self.no = PRMP_Button(self, config=dict(text='No', command=self.noCom), place=dict(relx=.63, rely=.83, relh=.15, relw=.17))
+            self.bind('<Return>', lambda e: self.no.invoke())
 
         if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.33, rely=.83, height=28, relw=.2)
+        self.focus()
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type
         elif _type in self._xbms: return f'@{self._xbms[_type]}'
     
     @property
-    def _xbms(self): return Xbms.filesDict()
+    def _xbms(self): return PRMP_Xbms.filesDict()
 
     def yesCom(self):
         if self.ask: self._setResult(True)

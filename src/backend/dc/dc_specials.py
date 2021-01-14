@@ -19,6 +19,8 @@ class Thrift(Object):
     def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=0, **kwargs):
         assert clientAccount, 'Account must be given'
 
+        assert income or paidout, 'Income or Paidout transactions must be made first.'
+
         self.account = self.clientAccount = clientAccount
         self.ledgerNumber = clientAccount.ledgerNumber
         
@@ -30,7 +32,7 @@ class Thrift(Object):
         
         self._subs = None
         
-        super().__init__(manager, **kwargs)
+        super().__init__(manager, month=self.account.month, **kwargs)
         del self.objectSort
 
         self.update(transfer=transfer, income=income, money=money, paidout=paidout, reload_=0)
@@ -218,19 +220,22 @@ class DailyContribution(ObjectsManager):
     @property
     def region(self): return self.manager.region
     
-    def createSub(self, ledgerNumber, month=None, account=None, **kwargs):
-        month = self.getDate(month)
+    def createSub(self, ledgerNumber, month=None, account=None, clientAccount=None, **kwargs):
+        if account: month = account.month
+        else: month = self.getDate(month)
 
         prevs = self.getSub(number=ledgerNumber, month=month) or []
 
         if prevs and len(prevs): raise ValueError(f'{prevs.name} already exists.')
 
         clientAccount = self.getClientAccount(ledgerNumber, account, month)
+        # clientAccount = clientAccount or self.getClientAccount(ledgerNumber, account, month)
+        print(ledgerNumber, account, month)
         
-        if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
-        else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
+        if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
+        else: raise ValueError(f'ClientAccount({month.monthYear}, No. {ledgerNumber}) does not exists.')
     
-    def createThrift(self, ledgerNumber=None, month=None, income=0, money=False, paidout=0, transfer=0, account=None): return self.createSub(ledgerNumber, month=month, income=income, money=money, paidout=paidout, transfer=transfer, account=account)
+    def createThrift(self, ledgerNumber=None, month=None, income=0, money=False, paidout=0, transfer=0, account=None, clientAccount=None): return self.createSub(ledgerNumber, month=month, income=income, money=money, paidout=paidout, transfer=transfer, account=account, clientAccount=clientAccount)
     
     def getClientAccount(self, ledgerNumber, account=None, month=None):
         month = self.getDate(month)
