@@ -97,11 +97,14 @@ class PRMP_FillWidgets(PRMP_Mixins):
         else:
             if self.values: return self.set(self.values)
     
-    def get(self):
+    def get(self, widgets=[]):
         result = {}
 
-        self.resultsWidgets.sort()
-        for widgetName in self.resultsWidgets:
+        if not widgets: widgets = self.resultsWidgets
+        
+        widgets.sort()
+
+        for widgetName in widgets:
             if widgetName in self.__notEditables: continue
 
             wid = self.__dict__.get(widgetName)

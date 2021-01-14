@@ -206,11 +206,11 @@ class AreaAccount(DCAccount):
         acs = self.manager.sortClientsAccountsByMonth(month or self.month)
         return sorted(acs)
 
-    def getClientAccount(self, number, month=None):
+    def getClientAccount(self, ledgerNumber, month=None):
         clientsAccounts = self.clientsAccounts(month)
         
         for clientsAccount in clientsAccounts:
-            if clientsAccount.ledgerNumber == number: return clientsAccount
+            if clientsAccount.ledgerNumber == ledgerNumber: return clientsAccount
 
 
 class ClientAccountsManager(DCAccountsManager):

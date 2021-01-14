@@ -148,7 +148,7 @@ class DailyContributionDailog(PRMP_Dialog):
 
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate), longent=.37)
 
-        self.areaAccounts = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.06, relw=.2, relh=.1), longent=.4, func=self.setAreaAccountDependents)
+        self.account = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.06, relw=.2, relh=.1), longent=.4, func=self.setAreaAccountDependents)
         
         self.month = LabelMonthYearButton(self.container, topKwargs=dict(text='Month'), place=dict(relx=.21, rely=.06, relw=.08, relh=.1), longent=.4)
 
@@ -171,7 +171,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.57, relh=.05, relw=.14))
 
         self.ready = Checkbutton(self.container, text='Ready?', place=dict(relx=.2, rely=.525, relh=.04, relw=.07))
-        self.addThrift = Button(self.container, text='Add Thrift', place=dict(relx=.18, rely=.575, relh=.04, relw=.09))
+        self.addThriftBtn = Button(self.container, text='Add Thrift', place=dict(relx=.18, rely=.575, relh=.04, relw=.09), command=self.addThrift)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.663, relh=.005, relw=.29))
 
@@ -192,12 +192,13 @@ class DailyContributionDailog(PRMP_Dialog):
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
-        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'areaAccounts', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThrift'])
-
+        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn'])
+        
     def defaults(self):
 
         self.bind('<Up>', self.increaseClientNumber)
         self.bind('<Down>', self.decreaseClientNumber)
+        self.bind('<Return>', self.addThrift)
         
         self.container.bind('<1>', lambda e: self.focus())
 
@@ -209,21 +210,44 @@ class DailyContributionDailog(PRMP_Dialog):
         else: self._area = None
 
         if self._area:
-            self.areaAccounts.B.setObjs(self._area, 'name')
+            self.account.B.setObjs(self._area, 'name')
             self.area.set(self._area.name)
         
-        if self.dcContrib:
-            self.date.set(self.dcContrib.date.date)
-    
+        self.update()
+
+        self.editBtn.set(False)
+        self.editInput()
+
+    def getThriftDetails(self): return self.get(['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account'])
+
+    def update(self):
+        if not self.dcContrib: return
+
+        self.date.set(self.dcContrib.date.date)
+        self.totals.set()
+
+
     def openArea(self): pass
 
-    # @property
+    def processInput(self):
+        pass
+
+    def addThrift(self, e=0):
+        if not self.editBtn.get(): return
+        thriftDetails = self.getThriftDetails()
+        
+        others = dict(number=self.ledger)
+
+
+        print(thriftDetails)
+        self.update()
+
     def clientsAccounts(self):
         if self._account: return self._account.clientsAccounts()
         return []
 
     def setAreaAccountDependents(self, e=None):
-        self._account = self.areaAccounts.B.getObj()
+        self._account = self.account.B.getObj()
         self.setClientNumbers()
 
     def maxNum(self): return len(self.clientsAccounts())

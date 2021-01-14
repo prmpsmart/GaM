@@ -55,12 +55,13 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         self._setupDialog()
         self.set()
 
-        self.paint()
-        self.defaults()
-        
         if editable:
             if values: self.editInput(0)
             else: self.editInput(1)
+            
+        self.defaults()
+        
+        self.paint()
                 
         self.mainloop()
         # if show: self.mainloop()
@@ -124,7 +125,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     def editInput(self, e=0):
         if self.editBtn == None: return
         if e: self.editBtn.set('1')
-        if self.editBtn.get():self.placeSubmitBtn(1)
+        if self.editBtn.get(): self.placeSubmitBtn(1)
         else: self.placeSubmitBtn()
         for widgetName in self.resultsWidgets:
             wid = self[widgetName]

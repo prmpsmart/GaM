@@ -218,25 +218,25 @@ class DailyContribution(ObjectsManager):
     @property
     def region(self): return self.manager.region
     
-    def createSub(self, number, month=None, account=None, **kwargs):
+    def createSub(self, ledgerNumber, month=None, account=None, **kwargs):
         month = self.getDate(month)
 
-        prevs = self.getSub(number=number, month=month) or []
+        prevs = self.getSub(number=ledgerNumber, month=month) or []
 
         if prevs and len(prevs): raise ValueError(f'{prevs.name} already exists.')
 
-        clientAccount = self.getClientAccount(number, account, month)
+        clientAccount = self.getClientAccount(ledgerNumber, account, month)
         
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, month=month, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {number}) does not exists.')
     
-    def createThrift(self, number, month=None, income=0, money=False, paidout=0, transfer=0, account=None): return self.createSub(number, month=month, income=income, money=money, paidout=paidout, transfer=transfer, account=account)
+    def createThrift(self, ledgerNumber=None, month=None, income=0, money=False, paidout=0, transfer=0, account=None): return self.createSub(ledgerNumber, month=month, income=income, money=money, paidout=paidout, transfer=transfer, account=account)
     
-    def getClientAccount(self, number, account=None, month=None):
+    def getClientAccount(self, ledgerNumber, account=None, month=None):
         month = self.getDate(month)
         account = account or self.accountsManager.getAccount(month=month)
         
-        if account: return account.getClientAccount(number)
+        if account: return account.getClientAccount(ledgerNumber)
     
     def deleteSub(self, number, month=None):
         pass
