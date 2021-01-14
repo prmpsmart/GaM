@@ -268,6 +268,8 @@ class DailyContributionDailog(PRMP_Dialog):
         self.ledgerNumber.B.configure(from_=1, to=max_ or 1, increment=1)
     
     def decreaseClientNumber(self, e=0):
+        if e.widget == self.account.B: return
+
         get = self.ledgerNumber.get() or 0
         get = int(float(get))
         
@@ -279,6 +281,8 @@ class DailyContributionDailog(PRMP_Dialog):
         self.ledgerNumber.B.event_generate('<<Decrement>>')
 
     def increaseClientNumber(self, e=0):
+        if e.widget == self.account.B: return
+
         maxNum = self.maxNum()
         get = self.ledgerNumber.get() or maxNum
         get = int(float(get))

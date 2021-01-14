@@ -167,8 +167,9 @@ class Hierachy(PRMP_TreeView):
         current = self.selected()
         if current: openCores(self, current)
 
-    def viewAll(self, obj, parent=''):
+    def _viewAll(self, obj, parent=''):
         if not obj: return
+
         if isinstance(obj, list):
             subs = obj
             item = parent
@@ -194,8 +195,12 @@ class Hierachy(PRMP_TreeView):
         
         if isinstance(subs, list):
             for sub in subs:
-                if sub: self.viewAll(sub, item)
-
+                if sub: self._viewAll(sub, item)
+    
+    def viewAll(self, obj, parent=''):
+        if not parent: self.clear()
+        self._viewAll(obj, parent)
+        
     def viewSubs(self, obj): self.viewAll(obj[:])
 
 

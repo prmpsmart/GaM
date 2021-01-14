@@ -54,6 +54,7 @@ class Thrift(Object):
         self.money = money
         self.transfer = float(transfer)
         self._income = float(income)
+        self.paidout = float(paidout)
         
         max_ = 31.0
         contribs = float(self.contributions)

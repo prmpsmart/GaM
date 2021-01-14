@@ -2,6 +2,7 @@ import os, time, random, ctypes, tkinter as tk
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
+import _tkinter
 from prmp_miscs.prmp_pics import PRMP_Image
 from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
@@ -2608,9 +2609,15 @@ class PRMP_TreeView(PRMP_Frame):
             for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
 
     def clear(self):
-        if self.firstItem:
-            self.tree.delete(self.firstItem)
-            self.firstItem = None
+        # if self.firstItem:
+        #     self.tree.delete(self.firstItem)
+        #     self.firstItem = None
+
+        for key in self.ivd:
+            try: self.tree.delete(key)
+            except _tkinter.TclError: pass
+        
+        self.ivd = self.itemsValuesDict = {}
         
     
     def set(self, obj, op=0):
