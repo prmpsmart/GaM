@@ -62,12 +62,13 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
 
 class TreeColumns:
-    def columns(self, sup):
+    @staticmethod
+    def columns(sup):
         if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
                 
         elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
         
-        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name']}, {'text': 'Name', 'attr': 'regionName'}, 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
+        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 50}, {'text': 'Name', 'attr': 'regionName', 'width': 150}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'contributions', 'type': int}]
         
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
@@ -168,28 +169,35 @@ class Hierachy(PRMP_TreeView):
 
     def viewAll(self, obj, parent=''):
         if not obj: return
-        raw = self.columns.get(obj)
-        first, *columns = raw
-        item = self.insert(parent, text=first, values=columns)
+        if isinstance(obj, list):
+            subs = obj
+            item = parent
+        else:
+            raw = self.columns.get(obj)
+            first, *columns = raw
+            item = self.insert(parent, text=first, values=columns)
 
-        self.ivd[item] = obj
-        subs = []
+            self.ivd[item] = obj
+            subs = []
 
-        if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts, obj.persons] + [obj['dailyContributions']] or []
-        elif isinstance(obj, Record):
-            # insert
-            for a in obj:
-                item_ = self.insert(item, text=a.name)
-                # f, *g = self.columns.get(a)
-                # item_ = self.insert(item, text=f, values=g)
-       
-                self.ivd[item_] = a
-            return
-        elif isinstance(obj, ObjectsMixins): subs = obj.subs
+            if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts, obj.persons] + [obj['dailyContributions']] or []
+            elif isinstance(obj, Record):
+                # insert
+                for a in obj:
+                    item_ = self.insert(item, text=a.name)
+                    # f, *g = self.columns.get(a)
+                    # item_ = self.insert(item, text=f, values=g)
+        
+                    self.ivd[item_] = a
+                return
+            elif isinstance(obj, ObjectsMixins): subs = obj.subs
         
         if isinstance(subs, list):
             for sub in subs:
                 if sub: self.viewAll(sub, item)
+
+    def viewSubs(self, obj): self.viewAll(obj[:])
+
 
 H = Hierachy
 

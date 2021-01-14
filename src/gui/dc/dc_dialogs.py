@@ -128,10 +128,9 @@ class ThriftDetailsDialog(PRMP_Dialog):
 
 class DailyContributionDailog(PRMP_Dialog):
     
-    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, manager=None, geo=(1200, 800), **kwargs):
+    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1200, 800), **kwargs):
         
         self.dcContrib = dcContrib
-        self.manager = manager
         super().__init__(master, title=title, geo=geo, **kwargs)
     
     def changeDate(self, date):
@@ -188,12 +187,15 @@ class DailyContributionDailog(PRMP_Dialog):
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.882, relh=.005, relw=.29))
 
+        self.manUpdate = Button(self.container, text='Update', place=dict(relx=.225, rely=.945, relw=.07, relh=.04), command=self.update)
 
 
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
+        self.view.setColumns(TreeColumns.columns(self.dcContrib))
+
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
-        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn'])
+        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn', 'manUpdate'])
         
     def defaults(self):
 
@@ -206,8 +208,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self._account = None
         self._clientAccount = None
         
-        if self.manager: self._area = self.manager.master
-        elif self.dcContrib: self._area = self.dcContrib.manager.master
+        if self.dcContrib: self._area = self.dcContrib.manager.master
         else: self._area = None
 
         if self._area:
@@ -225,6 +226,7 @@ class DailyContributionDailog(PRMP_Dialog):
         if not self.dcContrib: return
 
         self.date.set(self.dcContrib.date.date)
+        self.view.viewSubs(self.dcContrib)
         self.totals.set()
 
 

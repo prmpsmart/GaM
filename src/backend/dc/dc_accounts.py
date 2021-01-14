@@ -208,9 +208,8 @@ class AreaAccount(DCAccount):
 
     def getClientAccount(self, ledgerNumber, month=None):
         clientsAccounts = self.clientsAccounts(month)
-        
         for clientsAccount in clientsAccounts:
-            if clientsAccount.ledgerNumber == ledgerNumber: return clientsAccount
+            if clientsAccount.ledgerNumber == int(ledgerNumber): return clientsAccount
 
 
 class ClientAccountsManager(DCAccountsManager):

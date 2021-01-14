@@ -175,7 +175,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         else: self.label = PRMP_Label(self.container, config=dict(bitmap='', wraplength=250), font='PRMP_FONT')
 
         self.label.set(self.message)
-        self.label.place(x=0, y=0, relh=1, relw=.85)
+        self.label.place(x=0, y=0, relh=.75, relw=.85)
         
         self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)))
         self.bitmap.place(relx=.85, y=0, relh=1, relw=.15)

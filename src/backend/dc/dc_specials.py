@@ -62,7 +62,7 @@ class Thrift(Object):
 
         new = contribs + contributed
         if new <= max_:
-            self.contributed = contributed
+            self.contributed = float(contributed)
             self.saved = self.income = contributed * self.rate
             self.cash = self.saved if not transfer else self.saved - transfer
 
@@ -226,11 +226,10 @@ class DailyContribution(ObjectsManager):
 
         prevs = self.getSub(number=ledgerNumber, month=month) or []
 
-        if prevs and len(prevs): raise ValueError(f'{prevs.name} already exists.')
+        if prevs: raise ValueError(f'{prevs.name} already exists.')
 
-        clientAccount = self.getClientAccount(ledgerNumber, account, month)
-        # clientAccount = clientAccount or self.getClientAccount(ledgerNumber, account, month)
-        print(ledgerNumber, account, month)
+        # clientAccount = self.getClientAccount(ledgerNumber, account, month)
+        clientAccount = clientAccount or self.getClientAccount(ledgerNumber, account, month)
         
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {ledgerNumber}) does not exists.')

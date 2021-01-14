@@ -116,20 +116,23 @@ class Column(Col_Mixins):
     
     def get(self, obj):
         if obj:
-            if self.type:
-                try: return self.type(obj)
-                except: pass
             try:
                 val = ''
                 if self._attr:
                     for attr in self._attr:
                         try:
                             val = obj[attr]
-                            if val != None: return val
+                            if val != None: break
                         except: pass
-                    return val
-                else: return obj[self.attr] or val
-            except Exception as e: return ''
+                else: val = obj[self.attr] or val
+
+                if val:
+                    if self.type: return self.type(val)
+                    else: return val
+
+            except Exception as e:
+                print(e)
+                return ''
 
     def proof(self, obj): return self.get(obj) == self.value
 
