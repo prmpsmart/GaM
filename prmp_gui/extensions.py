@@ -77,8 +77,9 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 for ch in child: self.addNotEditables(ch)
             else: self.__notEditables.append(child)
     
-    def emptyWidgets(self):
-        for widgetName in self.resultsWidgets:
+    def emptyWidgets(self, widgets=[]):
+        widgets = widgets or self.resultsWidgets
+        for widgetName in widgets:
             widget = self.getFromSelf(widgetName)
             if widget:
                 B = widget.getFromSelf('Bottom', None)
@@ -108,9 +109,9 @@ class PRMP_FillWidgets(PRMP_Mixins):
     def get(self, widgets=[]):
         result = {}
 
-        if not widgets: widgets = self.resultsWidgets
+        widgets = widgets or self.resultsWidgets
         
-        widgets.sort()
+        # widgets.sort()
 
         for widgetName in widgets:
             if widgetName in self.__notEditables: continue

@@ -196,6 +196,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
         self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn', 'manUpdate'])
+        self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
         
     def defaults(self):
 
@@ -220,7 +221,7 @@ class DailyContributionDailog(PRMP_Dialog):
         # self.editBtn.set(False)
         # self.editInput()
 
-    def getThriftDetails(self): return self.get(['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account'])
+    def getThriftDetails(self): return self.get(self.thriftWidgets)
 
     def update(self):
         if not self.dcContrib: return
@@ -236,14 +237,12 @@ class DailyContributionDailog(PRMP_Dialog):
 
     def addThrift(self, e=0):
         if not self.editBtn.get(): return
-        if e and (e.widget == self.ledgerNumber.B): return
-        if e.widget == self.account.B: return
+        if e and ((e.widget == self.ledgerNumber.B) or (e.widget == self.account.B)): return
 
         if self.ready.get(): self.isReady(1)
         else:
             PRMP_MsgBox(self, title='Ready to continue?', message='Are you sure to add this transaction?', _type='warn', callback=self.isReady)
             return
-
     
     def isReady(self, w):
         if w: self._addThrift()
@@ -259,7 +258,7 @@ class DailyContributionDailog(PRMP_Dialog):
         except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error')
         
         self.update()
-        self.emptyWidgets()
+        self.emptyWidgets(self.thriftWidgets[:4])
 
         # print(self.dcContrib[:])
 

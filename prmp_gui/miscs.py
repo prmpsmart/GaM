@@ -127,8 +127,8 @@ class Column(Col_Mixins):
                 else: val = obj[self.attr] or val
 
                 if val:
-                    if self.type: return self.type(val)
-                    else: return val or ''
+                    if self.type: val = self.type(val)
+                return val or ''
 
             except Exception as e:
                 print(e)

@@ -177,7 +177,7 @@ class Hierachy(PRMP_TreeView):
             raw = self.columns.get(obj)
             first, *columns = raw
             item = self.insert(parent, text=first, values=columns)
-
+            # print(columns)
             self.ivd[item] = obj
             subs = []
 
@@ -218,7 +218,7 @@ class UniqueID(Button):
         if self.view: self.view.destroy()
 
 
-        self.view = PRMP_Toplevel(self, geo=(450, 80), tm=1, tw=1, grab=1, atb=0, asb=0, ntb=1)
+        self.view = PRMP_Toplevel(self, geo=(450, 80), tm=1, tw=1, grab=1, atb=0, asb=0, ntb=1, gaw=1)
         date = uniqueID = ''
         if self.obj:
             date = self.obj.date.date

@@ -78,9 +78,8 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         pass
 
     def destroyDialog(self):
-        if self.callback: self.callback(self.result)
-
         if self._return: self.destroy()
+        if self.callback: self.callback(self.result)
 
     @property
     def result(self): return self.__result
