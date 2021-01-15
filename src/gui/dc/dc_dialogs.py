@@ -129,7 +129,6 @@ class ThriftDetailsDialog(PRMP_Dialog):
 class DailyContributionDailog(PRMP_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1200, 800), **kwargs):
-        
         self.dcContrib = dcContrib
         super().__init__(master, title=title, geo=geo, **kwargs)
     
@@ -197,6 +196,7 @@ class DailyContributionDailog(PRMP_Dialog):
 
         self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn', 'manUpdate'])
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
+    
     def defaults(self):
         
 
@@ -229,7 +229,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.contributed.B.config(to=len(self.dcContrib), from_=1)
         self.date.set(self.dcContrib.date.date)
         self.view.viewSubs(self.dcContrib)
-        self.totals.set()
+        self.totals.refresh()
 
     def openArea(self): pass
 
@@ -240,11 +240,11 @@ class DailyContributionDailog(PRMP_Dialog):
         get = self.contributed.get() or 0
         get = int(float(get))
         return get
-    def deleteThrift(self):
 
+    def deleteThrift(self):
         get = self.getDel()
 
-        if get and (get < len(self.dcContrib)):
+        if get and (get <= len(self.dcContrib)):
             title = 'Sure to delete?'
             message = f'Are you sure to delete thrift No. {get}.'
             ask = 1
@@ -259,10 +259,10 @@ class DailyContributionDailog(PRMP_Dialog):
         
         PRMP_MsgBox(self, title=title, message=message, ask=ask, _type=_type, callback=callback)
 
-    
     def _deleteThrift(self, w):
         if w:
             get = self.getDel()
+            print(get)
             self.dcContrib.removeSubByIndex(get - 1)
             
             self.update()
@@ -307,9 +307,10 @@ class DailyContributionDailog(PRMP_Dialog):
         max_ = self.maxNum()
         
         self.ledgerNumber.B.configure(from_=1, to=max_ or 1, increment=1)
+    
     def decreaseClientNumber(self, e=0):
     
-        if e.widget == self.account.B: return
+        if e.widget in [self.account.B, self.contributed.B]: return
 
         get = self.ledgerNumber.get() or 0
         get = int(float(get))
@@ -322,7 +323,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.ledgerNumber.B.event_generate('<<Decrement>>')
 
     def increaseClientNumber(self, e=0):
-        if e.widget == self.account.B: return
+        if e.widget in [self.account.B, self.contributed.B]: return
 
         maxNum = self.maxNum()
         get = self.ledgerNumber.get() or maxNum
@@ -337,7 +338,8 @@ class DailyContributionDailog(PRMP_Dialog):
         self.ledgerNumber.B.event_generate('<<Increment>>')
 
     def clientNumberChanged(self, e=None):
-        if e.widget == self.account.B: return
+        if e.widget in [self.account.B, self.contributed.B]: return
+
 
         num = self.ledgerNumber.get()
         if num == None: return

@@ -409,13 +409,15 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         PRMP_FillWidgets.__init__(self, dcContrib)
         self.addResultsWidgets(['lastMonths', 'currentMonths', 'nextMonths', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
 
-
         self.refresh()
     
     def refresh(self):
         if  not self.dcContrib: return
         self.date.set(self.dcContrib.date.date)
-        self.set(self.dcContrib)
+        for wid in self.resultsWidgets: self.getFromSelf(wid).normal()
+        self.set()
+        for wid in self.resultsWidgets: self.getFromSelf(wid).readonly()
+
 
 
 

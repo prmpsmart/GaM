@@ -98,7 +98,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 if widget:
                     # try:
                         val = values.get(widgetName, '')
-                        if val: widget.set(val)
+                        widget.set(val)
                     # except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
             if isinstance(values, dict): self.values.update(values)
