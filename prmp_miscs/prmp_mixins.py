@@ -1,5 +1,5 @@
 from .prmp_errors import PRMP_Errors
-import re
+import re, os
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
@@ -74,6 +74,10 @@ class PRMP_Mixins:
     def printError(self, func, error): print(f"Errors from {self}->{func}: ", error)
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
+    
+    def checkFile(self, file): return os.path.isfile(file)
+    def checkDir(self, dir_): return os.path.isdir(dir_)
+    def checkPath(self, path): return os.path.exists(path)
     
     def checkNumber(self, number):
         strNum = str(number)

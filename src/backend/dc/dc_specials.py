@@ -224,6 +224,7 @@ class DailyContribution(ObjectsManager):
     def createSub(self, ledgerNumber, month=None, account=None, clientAccount=None, **kwargs):
         if account: month = account.month
         else: month = self.getDate(month)
+        ledgerNumber = int(ledgerNumber)
 
         prevs = self.getSub(number=ledgerNumber, month=month) or []
 

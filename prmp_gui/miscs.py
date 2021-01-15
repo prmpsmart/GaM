@@ -128,7 +128,7 @@ class Column(Col_Mixins):
 
                 if val:
                     if self.type: return self.type(val)
-                    else: return val
+                    else: return val or ''
 
             except Exception as e:
                 print(e)

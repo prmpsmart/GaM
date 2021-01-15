@@ -77,6 +77,14 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 for ch in child: self.addNotEditables(ch)
             else: self.__notEditables.append(child)
     
+    def emptyWidgets(self):
+        for widgetName in self.resultsWidgets:
+            widget = self.getFromSelf(widgetName)
+            if widget:
+                B = widget.getFromSelf('Bottom', None)
+                if B: B.set(B.getFromSelf('placeholder'))
+                else: widget.set(widget.getFromSelf('placeholder', widget['text']))
+    
     @property
     def notEditables(self): return self.__notEditables
     @property

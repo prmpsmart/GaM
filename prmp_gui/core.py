@@ -829,6 +829,15 @@ class PRMP_Input:
             self.get = self.getMoney
             self.bind('<KeyRelease>', self.checkingMoney, '+')
             self.verify = self.checkingMoney
+        elif _type == 'dir':
+            self.bind('<KeyRelease>', self.checkingDir, '+')
+            self.verify = self.checkingDir
+        elif _type == 'file':
+            self.bind('<KeyRelease>', self.checkingFile, '+')
+            self.verify = self.checkingFile
+        elif _type == 'path':
+            self.bind('<KeyRelease>', self.checkingPath, '+')
+            self.verify = self.checkingPath
         else:
             self.bind('<KeyRelease>', self.normVery, '+')
             self.verify = self.normVery
@@ -884,6 +893,24 @@ class PRMP_Input:
     def red(self):
         self.configure(foreground='red')
         return False
+    
+    def checkingPath(self, e=0):
+        path = self._get()
+        if path:
+            if self.checkPath(path): return self.green()
+            else: return self.red()
+    
+    def checkingDir(self, e=0):
+        dir_ = self._get()
+        if dir_:
+            if self.checkDir(dir_): return self.green()
+            else: return self.red()
+    
+    def checkingFile(self, e=0):
+        file = self._get()
+        if file:
+            if self.checkFile(file): return self.green()
+            else: return self.red()
     
     def checkingEmail(self, e=0):
         email = self._get()

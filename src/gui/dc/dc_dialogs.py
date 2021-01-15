@@ -229,28 +229,39 @@ class DailyContributionDailog(PRMP_Dialog):
         self.view.viewSubs(self.dcContrib)
         self.totals.set()
 
-
     def openArea(self): pass
 
     def processInput(self):
         pass
 
     def addThrift(self, e=0):
-        if e and (e.widget == self.ledgerNumber.B): return
-
         if not self.editBtn.get(): return
+        if e and (e.widget == self.ledgerNumber.B): return
+        if e.widget == self.account.B: return
+
+        if self.ready.get(): self.isReady(1)
+        else:
+            PRMP_MsgBox(self, title='Ready to continue?', message='Are you sure to add this transaction?', _type='warn', callback=self.isReady)
+            return
+
+    
+    def isReady(self, w):
+        if w: self._addThrift()
+
+    def _addThrift(self, e=0):
         thriftDetails = self.getThriftDetails()
-        
         try: assert self._account == thriftDetails['account'], 'No area account is selected.'
         except AssertionError:
             PRMP_MsgBox(self, title='Account Error', message='No area account is selected.', ask=0, _type='error')
             return
 
-
         try: self.dcContrib.createThrift(**thriftDetails)
-        except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type=error)
+        except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error')
+        
         self.update()
-        print(self.dcContrib[:])
+        self.emptyWidgets()
+
+        # print(self.dcContrib[:])
 
     def clientsAccounts(self):
         if self._account: return self._account.clientsAccounts()
@@ -296,6 +307,8 @@ class DailyContributionDailog(PRMP_Dialog):
         self.ledgerNumber.B.event_generate('<<Increment>>')
 
     def clientNumberChanged(self, e=None):
+        if e.widget == self.account.B: return
+
         num = self.ledgerNumber.get()
         if num == None: return
         if not self._account:
