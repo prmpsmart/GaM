@@ -248,14 +248,6 @@ class ObjectsMixins(Mixins, CompareByDate):
     @property
     def uniqueID(self): return self._uniqueID
     
-    def delete(self, called=0):
-        if self.next:
-            self.next.previous = self.previous
-            # self.previous = None
-        if self.previous: self.previous.next = self.next
-
-        self.manager.removeSub(self)
-    
     @property
     def sort(self): return self.objectSort.sort
 
@@ -429,6 +421,14 @@ class Object(CompareByNumber, ObjectsMixins):
     @property
     def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
     
+    def delete(self, called=0):
+        if self.next:
+            self.next.previous = self.previous
+            # self.previous = None
+        if self.previous: self.previous.next = self.next
+
+        self.manager.removeSub(self)
+
     @property
     def sup(self): return self._sup
     
@@ -547,11 +547,18 @@ class ObjectsManager(ObjectsMixins):
         self.addSub(sub)
         
         return sub
-
+    
     def deleteSubs(self): self._subs = []
     
     def removeSub(self, sub):
         if sub in self: self._subs.remove(sub)
+    
+    def removeSubByIndex(self, index):
+        if len(self.subs) >= index:
+            sub = self.subs[index]
+            sub.delete()
+            self.removeSub(sub)
+        else: raise ValueError(f'Total Subs is not upto {index}.')
     
  ########## Sorting
 

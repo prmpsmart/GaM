@@ -177,7 +177,7 @@ class DailyContributionDailog(PRMP_Dialog):
 
         self.contributed = LabelSpin(self.container, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.685, relw=.22, relh=.05), orient='h', longent=.4)
 
-        self.delete = Button(self.container, text='Delete', place=dict(relx=.23, rely=.685, relw=.06, relh=.04))
+        self.delete = Button(self.container, text='Delete', place=dict(relx=.23, rely=.685, relw=.06, relh=.04), command=self.deleteThrift)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.765, relh=.005, relw=.29))
 
@@ -197,8 +197,8 @@ class DailyContributionDailog(PRMP_Dialog):
 
         self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn', 'manUpdate'])
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
-        
     def defaults(self):
+        
 
         self.bind('<Up>', self.increaseClientNumber, '+')
         self.bind('<Down>', self.decreaseClientNumber, '+')
@@ -225,7 +225,8 @@ class DailyContributionDailog(PRMP_Dialog):
 
     def update(self):
         if not self.dcContrib: return
-
+        if self._account: self.ledgerNumber.B.config(to=len(self._account), from_=1)
+        self.contributed.B.config(to=len(self.dcContrib), from_=1)
         self.date.set(self.dcContrib.date.date)
         self.view.viewSubs(self.dcContrib)
         self.totals.set()
@@ -235,9 +236,41 @@ class DailyContributionDailog(PRMP_Dialog):
     def processInput(self):
         pass
 
+    def getDel(self):
+        get = self.contributed.get() or 0
+        get = int(float(get))
+        return get
+    def deleteThrift(self):
+
+        get = self.getDel()
+
+        if get and (get < len(self.dcContrib)):
+            title = 'Sure to delete?'
+            message = f'Are you sure to delete thrift No. {get}.'
+            ask = 1
+            _type = 'question'
+            callback = self._deleteThrift
+        else:
+            title = 'Error'
+            message = 'The input is invalid.'
+            ask = 0
+            _type = 'error'
+            callback = None
+        
+        PRMP_MsgBox(self, title=title, message=message, ask=ask, _type=_type, callback=callback)
+
+    
+    def _deleteThrift(self, w):
+        if w:
+            get = self.getDel()
+            self.dcContrib.removeSubByIndex(get - 1)
+            
+            self.update()
+            PRMP_MsgBox(self, title='Removed Successful.', message=f'Thrift No. {get} has been successfully removed. ', ask=0, _type='info')
+
     def addThrift(self, e=0):
         if not self.editBtn.get(): return
-        if e and ((e.widget == self.ledgerNumber.B) or (e.widget == self.account.B)): return
+        if e and (e.widget in [self.ledgerNumber.B, self.account.B, self.contributed.B]): return
 
         if self.ready.get(): self.isReady(1)
         else:
@@ -256,11 +289,9 @@ class DailyContributionDailog(PRMP_Dialog):
 
         try: self.dcContrib.createThrift(**thriftDetails)
         except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error')
-        
+
         self.update()
         self.emptyWidgets(self.thriftWidgets[:4])
-
-        # print(self.dcContrib[:])
 
     def clientsAccounts(self):
         if self._account: return self._account.clientsAccounts()
@@ -276,8 +307,8 @@ class DailyContributionDailog(PRMP_Dialog):
         max_ = self.maxNum()
         
         self.ledgerNumber.B.configure(from_=1, to=max_ or 1, increment=1)
-    
     def decreaseClientNumber(self, e=0):
+    
         if e.widget == self.account.B: return
 
         get = self.ledgerNumber.get() or 0

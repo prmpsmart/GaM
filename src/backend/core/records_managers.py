@@ -296,9 +296,7 @@ class RecordsManager(ObjectsManager):
     
     def removeRecord(self, rec): self.removeSub(rec)
     
-    def removeRecordByIndex(self, index):
-        if len(self.records) >= index:
-            self.removeRecord(self.records[index])
+    def removeRecordByIndex(self, index): self.removeSubByIndex(index)
     
     def checkMoney(self, money):
         if (money < self.lowest): raise ValueError(f'Amount of {money} is too small.')
