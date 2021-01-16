@@ -4,6 +4,21 @@ import re, os
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
     _unget = '_prmp_'
+
+    _top = 'top'
+    _left = 'left'
+    _right = 'right'
+    _bottom = 'bottom'
+    _center = 'center'
+    _sides = [_top, _left, _right, _bottom, _center]
+    
+    upArrow = chr(11014)
+    downArrow = chr(11015)
+    x_btn1 = chr(10060)
+    x_btn2 = chr(10062)
+    
+    max_ = chr(9645)
+    min_ = chr(10134)
     
     containers = list, set, tuple
     naira = chr(8358)

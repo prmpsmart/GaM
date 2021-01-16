@@ -6,7 +6,7 @@ import zlib, pickle, os
 from base64 import b64encode, b64decode
 from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
 
-class ImageType:
+class PRMP_ImageType:
     
     tests = []
 
@@ -251,7 +251,7 @@ class PRMP_ImageFile(BytesIO):
     def data(self): return self.getvalue()
     
     @property
-    def ext(self): return ImageType.get(self)
+    def ext(self): return PRMP_ImageType.get(self)
 
     @property
     def size(self): return len(self.data)
