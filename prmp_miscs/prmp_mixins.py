@@ -11,6 +11,12 @@ class PRMP_Mixins:
     _bottom = 'bottom'
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
+
+    _both = '◄►'
+    _next = '►'
+    _previous = '◄'
+    _forward = '⏭'
+    _backward = '⏮'
     
     upArrow = chr(11014)
     downArrow = chr(11015)

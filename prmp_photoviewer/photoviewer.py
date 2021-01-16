@@ -32,8 +32,8 @@ class PhotoViewer(PRMP_MainWindow):
 
         self.folder = LabelButton(self.frame, place=dict(relx=.005, rely=.005, relw=.99, relh=.09), orient='h', topKwargs=dict(text='Folder'), longent=.13)
         self.imageLabel = PRMP_ImageLabel(self.frame, place=dict(relx=.005, rely=.1, relw=.99, relh=.7))
-        self.left = Button(self.imageLabel, text=self._left, place=dict(relx=.005, rely=.42, relw=.1, relh=.16), command=self.leftPic, relief='flat')
-        self.right = Button(self.imageLabel, text=self._right, place=dict(relx=.9, rely=.42, relw=.1, relh=.16), command=self.rightPic, relief='flat')
+        self.previous = Button(self.imageLabel, text=self._previous, place=dict(relx=.005, rely=.42, relw=.1, relh=.16), command=self.previousPic, relief='flat')
+        self.next = Button(self.imageLabel, text=self._next, place=dict(relx=.9, rely=.42, relw=.1, relh=.16), command=self.nextPic, relief='flat')
         self.total = LabelLabel(self.frame, place=dict(relx=.005, rely=.8, relw=.5, relh=.09), orient='h', topKwargs=dict(text='Total Pictures: '), longent=.55)
         self.currentName = LabelLabel(self.frame, place=dict(relx=.005, rely=.9, relw=.7, relh=.09), orient='h', topKwargs=dict(text='Current: '), longent=.24)
         self.index = LabelEntry(self.frame, place=dict(relx=.65, rely=.8, relw=.35, relh=.09), orient='h', topKwargs=dict(text='Index'), longent=.45)
@@ -58,15 +58,15 @@ class PhotoViewer(PRMP_MainWindow):
     
     def defaults(self):
         
-        self.bind('<Left>', self.leftPic)
-        self.bind('<Right>', self.rightPic)
+        self.bind('<Left>', self.previousPic)
+        self.bind('<Right>', self.nextPic)
 
     
-    def leftPic(self, e=0):
+    def previousPic(self, e=0):
 
         print(e)
     
-    def rightPic(self, e=0):
+    def nextPic(self, e=0):
 
 
         print(e)

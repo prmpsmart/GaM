@@ -496,11 +496,7 @@ class PRMP_DateTimeView(LabelFrame):
         self.after(10, self.update)
 
 class PRMP_Calendar(Frame):
-    _both = '◄►'
-    _next = '►'
-    _previous = '◄'
-    _forward = '⏭'
-    _backward = '⏮'
+    
     choosen = None
     _version_ = '3.3.0' # Alpha by PRMPSmart
 
