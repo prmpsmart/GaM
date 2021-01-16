@@ -1,6 +1,5 @@
 from os import path, chdir, listdir, getcwd
-from prmp_gui.dialogs import PRMP_MainWindow, PRMP_ImageType, PRMP_ImageLabel, dialogFunc, PRMP_MsgBox
-from prmp_gui.two_widgets import *
+from prmp_gui import *
 PRMP_Theme.setThemeIndex(38)
 
 def getPixs(folder):
