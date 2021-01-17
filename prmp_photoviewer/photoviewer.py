@@ -70,19 +70,20 @@ class PhotoViewer(PRMP_MainWindow):
     def updateDatas(self):
         self.folder.set(self._folder)
         self.total.set(self._total)
-        current = path.basename(self._current)
-        self.current.set(current)
-        self.index.set(self._index)
+        self.index.set(self._index+1)
         self.setCurrent()
     
     def setCurrent(self):
         if not self._pixs: return
         self.index.set(self._index)
         self._current = self._pixs[self._index]
+        current = path.basename(self._current)
+        self.current.set(current)
         self.imageLabel.loadImage(self._current)
     
     def chooseDir(self, e=0):
         folder = dialogFunc(path=1, folder=1)
+        if not folder: return
         self._folder = folder
         self._pixs = getPixs(folder)
         self._current = ''
@@ -129,5 +130,5 @@ class PhotoViewer(PRMP_MainWindow):
 
 PV = PhotoViewer
 
-PV(geo=(500, 500)).mainloop()
+PV(geo=(500, 500), tm=1).mainloop()
 

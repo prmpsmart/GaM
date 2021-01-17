@@ -161,6 +161,7 @@ class PRMP_ImageWidget:
         self.isGif = False
 
         dif = 20
+        self.frame_counter = 0
         # self.thumb = self.resize or self.thumb
         if not (self.resize and self.thumb):
             self.thumb = self.width-dif, self.height-dif
@@ -195,7 +196,7 @@ class PRMP_ImageWidget:
                     tkimg = PhotoImage(frame)
                     self.frames.append(tkimg)
                     self.durations.append(frame.info['duration'])
-                self.frame = self.frames[self.frame_counter]
+                if self.frames: self.frame = self.frames[self.frame_counter]
                 
                 self.isGif = True
                 self.__renderGif()
@@ -206,6 +207,7 @@ class PRMP_ImageWidget:
     
     def __renderGif(self):
         if not self.isGif: return
+        if not self.frames: return
         # Update Frame
         self.frame = self.frames[self.frame_counter]
         self.config(image=self.frames[self.frame_counter])
