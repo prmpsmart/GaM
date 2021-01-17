@@ -316,9 +316,9 @@ class PRMP_Image:
             img = self.image = Image.open(self.imageFile)
             self.info = img.info
 
-            if resize and len(resize) == 2: img = self.resizedImage = self.image.resize(resize)
-            
-            if thumb and len(thumb) == 2: img.thumbnail(thumb)
+            if resize and len(resize) == 2 and resize[0] > 0 and resize[1] > 0: img = self.resizedImage = self.image.resize(resize)
+                
+            if thumb and len(thumb) == 2 and thumb[0] > 0 and thumb[1] > 0: img.thumbnail(thumb)
             
             self.img = img
             
