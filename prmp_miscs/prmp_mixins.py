@@ -62,7 +62,7 @@ class PRMP_Mixins:
         except:
             if num == self._moneySign: return num
             
-        return f'{self._moneySign} {num}'
+        return '{} {}'.format(self._moneySign, num)
     
     numberToMoney = addSignToMoney = addSignToNum
 
@@ -121,7 +121,7 @@ class PRMP_Mixins:
     def notImp(cls): raise NotImplementedError(f'A subclass of {cls} should call this method.')
 
     @property
-    def className(self): return f'{self.__class__.__name__}'
+    def className(self): return self.__class__.__name__
     
     @property
     def AlphabetsSwitch(self):

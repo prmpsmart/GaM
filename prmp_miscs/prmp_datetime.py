@@ -393,15 +393,15 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def monthNameAbbr(self): return self.strftime('%b')
    
     @property
-    def monthYear(self): return f'{self.monthName}-{self.year}'
+    def monthYear(self): return '{}-{}'.format(self.monthName, self.year)
     @property
-    def weekMonthYear(self): return f'Week {self.week}, {self.monthName}-{self.year}'
+    def weekMonthYear(self): return 'Week {}, {}-{}'.format(self.week, self.monthName, self.year)
     @property
     def monthYearTuple(self): return (self.year, self.month)
     @property
     def weekMonthYearTuple(self): return (self.year, self.month, self.week)
     @property
-    def dayMonthYear(self): return f'{self.day}-{self.monthYear}'
+    def dayMonthYear(self): return '{}-{}'.format(self.day, self.monthYear)
     
     @property
     def isoWeekDay(self):

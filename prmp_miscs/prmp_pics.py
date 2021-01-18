@@ -224,7 +224,7 @@ class PRMP_ImageFile(BytesIO):
         self.name = None
         self._data = data
         
-        if data: self.name = f'data_{PRMP_ImageFile.count}'
+        if data: self.name = 'data_%d'%PRMP_ImageFile.count
 
         elif filename:
             self.name = os.path.basename(filename)
@@ -233,7 +233,7 @@ class PRMP_ImageFile(BytesIO):
 
         elif base64:
             self._data = b64decode(base64)
-            self.name = f'base64_{PRMP_ImageFile.count}'
+            self.name = 'base64_%d'%PRMP_ImageFile.count
 
         super().__init__(self._data)
         
@@ -242,8 +242,8 @@ class PRMP_ImageFile(BytesIO):
         PRMP_ImageFile.count += 1
 
     def __str__(self):
-        if self.name: return f'PRMP_ImageFile({self.name})'
-        else: return f'PRMP_ImageFile({PRMP_ImageFile.count})'
+        if self.name: return 'PRMP_ImageFile(%s)'%self.name
+        else: return 'PRMP_ImageFile(%d)'%PRMP_ImageFile.count
 
     def __len__(self): return self.size
 
@@ -306,7 +306,7 @@ class PRMP_Image:
             elif image: self.imageFile = PRMP_ImageFile(image=image)
             else: self.imageFile = filename or image
 
-            if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError(f'{filename} or {image} is not a valid value. ')
+            if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError('{} or {} is not a valid value.'.format(filename, image))
             
             self.name = self.imageFile.name
             self.ext = self.imageFile.ext
@@ -369,7 +369,7 @@ class PRMP_Image:
     @property
     def basename(self):
         if self.imageFile: return self.imageFile.name
-        return f'PRMP_Image({PRMP_Image.count})'
+        return 'PRMP_Image(%d)'%dPRMP_Image.count
 
     def resize(self, rz): return self.image.resize(rz)
 
