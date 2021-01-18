@@ -409,14 +409,18 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         PRMP_FillWidgets.__init__(self, dcContrib)
         self.addResultsWidgets(['lastMonths', 'currentMonths', 'nextMonths', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
 
-        self.refresh()
+        self._refresh()
     
-    def refresh(self):
+    def _refresh(self):
         if  not self.dcContrib: return
         self.date.set(self.dcContrib.date.date)
         for wid in self.resultsWidgets: self.getFromSelf(wid).normal()
         self.set()
         for wid in self.resultsWidgets: self.getFromSelf(wid).readonly()
+
+    def refresh(self):
+        self._refresh()
+        PRMP_MsgBox(self, title='Successful', message='The refresh is successful.', ask=0, okText='Ok')
 
 
 

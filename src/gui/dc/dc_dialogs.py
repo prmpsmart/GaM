@@ -182,7 +182,7 @@ class DailyContributionDailog(PRMP_Dialog):
 
         self.bto = LabelEntry(self.container, topKwargs=dict(text='Brought To Office'), place=dict(relx=.005, rely=.8, relw=.2, relh=.05), orient='h', longent=.6, bottomKwargs=dict(placeholder='Enter B-T-O', _type='money'))
 
-        self.addBto = Button(self.container, text='Add B-T-O', place=dict(relx=.21, rely=.805, relw=.08, relh=.04))
+        self.addBto = Button(self.container, text='Add B-T-O', place=dict(relx=.21, rely=.805, relw=.08, relh=.04), command=self.addBTO)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.882, relh=.005, relw=.29))
 
@@ -198,8 +198,6 @@ class DailyContributionDailog(PRMP_Dialog):
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
     
     def defaults(self):
-        
-
         self.bind('<Up>', self.increaseClientNumber, '+')
         self.bind('<Down>', self.decreaseClientNumber, '+')
         self.bind('<Return>', self.addThrift, '+')
@@ -229,7 +227,7 @@ class DailyContributionDailog(PRMP_Dialog):
         self.contributed.B.config(to=len(self.dcContrib), from_=1)
         self.date.set(self.dcContrib.date.date)
         self.view.viewSubs(self.dcContrib)
-        self.totals.refresh()
+        self.totals._refresh()
 
     def openArea(self): pass
 
@@ -340,7 +338,6 @@ class DailyContributionDailog(PRMP_Dialog):
     def clientNumberChanged(self, e=None):
         if e.widget in [self.account.B, self.contributed.B]: return
 
-
         num = self.ledgerNumber.get()
         if num == None: return
         if not self._account:
@@ -357,7 +354,13 @@ class DailyContributionDailog(PRMP_Dialog):
             self._clientAccount = None
             PRMP_MsgBox(self, title='Not Found', message=f'No Client with account\'s ledger number = {num}.', ask=0, _type='error')
 
-
+    def addBTO(self):
+        bto = self.bto.get()
+        try:
+            assert bto, 'Brought to office cannot be less than 0'
+            self.dcContrib.addBTO(bto)
+            self.totals._refresh()
+        except AssertionError as error: PRMP_MsgBox(self, title=error.__class__.__name__, message=error, ask=0)
 
 
 

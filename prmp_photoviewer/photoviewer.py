@@ -130,8 +130,8 @@ class PhotoViewer(PRMP_MainWindow):
 
 PV = PhotoViewer
 
-# PV(geo=(500, 500), tm=1).mainloop()
-
+PV(geo=(500, 500), tm=1).mainloop()
+exit()
 
 rootDir = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GAM\GAM\prmp_miscs\prmp_pics\prmp_xbms'
 rootDir = r'C:\Users\Administrator\pictures\valentina'

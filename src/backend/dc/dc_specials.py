@@ -175,7 +175,6 @@ class DailyContribution(ObjectsManager):
     def nextMonths(self):
         thrifts = [thf for thf in self if thf.account.date.monthYearTuple > self.date.monthYearTuple]
         return sum([thrift.income for thrift in thrifts])
-    
     @property
     def accounts(self): return len(self)
     @property
@@ -190,7 +189,6 @@ class DailyContribution(ObjectsManager):
     def saved(self): return sum([thrift.saved for thrift in self.thrifts])
     @property
     def upfrontRepay(self): return sum([thrift.upfrontRepay for thrift in self.thrifts])
-
     @property
     def bto(self): return self.__bto
     @property
@@ -247,7 +245,7 @@ class DailyContribution(ObjectsManager):
     def deleteSub(self, number, month=None):
         pass
 
-    def setBto(self, bto): self.__bto = bto
+    def addBTO(self, bto): self.__bto = bto
 
     def update(self):
         for sub in self: sub.updateRecords()

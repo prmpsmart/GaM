@@ -1884,7 +1884,7 @@ class PRMP_Window(PRMP_Widget):
     TKICON = ''
     PRMPICON = ''
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, **kwargs):
         
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
@@ -1921,10 +1921,15 @@ class PRMP_Window(PRMP_Widget):
         if be != None: bindExit = be
         if atb != None: addTitleBar = atb
         if asb != None: addStatusBar = asb
+        if b4t != None: bind4Theme = b4t
         
         if notResizable: resize = (0, 0)
         
         if bindExit: self.bindExit()
+
+        if bind4Theme:
+            self.bind('<Control-Up>', self.nextTheme)
+            self.bind('<Control-Down>', self.prevTheme)
 
         self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar, prmpIcon=prmpIcon, tkIcon=tkIcon, resize=resize)
         
@@ -1938,6 +1943,7 @@ class PRMP_Window(PRMP_Widget):
         self.bind('<Control-Z>', self.destroySelf)
 
         if grab: self.grab_set()
+        self.focus()
 
         self.after(100, self.loadAfters)
     
@@ -2334,12 +2340,12 @@ class PRMP_Window(PRMP_Widget):
             self._up.place(x=x-60, rely=0, relh=1, w=30)
             self._down.place(x=x-30, rely=0, relh=1, w=30)
 
-    def prevTheme(self):
+    def prevTheme(self, e=0):
         theme, index = self._prevTheme()
         self.editStatus(f'Theme({theme}) | Index({index})')
         self._colorize()
         
-    def nextTheme(self):
+    def nextTheme(self, e=0):
         theme, index = self._nextTheme()
         self.editStatus(f'Theme({theme}) | Index({index})')
         self._colorize()
