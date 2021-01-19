@@ -301,7 +301,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     
     @classmethod
     def getDayNum(cls, day):
-        error = cls.Errors(f'day must be among {cls.daysAbbrs} or {cls.daysNames}')
+        error = cls.Errors('day must be among {} or {}'.format(cls.daysAbbrs, cls.daysNames))
         if isinstance(day, str):
             if day in cls.daysAbbrs: dayNum = cls.daysAbbrs.index(day) + 1
             elif day in cls.daysNames: dayNum = cls.daysNames.index(day) + 1
@@ -312,7 +312,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     @classmethod
     def getDayName(cls, day, abbr=False):
         range_ = list(range(1, 31))
-        error = cls.Errors(f'day must be among {range_}')
+        error = cls.Errors('day must be among {}'.format(range_))
         if isinstance(day, int):
             if day in range_:
                 if abbr: dayName = cls.daysAbbrs[day - 1]
@@ -333,7 +333,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     
     @classmethod
     def getMonthNum(cls, month):
-        error = cls.Errors(f'month must be among {cls.monthsAbbrs} or {cls.monthsNames}')
+        error = cls.Errors(f'month must be among {} or {}'.format(cls.monthsAbbrs), cls.monthsNames)
         if isinstance(month, str):
             if month in cls.monthsAbbrs: monthNum = cls.monthsAbbrs.index(month)
             elif month in cls.monthsNames: monthNum = cls.monthsNames.index(month)
@@ -344,7 +344,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     @classmethod
     def getMonthName(cls, month, abbr=False):
         range_ = list(range(1, 12))
-        error = cls.Errors(f'month must be among {range_}')
+        error = cls.Errors('month must be among {}'.format(range_))
         if isinstance(month, int):
             if month in range_:
                 if abbr: monthName = cls.monthsAbbrs[month - 1]

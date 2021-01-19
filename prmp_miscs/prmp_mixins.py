@@ -1,5 +1,5 @@
 from .prmp_errors import PRMP_Errors
-import re, os
+import re, os, io
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
@@ -79,7 +79,7 @@ class PRMP_Mixins:
     @property
     def class_(self): return self.__class__
 
-    def attrError(self, attr): raise AttributeError(f'"{attr}" does not exist in {self}')
+    def attrError(self, attr): raise AttributeError('"{}" does not exist in {}'.format(attr, self))
 
     def getFromSelf(self, name, unget=None):
         ret = self.__dict__.get(name, unget)
@@ -92,7 +92,7 @@ class PRMP_Mixins:
                     return ret
         return unget
         
-    def printError(self, func, error): print(f"Errors from {self}->{func}: ", error)
+    def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
     
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
     
@@ -118,7 +118,7 @@ class PRMP_Mixins:
         except: return False
 
     @classmethod
-    def notImp(cls): raise NotImplementedError(f'A subclass of {cls} should call this method.')
+    def notImp(cls): raise NotImplementedError('A subclass of {} should call this method.'.format(cls))
 
     @property
     def className(self): return self.__class__.__name__
