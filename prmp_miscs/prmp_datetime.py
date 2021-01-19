@@ -333,7 +333,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     
     @classmethod
     def getMonthNum(cls, month):
-        error = cls.Errors(f'month must be among {} or {}'.format(cls.monthsAbbrs), cls.monthsNames)
+        error = cls.Errors('month must be among {} or {}'.format(cls.monthsAbbrs), cls.monthsNames)
         if isinstance(month, str):
             if month in cls.monthsAbbrs: monthNum = cls.monthsAbbrs.index(month)
             elif month in cls.monthsNames: monthNum = cls.monthsNames.index(month)

@@ -77,6 +77,9 @@ class PhotoViewer(PRMP_MainWindow):
         if not self._pixs: return
         self.index.set(self._index)
         self._current = self._pixs[self._index]
+        if not path.exists(self._current):
+            PRMP_MsgBox(self, title='Not Exist', message=f'{self._current} does not exist, try to reload the folder.', ask=0)
+            return
         current = path.basename(self._current)
         self.current.set(current)
         self.imageLabel.loadImage(self._current)
