@@ -8,7 +8,6 @@ class GaM_App(PRMP_MainWindow):
     def __init__(self, master=None, title='Goodness and Mercy', **kwargs):
         super().__init__(master, title=title, **kwargs)
         
-        
         self._setupApp()
 
         self.defaults()
@@ -381,9 +380,6 @@ class ManagerHome(TreeColumns, GaM_App):
     def selected(self, sub):
         self.subs.setColumns(self.columns(sub))
         self.subs.viewAll(obj=sub)
-
-
-
 
 
 

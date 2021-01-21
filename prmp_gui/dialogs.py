@@ -95,6 +95,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     def _placeSubmitButton(self):
         x, y = self.containerGeo
         self.submitBtn.place(x=(x/2)-30 , y=y-40, h=30, w=60)
+        
     def placeSubmitBtn(self, wh=0):
         if wh:
             self.bindCR()

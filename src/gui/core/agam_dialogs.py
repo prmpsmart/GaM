@@ -171,6 +171,34 @@ AccD = AccountDialog
 
 
 
+class StartDialog(GaM_Dialog):
+    TOPS = ['AGAM_Office', 'DC_Office', 'COOP_Office']
+    
+    def __init__(self, master=None, title='Start Dialog', **kwargs):
+        super().__init__(master, title=title, **kwargs)
+
+    def _setupDialog(self):
+
+        self.addSubmitButton()
+        self.submitBtn.config(command=self.action)
+        self._placeSubmitButton()
+
+        self.welcome = Label(self.container, text='Welcome to GaM Software, create the manager !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font='PRMP_FONT')
+        self.tops = LabelCombo(self.container, topKwargs=dict(text='Region'), bottomKwargs=dict(values=self.TOPS), place=dict(relx=.02, rely=.14, relw=.46, relh=.1), orient='h', longent=.4)
+    
+    def action(self):
+        pass
+
+
+
+
+
+
+
+
+
+
+
 
 
 
