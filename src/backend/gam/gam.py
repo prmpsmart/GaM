@@ -1,6 +1,7 @@
 from ..office.office_regions import OfficesManager, Region
 from .gam_accounts import GaMAccountsManager
 from ..core.regions_managers import Person, PersonsManager
+from ..gam_config import GaM_Settings
 
 class CEO(Person): Manager = 'CEOsManager'
 
@@ -11,7 +12,6 @@ class CEOsManager(PersonsManager):
 
 
 class GaM(Region):
-    GaMs = []
 
     SubRegionsManager = OfficesManager
     AccountsManager = GaMAccountsManager
@@ -19,8 +19,8 @@ class GaM(Region):
     
     def __init__(self, manager='GaM',  name='GaM', date=None):
         super().__init__(manager, name=name, date=date)
-        assert not len(GaM.GaMs), 'An Object of GaM is aready created.'
-        GaM.GaMs.append(self)
+        assert not GaM_Settings.GaM, 'An Object of GaM is aready created.'
+        GaM_Settings.GaM = self
     
     def __str__(self): return self.name
     

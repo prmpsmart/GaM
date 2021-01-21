@@ -1,5 +1,5 @@
 from .gam_extensions import *
-from ...backend.config import GaM_Settings, GaM
+from ...backend.gam.gam import GaM_Settings, GaM
 
 
 class GaM_Dialog(PRMP_Dialog):
@@ -177,8 +177,8 @@ class StartDialog(GaM_Dialog):
     
     def __init__(self, master=None, title='Start Dialog', **kwargs):
         
-        if not GaM.GaMs: GaM_Settings.GaM = self.GaM = GaM()
-        else: self.GaM = GaM.GaMs[0]
+        self.GaM = None
+        if GaM_Settings.GaM: self.GaM = GaM_Settings.GaM
         
         super().__init__(master, title=title, **kwargs)
 
@@ -188,11 +188,29 @@ class StartDialog(GaM_Dialog):
         self.submitBtn.config(command=self.action)
         self._placeSubmitButton()
 
-        self.welcome = Label(self.container, text='Welcome to GaM Software, create the manager !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font='PRMP_FONT')
-        self.tops = LabelCombo(self.container, topKwargs=dict(text='Region'), bottomKwargs=dict(values=self.TOPS), place=dict(relx=.02, rely=.14, relw=.46, relh=.1), orient='h', longent=.4)
-    
+        if self.GaM:
+            date = self.GaM.date.date
+
+        font = PRMP_Theme.PRMP_FONT.copy()
+        font['size'] = 15
+
+        self.welcome = PRMP_Label(self.container, text='Welcome to GaM Software, create the CEO details !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font=font)
+
+        self.ceo = PRMP_Button(self.container, text='Create CEO Details', place=dict(relx=.02, rely=.14, relw=.4, relh=.1))
+        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), bottomKwargs=dict(text=date), place=dict(relx=.02, rely=.26, relw=.4, relh=.1), orient='h', longent=.4)
+        self.uniqueID = UniqueID(self.container, obj=self.GaM, place=dict(relx=.02, rely=.38, relw=.4, relh=.1))
+
+        
+    def createGaM(self):
+        date = self.date.get()
+        self.GaM = GaM()
+
     def action(self):
         pass
+
+
+
+
 
 
 

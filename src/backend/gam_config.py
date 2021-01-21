@@ -1,4 +1,4 @@
-from .gam.gam import GaM
+# from .gam.gam import GaM
 
 class GaM_Settings:
     GaM = None
