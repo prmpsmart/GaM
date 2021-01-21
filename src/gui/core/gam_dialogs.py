@@ -1,4 +1,5 @@
-from .agam_extensions import *
+from .gam_extensions import *
+from ...backend.config import GaM_Settings, GaM
 
 
 class GaM_Dialog(PRMP_Dialog):
@@ -172,9 +173,13 @@ AccD = AccountDialog
 
 
 class StartDialog(GaM_Dialog):
-    TOPS = ['AGAM_Office', 'DC_Office', 'COOP_Office']
+    TOPS = ['GaM_Office', 'DC_Office', 'COOP_Office']
     
     def __init__(self, master=None, title='Start Dialog', **kwargs):
+        
+        if not GaM.GaMs: GaM_Settings.GaM = self.GaM = GaM()
+        else: self.GaM = GaM.GaMs[0]
+        
         super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):

@@ -419,7 +419,7 @@ class Object(CompareByNumber, ObjectsMixins):
         # self._uniqueID = sha224(self.id.encode()).hexdigest()
 
     @property
-    def id(self): return ''.join(self.spacedID.split(' | ')).replace('AGAM', 'A')
+    def id(self): return ''.join(self.spacedID.split(' | ')).replace('GaM', 'A')
     
     def delete(self, called=0):
         if self.next:

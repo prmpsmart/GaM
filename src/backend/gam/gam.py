@@ -1,5 +1,5 @@
 from ..office.office_regions import OfficesManager, Region
-from .agam_accounts import AGAMAccountsManager
+from .gam_accounts import GaMAccountsManager
 from ..core.regions_managers import Person, PersonsManager
 
 class CEO(Person): Manager = 'CEOsManager'
@@ -10,13 +10,17 @@ class CEOsManager(PersonsManager):
     def createCEO(self, **kwargs): return self.createPerson(**kwargs)
 
 
-class AGAM(Region):
+class GaM(Region):
+    GaMs = []
+
     SubRegionsManager = OfficesManager
-    AccountsManager = AGAMAccountsManager
+    AccountsManager = GaMAccountsManager
     PersonsManager = CEOsManager
     
-    def __init__(self, manager='AGAM',  name='AGAM', date=None):
+    def __init__(self, manager='GaM',  name='GaM', date=None):
         super().__init__(manager, name=name, date=date)
+        assert not len(GaM.GaMs), 'An Object of GaM is aready created.'
+        GaM.GaMs.append(self)
     
     def __str__(self): return self.name
     

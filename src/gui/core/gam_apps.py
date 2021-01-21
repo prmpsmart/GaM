@@ -1,4 +1,4 @@
-from .agam_dialogs import *
+from .gam_dialogs import *
 # from ...backend.core.bases import ObjectsManager
 from ...backend.dc.dc_specials import *
 

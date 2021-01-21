@@ -2,7 +2,7 @@ from prmp_gui.extensions import *
 from prmp_gui.two_widgets import *
 from prmp_gui.dialogs import *
 from prmp_miscs.prmp_datetime import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
-from ...backend.agam.agam import AGAM
+from ...backend.gam.gam import GaM
 from ...backend.dc.dc_regions import *
 
 
@@ -16,7 +16,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
     from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog
 
-    from .agam_apps import RegionHome, AccountHome, ManagerHome
+    from .gam_apps import RegionHome, AccountHome, ManagerHome
 
     # print(obj)
 
@@ -384,7 +384,7 @@ class RegionDetails(PRMP_FillWidgets, LabelFrame):
         co = 0
 
         for h in hie:
-            if isinstance(h, AGAM):
+            if isinstance(h, GaM):
                 co += 1
                 continue
             ind = hie.index(h)
@@ -418,7 +418,7 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
         self.sns = None
         self.objdet = None
 
-        from .agam_apps import SortNSearch, ManagerHome
+        from .gam_apps import SortNSearch, ManagerHome
 
         self.SNS = SortNSearch
         self.MAN = ManagerHome
