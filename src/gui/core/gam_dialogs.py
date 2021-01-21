@@ -170,8 +170,6 @@ class AccountDialog(GaM_Dialog):
         self.destroyDialog()
 AccD = AccountDialog
 
-
-
 class StartDialog(GaM_Dialog):
     TOPS = ['GaM_Office', 'DC_Office', 'COOP_Office']
     
@@ -190,26 +188,43 @@ class StartDialog(GaM_Dialog):
 
         if self.GaM:
             date = self.GaM.date.date
+        else:
+            date = ''
 
         font = PRMP_Theme.PRMP_FONT.copy()
         font['size'] = 15
 
         self.welcome = PRMP_Label(self.container, text='Welcome to GaM Software, create the CEO details !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font=font)
 
-        self.ceo = PRMP_Button(self.container, text='Create CEO Details', place=dict(relx=.02, rely=.14, relw=.4, relh=.1))
+        self.create = PRMP_Button(self.container, text='Create GaM', place=dict(relx=.02, rely=.14, relw=.4, relh=.1), command=self.createGaM)
+        self.ceo = PRMP_Button(self.container, text='CEO Details', place=dict(relx=.48, rely=.14, relw=.32, relh=.1), command=self.openCEODetail)
         self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), bottomKwargs=dict(text=date), place=dict(relx=.02, rely=.26, relw=.4, relh=.1), orient='h', longent=.4)
         self.uniqueID = UniqueID(self.container, obj=self.GaM, place=dict(relx=.02, rely=.38, relw=.4, relh=.1))
 
-        
+
     def createGaM(self):
+        if self.GaM: PRMP_MsgBox(self, message='A GaM object already existed.', title='GaM Error', ask=0)
+        else: PRMP_MsgBox(self, message='Are you sure to create a GaM object?', title='GaM creation confirmation', callback=self._createGaM)
+
+    def _createGaM(self, e=0):
+        if not e: return
         date = self.date.get()
         self.GaM = GaM()
+        self.uniqueID.obj = self.GaM
+        PRMP_MsgBox(self, message='GaM Object created successfully, update the CEO\'s details using the CEO details button.', title='GaM creation successful.', ask=0)
+
+    def openCEODetail(self):
+        if not self.GaM:
+            PRMP_MsgBox(self, message='No GaM object created', title='GaM Error', ask=0)
+            return
+        personsManager = self.GaM.personsManager
+        if len(personsManager): dic = dict(person=personsManager[-1])
+        else: dic = dict(manager=personsManager)
+
+        PersonDialog(self, **dic)
 
     def action(self):
         pass
-
-
-
 
 
 
