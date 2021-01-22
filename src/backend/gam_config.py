@@ -1,4 +1,5 @@
 # from .gam.gam import GaM
+import pickle
 
 class GaM_Settings:
     GaM = None

@@ -942,6 +942,11 @@ class PRMP_Input:
         self.insert(0, str(values))
         self.verify()
     
+    def setReadonlyValue(self, values):
+        self.normal()
+        self.set(values)
+        self.readonly()
+    
     def _clear_placeholder(self, e=0):
         if self._get() == self.placeholder: self.clear()
 

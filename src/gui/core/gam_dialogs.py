@@ -13,13 +13,16 @@ class PersonDialog(GaM_Dialog):
         self.person = person
         
         if person: title = f'{person.master.className} {title}'
+        values = person or values
         
-        super().__init__(master=master, title=title, geo=geo, values=person if person else values, **kwargs)
+
+        super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
 
     def _setupDialog(self):
-        name = self.values.get('name')
-        if name: self.setTitle(name)
         
+        # name = self.values.get('name')
+        # if name: self.setTitle(name)
+
         self.addEditButton()
         
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
@@ -47,9 +50,10 @@ class PersonDialog(GaM_Dialog):
             elif self.manager: PRMP_MsgBox(self, title='Person Creation', message='Are you sure to create a new person?', _type='question', callback=self.newPerson)
             else: PRMP_MsgBox(self, title='Person Dialog Error', message='No Person or Manager is given.', _type='error', ask=0)
 
-
     def updatePerson(self, w):
-        if w: self.person.update(self.result)
+        if w:
+            self.person.update(self.result)
+            self._setResult(self.person)
         self.destroyDialog()
 
     def newPerson(self, w):
@@ -176,7 +180,11 @@ class StartDialog(GaM_Dialog):
     def __init__(self, master=None, title='Start Dialog', **kwargs):
         
         self.GaM = None
-        if GaM_Settings.GaM: self.GaM = GaM_Settings.GaM
+        self.CEO = None
+
+        if GaM_Settings.GaM:
+            self.GaM = GaM_Settings.GaM
+            self.CEO = self.GaM.person
         
         super().__init__(master, title=title, **kwargs)
 
@@ -188,30 +196,39 @@ class StartDialog(GaM_Dialog):
 
         if self.GaM:
             date = self.GaM.date.date
-        else:
-            date = ''
+            uniqueID = self.GaM.uniqueID
+        else: uniqueID = date = ''
 
         font = PRMP_Theme.PRMP_FONT.copy()
         font['size'] = 15
 
         self.welcome = PRMP_Label(self.container, text='Welcome to GaM Software, create the CEO details !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font=font)
+        
+        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), bottomKwargs=dict(text=date), place=dict(relx=.02, rely=.14, relw=.4, relh=.1), orient='h', longent=.4)
 
-        self.create = PRMP_Button(self.container, text='Create GaM', place=dict(relx=.02, rely=.14, relw=.4, relh=.1), command=self.createGaM)
-        self.ceo = PRMP_Button(self.container, text='CEO Details', place=dict(relx=.48, rely=.14, relw=.32, relh=.1), command=self.openCEODetail)
-        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), bottomKwargs=dict(text=date), place=dict(relx=.02, rely=.26, relw=.4, relh=.1), orient='h', longent=.4)
-        self.uniqueID = UniqueID(self.container, obj=self.GaM, place=dict(relx=.02, rely=.38, relw=.4, relh=.1))
+        self.create = PRMP_Button(self.container, text='Create GaM', place=dict(relx=.02, rely=.26, relw=.4, relh=.1), command=self.createGaM)
+        self.ceo = PRMP_Button(self.container, text='CEO Details', place=dict(relx=.48, rely=.26, relw=.32, relh=.1), command=self.openCEODetail)
+        # self.uniqueID = UniqueID(self.container, obj=self.GaM, place=dict(relx=.02, rely=.38, relw=.4, relh=.1))
+        self.uniqueID = LabelEntry(self.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.1, rely=.6, relw=.8, relh=.25), bottomKwargs=dict(state='readonly'))
+        self.uniqueID.set(uniqueID)
+
 
 
     def createGaM(self):
-        if self.GaM: PRMP_MsgBox(self, message='A GaM object already existed.', title='GaM Error', ask=0)
-        else: PRMP_MsgBox(self, message='Are you sure to create a GaM object?', title='GaM creation confirmation', callback=self._createGaM)
+        if self.GaM: PRMP_MsgBox(self, message='A GaM object already existed.', title='GaM Error', ask=0, _type='error')
+        else: PRMP_MsgBox(self, message='Are you sure to create a GaM object?', title='GaM creation confirmation', callback=self._createGaM, _type='question')
 
     def _createGaM(self, e=0):
         if not e: return
         date = self.date.get()
-        self.GaM = GaM()
-        self.uniqueID.obj = self.GaM
-        PRMP_MsgBox(self, message='GaM Object created successfully, update the CEO\'s details using the CEO details button.', title='GaM creation successful.', ask=0)
+        if not date:
+            PRMP_MsgBox(self, title='Date Error', message='Please choose a date.', ask=0, _type='error')
+            return
+        self.GaM = GaM(date=date)
+        
+        self.uniqueID.B.setReadonlyValue(self.GaM.uniqueID)
+
+        PRMP_MsgBox(self, message='GaM Object created successfully, update the CEO\'s details using the CEO details button.', title='GaM creation successful.', ask=0, _type='info')
 
     def openCEODetail(self):
         if not self.GaM:
@@ -221,7 +238,10 @@ class StartDialog(GaM_Dialog):
         if len(personsManager): dic = dict(person=personsManager[-1])
         else: dic = dict(manager=personsManager)
 
-        PersonDialog(self, **dic)
+        PersonDialog(self, title='CEO Details', callback=self.setCEO, **dic)
+    
+    def setCEO(self, ceo):
+        if not self.CEO: self.CEO = ceo
 
     def action(self):
         pass
