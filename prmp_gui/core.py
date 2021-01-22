@@ -923,7 +923,7 @@ class PRMP_Input:
         else:
             self.clear()
             self.set(self._moneySign)
-    
+
     def normal(self):
         super().normal()
         self.verify()
@@ -1724,12 +1724,12 @@ class PRMP_LabelFrame(PRMP_, tk.LabelFrame):
     def PRMP_WIDGET(self): return 'LabelFrame'
 LabelFrame = PLF = PRMP_LabelFrame
 
-class PRMP_Menubutton(PRMP_, tk.Scrollbar):
+class PRMP_Menubutton(PRMP_, tk.Menubutton):
     
     def __init__(self, master=None, config={}, **kwargs):
-        tk.Scrollbar.__init__(self, master, **config)
+        tk.Menubutton.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
-Scrollbar = PM = PRMP_Menubutton
+Menubutton = PM = PRMP_Menubutton
 
 class PRMP_OptionMenu(PRMP_, tk.OptionMenu):
     
@@ -1899,10 +1899,12 @@ class PRMP_Window(PRMP_Widget):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
 
+        self.toggleMenuBar = False
         self.container = None
         self.zoomed = False
         self.iconed = False
         self.titleBar = None
+        self.menuBar = None
         self.statusBar = None
         self.side = side
         self.titleText = title
@@ -2275,10 +2277,23 @@ class PRMP_Window(PRMP_Widget):
         self._icon = L(fr)
 
         self.titleBar = L(fr, config=dict( text=title or self.titleText), font='DEFAULT_TITLE_FONT', relief='groove')
-        self.titleBar.bind('<Double-1>', self.maximize, '+')
-        self.titleBar._moveroot()
+        self.menuBar = F(fr)
+
+        for bar in [self.titleBar, self.menuBar]:
+            bar.bind('<Double-1>', self.maximize, '+')
+            bar._moveroot()
+            bar.bind('<3>', self.switchMenu)
+            
+        self.placeTitlebar()
+    
+    def switchMenu(self, e=None):
+        if e.widget == self.titleBar: self.toggleMenuBar = True
+        else: self.toggleMenuBar = False
 
         self.placeTitlebar()
+    
+    def addToMenu(self, widget, **kwargs):
+        if self.menuBar: self.menuBar.addWidget(widget, **kwargs)
     
     def destroySelf(self, e=0):
         self.closing()
@@ -2304,6 +2319,11 @@ class PRMP_Window(PRMP_Widget):
             x = self.titleBar.master.winfo_width()
             xw = self.titleBar.master.master.winfo_width()
             self.titleBar.master.place(x=0, rely=0, h=30, w=xw)
+            
+            if self.toggleMenuBar: bar, unbar = self.menuBar, self.titleBar
+            else: unbar, bar = self.menuBar, self.titleBar
+
+            
             if x < 0: return
             w = 30
             if not self.__r:
@@ -2311,7 +2331,8 @@ class PRMP_Window(PRMP_Widget):
                 self._max.place(x=x-60, rely=0, relh=1, w=30)
                 w = 90
             self._icon.place(x=0, rely=0, relh=1, w=30)
-            self.titleBar.place(x=30, rely=0, relh=1, w=x-w-30)
+            bar.place(x=30, rely=0, relh=1, w=x-w-30)
+            unbar.place_forget()
             self._exit.place(x=x-30, rely=0, relh=1, w=30)
 
     def editStatus(self, text):

@@ -229,7 +229,7 @@ class SortNSearch(GaM_App):
 
 
 
-class Home(GaM_App):
+class ObjectHome(GaM_App):
     
     def __init__(self, master=None, geo=(1500, 800), title='Home', obj=None, **kwargs):
         self.obj = obj
@@ -264,7 +264,7 @@ class Home(GaM_App):
 
 
 
-class RegionHome(Home):
+class RegionHome(ObjectHome):
 
     def __init__(self, master=None, title='Region Home', region=None, **kwargs):
 
@@ -286,7 +286,7 @@ class RegionHome(Home):
             self.accounts.set(region.accounts)
 
 
-class AccountHome(Home):
+class AccountHome(ObjectHome):
     
     def __init__(self, master=None, title='Account Home', account=None, **kwargs):
 
@@ -383,6 +383,12 @@ class ManagerHome(TreeColumns, GaM_App):
 
 
 
+class Home(GaM_App):
 
+    def __init__(self, title='Goodness and Mercy.', geo=(1000, 700), **kwargs):
+        super().__init__(title=title, geo=geo, **kwargs)
+        
+
+        self.mainloop()
 
 
