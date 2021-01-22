@@ -388,7 +388,11 @@ class Home(GaM_App):
     def __init__(self, title='Goodness and Mercy.', geo=(1000, 700), **kwargs):
         super().__init__(title=title, geo=geo, **kwargs)
         
+        self.setMenus()
 
         self.mainloop()
+    
+    def setMenus(self):
+        
 
 
