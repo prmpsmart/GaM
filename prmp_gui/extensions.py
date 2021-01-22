@@ -123,6 +123,9 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 if verify:
                     if verify(): result[widgetName] = get
                     else:
+                        try: wid.flash()
+                        except: pass
+                        
                         from .dialogs import PRMP_MsgBox
                         PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()}* is required to proceed!', _type='error', okText='Understood')
                         return

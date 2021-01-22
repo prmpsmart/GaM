@@ -267,6 +267,8 @@ class DailyContributionDailog(PRMP_Dialog):
             PRMP_MsgBox(self, title='Removed Successful.', message=f'Thrift No. {get} has been successfully removed. ', ask=0, _type='info')
 
     def addThrift(self, e=0):
+        # self.month.B.flash()
+        # return
         if not self.editBtn.get(): return
         if e and (e.widget in [self.ledgerNumber.B, self.account.B, self.contributed.B]): return
 
