@@ -249,25 +249,33 @@ class PRMP_ImageDialog(PRMP_Dialog):
         self.destroyDialog()
 
 
-class Splash(PRMP_Toplevel):
+class Splash(PRMP_Dialog):
     def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), callback=None, title='Goodness and Mercy', **kwargs):
-        super().__init__(master, atb=atb, asb=asb, ntb=ntb, geo=geo, title=title, **kwargs)
 
-        self.callback = callback
+        self.prmpImage = prmpImage
+
+        super().__init__(master, atb=atb, asb=asb, ntb=ntb, geo=geo, title=title, editable=0, callback=callback, **kwargs)
+    
+    def _setupDialog(self):
+        asb = self.addStatusBar
         if asb: cont = self.container
         else:
             cont = self
             self.container.place_forget()
-        self.image = PRMP_ImageLabel(cont, prmpImage=prmpImage, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=geo)
-        self.image.unbind('<3>')
-        self.image.unbind('<Double-1>')
+        self.image = PRMP_ImageLabel(cont, prmpImage=self.prmpImage, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=self.geo)
 
         self.load = PRMP_ImageLabel(cont, prmpImage='line_boxes', place=dict(relx=0, rely=.9, relw=1, relh=.1), inbuiltKwargs=dict(inbuilt=1, inExt='gif'), resize=(280, 50))
+        
+        # self.attributes('-alpha', .4)
+    def set(self): pass
+    
+    def defaults(self):
+        self.image.unbind('<3>')
+        self.image.unbind('<Double-1>')
         self.load.unbind('<3>')
         self.load.unbind('<Double-1>')
-        
         self.after(10, self.processCallback)
-        # self.attributes('-alpha', .4)
+
     
     def processCallback(self):
         if self.callback: self.callback(self.recieveCallbackResponse)

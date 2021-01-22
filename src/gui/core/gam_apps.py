@@ -396,11 +396,10 @@ class Home(GaM_App):
     
     def setMenus(self):
         self.menu = Menu(self.menuBar, config=dict(tearoff=0))
-        self.menuFile = Menubutton(self.menuBar, config=dict(menu=self.menu, text="Dailies"), place=dict(relx=0, rely=.05, relw=.07, relh=.9), font='PRMP_FONT', relief='flat')
+        self.menuFile = Menubutton(self.menuBar, config=dict(menu=self.menu, text="Dailies", style='Window.TMenubutton'), place=dict(relx=0, rely=.05, relw=.1, relh=.9), font='PRMP_FONT', relief='flat')
 
-        # self.menuFile["menu"] = self.menu
-        print(self.menu)
-        
         self.menu.add_radiobutton(label='File')
+
+        # print(self.STYLE.layout('TMenubutton'))
 
 

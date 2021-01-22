@@ -1422,6 +1422,24 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     'background': background
                 }
             },
+            'TMenubutton': {
+                'configure': {
+                    'relief': 'flat'
+                },
+                'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.indicator', {'side': 'right', 'sticky': ''}), ('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
+            },
+            'Window.TMenubutton': {
+                'configure': {
+                    'relief': 'flat'
+                },
+                'mapping': {
+                    'relief': [('hover', 'sunken')],
+                    'backgound': [('hover', foreground)],
+                    'foregound': [('hover', background)]
+                },
+                # 'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.indicator', {'side': 'right', 'sticky': ''}), ('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
+                'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
+            },
             'TPanedwindow': {
                 '': ''
             },
@@ -1731,11 +1749,11 @@ class PRMP_Menu(PRMP_, tk.Menu):
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
 Menu = PM = PRMP_Menu
 
-class PRMP_Menubutton(PRMP_, tk.Menubutton):
+class PRMP_Menubutton(PRMP_Style_, ttk.Menubutton):
     
     def __init__(self, master=None, config={}, **kwargs):
-        tk.Menubutton.__init__(self, master, **config)
-        PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
+        ttk.Menubutton.__init__(self, master, **config)
+        PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
 Menubutton = PM = PRMP_Menubutton
 
 class PRMP_OptionMenu(PRMP_, tk.OptionMenu):
@@ -1896,7 +1914,7 @@ class PRMP_Window(PRMP_Widget):
     TKICON = ''
     PRMPICON = ''
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, **kwargs):
         
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
@@ -1906,7 +1924,6 @@ class PRMP_Window(PRMP_Widget):
         
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
 
-        self.toggleMenuBar = False
         self.container = None
         self.zoomed = False
         self.iconed = False
@@ -1936,7 +1953,9 @@ class PRMP_Window(PRMP_Widget):
         if atb != None: addTitleBar = atb
         if asb != None: addStatusBar = asb
         if b4t != None: bind4Theme = b4t
+        if tbm != None: toggleMenuBar = tbm
         
+        self.toggleMenuBar = toggleMenuBar
         if notResizable: resize = (0, 0)
         
         if bindExit: self.bindExit()

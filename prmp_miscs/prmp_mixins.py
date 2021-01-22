@@ -1,3 +1,5 @@
+#! unicode *
+
 from .prmp_errors import PRMP_Errors
 import re, os, io
 
