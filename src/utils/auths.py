@@ -341,7 +341,3 @@ class Authorisation(Auths_Vars):
     @classmethod
     def get_text_permission_from_bool(cls, admin): return cls.get_permission(admin)[1]
 
-
-
-
-

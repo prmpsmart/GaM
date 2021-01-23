@@ -102,7 +102,7 @@ class Daily_Workbook:
                     self.dd.write(J, data[9])
                     self.dd.write(K, data[10])
                     count += 1
-        
+
 
 
 
