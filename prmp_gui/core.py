@@ -1430,7 +1430,8 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
             },
             'Window.TMenubutton': {
                 'configure': {
-                    'relief': 'flat'
+                    'relief': 'flat',
+                    'overrelief': 'groove'
                 },
                 'mapping': {
                     'relief': [('hover', 'sunken')],
@@ -2587,6 +2588,7 @@ class PRMP_TreeView(PRMP_Frame):
     
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, **kwargs)
+
         self.treeview = None
         self.xscrollbar = None
         self.yscrollbar = None
@@ -2662,7 +2664,7 @@ class PRMP_TreeView(PRMP_Frame):
             self.heading(column.index, text=column.text, anchor='center')
             self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
     
-    def _set(self, obj=None, parent='', subs='subs', op=False):
+    def _set(self, obj=None, parent='', subs='subs', op=1):
         name, *columns = self.columns.get(obj)
         tag = 'prmp'
         
@@ -2693,7 +2695,7 @@ class PRMP_TreeView(PRMP_Frame):
         self.ivd = self.itemsValuesDict = {}
         
     
-    def set(self, obj, op=0):
+    def set(self, obj, op=1):
         self.setColumns()
         self.clear()
         if obj:

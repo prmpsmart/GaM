@@ -10,6 +10,7 @@ class PersonDialog(GaM_Dialog):
     def __init__(self, master=None, title='Person Dialog', person=None, manager=None, geo=(550, 390), values={}, **kwargs):
 
         self.manager = manager
+        print(manager)
         self.person = person
         
         if person: title = f'{person.master.className} {title}'
@@ -167,7 +168,7 @@ class AccountDialog(GaM_Dialog):
                 account = self.manager.createAccount(**self.result)
                 self._setResult(account)
             except Exception as error:
-                print(error)
+                # print(error)
                 font = self.DEFAULT_FONT.copy()
                 font['size'] = 15
                 PRMP_MsgBox(self, title='Account Creation Error', message=error, _type='error', ask=0, msgFont=font)

@@ -1,7 +1,9 @@
-#! unicode *
+# for python 2
+#  -*- coding: utf-8 -*-
 
 from .prmp_errors import PRMP_Errors
 import re, os, io
+py = os.sys.version_info[0]
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
@@ -14,27 +16,33 @@ class PRMP_Mixins:
     _center = 'center'
     _sides = [_top, _left, _right, _bottom, _center]
 
+
     _both = '◄►'
     _next = '►'
     _previous = '◄'
     _forward = '⏭'
     _backward = '⏮'
     
-    upArrow = chr(11014)
-    downArrow = chr(11015)
-    x_btn1 = chr(10060)
-    x_btn2 = chr(10062)
-    
-    max_ = chr(9645)
-    min_ = chr(10134)
-    
-    containers = list, set, tuple
-    naira = chr(8358)
     dollar = chr(36)
     euro = chr(163)
     yen = chr(165)
-    _moneySign = naira + chr(32)
+    _moneySign = dollar + chr(32)
+
+    if py == 3:
+        upArrow = chr(11014)
+        downArrow = chr(11015)
+        x_btn1 = chr(10060)
+        x_btn2 = chr(10062)
+        
+        max_ = chr(9645)
+        min_ = chr(10134)
+    
+        naira = chr(8358)
+        _moneySign = naira + chr(32)
+        
+
     Errors = PRMP_Errors
+    containers = list, set, tuple
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
     
     @property
@@ -143,7 +151,7 @@ class PRMP_Mixins:
     
     def testPrint(self, *args):
         print()
-        for a in args: print(a, end='=')
+        for a in args: print(a, '=')
         print()
     
     def __bool__(self): return True

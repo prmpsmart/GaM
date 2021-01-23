@@ -47,7 +47,7 @@ class ClientDialog(PersonDialog):
             elif self.manager and PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question').result == True: client = self.manager.createClient(**result)
 
 
-        print(result)
+        # print(result)
 
 
 class ClientAccountDialog(AccountDialog):
@@ -260,7 +260,7 @@ class DailyContributionDailog(PRMP_Dialog):
     def _deleteThrift(self, w):
         if w:
             get = self.getDel()
-            print(get)
+            # print(get)
             self.dcContrib.removeSubByIndex(get - 1)
             
             self.update()

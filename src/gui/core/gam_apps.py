@@ -282,8 +282,8 @@ class RegionHome(ObjectHome):
         self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
 
         if region:
-            self.subRegions.set(region.subRegions)
-            self.accounts.set(region.accounts)
+            self.subRegions.set(region.subRegions, showAttr='name')
+            self.accounts.set(region.accounts, showAttr='name')
 
 
 class AccountHome(ObjectHome):
@@ -302,7 +302,7 @@ class AccountHome(ObjectHome):
 
         self.recordsManagers = SubsList(self.container, text='Records Managers', place=dict(relx=.005, rely=.15, relh=.6, relw=.24))
 
-        if account: self.recordsManagers.set(account)
+        if account: self.recordsManagers.set(account, showAttr='name')
     def openManager(self):
         if self._manager: openCores(self._manager, edit=0)
 
@@ -395,11 +395,33 @@ class Home(GaM_App):
         self.mainloop()
     
     def setMenus(self):
-        self.menu = Menu(self.menuBar, config=dict(tearoff=0))
-        self.menuFile = Menubutton(self.menuBar, config=dict(menu=self.menu, text="Dailies", style='Window.TMenubutton'), place=dict(relx=0, rely=.05, relw=.1, relh=.9), font='PRMP_FONT', relief='flat')
 
-        self.menu.add_radiobutton(label='File')
+        self.viewMenu = None # search, details
+        self.settingsMenu = None # load, save, security, theme, plot color, save path
 
-        # print(self.STYLE.layout('TMenubutton'))
+        self.viewMenu = Menu(config=dict(tearoff=0))
+        view = [dict(label='Search'), dict(label='Details')]
+        for vie in view: self.viewMenu.add_command(**vie)
+
+        self.settingsMenu = Menu(config=dict(tearoff=0))
+        settings = [dict(label='Load'), dict(label='Save'), dict(label='Security'), dict(label='Others')]
+        for sett in settings: self.settingsMenu.add_command(**sett)
+
+        self.helpMenu = Menu(config=dict(tearoff=0))
+        help_ = [dict(label='Welcome'), dict(label='Documentation'), dict(label='Keyboard Shortcuts Reference'), dict(label='About')]
+        for hel in help_: self.helpMenu.add_command(**hel)
+
+        Menubutton(self.menuBar, config=dict(menu=self.viewMenu, text="View", style='Window.TMenubutton'), place=dict(relx=.005, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
+        Menubutton(self.menuBar, config=dict(menu=self.settingsMenu, text="Settings", style='Window.TMenubutton'), place=dict(relx=.05, rely=.05, relw=.065, relh=.9), font='PRMP_FONT', relief='flat')
+        Menubutton(self.menuBar, config=dict(menu=self.helpMenu, text="Help", style='Window.TMenubutton'), place=dict(relx=.115, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
+
+
+
+
+
+
+
+
+
 
 

@@ -156,8 +156,18 @@ RRC = RegionRadioCombo
 
 class Hierachy(PRMP_TreeView):
     
-    # def __init__(self, master=None, columns=[], **kwargs):
-    #     super().__init__(master=master, columns=columns, **kwargs)
+    def __init__(self, master=None, columns=[], toggleOpen=True, **kwargs):
+        super().__init__(master=master, columns=columns, **kwargs)
+
+        self._toggleOpen = False
+        if toggleOpen:
+            self.bind('<Control-o>', self.toggleOpen)
+            self.bind('<Control-O>', self.toggleOpen)
+    
+    def toggleOpen(self, e=0):
+        print(e)
+        if self._toggleOpen: self._toggleOpen = False
+        else: self._toggleOpen = True
     
     def bindings(self):
         super().bindings()
@@ -176,7 +186,7 @@ class Hierachy(PRMP_TreeView):
         else:
             raw = self.columns.get(obj)
             first, *columns = raw
-            item = self.insert(parent, text=first, values=columns)
+            item = self.insert(parent, text=first, values=columns, open=self._toggleOpen)
             # print(columns)
             self.ivd[item] = obj
             subs = []
@@ -202,8 +212,6 @@ class Hierachy(PRMP_TreeView):
         self._viewAll(obj, parent)
         
     def viewSubs(self, obj): self.viewAll(obj[:])
-
-
 H = Hierachy
 
 

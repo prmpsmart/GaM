@@ -20,6 +20,7 @@ class DC_RegionHome(TreeColumns, RegionHome):
         self.subRegions.callback = self.selectedSubRegion
         self.accounts.callback = self.selectedAccount
         addNote(self)
+
         if self.region:
             self.selected(self.region)
             self.overview.updateDCDigits(self.region.lastAccount)

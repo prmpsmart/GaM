@@ -196,7 +196,7 @@ class DC_Overview(Frame):
     def next(self):
         if not self.account: return
         _next = self.account.next
-        print(_next)
+        # print(_next)
         if _next: self.updateDCDigits(_next)
 
     def prev(self):
