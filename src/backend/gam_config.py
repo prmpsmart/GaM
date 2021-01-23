@@ -14,8 +14,10 @@ class GaM_Settings:
 
     @classmethod
     def loadAll(cls):
-        # cls.loadDatas()
-        # cls.loadOtherDatas()
+        try:
+            cls.loadDatas()
+            cls.loadOtherDatas()
+        except: pass
 
         PRMP_Theme.setThemeIndex(cls.ThemeIndex)
     
