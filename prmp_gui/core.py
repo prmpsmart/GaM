@@ -462,6 +462,8 @@ class PRMP_Theme(PRMP_Mixins):
         self._paintAll()
     
     @classmethod
+    def currentThemeIndex(cls): return list(cls.THEMES_DICTS.keys()).index(cls.CURRENT_THEME)
+    @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
 
 PTh = PRMP_Theme
