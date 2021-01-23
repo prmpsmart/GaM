@@ -2,8 +2,6 @@
 import pickle, os, io, zlib, threading
 from prmp_gui.core import PRMP_Theme
 
-PRMP_Theme.setThemeIndex(78)
-
 
 class GaM_Settings:
     TOP = None
@@ -18,10 +16,10 @@ class GaM_Settings:
 
     @classmethod
     def loadAll(cls):
-        try:
-            cls.loadDatas()
-            cls.loadOtherDatas()
-        except Exception as e: print(e)
+        # try:
+        cls.loadDatas()
+        cls.loadOtherDatas()
+        # except Exception as e: print(e)
 
         PRMP_Theme.setThemeIndex(cls.ThemeIndex)
 
@@ -43,7 +41,7 @@ class GaM_Settings:
     @classmethod
     def decompress(cls, file):
         compData = open(file, 'rb').read()
-        data = zlib.decompress(data)
+        data = zlib.decompress(compData)
         return data
 
     @classmethod
@@ -62,7 +60,7 @@ class GaM_Settings:
     def loadOtherDatas(cls):
         dataBytes = cls.decompress(cls.otherDataPath)
         data = pickle.loads(dataBytes)
-        GaM_Settings.__dict__.update(data)
+        for k, v in data.items(): setattr(GaM_Settings, k, v)
         # saveDir
         # auths
         pass
@@ -71,6 +69,11 @@ class GaM_Settings:
         data = dict(SaveDir=GaM_Settings.SaveDir, ThemeIndex=PRMP_Theme.currentThemeIndex())
         dataBytes = pickle.dumps(data)
         cls.compress(dataBytes, cls.otherDataPath)
+
+    @classmethod
+    def threadLoad(cls): cls.usingThread(cls.loadAll)
+    @classmethod
+    def threadSave(cls): cls.usingThread(cls.saveAll)
 
     @classmethod
     def usingThread(cls, func, *args, **kwargs):

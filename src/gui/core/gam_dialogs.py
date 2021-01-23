@@ -328,7 +328,12 @@ class Office_StartDialog(StartDialog):
         super()._createTOP(1)
 
 
-
+class DCOffice_StartDialog(Office_StartDialog):
+    
+    def _createOFFICE(self, result=0):
+        if not result: return
+        self.Top = self.TOP(result['name'], **result).dcOffice
+        super()._createTOP(1)
 
 
 
