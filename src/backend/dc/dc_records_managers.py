@@ -21,7 +21,6 @@ class DCRecordsManager(RecordsManager):
     def removeRecord(self, rec, called=0):
         super().removeRecord(rec)
         if called == 0: self.balance()
-        
 
 class Rates(DCRecordsManager):
     ObjectType = Rate
@@ -162,7 +161,7 @@ class Debits(DCRecordsManager):
                 return debRec 
 
             else: raise DCErrors.BalancesError(f'Amount {toDebit} to debit is more than balance of {balance}')
-   
+
 class Deficits(DCRecordsManager):
     ObjectType = Deficit
 

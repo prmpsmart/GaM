@@ -1,5 +1,7 @@
 from .gam_extensions import *
-from ...backend.gam.gam import GaM_Settings, GaM
+from ...backend.gam.gam import GaM_Settings, GaM, Region
+from ...backend.office.office_regions import Office
+
 
 
 class GaM_Dialog(PRMP_Dialog):
@@ -40,9 +42,9 @@ class PersonDialog(GaM_Dialog):
         
         self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41))
 
-        self.regDate = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
+        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
 
-        self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
+        self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'date'])
 
     def action(self):
         if self.result:
@@ -175,19 +177,75 @@ class AccountDialog(GaM_Dialog):
         self.destroyDialog()
 AccD = AccountDialog
 
-class StartDialog(GaM_Dialog):
-    TOPS = ['GaM_Office', 'DC_Office', 'COOP_Office']
+class OfficeDialog(GaM_Dialog):
     
-    def __init__(self, master=None, title='Start Dialog', **kwargs):
+    def __init__(self, master=None, title='Office Dialog', office=None, manager=None, geo=(300, 300), values={}, first=False, **kwargs):
+
+        self.first = first
+        self.manager = manager
+        self.office = office
+        if office: title = f'{office.master.className} {title}'
         
-        self.GaM = None
-        self.CEO = None
+        super().__init__(master=master, title=title, geo=geo, values=office if office else values, **kwargs)
+    
+    def _setupDialog(self):
+        name = self.values.get('name')
+        if name: self.setTitle(name)
+        
+        self.addEditButton()
+        
+        self.name = LabelEntry(self.container, topKwargs=dict(config=dict(text='Name')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(very=1))
+        self.location = LabelEntry(self.container, topKwargs=dict(config=dict(text='Location')), place=dict(relx=.005, y=60, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(very=1))
+        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.005, y=130, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(very=1))
+
+        self.addResultsWidgets(['date', 'location', 'name'])
+    
+    def action(self):
+        if self.result:
+
+            if self.office: PRMP_MsgBox(self, title='Edit Office Details', message='Are you sure to edit the details of this office?', _type='question', callback=self.updateOffice)
+        
+            elif self.manager: PRMP_MsgBox(self, title='Office Creation', message='Are you sure to create a new office?', _type='question', callback=self.newOffice)
+            else:
+                if self.first: self.destroyDialog()
+                else: PRMP_MsgBox(self, title='Office Dialog Error', message='No Office or Manager is given.', _type='error', ask=0)
+        
+    def updateOffice(self, w):
+        if w: self.office.update(self.result)
+        self.destroyDialog()
+
+    def newOffice(self, w):
+        if w:
+            try:
+                office = self.manager.createOffice(**self.result)
+                self._setResult(office)
+            except Exception as error:
+                # print(error)
+                font = self.DEFAULT_FONT.copy()
+                font['size'] = 15
+                PRMP_MsgBox(self, title='Office Creation Error', message=error, _type='error', ask=0, msgFont=font)
+        self.destroyDialog()
+
+
+
+class StartDialog(GaM_Dialog):
+    TOPS = ['GaM', 'Office', 'DC_Office', 'COOP_Office']
+    TOP = Region
+    MANAGER = 'Manager'
+    
+    def __init__(self, master=None, title='Start Dialog', geo=(500, 400), **kwargs):
+        
+        self.Top = None
+        self.Manager = None
+        self.font = PRMP_Theme.PRMP_FONT.copy()
+        self.font['size'] = 15
+        self.topName = self.TOP.__name__
 
         if GaM_Settings.GaM:
-            self.GaM = GaM_Settings.GaM
-            self.CEO = self.GaM.person
+            self.Top = GaM_Settings.GaM
+            self.Manager = self.Top.person
         
-        super().__init__(master, title=title, **kwargs)
+        super().__init__(master, title=title, geo=geo, **kwargs)
 
     def _setupDialog(self):
 
@@ -195,57 +253,80 @@ class StartDialog(GaM_Dialog):
         self.submitBtn.config(command=self.action)
         self._placeSubmitButton()
 
-        if self.GaM:
-            date = self.GaM.date.date
-            uniqueID = self.GaM.uniqueID
-        else: uniqueID = date = ''
+        self.welcome = PRMP_Label(self.container, text=f'Welcome to GaM Software, create the {self.MANAGER} details !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font=self.font)
 
-        font = PRMP_Theme.PRMP_FONT.copy()
-        font['size'] = 15
-
-        self.welcome = PRMP_Label(self.container, text='Welcome to GaM Software, create the CEO details !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font=font)
-        
-        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), bottomKwargs=dict(text=date), place=dict(relx=.02, rely=.14, relw=.4, relh=.1), orient='h', longent=.4)
-
-        self.create = PRMP_Button(self.container, text='Create GaM', place=dict(relx=.02, rely=.26, relw=.4, relh=.1), command=self.createGaM)
-        self.ceo = PRMP_Button(self.container, text='CEO Details', place=dict(relx=.48, rely=.26, relw=.32, relh=.1), command=self.openCEODetail)
-        # self.uniqueID = UniqueID(self.container, obj=self.GaM, place=dict(relx=.02, rely=.38, relw=.4, relh=.1))
+        self.create = PRMP_Button(self.container, text=f'Create {self.topName}', place=dict(relx=.1, rely=.26, relw=.3, relh=.1), command=self.createTOP)
+        self.manager = PRMP_Button(self.container, text=f'{self.MANAGER} Details', place=dict(relx=.6, rely=.26, relw=.3, relh=.1), command=self.openManagerDetail)
         self.uniqueID = LabelEntry(self.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.1, rely=.6, relw=.8, relh=.25), bottomKwargs=dict(state='readonly'))
-        self.uniqueID.set(uniqueID)
+        self.uniqueID.set(self.Top.uniqueID if self.Top else '')
 
+    def createTOP(self):
+        if self.Top: PRMP_MsgBox(self, message=f'A {self.topName} object already existed.', title='{self.topName} Error', ask=0, _type='error')
+        else: PRMP_MsgBox(self, message=f'Are you sure to create a {self.topName} object?', title=f'{self.topName} creation confirmation', callback=self._createTOP, _type='question')
 
-
-    def createGaM(self):
-        if self.GaM: PRMP_MsgBox(self, message='A GaM object already existed.', title='GaM Error', ask=0, _type='error')
-        else: PRMP_MsgBox(self, message='Are you sure to create a GaM object?', title='GaM creation confirmation', callback=self._createGaM, _type='question')
-
-    def _createGaM(self, e=0):
+    def _createTOP(self, e=0):
         if not e: return
+        self.uniqueID.B.setReadonlyValue(self.Top.uniqueID)
+
+        PRMP_MsgBox(self, message=f'{self.topName} Object created successfully, update the {self.MANAGER}\'s details using the {self.MANAGER} details button.', title=f'{self.topName} creation successful.', ask=0, _type='info')
+
+    def openManagerDetail(self):
+        if not self.Top:
+            PRMP_MsgBox(self, message=f'No {self.topName} object created', title=f'{self.topName} Error', ask=0)
+            return
+        personsManager = self.Top.personsManager
+        if len(personsManager): dic = dict(person=personsManager[-1])
+        else: dic = dict(manager=personsManager)
+
+        PersonDialog(self, title=f'{self.MANAGER} Details', callback=self.setMANAGER, **dic)
+    
+    def setMANAGER(self, manager):
+        if not self.MANAGER: self.MANAGER = manager
+
+    def action(self):
+        pass
+
+class GaM_StartDialog(StartDialog):
+    TOP = GaM
+    MANAGER = 'CEO'
+    def __init__(self, master=None, title='GaM Start Dialog', **kwargs):
+
+        super().__init__(master, title=title, **kwargs)
+    
+    def _setupDialog(self):
+        super()._setupDialog()
+        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), bottomKwargs=dict(text=self.Top.date.date if self.Top else ''), place=dict(relx=.02, rely=.14, relw=.4, relh=.1), orient='h', longent=.4)
+    
+    def _createTOP(self, e=0):
         date = self.date.get()
         if not date:
             PRMP_MsgBox(self, title='Date Error', message='Please choose a date.', ask=0, _type='error')
             return
-        self.GaM = GaM(date=date)
-        
-        self.uniqueID.B.setReadonlyValue(self.GaM.uniqueID)
+        self.Top = self.TOP(date=date)
+        super()._createTOP(e)
 
-        PRMP_MsgBox(self, message='GaM Object created successfully, update the CEO\'s details using the CEO details button.', title='GaM creation successful.', ask=0, _type='info')
 
-    def openCEODetail(self):
-        if not self.GaM:
-            PRMP_MsgBox(self, message='No GaM object created', title='GaM Error', ask=0)
-            return
-        personsManager = self.GaM.personsManager
-        if len(personsManager): dic = dict(person=personsManager[-1])
-        else: dic = dict(manager=personsManager)
 
-        PersonDialog(self, title='CEO Details', callback=self.setCEO, **dic)
+
+class Office_StartDialog(StartDialog):
+    TOP = Office
     
-    def setCEO(self, ceo):
-        if not self.CEO: self.CEO = ceo
+    def __init__(self, master=None, title='Office Start Dialog', **kwargs):
 
-    def action(self):
-        pass
+        super().__init__(master, title=title, **kwargs)
+
+    def _setupDialog(self):
+        self.font['size'] = 14
+        super()._setupDialog()
+
+    def _createTOP(self, e=0):
+        if e: OfficeDialog(self, callback=self._createOFFICE, first=1)
+
+    def _createOFFICE(self, result=0):
+        if not result: return
+        self.Top = self.TOP(result['name'], **result)
+        super()._createTOP(1)
+
 
 
 

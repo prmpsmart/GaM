@@ -167,7 +167,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         
         if okText: self.ask = 0
         
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)

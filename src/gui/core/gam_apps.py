@@ -20,6 +20,28 @@ class GaM_App(PRMP_MainWindow):
     def defaults(self):
         pass
 
+    
+    def setMenus(self):
+
+        self.viewMenu = None # search, details
+        self.settingsMenu = None # load, save, security, theme, plot color, save path
+
+        self.viewMenu = Menu(config=dict(tearoff=0))
+        view = [dict(label='Search'), dict(label='Details')]
+        for vie in view: self.viewMenu.add_command(**vie)
+
+        self.settingsMenu = Menu(config=dict(tearoff=0))
+        settings = [dict(label='Load'), dict(label='Save'), dict(label='Security'), dict(label='Others')]
+        for sett in settings: self.settingsMenu.add_command(**sett)
+
+        self.helpMenu = Menu(config=dict(tearoff=0))
+        help_ = [dict(label='Welcome'), dict(label='Documentation'), dict(label='Keyboard Shortcuts Reference'), dict(label='About')]
+        for hel in help_: self.helpMenu.add_command(**hel)
+
+        Menubutton(self.menuBar, config=dict(menu=self.viewMenu, text="View", style='Window.TMenubutton'), place=dict(relx=.005, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
+        Menubutton(self.menuBar, config=dict(menu=self.settingsMenu, text="Settings", style='Window.TMenubutton'), place=dict(relx=.05, rely=.05, relw=.065, relh=.9), font='PRMP_FONT', relief='flat')
+        Menubutton(self.menuBar, config=dict(menu=self.helpMenu, text="Help", style='Window.TMenubutton'), place=dict(relx=.115, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
+
 
 class RegionLookUp(GaM_App, PRMP_FillWidgets):
     
@@ -263,7 +285,6 @@ class ObjectHome(GaM_App):
         self.objdet.mainloop()
 
 
-
 class RegionHome(ObjectHome):
 
     def __init__(self, master=None, title='Region Home', region=None, **kwargs):
@@ -352,23 +373,26 @@ class ManagerHome(TreeColumns, GaM_App):
         return subs
     
     @property
-    def c_or_m(self): return self._sup.className in ('Client', 'Member')
+    def c_or_m(self):
+        k = ('Client', 'Member')
+        return self._sup.className in k or self._sup.region.className in k
 
     def changeSubs(self, e=0):
         st = self.selectedSubType
         if self.new.get():
-            new = self._sup[st]
-            if self.c_or_m and new.className == 'Persons':
-                PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error', ask=0)
-                return
-
-            try:
-                dialog = self.getNewObjectDialog(st)
-                if dialog: dialog(self, manager=self._sup[st])
-            except: PRMP_MsgBox(self, title='Creation Error ', message=f'A new one cannot be created for {st}.', _type='error', ask=0)
+            
+            if self.c_or_m and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error', ask=0)
+            
+            else:
+                try:
+                    dialog = self.getNewObjectDialog(st)
+                    if dialog:
+                        manager = self._sup if isinstance(self._sup, ObjectsManager) else self._sup[st]
+                        dialog(self, manager=manager)
+                except Exception as er: PRMP_MsgBox(self, title=er.__class__.__name__, message=er, _type='error', ask=0)
         else:
             subs = self.getSubs()
-            if subs: self.subsList.set(subs)
+            if subs: self.subsList.set(subs, showAttr='name')
             columns = self.columns(self._sup)
             # print(columns)
             self.subs.setColumns(columns)
@@ -383,42 +407,37 @@ class ManagerHome(TreeColumns, GaM_App):
 
 
 
-class Home(GaM_App):
+class GaM_Home(GaM_App):
 
     def __init__(self, title='Goodness and Mercy.', geo=(1000, 700), **kwargs):
         super().__init__(title=title, geo=geo, **kwargs)
         
-        self.setMenus()
-
-        self.paint()
-
+        # self.setMenus()
         self.mainloop()
-    
-    def setMenus(self):
 
-        self.viewMenu = None # search, details
-        self.settingsMenu = None # load, save, security, theme, plot color, save path
+        
+    def _setupApp(self):
+        offices
 
-        self.viewMenu = Menu(config=dict(tearoff=0))
-        view = [dict(label='Search'), dict(label='Details')]
-        for vie in view: self.viewMenu.add_command(**vie)
-
-        self.settingsMenu = Menu(config=dict(tearoff=0))
-        settings = [dict(label='Load'), dict(label='Save'), dict(label='Security'), dict(label='Others')]
-        for sett in settings: self.settingsMenu.add_command(**sett)
-
-        self.helpMenu = Menu(config=dict(tearoff=0))
-        help_ = [dict(label='Welcome'), dict(label='Documentation'), dict(label='Keyboard Shortcuts Reference'), dict(label='About')]
-        for hel in help_: self.helpMenu.add_command(**hel)
-
-        Menubutton(self.menuBar, config=dict(menu=self.viewMenu, text="View", style='Window.TMenubutton'), place=dict(relx=.005, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
-        Menubutton(self.menuBar, config=dict(menu=self.settingsMenu, text="Settings", style='Window.TMenubutton'), place=dict(relx=.05, rely=.05, relw=.065, relh=.9), font='PRMP_FONT', relief='flat')
-        Menubutton(self.menuBar, config=dict(menu=self.helpMenu, text="Help", style='Window.TMenubutton'), place=dict(relx=.115, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
+        incomes
+        savings
+        balances
+        debits
+        transfers
+        excesses
+        deficits
+        loans
+        loanrepays
+        interests
 
 
+        dcaccounts
+        coopaccounts
 
-
-
+        
+        
+        
+        pass
 
 
 

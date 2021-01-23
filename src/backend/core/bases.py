@@ -280,6 +280,7 @@ class ObjectsMixins(Mixins, CompareByDate):
             val = values.get(key, None)
             if _type: val = _type(val)
             if val: setattr(self, key, val)
+            # print(key, val)
     
     @property
     def values(self):
@@ -416,15 +417,11 @@ class Object(CompareByNumber, ObjectsMixins):
 
         ObjectsMixins.__init__(self, date=date, previous=previous)
         
-        # self._uniqueID = sha224(self.id.encode()).hexdigest()
-
     @property
     def id(self): return ''.join(self.spacedID.split(' | ')).replace('GaM', 'A')
     
     def delete(self, called=0):
-        if self.next:
-            self.next.previous = self.previous
-            # self.previous = None
+        if self.next: self.next.previous = self.previous
         if self.previous: self.previous.next = self.next
 
         self.manager.removeSub(self)

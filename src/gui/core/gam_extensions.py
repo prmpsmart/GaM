@@ -157,21 +157,23 @@ RRC = RegionRadioCombo
 class Hierachy(PRMP_TreeView):
     
     def __init__(self, master=None, columns=[], toggleOpen=True, **kwargs):
+        self._toggleOpen = False
+        self.toop = toggleOpen
+        self.last = []
         super().__init__(master=master, columns=columns, **kwargs)
 
-        self._toggleOpen = False
-        if toggleOpen:
-            self.bind('<Control-o>', self.toggleOpen)
-            self.bind('<Control-O>', self.toggleOpen)
     
     def toggleOpen(self, e=0):
-        print(e)
         if self._toggleOpen: self._toggleOpen = False
         else: self._toggleOpen = True
+        self.viewAll(*self.last)
     
     def bindings(self):
         super().bindings()
         self.treeview.bind('<Control-Return>', self.viewRegion)
+        if self.toop:
+            self.treeview.bind('<Control-o>', self.toggleOpen)
+            self.treeview.bind('<Control-O>', self.toggleOpen)
 
     def viewRegion(self, e=0):
         current = self.selected()
@@ -210,6 +212,7 @@ class Hierachy(PRMP_TreeView):
     def viewAll(self, obj, parent=''):
         if not parent: self.clear()
         self._viewAll(obj, parent)
+        self.last = obj, parent
         
     def viewSubs(self, obj): self.viewAll(obj[:])
 H = Hierachy
@@ -387,7 +390,7 @@ class RegionDetails(PRMP_FillWidgets, LabelFrame):
         vs = ['office', 'department', 'sup', 'sub']
         values = {}
 
-        hie = region.hie[1:]
+        hie = region.hie
         ln = len(hie)
         co = 0
 
@@ -398,7 +401,7 @@ class RegionDetails(PRMP_FillWidgets, LabelFrame):
             ind = hie.index(h)
             key = vs[ind-co]
             values[key] = h.name
-        
+        # print(values)
         super().set(values)
 
 

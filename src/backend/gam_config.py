@@ -1,12 +1,23 @@
 # from .gam.gam import GaM
 import pickle, os, io, zlib, threading
+from prmp_gui.core import PRMP_Theme
 
 class GaM_Settings:
+    TOP = None
+
     GaM = None
+
     ThemeIndex = 38
     cwd = os.getcwd()
     dataPath = os.path.join(cwd, 'data.prmp')
     otherDataPath = os.path.join(cwd, 'specialData.prmp')
+
+    @classmethod
+    def loadAll(cls):
+        # cls.loadDatas()
+        # cls.loadOtherDatas()
+
+        PRMP_Theme.setThemeIndex(cls.ThemeIndex)
     
     @classmethod
     def compress(cls, data, destFile):
@@ -18,7 +29,6 @@ class GaM_Settings:
     
     @classmethod
     def decompress(cls, file):
-        # temp = io.ByetsIO()
         compData = open(file, 'rb').read()
         data = zlib.decompress(data)
         return data
