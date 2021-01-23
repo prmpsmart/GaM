@@ -35,16 +35,19 @@ class TDetails:
             co -= 3
             to += 1
         return "".join(num_list)
+    
     @classmethod
     def mul_1000s(cls, lists):
         for a in lists:
             ind = lists.index(a)
             if isinstance(a, int): lists[ind] = cls.mul_1000(a)
+
     @classmethod
     def ints(cls, lists):
         for a in lists:
             ind = lists.index(a)
             if cls.isnumeric(a): lists[ind] = int(a)
+            
     @classmethod
     def isnumeric(cls, num):
         try: int(num); return True

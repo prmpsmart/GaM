@@ -11,6 +11,7 @@ class GaM_App(PRMP_MainWindow):
         self._setupApp()
 
         self.defaults()
+        self.setMenus()
 
         self.paint()
     

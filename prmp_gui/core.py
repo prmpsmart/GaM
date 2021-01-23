@@ -462,7 +462,7 @@ class PRMP_Theme(PRMP_Mixins):
         self._paintAll()
     
     @classmethod
-    def currentThemeIndex(cls): return list(cls.THEMES_DICTS.keys()).index(cls.CURRENT_THEME)
+    def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
 

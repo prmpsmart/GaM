@@ -1,4 +1,4 @@
-import os, zipfile
+import os, zipfile, subprocess
 
 def zipPath(resource, destination='', latest=False):
     # Create name of new zip file, based on original folder or file name
@@ -30,3 +30,24 @@ def zipPath(resource, destination='', latest=False):
                    zipFile.write(filename, arcname, zipfile.ZIP_DEFLATED)
         else: zipFile.write(resource, zipFileName, zipfile.ZIP_DEFLATED)
     return zipFileName
+
+
+class Reloader:
+    def runner(self):
+        args, env = [os.sys.executable] + os.sys.argv,  os.environ
+        env["PRMP_TK"] = "RUNNING"
+        while True:
+            exit_code = subprocess.call(args, env=env, close_fds=False)
+            if exit_code != 63: return exit_code
+    def reloader(self, e=None):
+        try: os.system("cls")
+        except: os.system("clear")
+        print("Reloading")
+        os.sys.exit(63)
+    def reload(self, func):
+        try:
+            if os.environ.get("PRMP_TK") == "RUNNING": func()
+            else: os.sys.exit(self.runner())
+        except Exception as E: pass
+
+

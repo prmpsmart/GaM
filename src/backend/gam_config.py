@@ -53,6 +53,8 @@ class GaM_Settings:
     @classmethod
     def saveDatas(cls):
         gam = GaM_Settings.GaM
+        if not gam: return
+        
         gamBytes = pickle.dumps(gam)
         cls.compress(gamBytes, cls.dataPath)
 

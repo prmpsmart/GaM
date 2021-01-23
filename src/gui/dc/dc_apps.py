@@ -1,7 +1,6 @@
 from .dc_dialogs import *
 
 def addNote(self):
-    
     self.overview = DC_Overview(self.note, region=self.obj)
     self.note.add(self.overview, padding=3)
     self.note.tab(0, text='Overview', compound='left', underline='-1')
@@ -13,8 +12,9 @@ def addNote(self):
 
 class DC_RegionHome(TreeColumns, RegionHome):
     def _setupApp(self):
+        self.setMenus()
         super()._setupApp()
-        
+
         self.setTitle('DC Region Home')
 
         self.subRegions.callback = self.selectedSubRegion
