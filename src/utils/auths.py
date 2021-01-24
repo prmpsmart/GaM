@@ -129,10 +129,10 @@ class User(PRMP_Mixins):
         self.__hint = hint
         self.__permission = permission
     
-    def __repr__(self): return f'<{self.username}, {self.permission}>'
+    def __repr__(self): return '<{}, {}>'.format(self.username, self.permission)
     
     def __str__(self):
-        text = f"{self.className}(name={self.name}, username={self.username}, password={self.password}, hint={self.hint}, permission={self.permission})"
+        text = "{}(name={}, username={}, password={}, hint={}, permission={})".format(self.className, self.name, self.username, self.password, self.hint, self.permission)
         return text
     
     @property
@@ -186,7 +186,6 @@ class User(PRMP_Mixins):
 class Super_User(User):
     super_user = True
     ADMIN = True
-
 
 
 class Authorisation(Auths_Vars):
@@ -399,4 +398,5 @@ class Authorisation(Auths_Vars):
 
     @classmethod
     def get_text_permission_from_bool(cls, admin): return cls.get_permission(admin)[1]
+
 

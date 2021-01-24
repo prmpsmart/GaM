@@ -43,4 +43,4 @@ class Add_User(Change_Password):
 
         self.username_ent.place(relx=.1, rely=.15, relh=.1, relw=.6)
         self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
-        
+
