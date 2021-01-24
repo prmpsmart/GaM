@@ -5,7 +5,7 @@ from .auths import Authorisation
 from prmp_gui.dialogs import *
 
 
-def show_admin_required(): show("ADMIN Required", "An ADMIN permission is required.", "error")
+def show_admin_required(): dialogFunc(title="ADMIN Required", msg="An ADMIN permission is required.", which="error")
 
 def make_change(ordfunc=None, *args, **kwargs):
     if Authorisation.is_admin():
@@ -26,11 +26,12 @@ def make_change(ordfunc=None, *args, **kwargs):
 
 
 
-class Base_Password(Frame):
+class Base_Password(PRMP_FillWidgets, Frame):
     
-    def __init__(self, master=None):
+    def __init__(self, master, **kwargs):
         
-        super().__init__(master=master, bg=Styles.background)
+        Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self)
         
         self.new_is_password = False
         self.old_is_password = False
@@ -46,114 +47,70 @@ class Base_Password(Frame):
         self.ent_new = ''
         self.ent_old = ''
         self.hint_text=''
-
-        self.name = StringVar()
-        self.username = StringVar()
-        self.admin = StringVar()
-        self.password = StringVar()
-        self.old = StringVar()
-        self.new = StringVar()
-        self.pass_show = StringVar()
-        self.old_show = StringVar()
-        self.hint = StringVar()
-        self.forgot = StringVar()
         
-        self.name_ent = Entry(self, textvariable=self.name, bd=2, font=Fonts.font10)
+        self.name = Entry(self, placeholder=self.ent_name, very=1)
+        self.clr_name = Button(self, text="Clear", command=self.name.empty, relief="solid")
         
-        self.clr_name = Button(self, text="Clear", command=self.clear_name, relief="solid")
+        self.username = Entry(self, placeholder=self.ent_usr, very=1)
+        self.clr_usr = Button(self, text="Clear", command=self.username.empty, relief="solid")
         
-        self.username_ent = Entry(self, textvariable=self.username, font=Fonts.font10, bd=2)
-        self.clr_usr = Button(self, text="Clear", command=self.clear_username, relief="solid")
+        self.admin = Checkbutton(self, relief="solid", text="Admin?", command=self.admin_add)
         
-        self.admin_chk = Checkbutton(self, variable=self.admin, relief="solid", text="Admin?", command=self.admin_add)
+        self.password = Entry(self, placeholder=self.ent_pwd, very=1)
+        self.first = 0
+        self.password.bind('<KeyPress>', self.show_star)
         
-        self.password_ent = Entry(self, textvariable=self.password, font=Fonts.font10, bd=2)
-        
-        self.old_ent = Entry(self, textvariable=self.old, font=Fonts.font10, bd=2)
-        self.clr_old = Button(self, text="Clear", command=self.clear_old, relief="solid")
+        self.old = Entry(self, very=1)
+        self.clr_old = Button(self, text="Clear", command=self.old.empty, relief="solid")
         
         self.password_confirm = Label(self)
         
         self.password_length = Label(self, relief="sunken", bd=3)
         
-        self.clr_pwd = Button(self, text="Clear", command=self.clear_password, relief="solid")
+        self.clr_pwd = Button(self, text="Clear", command=self.password.empty, relief="solid")
         
-        self.new_ent = Entry(self, textvariable=self.new, font=Fonts.font10, bd=2)
-        self.clr_new = Button(self, text="Clear", command=self.clear_new, relief="solid")
+        self.new = Entry(self, very=1)
+        self.clr_new = Button(self, text="Clear", command=self.new.empty, relief="solid")
         
-        self.show_pass = Checkbutton(self, variable=self.pass_show, command=self.show_password, relief="solid", text="Show")
+        self.show_pass = Checkbutton(self, command=self.show_password, relief="solid", text="Show")
         
-        self.show_old = Checkbutton(self, variable=self.old_show, command=self.show_old_, relief="solid", text="Show")
+        self.show_old = Checkbutton(self, command=self.show_old_, relief="solid", text="Show")
         
-        self.hint_ent = Entry(self, textvariable=self.hint, font=Fonts.font10, bd=2)
+        self.hint = Entry(self, very=0)
         
-        self.clr_hint = Button(self, text="Clear", command=self.clear_hint, relief="solid")
+        self.clr_hint = Button(self, text="Clear", command=self.hint.empty, relief="solid")
         
         self.hx, self.hy, self.hh, self.hw, = .1, .43, .04, .5
-        self.forgot_chk = Checkbutton(self, variable=self.forgot, command=self.forgot_check, relief="solid", text="Forgot Password?")
+        self.forgot_chk = Checkbutton(self, command=self.forgot_check, relief="solid", text="Forgot Password?")
         
         self.hint_lbl = Label(self, relief="groove")
         
         self.action = Button(self, text='Action', relief="solid", command=self.make_change)
+
         
         # self.init()
-        
-    def get_name(self): return self.name.get()
-    def get_username(self): return self.username.get()
-    def get_password(self): return self.password.get()
-    def get_new(self): return self.new.get()
-    def get_hint(self): return self.hint.get()
-        
-    def defaults(self):
-        self.username.set(self.ent_usr)
-        self.name.set(self.ent_name)
-        self.admin.set('0')
-        self.password.set(self.ent_pwd)
-        self.old.set(self.ent_old)
-        self.new.set(self.ent_new)
-        self.hint.set(self.ent_hint)
-        self.pass_show.set('0')
-        self.old_show.set('0')
-        self.password_length.config(text='')
-
+       
     def binds(self):
-        self.username_ent.bind("<Enter>", self.usr_enter)
-        self.username_ent.bind("<Leave>", self.usr_leave)
+        # return
+        if self.old_is_password: self.old.bind("<KeyRelease>", self.old_show_star)
         
-        self.name_ent.bind("<Enter>", self.name_enter)
-        self.name_ent.bind("<Leave>", self.name_leave)
-        
-        self.hint_ent.bind("<Enter>", self.hint_enter)
-        self.hint_ent.bind("<Leave>", self.hint_leave)
-        
-        self.password_ent.bind("<Enter>", self.pass_enter)
-        self.password_ent.bind("<Leave>", self.pass_leave)
-        self.password_ent.bind("<KeyRelease>", self.show_star)
-        
-        self.old_ent.bind("<Enter>", self.old_enter)
-        self.old_ent.bind("<Leave>", self.old_leave)
-        if self.old_is_password: self.old_ent.bind("<KeyRelease>", self.old_show_star)
-        
-        self.new_ent.bind("<Enter>", self.new_enter)
-        self.new_ent.bind("<Leave>", self.new_leave)
-        if self.new_is_password: self.new_ent.bind("<KeyRelease>", self.new_show_star)
+        if self.new_is_password: self.new.bind("<KeyRelease>", self.new_show_star)
 
-    def clear_username(self, *e): self.username.set(self.ent_usr)
-    def clear_name(self, *e): self.name.set(self.ent_name)
-    def clear_hint(self, *e): self.hint.set(self.ent_hint)
+
     def clear_password(self, *e):
-        self.password.set(self.ent_pwd)
+        self.password.empty()
         self.pass_leave()
         self.show_norm()
         self.clear_new()
         if self.new_is_password:
             self.new_leave()
             self.new_show_norm()
+
     def admin_add(self):
         if Authorisation.is_admin(): return True
         else:
             self.admin.set('0')
-            show("ADMIN?", "Only an ADMIN can add another user", "error")
+            dialogFunc(title="ADMIN?", msg="Only an ADMIN can add another user", which="error")
             
     def clear_new(self, *e):
         self.new.set(self.ent_new)
@@ -168,15 +125,13 @@ class Base_Password(Frame):
             self.old_show_norm()
 
     def show_hint(self):
-        self.cb_clicked()
-        if self.forgot.get() == '1':
+        if self.forgot.get():
             self.hint_lbl.config(text=self.hint_text)
             self.hint_lbl.place(relx=self.hx, rely=self.hy, relh=self.hh, relw=self.hw)
         else: self.hint_lbl.place_forget()
     
     def show_password(self, *e):
-        self.cb_clicked()
-        if self.pass_show.get() == '1':
+        if self.show_pass.get():
             self.show_norm()
             if self.new_is_password: self.new_show_norm()
         else:
@@ -184,68 +139,13 @@ class Base_Password(Frame):
             if self.new_is_password: self.new_show_star()
     
     def show_old_(self, *e):
-        self.cb_clicked()
-        if self.old_show.get() == '1':
+        if self.show_old.get():
             self.old_show_norm()
             if self.old_is_password: self.old_show_norm()
         else:
             self.old_show_star()
             if self.old_is_password: self.old_show_star()
 
-    def usr_enter(self, *e):
-        username = self.username.get()
-        if username == self.ent_usr: self.username_ent.delete("0", "end")
-
-    def usr_leave(self, *e):
-        username = self.username.get()
-        if username == '': self.username_ent.insert("0", self.ent_usr)
-        
-    def name_enter(self, *e):
-        name = self.name.get()
-        if name == self.ent_name: self.name_ent.delete("0", "end")
-
-    def name_leave(self, *e):
-        name = self.name.get()
-        if name == '': self.name_ent.insert("0", self.ent_name)
-
-    def hint_enter(self, *e):
-        hint = self.hint.get()
-        if hint == self.ent_hint: self.hint_ent.delete("0", "end")
-
-    def hint_leave(self, *e):
-        hint = self.hint.get()
-        if hint == '': self.hint_ent.insert("0", self.ent_hint)
-
-    def pass_enter(self, *e):
-        password = self.password.get()
-        if password == self.ent_pwd: self.password_ent.delete("0", "end")
-
-    def pass_leave(self, *e):
-        password = self.password.get()
-        if password == '':
-            self.show_norm()
-            self.password_ent.insert("0", self.ent_pwd)
-    
-    def new_enter(self, *e):
-        new = self.new.get()
-        if new == self.ent_new: self.new_ent.delete("0", "end")
-    
-    def new_leave(self, *e):
-        new = self.new.get()
-        if new == '':
-            if self.new_is_password: self.new_show_norm()
-            self.new_ent.insert("0", self.ent_new)
-    
-    def old_enter(self, *e):
-        old = self.old.get()
-        if old == self.ent_old: self.old_ent.delete("0", "end")
-    
-    def old_leave(self, *e):
-        old = self.old.get()
-        if old == '':
-            if self.old_is_password: self.old_show_norm()
-            self.old_ent.insert("0", self.ent_old)
-    
     def confirm_password_correct(self):
         pwd, cpwd = self.password.get(), self.new.get()
         if pwd == cpwd: self.password_confirm.config(bg="green", text="CORRECT")
@@ -261,8 +161,7 @@ class Base_Password(Frame):
         
         else: self.informate("Incorrect Username", "Enter a correct username to check for hint", "info")
 
-    
-    def check_pass_length(self):
+    def check_pass_length(self, e=0):
         pwd = self.password.get()
         if self.check_valid(pwd):
             text = ''
@@ -285,22 +184,26 @@ class Base_Password(Frame):
             self.password_length.config(text=text, fg=fg, bg=bg)
 
     def new_show_star(self, *e):
-        if self.pass_show.get() == '1': pass
-        else: self.new_ent.config(show='*')
+        if self.show_pass.get(): pass
+        else: self.new.config(show='*')
         self.confirm_password_correct()
-    def new_show_norm(self, *e): self.new_ent.config(show='')
+    def new_show_norm(self, *e): self.new.config(show='')
 
     def old_show_star(self, *e):
-        if self.pass_show.get() == '1': pass
-        else: self.old_ent.config(show='*')
-    def old_show_norm(self, *e): self.old_ent.config(show='')
+        if self.show_pass.get(): pass
+        else: self.old.config(show='*')
+    
+    def old_show_norm(self, *e): self.old.config(show='')
 
     def show_star(self, *e):
-        if self.pass_show.get() == '1': pass
-        else: self.password_ent.config(show='*')
+        if e:
+            if not self.first: self.first = 1
+            else: return
+        if self.show_pass.get(): pass
+        else: self.password.config(show='*')
         self.check_pass_length()
         
-    def show_norm(self, *e): self.password_ent.config(show='')
+    def show_norm(self, *e): self.password.config(show='')
     
     def check_valid(self, text):
         tests = [self.ent_usr, self.ent_nusr, self.ent_pwd, self.ent_cpwd, self.ent_hint, self.ent_name]
@@ -317,54 +220,144 @@ class Base_Password(Frame):
     
     def get_inputs(self): pass
     
-    def cb_clicked(self):
-        buts = {self.forgot_chk:self.forgot, self.show_pass:self.pass_show, self.show_old:self.old_show}
-        for but in buts:
-            var = buts[but]
-            if var.get() == "1": but["fg"] = "blue"
-            else: but["fg"] = Styles.foreground
-    
-    def style(self):
-        self.config(bg=Styles.background)
-        ents = [self.name_ent, self.username_ent,  self.password_ent, self.new_ent, self.old_ent, self.hint_ent]
-        widgs = [self.show_pass, self.hint_lbl, self.password_confirm, self.show_old] #+ ents
-        for widg in widgs: widg.config(bg=Styles.background, fg=Styles.foreground, font=Fonts.font11b)
-        
-        buttons = [self.clr_name, self.clr_usr, self.admin_chk, self.clr_pwd, self.clr_new, self.clr_old, self.clr_hint, self.forgot_chk, self.action, self.forgot_chk, self.show_pass]
-        for button in buttons: button.config(activebackground=Styles.background, activeforeground="blue", background=Styles.background, disabledforeground=Styles.foreground, font=Fonts.font11b, foreground=Styles.foreground, highlightbackground=Styles.background, highlightcolor="white", justify="left", overrelief="ridge", relief="solid")
-
-
     def init(self):
         self.binds()
-        self.defaults()
         self.place_widgs()
-        self.style()
+    
     def make_change(self):
         if Authorisation.is_admin(): self.act()
         else: show_admin_required()
+    
     def act(self): pass
     
-    def load_data(self): Threads.load_passwords()
+    # def load_data(self): Threads.load_passwords()
     
-    def save_data(self): Threads.save_passwords()
+    # def save_data(self): Threads.save_passwords()
+
+class Change_Username(Base_Password):
+    
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master=master, **kwargs)
+    
+        self.username.changePlaceholder(self.ent_usr)
+        self.new.changePlaceholder(self.ent_nusr)
+
+        self.action.config(text="Change Username")
+        
+        self.init()
+        self.addResultsWidgets(['username', 'new', 'password'])
+    
+    def get_inputs(self):
+        results = self.get()
+        inputs = [results['username'], results['new'], results['password']]
+        if self.check_valids(*inputs): return inputs
+        
+    def act(self):
+        inputs = self.get_inputs()
+        if inputs:
+            old_usr, new_usr, pwd = inputs
+            if Authorisation.check_username(new_usr):
+                dialogFunc(title="User exists!", msg=f"User with username: {new_usr} already exists.", which="error")
+                return
+            user = Authorisation.get_user(old_usr, pwd)
+            not_exist = Authorisation.not_exist(old_usr)
+            if user == Authorisation.wrong_pass: dialogFunc(title="Wrong password", msg=f"Wrong password entered for User with username: {old_usr} ", which="error")
+            elif user == not_exist: dialogFunc(title="User Doesn't Exist", msg=f"User with username: {old_usr} doesn't exist", which="error")
+            else:
+                if dialogFunc(title="Change Username Confirmation", msg=f"Are you sure to change the username for this  user with details\nName :{user.name}\nUsername: {old_usr}\nNew Username: {new_usr} ", which=1, ask=1):
+                    Authorisation.change_username(old_usr, pwd, new_usr)
+                    # self.save_data()
+                    dialogFunc(title="Username change Successful", msg="Username change is successful", which="info")
+        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
+
+    def place_widgs(self):
+        
+        self.username.place(relx=.1, rely=.15, relh=.1, relw=.6)
+        self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
+
+        self.new.place(relx=.1, rely=.3, relh=.1, relw=.6)
+        
+        self.clr_new.place(relx=.72, rely=.3, relh=.09, relw=.1)
+        
+        self.password.place(relx=.1, rely=.45, relh=.1, relw=.6)
+        self.clr_pwd.place(relx=.72, rely=.45, relh=.09, relw=.1)
+        
+        self.show_pass.place(relx=.84, rely=.45, relh=.09, relw=.15)
+
+        self.action.place(relx=.1, rely=.78, relh=.09, relw=.8)
+
+class Delete_User(Base_Password):
+    
+    def __init__(self, master=None, inh=False, **kwargs):
+        super().__init__(master=master, **kwargs)
+        
+        self.action.config(text="Delete User")
+        
+        if not inh:
+            self.init()
+            self.addResultsWidgets(['username', 'password'])
+
+    
+    def get_inputs(self):
+        results = self.get()
+        inputs = [results['username'], results['password']]
+        if self.check_valids(*inputs): return inputs
+        
+    def act(self):
+        inputs = self.get_inputs()
+        if inputs:
+            usr, pwd = inputs
+            user = Authorisation.get_user(usr, pwd)
+            not_exist = Authorisation.not_exist(usr)
+            if user == Authorisation.wrong_pass: dialogFunc(title="Wrong password", msg=f"Wrong password entered for User with username: {usr} ", which="error")
+            elif user == not_exist: dialogFunc(title="User Doesn't Exist", msg=f"User with username: {usr} doesn't exist", which="error")
+            elif user.super_user == True: dialogFunc(title="Super_User", msg=Authorisation.get_cant_super(), which="error")
+            else:
+                if dialogFunc(title="Delete User Confirmation", msg=f"Are you sure to delete User with details\nName :{user.name}\nUsername: {usr}", which=1, ask=1):
+                    Authorisation.delete_user(usr, pwd)
+                    # self.save_data()
+                    dialogFunc(title="User Deleted Successful", msg=f"User:\nName: {user.name}\nUsername: {user.username}  is successful", which="info")
+        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
+
+    
+    def place_widgs(self):
+        
+        self.username.place(relx=.1, rely=.15, relh=.1, relw=.6)
+        self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
+
+        self.password.place(relx=.1, rely=.3, relh=.1, relw=.6)
+        
+        self.clr_pwd.place(relx=.72, rely=.3, relh=.09, relw=.1)
+        
+        self.show_pass.place(relx=.84, rely=.3, relh=.09, relw=.15)
+
+        self.action.place(relx=.1, rely=.5, relh=.08, relw=.8)
 
 class Change_Password(Base_Password):
     
-    def __init__(self, master=None, inh=False):
-        super().__init__(master=master)
+    def __init__(self, master=None, inh=False, **kwargs):
+        super().__init__(master=master, **kwargs)
         self.new_is_password = True
-        self.ent_new = self.ent_cpwd
+        self.new.changePlaceholder(self.ent_cpwd)
+        
         self.inh = inh
         if not self.inh:
             self.action.config(text="Change Password")
             self.old_is_password = True
-            self.ent_old = self.ent_pwd
-            self.ent_pwd = self.ent_npwd
-            self.ent_new = self.ent_cpwd
+
+            self.old.changePlaceholder(self.ent_pwd)
+            self.password.changePlaceholder(self.ent_npwd)
+            # self.new.changePlaceholder(self.ent_cpwd)
+            self.password.bind('<KeyRelease>', self.check_pass_length, '+')
+            self.hint.changePlaceholder(self.ent_hint)
+
+            self.addResultsWidgets(['username', 'password', 'old', 'hint', 'new'])
+
             self.init()
     
     def get_inputs(self):
-        inputs = [self.username.get(), self.old.get(), self.password.get(), self.new.get(), self.hint.get()]
+        results = self.get()
+        inputs = [results['username'], results['old'], results['password'], results['new'], results['hint']]
         if self.check_valids(*inputs): return inputs
     
     def act(self):
@@ -373,26 +366,25 @@ class Change_Password(Base_Password):
             username, old, new, conf, hint = inputs
             user = Authorisation.get_user(username, old)
             not_exist = Authorisation.not_exist(username)
-            if user == Authorisation.wrong_pass: show("Wrong password", f"Wrong password entered for User with username: {username} ", "error")
-            elif user == not_exist: show("User Not Exist", f"User with username: {username} doesn't exist", "error")
+            if user == Authorisation.wrong_pass: dialogFunc(title="Wrong password", msg="Wrong password entered for User with username: {username} ", which="error")
+            elif user == not_exist: dialogFunc(title="User Not Exist", msg=f"User with username: {username} doesn't exist", which="error")
             else:
-                if confirm("Change Password Confirmation", f"Are you sure to change the password for this  user with details\nName :{user.get_name()}\nUsername: {username}", 1):
+                if dialogFunc(title="Change Password Confirmation", msg=f"Are you sure to change the password for this  user with details\nName :{user.get_name()}\nUsername: {username}", which=1, ask=1):
                     Authorisation.change_password(username, old, new, hint)
                     self.save_data()
-                    show("Change Password Successful", f"The password for User:\nName :{user.get_name()}\nUsername: {username}\n is changed successfully", "info")
-        else: show("Incorrect Input", "Make sure to enter the required inputs correctly", "warn")
-
+                    dialogFunc(title="Change Password Successful", msg=f"The password for User:\nName :{user.get_name()}\nUsername: {username}\n is changed successfully", which="info")
+        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
 
     def place_widgs(self):
         if not self.inh:
-            self.username_ent.place(relx=.1, rely=.05, relh=.09, relw=.6)
+            self.username.place(relx=.1, rely=.05, relh=.09, relw=.6)
             self.clr_usr.place(relx=.72, rely=.05, relh=.09, relw=.1)
             
-            self.old_ent.place(relx=.1, rely=.15, relh=.1, relw=.6)
+            self.old.place(relx=.1, rely=.15, relh=.1, relw=.6)
             self.clr_old.place(relx=.72, rely=.15, relh=.09, relw=.1)
             self.show_old.place(relx=.84, rely=.15, relh=.09, relw=.15)
         
-        self.password_ent.place(relx=.1, rely=.3, relh=.1, relw=.6)
+        self.password.place(relx=.1, rely=.3, relh=.1, relw=.6)
         
         self.clr_pwd.place(relx=.72, rely=.3, relh=.09, relw=.1)
         
@@ -400,20 +392,22 @@ class Change_Password(Base_Password):
         
         self.password_length.place(relx=.1, rely=.405, relh=.05, relw=.6)
         
-        self.new_ent.place(relx=.1, rely=.47, relh=.1, relw=.6)
+        self.new.place(relx=.1, rely=.47, relh=.1, relw=.6)
         
         self.password_confirm.place(relx=.72, rely=.48, relh=.08, relw=.23)
 
-        self.hint_ent.place(relx=.1, rely=.6, relh=.09, relw=.7)
+        self.hint.place(relx=.1, rely=.6, relh=.09, relw=.7)
         
         self.clr_hint.place(relx=.84, rely=.6, relh=.09, relw=.1)
 
         self.action.place(relx=.1, rely=.78, relh=.09, relw=.8)
 
+
+
 class Add_User(Change_Password):
     
-    def __init__(self, master=None):
-        super().__init__(master=master, inh=True)
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master=master, inh=True, **kwargs)
         
         self.action.config(text="Add User")
         
@@ -421,7 +415,7 @@ class Add_User(Change_Password):
     
     def get_inputs(self):
         inputs = [self.name.get(), self.username.get(), self.password.get(), self.new.get(), self.hint.get()]
-        admin = True if self.admin.get() == '1' else False
+        admin = True if self.admin.get() else False
         if self.check_valids(*inputs): return [*inputs, admin]
         
     def act(self):
@@ -445,104 +439,80 @@ class Add_User(Change_Password):
 
     def place_widgs(self):
         super().place_widgs()
-        self.admin_chk.place(relx=.84, rely=.15, relh=.09, relw=.15)
-        self.name_ent.place(relx=.1, rely=.05, relh=.09, relw=.6)
+        self.admin.place(relx=.84, rely=.15, relh=.09, relw=.15)
+        self.name.place(relx=.1, rely=.05, relh=.09, relw=.6)
         self.clr_name.place(relx=.72, rely=.05, relh=.09, relw=.1)
 
-        self.username_ent.place(relx=.1, rely=.15, relh=.1, relw=.6)
+        self.username.place(relx=.1, rely=.15, relh=.1, relw=.6)
         self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
 
-class Change_Username(Base_Password):
-    
-    def __init__(self, master=None):
-        super().__init__(master=master)
-    
-        self.ent_new = self.ent_nusr
-        self.action.config(text="Change Username")
+class Password_Login(Delete_User):
+    def __init__(self, master=None, okay=None):
+        super().__init__(master=master, inh=True)
+        self.okay = okay
+        self.hx, self.hy, self.hh, self.hw, = .1, .43, .09, .6
+        self.hint_text = "Love You"
+        self.action.config(text="Login", command=self.login_check)
+        
+        self.pass_count = 0
+        
+        self.message = Out_Message(self, head="Love", relx=.008, rely=.7, relh=.3, relw=.968)
         
         self.init()
     
-    def get_inputs(self):
-        inputs = [self.username.get(), self.new.get(), self.password.get()]
-        if self.check_valids(*inputs): return inputs
+    def style(self):
+        super().style()
+        self.message.style()
         
-    def act(self):
-        inputs = self.get_inputs()
-        if inputs:
-            old_usr, new_usr, pwd = inputs
-            user = Authorisation.get_user(old_usr, pwd)
-            not_exist = Authorisation.not_exist(old_usr)
-            if user == Authorisation.wrong_pass: show("Wrong password", f"Wrong password entered for User with username: {old_usr} ", "error")
-            elif user == not_exist: show("User Doesn't Exist", f"User with username: {old_usr} doesn't exist", "error")
-            else:
-                if confirm("Change Username Confirmation", f"Are you sure to change the username for this  user with details\nName :{user.get_name()}\nUsername: {old_usr}\nNew Username: {new_usr} ", 1):
-                    Authorisation.change_username(old_usr, pwd, new_usr)
-                    self.save_data()
-                    show("Username change Successful", "Username change is successful", "info")
-        else: show("Incorrect Input", "Make sure to enter the required inputs correctly", "warn")
-
-    def place_widgs(self):
-        
-        self.username_ent.place(relx=.1, rely=.15, relh=.1, relw=.6)
-        self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
-
-        self.new_ent.place(relx=.1, rely=.3, relh=.1, relw=.6)
-        
-        self.clr_new.place(relx=.72, rely=.3, relh=.09, relw=.1)
-        
-        self.password_ent.place(relx=.1, rely=.45, relh=.1, relw=.6)
-        self.clr_pwd.place(relx=.72, rely=.45, relh=.09, relw=.1)
-        
-        self.show_pass.place(relx=.84, rely=.45, relh=.09, relw=.15)
-
-        self.action.place(relx=.1, rely=.78, relh=.09, relw=.8)
-
-class Delete_User(Base_Password):
     
-    def __init__(self, master=None, inh=False):
-        super().__init__(master=master)
+    def login_check(self):
+        self.pass_count += 1
+        if self.pass_count >= 3:
+            self.informate("Incorrect Credentials and EXITING", "Too much unsuccessful logins exiting in 5 seconds", "info")
+            self.root.after(5000, sys.exit)
         
-        self.action.config(text="Delete User")
         
-        if not inh: self.init()
-    
-    def get_inputs(self):
-        inputs = [self.username.get(), self.password.get()]
-        if self.check_valids(*inputs): return inputs
-        
-    def act(self):
-        inputs = self.get_inputs()
-        if inputs:
-            usr, pwd = inputs
-            user = Authorisation.get_user(usr, pwd)
-            not_exist = Authorisation.not_exist(usr)
-            if user == Authorisation.wrong_pass: show("Wrong password", f"Wrong password entered for User with username: {usr} ", "error")
-            elif user == not_exist: show("User Doesn't Exist", f"User with username: {usr} doesn't exist", "error")
-            elif user.super_user == True: show("Super_User", Authorisation.get_cant_super(), "error")
-            else:
-                if confirm("Delete User Confirmation", f"Are you sure to delete User with details\nName :{user.get_name()}\nUsername: {usr}", 1):
-                    Authorisation.delete_user(usr, pwd)
-                    self.save_data()
-                    show("User Deleted Successful", f"User:\nName: {user.get_name()}\nUsername: {user.get_username()}  is successful", "info")
-        else: show("Incorrect Input", "Make sure to enter the required inputs correctly", "warn")
+        usr = self.get_username()
+        pwd = self.get_password()
+        if self.check_valids(usr, pwd):
+            log = Authorisation.login(usr, pwd)
+            if log == 1:
+                self.informate("Correct Credentials", "Correct Password\nLogin Successful.", "info")
+                self.pass_count = 0
+                self.defaults()
+                if self.okay: self.okay()
+            elif log == 2: self.informate("Incorrect Credentials", "Wrong Password", "warn")
+            else: self.informate("Incorrect Credentials", Authorisation.not_exist(usr), "error")
+        else:  self.informate("Incorrect Credentials", "Enter valid credentials", "error")
+
+    def defaults(self):
+        super().defaults()
+        self.forgot.set('0')
+        self.show_hint()
+        self.clear_username()
+        self.clear_password()
+
+    def informate(self, title='', msg='', which=''):
+        self.message.set_message(msg)
+        if which: show(title=title, msg=msg, which=which)
 
     
     def place_widgs(self):
+        super().place_widgs()
         
-        self.username_ent.place(relx=.1, rely=.15, relh=.1, relw=.6)
-        self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
+        self.forgot_chk.place(relx=.72, rely=.43, relh=.09, relw=.27)
+        
+        self.action.place(relx=.1, rely=.6, relh=.08, relw=.8)
+        
+        self.message.place_widgs()
 
-        self.password_ent.place(relx=.1, rely=.3, relh=.1, relw=.6)
-        
-        self.clr_pwd.place(relx=.72, rely=.3, relh=.09, relw=.1)
-        
-        self.show_pass.place(relx=.84, rely=.3, relh=.09, relw=.15)
 
-        self.action.place(relx=.1, rely=.5, relh=.08, relw=.8)
+
+
 
 class Login_Status(LabelFrame):
-    font = Fonts.font15b
-    logout_font = font
+    # font = Fonts.font15b
+    # logout_font = font
     
     def __init__(self, master=None):
         super().__init__(master=master, relief="solid")
@@ -607,66 +577,6 @@ class Login(LabelFrame):
         self.header.place(relx=0, rely=0, relh=.26, relw=1)
         
         self.pass_login.place(relx=.05, rely=.35, relh=.63, relw=.9)
-
-class Password_Login(Delete_User):
-    def __init__(self, master=None, okay=None):
-        super().__init__(master=master, inh=True)
-        self.okay = okay
-        self.hx, self.hy, self.hh, self.hw, = .1, .43, .09, .6
-        self.hint_text = "Love You"
-        self.action.config(text="Login", command=self.login_check)
-        
-        self.pass_count = 0
-        
-        self.message = Out_Message(self, head="Love", relx=.008, rely=.7, relh=.3, relw=.968)
-        
-        self.init()
-    
-    def style(self):
-        super().style()
-        self.message.style()
-        
-    
-    def login_check(self):
-        self.pass_count += 1
-        if self.pass_count >= 3:
-            self.informate("Incorrect Credentials and EXITING", "Too much unsuccessful logins exiting in 5 seconds", "info")
-            self.root.after(5000, sys.exit)
-        
-        
-        usr = self.get_username()
-        pwd = self.get_password()
-        if self.check_valids(usr, pwd):
-            log = Authorisation.login(usr, pwd)
-            if log == 1:
-                self.informate("Correct Credentials", "Correct Password\nLogin Successful.", "info")
-                self.pass_count = 0
-                self.defaults()
-                if self.okay: self.okay()
-            elif log == 2: self.informate("Incorrect Credentials", "Wrong Password", "warn")
-            else: self.informate("Incorrect Credentials", Authorisation.not_exist(usr), "error")
-        else:  self.informate("Incorrect Credentials", "Enter valid credentials", "error")
-
-    def defaults(self):
-        super().defaults()
-        self.forgot.set('0')
-        self.show_hint()
-        self.clear_username()
-        self.clear_password()
-
-    def informate(self, title='', msg='', which=''):
-        self.message.set_message(msg)
-        if which: show(title=title, msg=msg, which=which)
-
-    
-    def place_widgs(self):
-        super().place_widgs()
-        
-        self.forgot_chk.place(relx=.72, rely=.43, relh=.09, relw=.27)
-        
-        self.action.place(relx=.1, rely=.6, relh=.08, relw=.8)
-        
-        self.message.place_widgs()
 
 class Password_Settings(Frame):
     

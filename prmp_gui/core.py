@@ -792,7 +792,6 @@ class PRMP_Input:
     def __init__(self, placeholder='', _type='text', values=[], very=False, default=None, **kwargs):
         _type = _type.lower()
 
-        self.placeholder = placeholder
         self.values = values
         
         self.bind("<FocusIn>", self._clear_placeholder, '+')
@@ -811,8 +810,8 @@ class PRMP_Input:
             self.verify = self.checkingNumber
             self.returnType = float
         elif _type == 'money':
-            self.placeholder = f'{self._moneySign} 0'
-            if default != None: self.placeholder = f'{self._moneySign}{default}'
+            placeholder = f'{self._moneySign} 0'
+            if default != None: placeholder = f'{self._moneySign}{default}'
             self.set = self.setMoney
             self.get = self.getMoney
             self.bind('<KeyRelease>', self.checkingMoney, '+')
@@ -833,7 +832,12 @@ class PRMP_Input:
         if self.values or (_type in types): self.very = True
         else: self.very = very or False
 
+        self.changePlaceholder(placeholder)
+    
+    def changePlaceholder(self, placeholder):
+        self.placeholder = placeholder
         self.set(self.placeholder)
+
     
     def normVery(self, e=0):
         if not self.very: return True
@@ -956,6 +960,7 @@ class PRMP_Input:
         if self._get() == '': self.set(self.placeholder)
         pass
     
+    def empty(self): self.set(self.placeholder)
     def clear(self): self.delete('0', 'end')
     
     def _get(self): return super().get()
@@ -1916,6 +1921,10 @@ class PRMP_Window(PRMP_Widget):
 
     TKICON = ''
     PRMPICON = ''
+
+    def start(self):
+        self.paint()
+        self.mainloop()
 
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, **kwargs):
         
