@@ -22,6 +22,8 @@ class Auths_Vars:
 
     
     @classmethod
+    def decify(cls, byt): return cls._decompit(byt).decode()
+    @classmethod
     def get_permission(cls, admin):
         if admin == True: return [cls.admin, cls.get_admin_text()]
         elif admin == False: return [cls.non_admin, cls.get_non_admin_text()]
@@ -134,6 +136,15 @@ class User(PRMP_Mixins):
         return text
     
     @property
+    def _name(self): return self.__name
+    @property
+    def _username(self): return self.__username
+    @property
+    def _hint(self): return self.__hint
+    @property
+    def _permission(self): return self.__permission
+
+    @property
     def name(self): return Auths_Vars._decompit(self.__name).decode()
     @property
     def username(self): return Auths_Vars._decompit(self.__username).decode()
@@ -168,7 +179,7 @@ class User(PRMP_Mixins):
     
     @property
     def _hash(self):
-        vals = [self.name, self.username, self.password, self.hint, self.permission]
+        vals = [self.__name, self.__username, self.__password, self.__hint, self.__permission]
         return vals
 
 
@@ -209,15 +220,14 @@ class Authorisation(Auths_Vars):
     @classmethod
     def check_username(cls, usr):
         users = cls.get_usernames_lower()
-        return usr.lower() in users
+        bol  = usr.lower() in users
+        return bol
     
     @classmethod
     def check_name(cls, name): return name.strip().lower() in cls.get_names_lower()
     
     @classmethod
-    def check_super_users(cls, usr): return cls._compit(usr) in [user[0] for user in cls.__super_users]
-    
-
+    def check_super_users(cls, usr): return cls._compit(usr) in [user._hash[0] for user in cls.__super_users]
     
     @classmethod
     def add_user(cls, name, usr, pwd, hint='', admin=False):
@@ -230,8 +240,8 @@ class Authorisation(Auths_Vars):
                 else:
                     new = User(cls._compit(name), cls._compit(usr), cls._compit(pwd), cls._compit(hint), cls.admin if admin else cls.non_admin)
                     cls.__users.append(new)
-                    return cls._decompit(cls.added).decode(), new
-        else: return cls._decompit(cls.insufficient).decode()
+                    return cls.added, new
+        else: return cls.insufficient
     
     @classmethod
     def get_usernames(cls):
@@ -261,7 +271,7 @@ class Authorisation(Auths_Vars):
     def get_user(cls, usr, pwd):
         all_ = cls.get_users()
         for user in all_:
-            if cls._compit(usr) == user.username:
+            if cls._compit(usr) == user._username:
                 if cls._compit(pwd) == user.password: return user
                 else: return cls.wrong_pass
         return cls.not_exist(usr)
@@ -321,26 +331,26 @@ class Authorisation(Auths_Vars):
             h_usr = cls._compit(usr)
             h_pwd = cls._compit(pwd)
             for user in cls.__users:
-                if (user[1] == h_usr) and (user[2] == h_pwd): user[-1] = cls.admin
+                if (user._username == h_usr) and (user._password == h_pwd): user._User__permission = cls.admin
     @classmethod
     def make_non_admin(cls, usr='', pwd=''):
         if usr and pwd:
             h_usr = cls._compit(usr)
             h_pwd = cls._compit(pwd)
             for user in cls.__users:
-                if (user[1] == h_usr) and (user[2] == h_pwd): user[-1] = cls.non_admin
+                if (user._username == h_usr) and (user._password == h_pwd): user._User__permission = cls.non_admin
     
     @classmethod
     def load_users(cls, users):
         for user_ in users:
-            if user_[0] in [user[0] for user in cls.__users]: continue
-            else: cls.__users.append(User(*user_))
+            if user_.username in [user.username for user in cls.__users]: continue
+            else: cls.__users.append(user_)
     
     @classmethod
     def load_super_users(cls, users):
-        users_ = []
-        for user in users: users_.append(User(*user))
-        cls.__super_users = users_
+        for user_ in users:
+            if user_.username in [user.username for user in cls.__users]: continue
+            else: cls.__super_users.append(user_)
 
     @classmethod
     def login(cls, usr, pwd):
@@ -379,13 +389,14 @@ class Authorisation(Auths_Vars):
     def all_users(cls): return cls.get_users()
     
     @classmethod
-    def __all_users_unhash(cls):
+    def _all_users_unhash(cls):
         users = []
         for user in cls.all_users(): users.append(user.unhash)
         return users
     
     @classmethod
     def get_hash_permission_from_bool(cls, admin): return cls.get_permission(admin)[0]
+
     @classmethod
     def get_text_permission_from_bool(cls, admin): return cls.get_permission(admin)[1]
 
