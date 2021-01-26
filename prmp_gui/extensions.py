@@ -166,8 +166,11 @@ class PRMP_ImageWidget:
         self.isGif = False
 
         dif = 20
+        # if not kwargs: return
+        # print(kwargs)
+        
         self.frame_counter = 0
-        # self.thumb = self.resize or self.thumb
+        # self.thumb = self.resize or self.thumb 
         if not (self.resize and self.thumb):
             self.thumb = self.width-dif, self.height-dif
             if self.thumb[0] < 0 and self.thumb[1] < 0: 
@@ -175,7 +178,7 @@ class PRMP_ImageWidget:
                 self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
                 return
 
-        if prmpImage:
+        try:
             if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image): self.imageFile = prmpImage.imageFile
@@ -208,7 +211,9 @@ class PRMP_ImageWidget:
             
             self.configure(image=self.frame)
 
-        else: self.loadImage(self.default_dp)
+        except Exception as e:
+            print(e, __file__, 'Line ', 212)
+            self.loadImage(self.default_dp)
     
     def __renderGif(self):
         if not self.isGif: return

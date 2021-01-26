@@ -1,6 +1,7 @@
 # from .gam.gam import GaM
 import pickle, os, io, zlib, threading
 from prmp_gui.core import PRMP_Theme
+from ..utils.auths import Authorisation
 
 
 class GaM_Settings:
@@ -13,6 +14,8 @@ class GaM_Settings:
     dataPath = os.path.join(cwd, 'data.prmp')
     otherDataPath = os.path.join(cwd, 'specialData.prmp')
     SaveDir = ''
+    Users = []
+    Super_Users = []
 
     @classmethod
     def loadAll(cls):
@@ -20,8 +23,6 @@ class GaM_Settings:
         cls.loadDatas()
         cls.loadOtherDatas()
         # except Exception as e: print(e)
-
-        PRMP_Theme.setThemeIndex(cls.ThemeIndex)
 
     @classmethod
     def saveAll(cls):
@@ -65,10 +66,17 @@ class GaM_Settings:
         for k, v in data.items(): setattr(GaM_Settings, k, v)
         # saveDir
         # auths
-        pass
+        cls.setLoads()
+    
+    @classmethod
+    def setLoads(cls):
+        PRMP_Theme.setThemeIndex(cls.ThemeIndex)
+        Authorisation.load_users(cls.Users)
+        Authorisation.load_super_users(cls.Super_Users)
+
     @classmethod
     def saveOtherDatas(cls):
-        data = dict(SaveDir=GaM_Settings.SaveDir, ThemeIndex=PRMP_Theme.currentThemeIndex())
+        data = dict(SaveDir=GaM_Settings.SaveDir, ThemeIndex=PRMP_Theme.currentThemeIndex(), Users=Authorisation.get_users(), Super_users=Authorisation.get_super_users())
         dataBytes = pickle.dumps(data)
         cls.compress(dataBytes, cls.otherDataPath)
 

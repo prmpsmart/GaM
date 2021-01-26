@@ -536,12 +536,12 @@ class Login(LabelFrame):
 
         di = os.path.dirname(__file__)
         logo = os.path.join(di, 'imgs/gam.png')
-        self.header = PRMP_ImageLabel(self, logo, imageKwargs=dict(inbuilt=0, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
+
+        self.header = PRMP_ImageLabel(self, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
 
         self.pass_login = Password_Login(self.container, self.okay)
 
         self.place_widgs()
-        # self.gui.show_gui()
 
     def okay(self): self.gui.load_gui()
 

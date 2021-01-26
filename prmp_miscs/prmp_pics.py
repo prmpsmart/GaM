@@ -218,6 +218,7 @@ class PRMP_ImageFile(BytesIO):
             return pic
 
     def __init__(self, filename='', inbuilt=False, inExt='png', base64=b'', image=None, data=b''):
+
         passed = [bool(a) for a in [filename, base64, image]].count(True)
         assert passed <= 1, 'Only one is required in [filename, base64, image]'
 
@@ -285,7 +286,7 @@ class PRMP_ImageFile(BytesIO):
 
 class PRMP_Image:
     count = 0
-    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None):
+    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, base64=b''):
         
         pic = None
         self.imageFile = None
@@ -294,6 +295,7 @@ class PRMP_Image:
         
         self._thumb = thumb
         self._resize = resize
+        # print(base64)
 
         self.image = None
         self.tkImage = None
@@ -301,9 +303,10 @@ class PRMP_Image:
         self._animatedTkFrames = []
         self._animatedFrames = []
 
-        if filename or image:
-            if isinstance(filename, (str, bytes)): self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
+        if filename or image or base64:
+            if filename: self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
+            elif base64: self.imageFile = PRMP_ImageFile(base64=base64)
             else: self.imageFile = filename or image
 
             if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError('{} or {} is not a valid value.'.format(filename, image))

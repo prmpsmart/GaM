@@ -253,9 +253,11 @@ class PRMP_ImageDialog(PRMP_Dialog):
 
 
 class Splash(PRMP_Dialog):
-    def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), callback=None, title='Goodness and Mercy', **kwargs):
+    def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), callback=None, title='Goodness and Mercy', imageKwargs={}, delay=2000, **kwargs):
 
         self.prmpImage = prmpImage
+        self.delay = delay
+        self.imageKwargs = imageKwargs
 
         super().__init__(master, atb=atb, asb=asb, ntb=ntb, geo=geo, title=title, editable=0, callback=callback, **kwargs)
     
@@ -265,26 +267,33 @@ class Splash(PRMP_Dialog):
         else:
             cont = self
             self.container.place_forget()
-        self.image = PRMP_ImageLabel(cont, prmpImage=self.prmpImage, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=self.geo)
 
-        self.load = PRMP_ImageLabel(cont, prmpImage='line_boxes', place=dict(relx=0, rely=.9, relw=1, relh=.1), imageKwargs=dict(inbuilt=1, inExt='gif'), resize=(280, 50))
-        
-        # self.attributes('-alpha', .4)
-    def set(self): pass
-    
-    def defaults(self):
-        self.image.unbind('<3>')
-        self.image.unbind('<Double-1>')
-        self.load.unbind('<3>')
-        self.load.unbind('<Double-1>')
+        self.image = PRMP_ImageLabel(cont, prmpImage=self.prmpImage, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=self.geo, imageKwargs=self.imageKwargs, normal=1)
+
+        self.load = PRMP_ImageLabel(cont, prmpImage='line_boxes', place=dict(relx=0, rely=.9, relw=1, relh=.1), imageKwargs=dict(inbuilt=1, inExt='gif'), resize=(280, 50), normal=1)
+
+        # self.after(self.delay, self.destroy)
         self.after(10, self.processCallback)
 
-    
     def processCallback(self):
         if self.callback: self.callback(self.recieveCallbackResponse)
         else: self.after(10, self.processCallback)
     
     def recieveCallbackResponse(self, response):
-        if response: proceed
+        if response: self.destroy()
         else: self.processCallback()
+
+    def set(self): pass
+    
+
+
+
+
+
+
+
+
+
+
+
 
