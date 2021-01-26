@@ -5,7 +5,7 @@ from .auths import Authorisation
 from prmp_gui.dialogs import *
 
 
-def show_admin_required(): dialogFunc(title="ADMIN Required", msg="An ADMIN permission is required.", which="error")
+def show_admin_required(): PRMP_MsgBox(title="ADMIN Required", msg="An ADMIN permission is required.", _type="error", ask=0)
 
 def make_change(ordfunc=None, *args, **kwargs):
     if Authorisation.is_admin():
@@ -257,18 +257,18 @@ class Change_Username(Base_Password):
         if inputs:
             old_usr, new_usr, pwd = inputs
             if Authorisation.check_username(new_usr):
-                dialogFunc(title="User exists!", msg=f"User with username: {new_usr} already exists.", which="error")
+                PRMP_MsgBox(self, title="User exists!", msg=f"User with username: {new_usr} already exists.", _type="error")
                 return
             user = Authorisation.get_user(old_usr, pwd)
             not_exist = Authorisation.not_exist(old_usr)
-            if user == Authorisation.wrong_pass: dialogFunc(title="Wrong password", msg=f"Wrong password entered for User with username: {old_usr} ", which="error")
-            elif user == not_exist: dialogFunc(title="User Doesn't Exist", msg=f"User with username: {old_usr} doesn't exist", which="error")
+            if user == Authorisation.wrong_pass: PRMP_MsgBox(self, title="Wrong password", msg=f"Wrong password entered for User with username: {old_usr} ", _type="error")
+            elif user == not_exist: PRMP_MsgBox(self, title="User Doesn't Exist", msg=f"User with username: {old_usr} doesn't exist", _type="error")
             else:
-                if dialogFunc(title="Change Username Confirmation", msg=f"Are you sure to change the username for this  user with details\nName :{user.name}\nUsername: {old_usr}\nNew Username: {new_usr} ", which=1, ask=1):
+                if dialogFunc(self, title="Change Username Confirmation", msg=f"Are you sure to change the username for this  user with details\nName :{user.name}\nUsername: {old_usr}\nNew Username: {new_usr} ", which=1, ask=1):
                     Authorisation.change_username(old_usr, pwd, new_usr)
-                    self.save_data()
-                    dialogFunc(title="Username change Successful", msg="Username change is successful", which="info")
-        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
+                    # self.save_data()
+                    PRMP_MsgBox(self, title="Username change Successful", msg="Username change is successful", _type="info")
+        else: PRMP_MsgBox(self, title="Incorrect Input", msg="Make sure to enter the required inputs correctly", _type="warn")
 
     def place_widgs(self):
         
@@ -309,15 +309,15 @@ class Delete_User(Base_Password):
             usr, pwd = inputs
             user = Authorisation.get_user(usr, pwd)
             not_exist = Authorisation.not_exist(usr)
-            if user == Authorisation.wrong_pass: dialogFunc(title="Wrong password", msg=f"Wrong password entered for User with username: {usr} ", which="error")
-            elif user == not_exist: dialogFunc(title="User Doesn't Exist", msg=f"User with username: {usr} doesn't exist", which="error")
-            elif user.super_user == True: dialogFunc(title="Super_User", msg=Authorisation.get_cant_super(), which="error")
+            if user == Authorisation.wrong_pass: PRMP_MsgBox(self, title="Wrong password", msg=f"Wrong password entered for User with username: {usr} ", _type="error")
+            elif user == not_exist: PRMP_MsgBox(self, title="User Doesn't Exist", msg=f"User with username: {usr} doesn't exist", _type="error")
+            elif user.super_user == True: PRMP_MsgBox(self, title="Super_User", msg=Authorisation.get_cant_super(), _type="error")
             else:
                 if dialogFunc(title="Delete User Confirmation", msg=f"Are you sure to delete User with details\nName :{user.name}\nUsername: {usr}", which=1, ask=1):
                     Authorisation.delete_user(usr, pwd)
                     self.save_data()
-                    dialogFunc(title="User Deleted Successful", msg=f"User:\nName: {user.name}\nUsername: {user.username}  is successful", which="info")
-        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
+                    PRMP_MsgBox(self, title="User Deleted Successful", msg=f"User:\nName: {user.name}\nUsername: {user.username}  is successful", _type="info")
+        else: PRMP_MsgBox(self, title="Incorrect Input", msg="Make sure to enter the required inputs correctly", _type="warn")
 
     
     def place_widgs(self):
@@ -366,14 +366,14 @@ class Change_Password(Base_Password):
             username, old, new, conf, hint = inputs
             user = Authorisation.get_user(username, old)
             not_exist = Authorisation.not_exist(username)
-            if user == Authorisation.wrong_pass: dialogFunc(title="Wrong password", msg="Wrong password entered for User with username: {username} ", which="error")
-            elif user == not_exist: dialogFunc(title="User Not Exist", msg=f"User with username: {username} doesn't exist", which="error")
+            if user == Authorisation.wrong_pass: PRMP_MsgBox(self, title="Wrong password", msg="Wrong password entered for User with username: {username} ", _type="error")
+            elif user == not_exist: PRMP_MsgBox(self, title="User Not Exist", msg=f"User with username: {username} doesn't exist", _type="error")
             else:
                 if dialogFunc(title="Change Password Confirmation", msg=f"Are you sure to change the password for this  user with details\nName :{user.name}\nUsername: {username}", which=1, ask=1):
                     Authorisation.change_password(username, old, new, hint)
                     # self.save_data()
-                    dialogFunc(title="Change Password Successful", msg=f"The password for User:\nName :{user.name}\nUsername: {username}\n is changed successfully", which="info")
-        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
+                    PRMP_MsgBox(self, title="Change Password Successful", msg=f"The password for User:\nName :{user.name}\nUsername: {username}\n is changed successfully", _type="info")
+        else: PRMP_MsgBox(self, title="Incorrect Input", msg="Make sure to enter the required inputs correctly", _type="warn")
 
     def place_widgs(self):
         if not self.inh:
@@ -426,7 +426,8 @@ class Add_User(Change_Password):
             name, username, password, confirm_password, hint, admin = inputs
             admin = Authorisation.get_permission(admin)[1]
             if password != confirm_password:
-                dialogFunc(title="Unmatch Passwords!", msg="The passwords are not matching", which="warn")
+                # dialogFunc(title="Unmatch Passwords!", msg="The passwords are not matching", which="warn")
+                PRMP_MsgBox(self, title="Unmatch Passwords!", msg="The passwords are not matching", _type="warn")
                 return
             if dialogFunc(title="Add User Confirmation", msg=f"Are you sure to add user with details\nName :{name}\nUsername: {username}\nHint for Password: {hint}\nPermission: {admin} ", which=1, ask=1):
                 del inputs[3]
@@ -434,10 +435,11 @@ class Add_User(Change_Password):
                 if add[0] == Authorisation.added:
                     # self.save_data()
                     add = Authorisation.decify(add[0])
-                    dialogFunc(title="Add Successful", msg=f"User: {name}\nUsername: {username}\nis added SUCCESSFULLY ", which="info")
+                    # dialogFunc(title="Add Successful", msg=f"User: {name}\nUsername: {username}\nis added SUCCESSFULLY ", which="info")
+                    PRMP_MsgBox(self, title="Add Successful", msg=f"User: {name}\nUsername: {username}\nis added SUCCESSFULLY ")
                     self.emptyWidgets()
-                else: dialogFunc(title="Add ERROR", msg=add, which="error")
-        else: dialogFunc(title="Incorrect Input", msg="Make sure to enter the required inputs correctly", which="warn")
+                else: PRMP_MsgBox(self, title="Add ERROR", msg=add, _type="error")
+        else: PRMP_MsgBox(self, title="Incorrect Input", msg="Make sure to enter the required inputs correctly", _type="warn")
 
     def place_widgs(self):
         super().place_widgs()
@@ -481,7 +483,8 @@ class Password_Login(Delete_User):
         else:  self.informate("Incorrect Credentials", "Enter valid credentials", "error")
 
     def informate(self, title='', msg='', which=''):
-        if which: dialogFunc(title=title, msg=msg,which=which)
+        # if which: dialogFunc(title=title, msg=msg,which=which)
+        PRMP_MsgBox(self, title=title, msg=msg,_type=which, ask=0)
     
     def place_widgs(self):
         super().place_widgs()
@@ -492,20 +495,18 @@ class Password_Login(Delete_User):
 
 
 
-
-
 class Login_Status(LabelFrame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master=master, relief="solid", **kwargs)
         
-        self.login_dets = Label(self, relief="solid", text=self.current_user(), place=dict(relx=0, rely=0, relh=1, relw=.7))
-        self.logout = Button(self, relief="solid", text="LOGOUT", command=self.logout_confirm, place=dict(relx=.7, rely=0, relh=1, relw=.1))
+        self.login_dets = Label(self, relief="solid", text=self.current_user(), place=dict(relx=0, rely=0, relh=1, relw=.6))
+        self.logout = Button(self, relief="solid", text="LOGOUT", command=self.logout_confirm, place=dict(relx=.6, rely=0, relh=1, relw=.2))
         self.admin_dets = Label(self, relief="solid", text=Authorisation.get_current_user_permission(), place=dict(relx=.8, rely=0, relh=1, relw=.2))
         
         self.update_status()
 
     def current_user(self):
-        user_text = "Current User : %s (%s) "
+        user_text = "%s (%s) "
         user = Authorisation.get_current_user()
         subs = ()
         if not isinstance(user, str): subs = user.status
@@ -513,15 +514,17 @@ class Login_Status(LabelFrame):
         else: return user
     
     def logout_confirm(self):
-        if dialogFunc(title="Logout Confirm", msg="Are you sure to LOGOUT?", which=1, ask=1): Authorisation.logout()
+        # if dialogFunc(title="Logout Confirm", msg="Are you sure to LOGOUT?", which=1, ask=1): Authorisation.logout()
+        PRMP_MsgBox(self, title="Logout Confirm", msg="Are you sure to LOGOUT?", ask=1, callback=self._logout_confirm)
+
+    def _logout_confirm(self, w):
+        if w: Authorisation.logout()
     
     def update_status(self):
         self.login_dets.config(text=self.current_user())
         self.admin_dets.config(text=Authorisation.get_current_user_permission())
         # print(Authorisation.get_current_user_permission())
         self.after(1000, self.update_status)
-    
-
 
 class Login(LabelFrame):
     def __init__(self, gui=None, **kwargs):
@@ -551,12 +554,10 @@ class Password_Settings(Frame):
     def __init__(self, master, **kwargs):
         try: master = master.root
         except: pass
-        super().__init__(master, bg=Styles.background, relief="solid", **kwargs)
+        super().__init__(master, relief="solid", **kwargs)
 
         self.container = Notebook(self)
         
-        Login_Status.font = Fonts.font9
-        Login_Status.logout_font = Fonts.font8
         self.login_status = Login_Status(self)
         
         self.tab_count = 0
@@ -575,6 +576,7 @@ class Password_Settings(Frame):
         self.add_wids_to_nb()
         self.place_widgs()
         
+        # self.bell()
         
         
     def add_wids_to_nb(self):
