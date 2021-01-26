@@ -134,7 +134,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
 FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, **inbuiltKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False,**inbuiltKwargs):
         self.rt = None
         self.prmpImage = prmpImage
         self.thumb = thumb
@@ -147,6 +147,8 @@ class PRMP_ImageWidget:
         self.isGif = False
 
         self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
+
+        self._normal = normal
         self.bindMenu()
         
         self.loadImage(self.prmpImage, **inbuiltKwargs)
@@ -237,6 +239,8 @@ class PRMP_ImageWidget:
         if file: self.loadImage(file)
     
     def bindMenu(self):
+        # print(self._normal)
+        if self._normal: return
         self.bind('<1>', self.delMenu, '+')
         self.bind('<3>', self.showMenu, '+')
         self.bind('<Double-1>', self.camera)
@@ -280,15 +284,15 @@ class PRMP_ImageWidget:
 IW = PRMP_ImageWidget
 
 class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={}, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={},  normal=0, **kwargs):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center'), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **inbuiltKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **inbuiltKwargs)
 IL = PRMP_ImageLabel
 
 class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={}, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={},  normal=0, **kwargs):
         PRMP_Button.__init__(self, master, config=dict(anchor='center'), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **inbuiltKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **inbuiltKwargs)
 IL = PRMP_ImageButton
 
 class PRMP_DateWidget:
