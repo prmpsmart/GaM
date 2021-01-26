@@ -530,7 +530,7 @@ class Login(LabelFrame):
         
         self.container = Frame(self, relief="solid")
         
-        self.header = PRMP_ImageLabel(self, inbuiltKwargs=dict(inbuilt=1, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'))
+        self.header = PRMP_ImageLabel(self, r'C:\Users\Administrator\Documents\GaM OFFICE\logos\gam.png', inbuiltKwargs=dict(inbuilt=0, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
 
         self.pass_login = Password_Login(self.container, self.okay)
 

@@ -54,7 +54,9 @@ class PhotoViewer(PRMP_MainWindow):
     def defaults(self):
         self.bind('<Left>', self.previousPic)
         self.bind('<Right>', self.nextPic)
-        self.updateDatas()
+        if self._folder: self.chooseDir(folder=self._folder)
+        else: self.updateDatas()
+
     
     def byIndex(self, e=0):
         index = self.index.get()
@@ -72,7 +74,7 @@ class PhotoViewer(PRMP_MainWindow):
         self.total.set(self._total)
         self.index.set(self._index+1)
         self.setCurrent()
-    
+        
     def setCurrent(self):
         if not self._pixs: return
         self.index.set(self._index)
@@ -84,9 +86,10 @@ class PhotoViewer(PRMP_MainWindow):
         self.current.set(current)
         self.imageLabel.loadImage(self._current)
     
-    def chooseDir(self, e=0):
-        folder = dialogFunc(path=1, folder=1)
+    def chooseDir(self, e=0, folder=''):
+        folder = folder or dialogFunc(path=1, folder=1)
         if not folder: return
+
         self._folder = folder
         self._pixs = getPixs(folder)
         self._current = ''
@@ -133,37 +136,6 @@ class PhotoViewer(PRMP_MainWindow):
 
 PV = PhotoViewer
 
-PV(geo=(500, 500), tm=1).mainloop()
-exit()
-
-rootDir = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GAM\GAM\prmp_miscs\prmp_pics\prmp_xbms'
-rootDir = r'C:\Users\Administrator\pictures\valentina'
-
-# PWd.TIPPING = 9
-root = Tk(title='XBM viewer', side='center', geo=(2100, 900), gaw=1, tm=1)
-cont = Frame(root.container)
-cont.place(relx=0, y=0, relw=1, relh=1)
+PV(geo=(500, 500), tm=1, folder=r'C:\Users\Administrator\Documents\GaM OFFICE\logos').mainloop()
 
 
-lbls = []
-count = 0
-c = 0
-
-for xbm in listdir(rootDir):
-    r = count % 8
-    if r == 0 and count != 0: c += 1
-    fxbm = path.join(rootDir, xbm)
-    # lbl = L(cont, text=xbm, tip=xbm)
-    # lbl = F(cont, tip=xbm)
-    lbl = PRMP_ImageLabel(cont, prmpImage=fxbm, inbuiltKwargs=dict(inbuilt=0, inExt='xbm'), resize=(100, 100))#.place(relx=.2, rely=.2, relh=.6, relw=.6)
-    lbl.grid(row=r, column=c)
-    count += 1
-    lbls.append(lbl)
-    
-# B(cont, text='tesst', tip='iepie kiuaw \niua oaiw acioe opopwefno aifu').grid(column=c, row=r+2)
-# B(cont, text='tesst', tip='iepie kiuaw \niua oaiw acioe opopwefno aifu').grid()
-
-
-root.paint()
-cont.paint()
-root.mainloop()
