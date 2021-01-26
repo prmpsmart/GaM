@@ -3,6 +3,7 @@ from ...utils.auths import Authorisation
 # GUI counterpart
 
 from prmp_gui.dialogs import *
+from .gam_images import GAM_PNGS
 
 
 def show_admin_required(): PRMP_MsgBox(title="ADMIN Required", msg="An ADMIN permission is required.", _type="error", ask=0)
@@ -535,7 +536,7 @@ class Login(LabelFrame):
 
         di = os.path.dirname(__file__)
         logo = os.path.join(di, 'imgs/gam.png')
-        self.header = PRMP_ImageLabel(self, logo, inbuiltKwargs=dict(inbuilt=0, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
+        self.header = PRMP_ImageLabel(self, logo, imageKwargs=dict(inbuilt=0, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
 
         self.pass_login = Password_Login(self.container, self.okay)
 

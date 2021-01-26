@@ -24,7 +24,7 @@ for xbm in listdir(rootDir):
     if r == 0 and count != 0: c += 1
     # lbl = L(cont, text=xbm, tip=xbm)
     # lbl = F(cont, tip=xbm)
-    lbl = PRMP_ImageLabel(cont, prmpImage=fxbm, inbuiltKwargs=dict(inbuilt=0, inExt='xbm'), resize=(100, 100))#.place(relx=.2, rely=.2, relh=.6, relw=.6)
+    lbl = PRMP_ImageLabel(cont, prmpImage=fxbm, imageKwargs=dict(inbuilt=0, inExt='xbm'), resize=(100, 100))#.place(relx=.2, rely=.2, relh=.6, relw=.6)
     lbl.grid(row=r, column=c)
     count += 1
     lbls.append(lbl)
