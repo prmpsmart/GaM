@@ -1143,13 +1143,13 @@ class PRMP_Sizegrip(PRMP_Style_, ttk.Sizegrip):
 Sizegrip = PSg = PRMP_Sizegrip
 
 class PRMP_Style(ttk.Style, PRMP_Mixins):
-    loaded = False
+    LOADED = False
     ttkthemes = ("black", "blue", 'prmp')
     ttkstyles = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
     def __init__(self, master=None):
         super().__init__(master)
-        if not PRMP_Style.loaded: self.createPrmp()
+        if not PRMP_Style.LOADED: self.createPrmp()
         self.theme_use('prmp')
     
     def tupledFont(self, fontDict):
@@ -1203,7 +1203,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
         return imageKeys
     
     def createPrmp(self):
-        if PRMP_Style.loaded: return
+        if PRMP_Style.LOADED: return
         
         self._images = (
 
@@ -1236,7 +1236,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
         settings = elements_creating
         
         self.theme_create('prmp', settings=settings)
-        PRMP_Style.loaded = True
+        PRMP_Style.LOADED = True
     
     @property
     def settings(self):
@@ -1666,7 +1666,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
         return _settings
 
     def update(self, e=0):
-        if not PRMP_Style.loaded: self.createPrmp()
+        if not PRMP_Style.LOADED: self.createPrmp()
         self.theme_settings('prmp', self.settings)
 Style = PSt = PRMP_Style
 
@@ -2333,13 +2333,28 @@ class PRMP_Window(PRMP_Widget):
     def addToMenu(self, widget, **kwargs):
         if self.menuBar: self.menuBar.addWidget(widget, **kwargs)
     
+    def destroy(self):
+        if self == self.topest:
+            PRMP_Window.TOPEST = None
+            PRMP_Window.STYLE = None
+            PRMP_Window.TKICON = ''
+            PRMP_Window.PRMPICON = ''
+            PRMP_Style.LOADED = False
+
+        super().destroy()
+    
     def destroySelf(self, e=0):
         self.closing()
         self.save()
         def out(u):
+            self.destroy()
             if u: os.sys.exit()
         
-        if self is self.topest:
+        if self == self.topest:
+            # PRMP_Window.TOPEST = None
+            # PRMP_Window.STYLE = None
+            # PRMP_Window.TKICON = ''
+            # PRMP_Window.PRMPICON = ''
             from .dialogs import PRMP_MsgBox
             PRMP_MsgBox(title='Exit', message='Are you sure to exit?', callback=out)
         else: self.destroy()
@@ -2441,13 +2456,13 @@ class PRMP_Window(PRMP_Widget):
 
 PW = PRMP_Window
 
-class PRMP_Tk(tk.Tk, PRMP_Window):
+class PRMP_Tk(PRMP_Window, tk.Tk):
     def __init__(self, _ttk_=False, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
 Tk = PT = PRMP_Tk
 
-class PRMP_Toplevel(tk.Toplevel, PRMP_Window):
+class PRMP_Toplevel(PRMP_Window, tk.Toplevel):
     def __init__(self, master=None, _ttk_=False, **kwargs):
         tk.Toplevel.__init__(self, master)
         if master:
@@ -2514,6 +2529,7 @@ class PRMP_MainWindow(PRMP_Mixins):
         
         master = master or PRMP_Window.TOPEST
 
+        
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, **kwargs)
         # self.root.root = self.root

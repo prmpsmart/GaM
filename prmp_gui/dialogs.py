@@ -44,6 +44,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, **kwargs):
 
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, grab=grab, **kwargs)
+
         PRMP_FillWidgets.__init__(self, values=values)
 
         self.__result = None
@@ -64,7 +65,9 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         
         self.paint()
         if bell: self.bell()
+        
         self.mainloop()
+
         # if show: self.mainloop()
         # else: self.wait_window()
         
@@ -273,7 +276,7 @@ class Splash(PRMP_Dialog):
         self.load = PRMP_ImageLabel(cont, prmpImage='line_boxes', place=dict(relx=0, rely=.9, relw=1, relh=.1), imageKwargs=dict(inbuilt=1, inExt='gif'), resize=(280, 50), normal=1)
 
         # self.after(self.delay, self.destroy)
-        self.after(10, self.processCallback)
+        self.after(self.delay, self.processCallback)
 
     def processCallback(self):
         if self.callback: self.callback(self.recieveCallbackResponse)

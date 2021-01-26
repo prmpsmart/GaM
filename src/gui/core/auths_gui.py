@@ -528,31 +528,6 @@ class Login_Status(LabelFrame):
         # print(Authorisation.get_current_user_permission())
         self.after(1000, self.update_status)
 
-class Login(LabelFrame):
-    def __init__(self, gui=None, **kwargs):
-        super().__init__(gui, relief="solid", **kwargs)
-        
-        self.container = Frame(self, relief="solid")
-
-        di = os.path.dirname(__file__)
-        logo = os.path.join(di, 'imgs/gam.png')
-
-        self.header = PRMP_ImageLabel(self, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
-
-        self.pass_login = Password_Login(self.container, self.okay)
-
-        self.place_widgs()
-
-    def okay(self): self.gui.load_gui()
-
-
-    def place_widgs(self):
-        self.place(relx=0, rely=0, relh=1, relw=1)
-        self.container.place(relx=.005, rely=.005, relh=.99, relw=.99)
-        self.header.place(relx=.005, rely=.005, relh=.26, relw=.99)
-        
-        self.pass_login.place(relx=.05, rely=.35, relh=.63, relw=.9)
-
 class Password_Settings(Frame):
     
     def __init__(self, master, **kwargs):
@@ -602,3 +577,20 @@ class Password_Settings(Frame):
         
         self.login_status.place(relx=0, rely=0, relh=.1, relw=1)
         self.container.place(relx=0, rely=.1, relh=.9, relw=1)
+
+
+class Login(PRMP_Dialog):
+    def __init__(self, gui=None, **kwargs):
+        super().__init__(gui, **kwargs)
+        print('kk')
+        
+    def _setupDialog(self):
+        self.header = PRMP_ImageLabel(self.container, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
+
+        self.pass_login = Password_Login(self.container, self.okay, place=dict(relx=.05, rely=.35, relh=.63, relw=.9))
+
+
+    def okay(self): self.gui.load_gui()
+
+
+
