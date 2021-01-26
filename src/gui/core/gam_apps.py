@@ -152,7 +152,7 @@ class RegionLookUp(GaM_App, PRMP_FillWidgets):
         # to switch between subregions and accounts
         val = self.hierachyVar.get()
         if val == '0':
-            PRMP_MsgBox(self, title='Choose First!', message='Choose a region first.', side=self.side, ask=0)
+            PRMP_MsgBox(self, title='Choose First!', message='Choose a region first.', side=self.side)
             return
         if self.switchState == None:
             if val != self.sub.val:
@@ -382,7 +382,7 @@ class ManagerHome(TreeColumns, GaM_App):
         st = self.selectedSubType
         if self.new.get():
             
-            if self.c_or_m and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error', ask=0)
+            if self.c_or_m and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error')
             
             else:
                 try:
@@ -390,7 +390,7 @@ class ManagerHome(TreeColumns, GaM_App):
                     if dialog:
                         manager = self._sup if isinstance(self._sup, ObjectsManager) else self._sup[st]
                         dialog(self, manager=manager)
-                except Exception as er: PRMP_MsgBox(self, title=er.__class__.__name__, message=er, _type='error', ask=0)
+                except Exception as er: PRMP_MsgBox(self, title=er.__class__.__name__, message=er, _type='error')
         else:
             subs = self.getSubs()
             if subs: self.subsList.set(subs, showAttr='name')

@@ -224,9 +224,7 @@ class Base_Password(PRMP_FillWidgets, Frame):
         self.binds()
         self.place_widgs()
     
-    def make_change(self):
-        if Authorisation.is_admin(): self.act()
-        else: show_admin_required()
+    def make_change(self): make_change(self.act)
     
     def act(self): pass
     
@@ -532,7 +530,7 @@ class Login(LabelFrame):
         
         self.container = Frame(self, relief="solid")
         
-        self.header = PRMP_ImageLabel(self, inbuiltKwargs=dict(inbuilt=1, inExt='png'), background="yellow", normal=1)
+        self.header = PRMP_ImageLabel(self, inbuiltKwargs=dict(inbuilt=1, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'))
 
         self.pass_login = Password_Login(self.container, self.okay)
 
@@ -544,8 +542,8 @@ class Login(LabelFrame):
 
     def place_widgs(self):
         self.place(relx=0, rely=0, relh=1, relw=1)
-        self.container.place(relx=0, rely=0, relh=1, relw=1)
-        self.header.place(relx=0, rely=0, relh=.26, relw=1)
+        self.container.place(relx=.005, rely=.005, relh=.99, relw=.99)
+        self.header.place(relx=.005, rely=.005, relh=.26, relw=.99)
         
         self.pass_login.place(relx=.05, rely=.35, relh=.63, relw=.9)
 

@@ -167,6 +167,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.ask = ask
         self._cancel = cancel
         
+        if kwargs.get('callback'): self.ask = 1
         if okText: self.ask = 0
         
         super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, **kwargs)

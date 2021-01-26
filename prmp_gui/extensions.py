@@ -284,14 +284,14 @@ class PRMP_ImageWidget:
 IW = PRMP_ImageWidget
 
 class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={},  normal=0, **kwargs):
-        PRMP_Style_Label.__init__(self, master, config=dict(anchor='center'), **kwargs)
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={},  normal=0, config={}, **kwargs):
+        PRMP_Style_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **inbuiltKwargs)
 IL = PRMP_ImageLabel
 
 class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), inbuiltKwargs={},  normal=0, **kwargs):
-        PRMP_Button.__init__(self, master, config=dict(anchor='center'), **kwargs)
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, inbuiltKwargs={},  normal=0, **kwargs):
+        PRMP_Button.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **inbuiltKwargs)
 IL = PRMP_ImageButton
 
