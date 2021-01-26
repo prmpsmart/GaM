@@ -1,4 +1,4 @@
-from .auths import Authorisation
+from ...utils.auths import Authorisation
 
 # GUI counterpart
 
@@ -529,8 +529,10 @@ class Login(LabelFrame):
         super().__init__(gui, relief="solid", **kwargs)
         
         self.container = Frame(self, relief="solid")
-        
-        self.header = PRMP_ImageLabel(self, r'C:\Users\Administrator\Documents\GaM OFFICE\logos\gam.png', inbuiltKwargs=dict(inbuilt=0, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
+
+        di = os.path.dirname(__file__)
+        logo = os.path.join(di, 'imgs/gam.png')
+        self.header = PRMP_ImageLabel(self, logo, inbuiltKwargs=dict(inbuilt=0, inExt='png'), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110))
 
         self.pass_login = Password_Login(self.container, self.okay)
 
