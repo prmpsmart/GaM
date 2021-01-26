@@ -28,11 +28,12 @@ def make_change(ordfunc=None, *args, **kwargs):
 
 class Base_Password(PRMP_FillWidgets, Frame):
     
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, req=1, **kwargs):
         
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
         
+        self.req = req
         self.new_is_password = False
         self.old_is_password = False
         
@@ -91,7 +92,7 @@ class Base_Password(PRMP_FillWidgets, Frame):
         # self.init()
        
     def binds(self):
-        # return
+        self.bind_all('<Return>', self.make_change)
         if self.old_is_password: self.old.bind("<KeyRelease>", self.old_show_star)
         
         if self.new_is_password: self.new.bind("<KeyRelease>", self.new_show_star)
@@ -224,7 +225,9 @@ class Base_Password(PRMP_FillWidgets, Frame):
         self.binds()
         self.place_widgs()
     
-    def make_change(self): make_change(self.act)
+    def make_change(self, e=0):
+        if self.req: make_change(self.act)
+        else: self.act()
     
     def act(self): pass
     
@@ -450,7 +453,7 @@ class Add_User(Change_Password):
 
 class Password_Login(Delete_User):
     def __init__(self, master=None, okay=None, **kwargs):
-        super().__init__(master=master, inh=True, **kwargs)
+        super().__init__(master=master, inh=True, req=0, **kwargs)
         self.okay = okay
         self.hx, self.hy, self.hh, self.hw, = .1, .43, .09, .6
         self.hint_text = "Love You"
