@@ -46,9 +46,11 @@ class GaM_Settings:
 
     @classmethod
     def loadDatas(cls):
-        gamBytes = cls.decompress(cls.dataPath)
-        gam = pickle.loads(gamBytes)
-        GaM_Settings.GaM = gam
+        try:
+            gamBytes = cls.decompress(cls.dataPath)
+            gam = pickle.loads(gamBytes)
+            GaM_Settings.GaM = gam
+        except Exception as e: print(e)
 
     @classmethod
     def saveDatas(cls):
@@ -60,12 +62,14 @@ class GaM_Settings:
 
     @classmethod
     def loadOtherDatas(cls):
-        dataBytes = cls.decompress(cls.otherDataPath)
-        data = pickle.loads(dataBytes)
-        for k, v in data.items(): setattr(GaM_Settings, k, v)
-        # saveDir
-        # auths
-        cls.setLoads()
+        try:
+            dataBytes = cls.decompress(cls.otherDataPath)
+            data = pickle.loads(dataBytes)
+            for k, v in data.items(): setattr(GaM_Settings, k, v)
+            # saveDir
+            # auths
+            cls.setLoads()
+        except Exception as e: print(e)
     
     @classmethod
     def setLoads(cls):

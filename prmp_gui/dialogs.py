@@ -146,9 +146,10 @@ class PRMP_CalendarDialog(PRMP_Dialog):
         
         self.min = min_
         self.max = max_
+        self.month = month
         super().__init__(master, title=title, geo=geo, editable=False, show=0, **kwargs)
 
-    def _setupDialog(self): self.calendar = self.addWidget(PRMP_Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min), place=dict(relx=0, rely=0, relh=1, relw=1))
+    def _setupDialog(self): self.calendar = self.addWidget(PRMP_Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min, month=self.month), place=dict(relx=0, rely=0, relh=1, relw=1))
     
     def afterPaint(self): self.calendar.afterPaint()
 
@@ -157,6 +158,7 @@ class PRMP_CalendarDialog(PRMP_Dialog):
         if self._return:
             PRMP_Calendar.choosen = None
             self.destroyDialog()
+
 CD = PRMP_CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):

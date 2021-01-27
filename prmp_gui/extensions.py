@@ -542,10 +542,10 @@ class PRMP_Calendar(Frame):
         days_bg = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
         notPart = False # for buttons not part of the days button
         
-        def __init__(self, master=None, returnMethod=None,  **kw):
+        def __init__(self, master=None, returnMethod=None, month=None, **kw):
             super().__init__(master=master, background=self.days_bg, foreground=self.days_fg, font=PRMP_Theme.DEFAULT_FONT, **kw)
             self.day = None
-            
+            self.month = month
             self.returnMethod = returnMethod
             
             self.bind('<Enter>', self.onButton)
@@ -565,7 +565,9 @@ class PRMP_Calendar(Frame):
         def offButton(self, e=0):
             if self.notPart: return
             if self == PRMP_Calendar.choosen: self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
-            elif self.now: self.config(background=self.class_.now_bg, foreground=self.class_.now_fg)
+            elif self.now:
+                print('yes')
+                self.config(background=self.class_.now_bg, foreground=self.class_.now_fg)
             else:
                 if self.day: self.config(background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground='red' if self.redDay else PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
                 else: self.config(background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
