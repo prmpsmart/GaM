@@ -8,17 +8,13 @@ class GaM_App(PRMP_MainWindow):
     def __init__(self, master=None, title='Goodness and Mercy', **kwargs):
         super().__init__(master, title=title, **kwargs)
         
-        self.root.save = self.save
+        self.root.save = GaM_Settings.threadSave
         self._setupApp()
 
         self.defaults()
         self.setMenus()
 
         self.paint()
-    
-    def save(self):
-        print('called')
-        GaM_Settings.threadSave()
     
     def _setupApp(self):
         pass
