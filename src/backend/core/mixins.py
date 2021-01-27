@@ -6,11 +6,6 @@ from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
 
 class Mixins(PRMP_Mixins):
 
-    def getDate(self, date=None):
-        if date == None: date = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(date)
-        return date
-
     def moneyWithSign_ListInList(self, listInList):
         try: listInList[0][0]
         except: raise AssertionError('Data must be list in another list')

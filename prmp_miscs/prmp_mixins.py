@@ -48,6 +48,13 @@ class PRMP_Mixins:
     @property
     def mroStr(self): return [s.__name__ for s in self.mro]
     
+    def getDate(self, date=None):
+        from .prmp_datetime import PRMP_DateTime
+
+        if date == None: date = PRMP_DateTime.now()
+        PRMP_DateTime.checkDateTime(date)
+        return date
+
     def numWithCommas(self, num=None):
         if num == None: num = int(self)
         
