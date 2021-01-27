@@ -471,6 +471,11 @@ PTh = PRMP_Theme
 class PRMP_Widget(PRMP_Theme):
 
     TIPPING = False
+
+    def after(self, time, func):
+        # print(func)
+        if not self.winfo_exists(): return
+        super().after(time, func)
     
     @property
     def topest(self): return PRMP_Window.TOPEST

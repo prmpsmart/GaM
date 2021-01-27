@@ -218,6 +218,8 @@ class PRMP_ImageWidget:
     def __renderGif(self):
         if not self.isGif: return
         if not self.frames: return
+        if not self.winfo_exists(): return
+
         # Update Frame
         self.frame = self.frames[self.frame_counter]
         self.config(image=self.frames[self.frame_counter])

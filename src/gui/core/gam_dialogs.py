@@ -284,7 +284,9 @@ class StartDialog(GaM_Dialog):
         if not self.MANAGER: self.MANAGER = manager
 
     def action(self):
-        pass
+        if self.callback:
+            self.destroy()
+            self.callback()
 
 class GaM_StartDialog(StartDialog):
     TOP = GaM
@@ -305,15 +307,10 @@ class GaM_StartDialog(StartDialog):
         self.Top = self.TOP(date=date)
         super()._createTOP(e)
 
-
-
-
 class Office_StartDialog(StartDialog):
     TOP = Office
     
-    def __init__(self, master=None, title='Office Start Dialog', **kwargs):
-
-        super().__init__(master, title=title, **kwargs)
+    def __init__(self, master=None, title='Office Start Dialog', **kwargs): super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):
         self.font['size'] = 14
@@ -327,13 +324,14 @@ class Office_StartDialog(StartDialog):
         self.Top = self.TOP(result['name'], **result)
         super()._createTOP(1)
 
-
 class DCOffice_StartDialog(Office_StartDialog):
     
     def _createOFFICE(self, result=0):
         if not result: return
         self.Top = self.TOP(result['name'], **result).dcOffice
         super()._createTOP(1)
+
+
 
 
 

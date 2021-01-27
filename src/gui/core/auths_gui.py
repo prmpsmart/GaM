@@ -236,6 +236,8 @@ class Base_Password(PRMP_FillWidgets, Frame):
     
     # def save_data(self): Threads.save_passwords()
 
+
+
 class Change_Username(Base_Password):
     
     def __init__(self, master=None, **kwargs):
@@ -453,40 +455,58 @@ class Add_User(Change_Password):
         self.clr_usr.place(relx=.72, rely=.15, relh=.09, relw=.1)
 
 class Password_Login(Delete_User):
-    def __init__(self, master=None, okay=None, **kwargs):
+    def __init__(self, master=None, callback=None, **kwargs):
         super().__init__(master=master, inh=True, req=0, **kwargs)
-        self.okay = okay
+
+        self.callback = callback
+
         self.hx, self.hy, self.hh, self.hw, = .1, .43, .09, .6
         self.hint_text = "Love You"
-        self.action.config(text="Login", command=self.login_check)
+
+        self.action.config(text="Login")
         
         self.pass_count = 0
         
         self.init()
     
-    def login_check(self):
+    def make_change(self, e=0):
+        if e:
+            children = list(self.children.keys())
+            child = str(e.widget).split('.')[-1]
+            if child not in children: return
+
+            if not isinstance(e.widget, str) and (e.widget.toplevel == self.toplevel): super().make_change()
+        else: super().make_change()
+    
+    def act(self):
         self.pass_count += 1
+        
         if self.pass_count >= 3:
+            self.after(2000, os.sys.exit)
             self.informate("Incorrect Credentials and EXITING", "Too much unsuccessful logins exiting in 5 seconds", "info")
-            self.root.after(5000, os.sys.exit)
         
-        
-        usr = self.username.get()
-        pwd = self.password.get()
+        res = self.get(['username', 'password'])
+        usr = res['username']
+        pwd = res['password']
+
         if self.check_valids(usr, pwd):
             log = Authorisation.login(usr, pwd)
             if log == 1:
-                self.informate("Correct Credentials", "Correct Password\nLogin Successful.", "info")
+                self.emptyWidgets(['username', 'password'])
                 self.pass_count = 0
-                self.emptyWidgets()
-                if self.okay: self.okay()
+                delay = 100
+
+                if self.callback: self.after(delay, self.callback)
+                
+                PRMP_MsgBox(title="Correct Credentials", msg="Correct Password\nLogin Successful.", which="info", delay=delay)
+
             elif log == 2: self.informate("Incorrect Credentials", "Wrong Password", "warn")
             else: self.informate("Incorrect Credentials", Authorisation.not_exist(usr), "error")
         else:  self.informate("Incorrect Credentials", "Enter valid credentials", "error")
 
     def informate(self, title='', msg='', which=''):
         # if which: dialogFunc(title=title, msg=msg,which=which)
-        PRMP_MsgBox(self, title=title, msg=msg,_type=which, ask=0)
+        PRMP_MsgBox(title=title, msg=msg,_type=which, ask=0)
     
     def place_widgs(self):
         super().place_widgs()
@@ -587,10 +607,12 @@ class Login(PRMP_Dialog):
     def _setupDialog(self):
         self.header = PRMP_ImageLabel(self.container, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
 
-        self.pass_login = Password_Login(self.container, self.okay, place=dict(relx=.05, rely=.35, relh=.63, relw=.9))
+        self.pass_login = Password_Login(self.container, callback=self._callback, place=dict(relx=.05, rely=.35, relh=.63, relw=.9))
 
 
-    def okay(self): self.gui.load_gui()
+    def _callback(self):
+        print(889)
+        if self.callback: self.callback(self.destroy)
 
 
 

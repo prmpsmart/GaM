@@ -41,7 +41,7 @@ def dialogFunc(ask=0, path=0, **kwargs):
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
     
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, delay=0, **kwargs):
 
         PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, grab=grab, **kwargs)
 
@@ -49,6 +49,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
         self.__result = None
         self.callback = callback
+        self.delay = delay
         self._return = _return
 
         self.submitBtn = None
@@ -66,6 +67,8 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         self.paint()
         if bell: self.bell()
         
+        self.focus()
+        if self.delay: self.after(self.delay, self.destroy)
         self.mainloop()
 
         # if show: self.mainloop()
@@ -193,13 +196,17 @@ class PRMP_MsgBox(PRMP_Dialog):
             self.bind('<Return>', lambda e: self.yes.invoke())
         else:
             self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)
+            self.bind('<Y>', lambda e: self.yes.invoke())
+            self.bind('<y>', lambda e: self.yes.invoke())
+
             self.no = PRMP_Button(self, config=dict(text='No', command=self.noCom), place=dict(relx=.63, rely=.83, relh=.15, relw=.17))
-            self.bind('<Return>', lambda e: self.no.invoke())
+            self.bind('<N>', lambda e: self.no.invoke())
+            self.bind('<n>', lambda e: self.no.invoke())
 
         if self._cancel:
             self.cancel = PRMP_Button(self, config=dict(text='Cancel', command=self.cancelCom))
             self.cancel.place(relx=.33, rely=.83, height=28, relw=.2)
-        self.focus()
+        self.yes.focus()
         
     def getType(self, _type):
         if _type in self._bitmaps: return _type
@@ -279,13 +286,9 @@ class Splash(PRMP_Dialog):
         self.after(self.delay, self.processCallback)
 
     def processCallback(self):
-        if self.callback: self.callback(self.recieveCallbackResponse)
+        if self.callback: self.callback(self.destroy)
         else: self.after(10, self.processCallback)
     
-    def recieveCallbackResponse(self, response):
-        if response: self.destroy()
-        else: self.processCallback()
-
     def set(self): pass
     
 

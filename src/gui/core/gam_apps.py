@@ -251,7 +251,6 @@ class SortNSearch(GaM_App):
         pass
 
 
-
 class ObjectHome(GaM_App):
     
     def __init__(self, master=None, geo=(1500, 800), title='Home', obj=None, **kwargs):
@@ -405,7 +404,6 @@ class ManagerHome(TreeColumns, GaM_App):
     def selected(self, sub):
         self.subs.setColumns(self.columns(sub))
         self.subs.viewAll(obj=sub)
-
 
 
 class GaM_Home(GaM_App):

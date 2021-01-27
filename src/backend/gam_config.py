@@ -6,17 +6,16 @@ from ..utils.auths import Authorisation
 
 class GaM_Settings:
     TOP = None
-
     GaM = None
-
     ThemeIndex = 38
-    cwd = os.getcwd()
-    dataPath = os.path.join(cwd, 'data.prmp')
-    otherDataPath = os.path.join(cwd, 'specialData.prmp')
     SaveDir = ''
     Users = []
     Super_Users = []
 
+    cwd = os.getcwd()
+    dataPath = os.path.join(cwd, 'data.prmp')
+    otherDataPath = os.path.join(cwd, 'specialData.prmp')
+    
     @classmethod
     def loadAll(cls):
         # try:
