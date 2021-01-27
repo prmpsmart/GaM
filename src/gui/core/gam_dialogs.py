@@ -5,7 +5,9 @@ from ...backend.office.office_regions import Office
 
 
 class GaM_Dialog(PRMP_Dialog):
-    pass
+    def save(self):
+        print('called')
+        GaM_Settings.threadSave()
 
 class PersonDialog(GaM_Dialog):
 
@@ -270,6 +272,7 @@ class StartDialog(GaM_Dialog):
         if not e: return
         self.uniqueID.B.setReadonlyValue(self.Top.uniqueID)
         self.startDefaults()
+        self.save()
 
         PRMP_MsgBox(self, message=f'{self.topName} Object created successfully, update the {self.MANAGER}\'s details using the {self.MANAGER} details button.', title=f'{self.topName} creation successful.', ask=0, _type='info')
 

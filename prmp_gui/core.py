@@ -1998,6 +1998,7 @@ class PRMP_Window(PRMP_Widget):
         self.after(100, self.loadAfters)
     
     def closing(self): pass
+
     def save(self): pass
     
     def withdrawTips(self):
@@ -2349,15 +2350,13 @@ class PRMP_Window(PRMP_Widget):
     def destroySelf(self, e=0):
         self.closing()
         self.save()
+
         def out(u):
+            if not u: return
             self.destroy()
-            if u: os.sys.exit()
+            os.sys.exit()
         
         if self == self.topest:
-            # PRMP_Window.TOPEST = None
-            # PRMP_Window.STYLE = None
-            # PRMP_Window.TKICON = ''
-            # PRMP_Window.PRMPICON = ''
             from .dialogs import PRMP_MsgBox
             PRMP_MsgBox(title='Exit', message='Are you sure to exit?', callback=out)
         else: self.destroy()

@@ -82,10 +82,6 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         # self.wait_window()
         pass
 
-    def destroyDialog(self):
-        if self._return: self.destroy()
-        if self.callback: self.callback(self.result)
-
     @property
     def result(self): return self.__result
     
@@ -123,10 +119,12 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         if result:
             self._setResult(result)
             self.action()
+            self.save()
         
         else: PRMP_MsgBox(self, title='No Input Error', message='No input whatsoever is given.', _type='error', ask=0)
 
     def action(self): print('redefine this method for functionality')
+    def save(self): print('redefine this method for functionality')
         
     def editInput(self, e=0):
         if self.editBtn == None: return
@@ -137,6 +135,10 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
             wid = self[widgetName]
             if self.editBtn.get(): wid.normal()
             else: wid.disabled()
+
+    def destroyDialog(self):
+        if self._return: self.destroy()
+        if self.callback: self.callback(self.result)
 PD = PRMP_Dialog
 
 class PRMP_CalendarDialog(PRMP_Dialog):
@@ -227,6 +229,7 @@ class PRMP_MsgBox(PRMP_Dialog):
     def noCom(self):
         self._setResult(False)
         self.destroyDialog()
+
 PMB = PRMP_MsgBox
 
 class PRMP_CameraDialog(PRMP_Dialog):
@@ -262,7 +265,6 @@ class PRMP_ImageDialog(PRMP_Dialog):
         self._setResult(imageFile)
         self.destroyDialog()
 
-
 class Splash(PRMP_Dialog):
     def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), callback=None, title='Goodness and Mercy', imageKwargs={}, delay=2000, **kwargs):
 
@@ -291,16 +293,3 @@ class Splash(PRMP_Dialog):
         else: self.after(10, self.processCallback)
     
     def set(self): pass
-    
-
-
-
-
-
-
-
-
-
-
-
-
