@@ -2342,8 +2342,6 @@ class PRMP_Window(PRMP_Widget):
         if self == self.topest:
             PRMP_Window.TOPEST = None
             PRMP_Window.STYLE = None
-            PRMP_Window.TKICON = ''
-            PRMP_Window.PRMPICON = ''
             PRMP_Style.LOADED = False
 
         super().destroy()

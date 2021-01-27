@@ -9,3 +9,5 @@ imgs = join(_dir, 'imgs')
 
 PRMP_Window.PRMPICON = join(imgs, 'nairabag.png')
 PRMP_Window.TKICON = join(imgs, 'nairabag.ico')
+
+print('here')

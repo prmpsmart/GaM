@@ -10,7 +10,7 @@ GaM_Settings.loadOtherDatas()
 def startGaM(func):
     from src.gui.core.gam_apps import openCores
     func()
-    print(GaM_Settings.GaM)
+    # print(GaM_Settings.GaM)
     openCores(obj=GaM_Settings.GaM)
 
 def testGaM(func):
@@ -31,7 +31,7 @@ def testLogin(func):
         Login(geo=(600, 600), tw=1, 
         title='Login', callback=testGaM)
 
-def start(): Splash(imageKwargs=dict(base64=GAM_PNGS['red_gam']), asb=0, callback=testLogin, delay=100)
+def start(): Splash(imageKwargs=dict(base64=GAM_PNGS['red_gam']), asb=0, callback=testLogin, delay=3000)
 
 
 

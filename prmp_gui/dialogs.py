@@ -49,7 +49,6 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
         self.__result = None
         self.callback = callback
-        self.delay = delay
         self._return = _return
 
         self.submitBtn = None
@@ -68,7 +67,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         if bell: self.bell()
         
         self.focus()
-        if self.delay: self.after(self.delay, self.destroy)
+        if delay: self.after(delay, self.destroy)
         self.mainloop()
 
         # if show: self.mainloop()
