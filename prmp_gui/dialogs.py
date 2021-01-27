@@ -251,7 +251,7 @@ CamD = PRMP_CameraDialog
 
 class PRMP_ImageDialog(PRMP_Dialog):
     
-    def __init__(self, master=None, image=0, title='Image Dialog', **kwargs):
+    def __init__(self, master=None, image=None, title='Image Dialog', **kwargs):
         self.image = image
         super().__init__(master, title=title, **kwargs)
     

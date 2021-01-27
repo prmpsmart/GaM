@@ -264,8 +264,8 @@ class StartDialog(GaM_Dialog):
         if self.Top: PRMP_MsgBox(self, message=f'A {self.topName} object already existed.', title='{self.topName} Error', ask=0, _type='error')
         else: PRMP_MsgBox(self, message=f'Are you sure to create a {self.topName} object?', title=f'{self.topName} creation confirmation', callback=self._createTOP, _type='question')
 
-    def startDefaults(self):
-        pass
+    def startDefaults(self): GaM_Settings.GaM = self.Top
+
     def _createTOP(self, e=0):
         if not e: return
         self.uniqueID.B.setReadonlyValue(self.Top.uniqueID)
@@ -287,9 +287,8 @@ class StartDialog(GaM_Dialog):
         if not self.MANAGER: self.MANAGER = manager
 
     def action(self):
-        if self.callback:
-            self.destroy()
-            self.callback()
+        print(889)
+        if self.callback: self.callback(self.destroy)
 
 class GaM_StartDialog(StartDialog):
     TOP = GaM
@@ -332,7 +331,7 @@ class DCOffice_StartDialog(Office_StartDialog):
     
     def startDefaults(self, e=0):
         self.Top = self.Top.dcOffice
-        # print(self.Top)
+        super().startDefaults()
 
 
 

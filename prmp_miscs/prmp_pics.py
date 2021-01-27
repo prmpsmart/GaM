@@ -304,7 +304,8 @@ class PRMP_Image:
         self._animatedFrames = []
 
         if filename or image or base64:
-            if filename: self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
+            if filename:
+                self.imageFile = filename if isinstance(filename, PRMP_ImageFile) else PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             elif image: self.imageFile = PRMP_ImageFile(image=image)
             elif base64: self.imageFile = PRMP_ImageFile(base64=base64)
             else: self.imageFile = filename or image
