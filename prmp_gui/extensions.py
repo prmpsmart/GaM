@@ -212,7 +212,7 @@ class PRMP_ImageWidget:
             self.configure(image=self.frame)
 
         except Exception as e:
-            print(e, __file__, 'Line ', 212)
+            # print(e, __file__, 'Line ', 212)
             self.loadImage(self.default_dp)
     
     def __renderGif(self):

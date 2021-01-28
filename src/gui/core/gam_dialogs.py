@@ -5,9 +5,7 @@ from ...backend.office.office_regions import Office
 
 
 class GaM_Dialog(PRMP_Dialog):
-    def save(self):
-        print('called')
-        GaM_Settings.threadSave()
+    def save(self): GaM_Settings.threadSave()
 
 class PersonDialog(GaM_Dialog):
 

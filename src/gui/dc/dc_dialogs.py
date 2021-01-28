@@ -9,6 +9,7 @@ class ClientDialog(PersonDialog):
         if not self.manager:
             if self.client:
                 kwargs['values'] = client
+                kwargs['person'] = client
                 self.manager = self.client.manager
         super().__init__(master=master, title=title, geo=geo, **kwargs)
     
@@ -37,33 +38,47 @@ class ClientDialog(PersonDialog):
 
         self.addResultsWidgets(['rate', 'cardDue'])
     
-    def processInput(self, e=0):
-        result = super().processInput(1)
+    def action(self, e=0):
+        if self.result:
 
-        if result:
+            if self.client: PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question', callback=self.updateClient)
+            elif self.manager: PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question', callback=self.newClient)
 
-            if self.client and PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question').result == True: print('yes')
-            
-            elif self.manager and PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question').result == True: client = self.manager.createClient(**result)
+    def updateClient(self, w):
+        if w:
+            self.client.update(self.result)
+            self._setResult(self.client)
+        self.destroyDialog()
+        print(self.client)
 
+    def newClient(self, w):
+        if w:
+            client = self.manager.createClient(self.result)
+            self._setResult(client)
+            print(client)
+        self.destroyDialog()
+        
 
-        # print(result)
 
 class AreaDialog(PRMP_Dialog):
     def __init__(self, master=None, area=None, manager=None, **kwargs):
         self.area = area
         self.manager = manager
 
-        super().__init__(master, geo=(350, 300), **kwargs)
+        super().__init__(master, geo=(350, 300), values=area, **kwargs)
     
     def _setupDialog(self):
         self.addEditButton()
         # name readonly
-        self.name = LabelEntry(self.container, place=dict(relx=.005, rely=.005, relw=.9, relh=.15), longent=.3, orient='h', topKwargs=dict(text='Name'), bottomKwargs=dict(state='readonly'))
-        # co
+        self.name = LabelEntry(self.container, place=dict(relx=.005, rely=.05, relw=.5, relh=.15), orient='h', topKwargs=dict(text='Name'), bottomKwargs=dict(state='readonly'))
         # date
+        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.25, relw=.45, relh=.15),  longent=.4, orient='h')
+        # co
+        self.co = Button(self.container, text='Cash Officers', place=dict(relx=.05, rely=.5, relw=.35, relh=.12))
+
         # unique_id
-        self.addResultsWidgets(['name'])
+        UniqueID(self.container, place=dict(relx=.5, rely=.5, relw=.35, relh=.12), obj=self.area)
+        self.addResultsWidgets(['name', 'date'])
         pass
 
 class ClientAccountDialog(AccountDialog):

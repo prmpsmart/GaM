@@ -240,6 +240,7 @@ class UniqueID(Button):
 
         self.view.paint()
 
+    def set(self, obj): self.obj = obj
 
 class SearchPersonalDetails(LabelFrame):
     def __init__(self, master, **kwargs):
