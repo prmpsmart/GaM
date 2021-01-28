@@ -794,8 +794,11 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
     
-    def __init__(self, placeholder='', _type='text', values=[], very=False, default=None, **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], very=False, default=None, state='normal', **kwargs):
         _type = _type.lower()
+        
+        self._read = False
+        # if self.kwargs.get('state') == 'readonly': self._read = True
 
         self.values = values
         
@@ -857,7 +860,7 @@ class PRMP_Input:
         self.clear()
         if number == self.placeholder: pass
         elif not self.checkNumber(number): return
-        self.insert(0, number)
+        self._set(number)
         
     def getNumber(self):
         number = self._get()
@@ -867,7 +870,7 @@ class PRMP_Input:
         self.clear()
         if money == self.placeholder or not money: money = self.placeholder
         elif not self.checkMoney(money): money = self.numberToMoney(money)
-        self.insert(0, money)
+        self._set(money)
         
     def getMoney(self):
         money = self._get()
@@ -948,22 +951,21 @@ class PRMP_Input:
         super().paint()
         self.verify()
 
-    def set(self, values):
+    def _set(self, values):
         self.clear()
+        if self._read: self.normal()
         self.insert(0, str(values))
-        self.verify()
+        if self._read: self.readonly()
     
-    def setReadonlyValue(self, values):
-        self.normal()
-        self.set(values)
-        self.readonly()
+    def set(self, values):
+        self._set(values)
+        self.verify()
     
     def _clear_placeholder(self, e=0):
         if self._get() == self.placeholder: self.clear()
 
     def _add_placeholder(self, e=0):
         if self._get() == '': self.set(self.placeholder)
-        pass
     
     def empty(self): self.set(self.placeholder)
     def clear(self): self.delete('0', 'end')

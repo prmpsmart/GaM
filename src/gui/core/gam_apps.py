@@ -8,7 +8,10 @@ class GaM_App(PRMP_MainWindow):
     def __init__(self, master=None, title='Goodness and Mercy', **kwargs):
         super().__init__(master, title=title, **kwargs)
         
-        self.root.save = GaM_Settings.threadSave
+        self._save = GaM_Settings.threadSave
+        self._load = GaM_Settings.threadLoad
+
+        self.root.save = self._save
         self._setupApp()
 
         self.defaults()
@@ -16,10 +19,19 @@ class GaM_App(PRMP_MainWindow):
 
         self.paint()
     
+    def save(self):
+        self._save()
+        PRMP_MsgBox(title='Successful', message='Saving is successful.', )
+
+    def load(self): GaM_Settings.threadLoad()
+    
     def _setupApp(self):
         pass
 
     def defaults(self):
+        pass
+
+    def security(self):
         pass
 
     
@@ -33,7 +45,7 @@ class GaM_App(PRMP_MainWindow):
         for vie in view: self.viewMenu.add_command(**vie)
 
         self.settingsMenu = Menu(config=dict(tearoff=0))
-        settings = [dict(label='Load'), dict(label='Save'), dict(label='Security'), dict(label='Others')]
+        settings = [dict(label='Load', command=self.load), dict(label='Save', command=self.save), dict(label='Security', command=self.security), dict(label='Others')]
         for sett in settings: self.settingsMenu.add_command(**sett)
 
         self.helpMenu = Menu(config=dict(tearoff=0))
@@ -356,9 +368,14 @@ class ManagerHome(TreeColumns, GaM_App):
     def getNewObjectDialog(self, st):
         creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
         
-        if self.c_or_m and st == 'Accounts':
+        className = self._sup.className
+
+        if (className == 'Client') and st == 'Accounts':
             from ..dc.dc_dialogs import ClientAccountDialog
             return ClientAccountDialog
+        elif className == 'AreasManager':
+            from ..dc.dc_dialogs import AreaDialog
+            return AreaDialog
         elif st == 'Thrifts':
             from ..dc.dc_dialogs import ThriftDialog
             return ThriftDialog
@@ -373,7 +390,7 @@ class ManagerHome(TreeColumns, GaM_App):
         subs = self._sup[subType] or []
         return subs
     
-    @property
+    # @property
     def c_or_m(self):
         k = ('Client', 'Member')
         return self._sup.className in k or self._sup.region.className in k
@@ -382,7 +399,7 @@ class ManagerHome(TreeColumns, GaM_App):
         st = self.selectedSubType
         if self.new.get():
             
-            if self.c_or_m and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error')
+            if self.c_or_m() and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error')
             
             else:
                 try:

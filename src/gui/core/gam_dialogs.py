@@ -258,9 +258,14 @@ class StartDialog(GaM_Dialog):
         self.welcome = PRMP_Label(self.container, text=f'Welcome to GaM Software, create the {self.MANAGER} details !!!', place=dict(relx=.02, rely=.02, relw=.96, relh=.1), asEntry=1, font=self.font)
 
         self.create = PRMP_Button(self.container, text=f'Create {self.topName}', place=dict(relx=.1, rely=.26, relw=.3, relh=.1), command=self.createTOP)
+
         self.manager = PRMP_Button(self.container, text=f'{self.MANAGER} Details', place=dict(relx=.6, rely=.26, relw=.3, relh=.1), command=self.openManagerDetail)
+
         self.uniqueID = LabelEntry(self.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.1, rely=.6, relw=.8, relh=.25), bottomKwargs=dict(state='readonly'))
-        self.uniqueID.set(self.Top.uniqueID if self.Top else '')
+    
+    def defaults(self): self.uniqueID.set(self.Top.uniqueID if self.Top else '')
+
+
 
     def createTOP(self):
         if self.Top: PRMP_MsgBox(self, message=f'A {self.topName} object already existed.', title='{self.topName} Error', ask=0, _type='error')
@@ -270,7 +275,7 @@ class StartDialog(GaM_Dialog):
 
     def _createTOP(self, e=0):
         if not e: return
-        self.uniqueID.B.setReadonlyValue(self.Top.uniqueID)
+        self.uniqueID.set(self.Top.uniqueID)
         self.startDefaults()
         self.save()
 

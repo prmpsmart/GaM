@@ -49,6 +49,20 @@ class ClientDialog(PersonDialog):
 
         # print(result)
 
+class AreaDialog(PRMP_Dialog):
+    def __init__(self, master=None, area=None, manager=None, **kwargs):
+        self.area = area
+        self.manager = manager
+
+        super().__init__(master, geo=(350, 300), **kwargs)
+    
+    def _setupDialog(self):
+        # name readonly
+        self.name = LabelEntry(self.container, place=dict(relx=.005, rely=.005, relw=.9, relh=.15), longent=.3, orient='h', topKwargs=dict(text='Name'), bottomKwargs=dict(state='readonly'))
+        # co
+        # date
+        # unique_id
+        pass
 
 class ClientAccountDialog(AccountDialog):
 
