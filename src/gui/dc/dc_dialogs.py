@@ -57,11 +57,13 @@ class AreaDialog(PRMP_Dialog):
         super().__init__(master, geo=(350, 300), **kwargs)
     
     def _setupDialog(self):
+        self.addEditButton()
         # name readonly
         self.name = LabelEntry(self.container, place=dict(relx=.005, rely=.005, relw=.9, relh=.15), longent=.3, orient='h', topKwargs=dict(text='Name'), bottomKwargs=dict(state='readonly'))
         # co
         # date
         # unique_id
+        self.addResultsWidgets(['name'])
         pass
 
 class ClientAccountDialog(AccountDialog):

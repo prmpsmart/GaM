@@ -798,7 +798,7 @@ class PRMP_Input:
         _type = _type.lower()
         
         self._read = False
-        # if self.kwargs.get('state') == 'readonly': self._read = True
+        if self.kwargs.get('state') == 'readonly': self._read = True
 
         self.values = values
         
@@ -938,7 +938,8 @@ class PRMP_Input:
             self.clear()
             self.set(self._moneySign)
 
-    def normal(self):
+    def normal(self, force=0):
+        if self._read and not force: return
         super().normal()
         self.verify()
         
@@ -952,8 +953,8 @@ class PRMP_Input:
         self.verify()
 
     def _set(self, values):
+        if self._read: self.normal(1)
         self.clear()
-        if self._read: self.normal()
         self.insert(0, str(values))
         if self._read: self.readonly()
     
