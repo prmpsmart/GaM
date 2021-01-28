@@ -8,10 +8,9 @@ class ClientDialog(PersonDialog):
         self.manager = manager
         if not self.manager:
             if self.client:
-                kwargs['values'] = client
                 kwargs['person'] = client
                 self.manager = self.client.manager
-        super().__init__(master=master, title=title, geo=geo, **kwargs)
+        super().__init__(master=master, title=title, geo=geo, manager=self.manager, **kwargs)
     
     def _setupDialog(self):
         super()._setupDialog()
@@ -22,42 +21,27 @@ class ClientDialog(PersonDialog):
         self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number'),orient='h', place=dict(relx=.02, rely=0, relh=.45, relw=.8), longent=.45)
         
         self.cardDue = PRMP_Checkbutton(clientDetails, text='Card Due', place=dict(relx=.02, rely=.5, relh=.45, relw=.8))
-        # self.addNotEditables('regDate')
-
-        def setCard(val):
-            if val: self.cardDue.var.set('1')
-            else: self.cardDue.var.set('0')
-        
-        def getCard():
-            val = self.cardDue.var.get()
-            if val == '1': return True
-            else: return False
-        
-        # self.cardDue.set = setCard
-        # self.cardDue.get = getCard
 
         self.addResultsWidgets(['rate', 'cardDue'])
     
     def action(self, e=0):
+        # print(self.result)
         if self.result:
-
             if self.client: PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question', callback=self.updateClient)
             elif self.manager: PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question', callback=self.newClient)
 
     def updateClient(self, w):
         if w:
-            self.client.update(self.result)
+            self.client.person.update(**self.result)
+            self.client.changeRate(self.result['rate'])
             self._setResult(self.client)
         self.destroyDialog()
-        print(self.client)
 
     def newClient(self, w):
         if w:
-            client = self.manager.createClient(self.result)
+            client = self.manager.createClient(**self.result)
             self._setResult(client)
-            print(client)
         self.destroyDialog()
-        
 
 
 class AreaDialog(PRMP_Dialog):

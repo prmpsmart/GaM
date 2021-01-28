@@ -50,7 +50,7 @@ class Client(DCRegion):
     def __init__(self, manager, name, date=None, rate=None, cardDue=False, **kwargs):
         super().__init__(manager=manager, name=name, date=date, rate=rate, **kwargs)
         self.cardDues = CardDues(self, cardDue)
-
+        
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     @property
     def spacedID(self): return f'{super().spacedID} | C{self.number}'
@@ -59,9 +59,17 @@ class Client(DCRegion):
     
     @property
     def cardDue(self): return self.cardDues
+
+    @cardDue.setter
+    def cardDue(self, c):
+        # a decoy to bypass the gui update dialog
+        pass
     
     @property
-    def rate(self): return float(self.accountsManager.rate)
+    def rate(self): return float(self.accountsManager.last.rate)
+
+    def changeRate(self, r):
+        if r and (r != self.rate): rat = self.accountsManager.last.rates.addRecord(r)
     
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
@@ -89,7 +97,7 @@ class ClientsManager(DCRegionsManager):
     @property
     def clients(self): return self.regions
     
-    def createClient(self, name, rate, cardDue=False, **kwargs): return self.createRegion(name=name, rate=rate, cardDue=cardDue, **kwargs)
+    def createClient(self, name, rate=0, cardDue=False, **kwargs): return self.createRegion(name=name, rate=rate, cardDue=cardDue, **kwargs)
 
 
 class Area(DCRegion):
