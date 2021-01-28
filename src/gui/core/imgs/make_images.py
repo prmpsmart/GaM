@@ -15,7 +15,6 @@ def makeImage(cat):
     # return
 
     names = {path.splitext(v)[0].replace('-', '_'): v for v in listdir(dir_) if PRMP_ImageType.get(v)}
-    print(names)
     lnames = list(names.keys())
     files = [path.join(dir_, f) for f in listdir(dir_)]
 

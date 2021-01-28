@@ -12,7 +12,6 @@ class PersonDialog(GaM_Dialog):
     def __init__(self, master=None, title='Person Dialog', person=None, manager=None, geo=(550, 390), values={}, **kwargs):
 
         self.manager = manager
-        print(manager)
         self.person = person
         
         if person: title = f'{person.master.className} {title}'
@@ -293,7 +292,6 @@ class StartDialog(GaM_Dialog):
         if not self.MANAGER: self.MANAGER = manager
 
     def action(self):
-        print(889)
         if self.callback: self.callback(self.destroy)
 
 class GaM_StartDialog(StartDialog):

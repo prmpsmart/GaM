@@ -602,7 +602,6 @@ class Password_Settings(Frame):
 class Login(PRMP_Dialog):
     def __init__(self, gui=None, **kwargs):
         super().__init__(gui, **kwargs)
-        print('kk')
         
     def _setupDialog(self):
         self.header = PRMP_ImageLabel(self.container, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
@@ -611,7 +610,6 @@ class Login(PRMP_Dialog):
 
 
     def _callback(self):
-        print(889)
         if self.callback: self.callback(self.destroy)
 
 

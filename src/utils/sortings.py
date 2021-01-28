@@ -656,7 +656,6 @@ class Weeks:
                     elif wk_num == 6:
                         nm = cls.new_month(month, "next")
                         next_month = month.year.get(nm)
-                        print(next_month, nm)
                         if next_month: return [next_month, "Week 1"]
         return ["", ""]
     @classmethod
@@ -887,5 +886,4 @@ class Weeks:
                 strs_date_name.append(str_date_name)
             return strs_date_name
         except Exception as e:
-            print(e)
             return list(range(1,6))
