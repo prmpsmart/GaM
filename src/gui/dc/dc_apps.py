@@ -12,10 +12,10 @@ def addNote(self):
 
 class DC_RegionHome(TreeColumns, RegionHome):
     def _setupApp(self):
-        self.setMenus()
+        
         super()._setupApp()
 
-        self.setTitle('DC Region Home')
+        # self.setTitle('DC Region Home')
 
         self.subRegions.callback = self.selectedSubRegion
         self.accounts.callback = self.selectedAccount

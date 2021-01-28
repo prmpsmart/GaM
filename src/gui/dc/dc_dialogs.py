@@ -44,7 +44,7 @@ class ClientDialog(PersonDialog):
         self.destroyDialog()
 
 
-class AreaDialog(PRMP_Dialog):
+class AreaDialog(GaM_Dialog):
     def __init__(self, master=None, area=None, manager=None, **kwargs):
         self.area = area
         self.manager = manager
@@ -63,7 +63,28 @@ class AreaDialog(PRMP_Dialog):
         # unique_id
         UniqueID(self.container, place=dict(relx=.5, rely=.5, relw=.35, relh=.12), obj=self.area)
         self.addResultsWidgets(['name', 'date'])
-        pass
+        
+    def action(self):
+        if self.result:
+            if self.area: PRMP_MsgBox(self, title='Edit Area Details', message='Are you sure to edit the details of this area?', _type='question', callback=self.updateArea)
+            
+            elif self.manager: PRMP_MsgBox(self, title='area Creation', message='Are you sure to create a new area?', _type='question', callback=self.newArea)
+
+            else: PRMP_MsgBox(self, title='Area Dialog Error', message='No Area or Manager is given.', _type='error', ask=0)
+
+    def updateArea(self, w):
+        if w:
+            self.area.update(self.result['date'])
+            self._setResult(self.area)
+        self.destroyDialog()
+
+    def newArea(self, w):
+        if w:
+            area = self.manager.createArea(date=self.result['date'])
+            self._setResult(area)
+        self.destroyDialog()
+
+
 
 class ClientAccountDialog(AccountDialog):
 
@@ -76,7 +97,7 @@ class ClientAccountDialog(AccountDialog):
         self.addResultsWidgets('rate')
 
 
-class ThriftDialog(PRMP_Dialog):
+class ThriftDialog(GaM_Dialog):
     def __init__(self, master=None, thrift=None, title='Thrift Dialog', values={}, manager=None, **kwargs):
         self.thrift = thrift
         self.values = values
@@ -128,7 +149,7 @@ class ThriftDialog(PRMP_Dialog):
         self.destroyDialog()
 
 
-class ThriftDetailsDialog(PRMP_Dialog):
+class ThriftDetailsDialog(GaM_Dialog):
     def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, geo=(350, 550), values={}, **kwargs):
         self.thrift = thrift
         self.values = values
@@ -141,7 +162,7 @@ class ThriftDetailsDialog(PRMP_Dialog):
         self.set = self.thriftDetail.set
 
 
-class DailyContributionDailog(PRMP_Dialog):
+class DailyContributionDailog(GaM_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1200, 800), **kwargs):
         self.dcContrib = dcContrib

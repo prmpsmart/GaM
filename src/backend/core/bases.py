@@ -458,7 +458,6 @@ class Object(CompareByNumber, ObjectsMixins):
     def number(self): return self._number
 
 
-
 class ObjectsManager(ObjectsMixins):
     ObjectType = Object
     MultipleSubsPerMonth = False

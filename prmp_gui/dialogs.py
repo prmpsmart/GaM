@@ -124,6 +124,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         else: PRMP_MsgBox(self, title='No Input Error', message='No input whatsoever is given.', _type='error', ask=0)
 
     def action(self): print('redefine this method for functionality')
+    
     def save(self): print('redefine this method for functionality')
         
     def editInput(self, e=0):

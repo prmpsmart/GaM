@@ -308,6 +308,7 @@ class RegionHome(ObjectHome):
         super()._setupApp()
         
         region = self.region = self.obj
+        if region: self.setTitle(region.name)
 
         self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
 
@@ -373,6 +374,9 @@ class ManagerHome(TreeColumns, GaM_App):
         if (className == 'Client') and st == 'Accounts':
             from ..dc.dc_dialogs import ClientAccountDialog
             return ClientAccountDialog
+        elif (className == 'ClientsManager'):
+            from ..dc.dc_dialogs import ClientDialog
+            return ClientDialog
         elif className == 'AreasManager':
             from ..dc.dc_dialogs import AreaDialog
             return AreaDialog

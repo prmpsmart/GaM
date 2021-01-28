@@ -91,6 +91,8 @@ class Client(DCRegion):
 class ClientsManager(DCRegionsManager):
     ObjectType = Client
     subsName = 'Clients'
+    subTypes = [subsName]
+
     
     @property
     def area(self): return self.master
