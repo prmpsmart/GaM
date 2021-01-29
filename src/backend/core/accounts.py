@@ -82,7 +82,7 @@ class Account(Object):
     def subs(self): return self.recordsManagers or []
     
     @property
-    def recordsManagers(self): self.notImp()
+    def recordsManagers(self): return []
     
     @property
     def headers(self): return [rec.className for rec in self.recordsManagers]

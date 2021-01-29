@@ -477,6 +477,8 @@ class ObjectsManager(ObjectsMixins):
     
     @property
     def master(self): return self._master
+    @property
+    def manager(self): return self._master
     
     @property
     def subs(self): return self._subs

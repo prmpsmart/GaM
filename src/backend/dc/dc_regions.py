@@ -33,6 +33,8 @@ class DCRegion(Region):
     AccountsManager = DCAccountsManager
     Manager = 'DCRegionsManager'
     SubRegionsManager = DCRegionsManager
+    subTypes = ['Regions', 'Accounts', 'Records Managers', 'Persons']
+
     
     @property
     def subs(self): return self.accountsManager or []

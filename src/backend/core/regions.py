@@ -63,7 +63,7 @@ class Region(Object):
     PersonsManager = None
     _type = 'reg'
     
-    subTypes = ['Regions', 'Accounts', 'Records Managers', 'Persons']
+    subTypes = ['Regions', 'Accounts', 'Persons']
 
     
     def __init__(self, manager, name=None, date=None, location=None, phone=None, previous=None, number=None, **kwargs):

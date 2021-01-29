@@ -41,7 +41,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
             if not create: kwargs.update(person=obj)
         elif isinstance(obj, ObjectsManager):
             window = ManagerHome
-            if not create: kwargs.update(title=f'{obj.name} Subscripts Details', sup=obj)
+            if not create: kwargs.update(title=f'{obj.name} Subscripts Details', obj=obj)
         elif isinstance(obj, Thrift):
             if not create:
                 window = ThriftDetailsDialog if not edit else ThriftDialog
@@ -54,7 +54,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
                 kwargs.update(title=obj.name, thrift=obj)
             else: window = ThriftDialog
         
-        else: kwargs.update(sup=obj)
+        else: kwargs.update(obj=obj)
 
         win = window(self, **kwargs)
         if not self: win.mainloop()

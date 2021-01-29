@@ -204,9 +204,6 @@ class DailyContribution(ObjectsManager):
     def thrifts(self): return self.subs
     
     @property
-    def manager(self): return self.master
-    
-    @property
     def accountsManager(self): return self.manager.accountsManager
     
     @property

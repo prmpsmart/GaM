@@ -1,5 +1,5 @@
 from .gam_dialogs import *
-# from ...backend.core.bases import ObjectsManager
+from ...backend.core.bases import ObjectsManager
 from ...backend.dc.dc_specials import *
 
 
@@ -37,9 +37,9 @@ class GaM_App(PRMP_MainWindow):
     def setMenus(self):
 
         def showSnS(obj):
-            if obj: SortNSearch(self, sup=self.obj)
+            if obj: SortNSearch(self, obj=self.obj)
         def showOD(obj):
-            if obj: ManagerHome(self, sup=self.obj, title=f'{self.obj.name} Details.')
+            if obj: ManagerHome(self, obj=self.obj, title=f'{self.obj.name} Details.')
 
         self.viewMenu = None # search, details
         self.settingsMenu = None # load, save, security, theme, plot color, save path
@@ -297,7 +297,7 @@ class ObjectHome(GaM_App):
     def openObjDet(self):
         if self.objdet:
             self.objdet.destroy()
-        self.objdet = ManagerHome(self, sup=self.obj)
+        self.objdet = ManagerHome(self, obj=self.obj)
         self.objdet.mainloop()
 
 
@@ -347,17 +347,18 @@ class AccountHome(ObjectHome):
 
 class ManagerHome(TreeColumns, GaM_App):
     
-    def __init__(self, master=None, geo=(1200, 600), title='Object Details', sup=None, **kwargs):
-        super().__init__(master, geo=geo, title=title, **kwargs)
+    def __init__(self, master=None, geo=(1200, 600), title='Object Details', obj=None, **kwargs):
+        super().__init__(master, geo=geo, title=title, obj=obj, **kwargs)
 
-        self._sup = sup
-        if sup: self.setTitle(sup.name)
+
+    def _setupApp(self):
+        if self.obj: self.setTitle(self.obj.name)
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
         
-        self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=sup.name if sup else 'Name'))
+        self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=self.obj.name if self.obj else 'Name'))
 
-        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=sup.subTypes if sup else []), orient='h', longent=.4, func=self.changeSubs)
+        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=self.obj.subTypes if self.obj else []), orient='h', longent=.4, func=self.changeSubs)
 
         self.new = Checkbutton(sups, text='New?', place=dict(relx=.77, rely=.09, relh=.05, relw=.22))
 
@@ -369,65 +370,77 @@ class ManagerHome(TreeColumns, GaM_App):
         
         self.paint()
     
-    def getNewObjectDialog(self, st):
-        creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
+    def getNewObjectDialog(self, st, obj=None):
         
-        className = self._sup.className
-        print(className)
+        className = self.obj.className
+        # print(className)
+        obj = obj or self.obj
 
-        if (className == 'Client') and st == 'Accounts':
-            from ..dc.dc_dialogs import ClientAccountDialog
-            return ClientAccountDialog
-        elif (className == 'ClientsManager'):
-            from ..dc.dc_dialogs import ClientDialog
-            return ClientDialog
-        elif className in ('AreasManager', 'DCOffice'):
-            from ..dc.dc_dialogs import AreaDialog
-            creations['Regions'] = AreaDialog
-        elif st == 'Thrifts':
-            from ..dc.dc_dialogs import ThriftDialog
-            return ThriftDialog
-    
+        if isinstance(obj, ObjectsManager):
+            subName = obj.objectName
+            print(subName, st)
+            if (subName == 'Client'):
+                from ..dc.dc_dialogs import ClientDialog
+                return ClientDialog
+            elif (subName == 'Area'):
+                from ..dc.dc_dialogs import AreaDialog
+                return AreaDialog
+            elif (subName == 'ClientAccount'):
+                from ..dc.dc_dialogs import ClientAccountDialog
+                return ClientAccountDialog
+            elif (subName == 'Thrift') and (st == 'Thrifts'):
+                from ..dc.dc_dialogs import ThriftDialog
+                return ThriftDialog
+            elif (subName == 'Thrift') and (st == 'Thrifts'):
+                from ..dc.dc_dialogs import ThriftDialog
+                return ThriftDialog
+            elif (subName == 'DailyContribution') and (st == 'Daily Contributions'):
+                from ..dc.dc_dialogs import DailyContributionDailog
+                return DailyContributionDailog
+            elif (st == 'Records'): return RecordDialog
+            elif (st == 'Persons'): return PersonDialog
+            elif (st == 'Accounts'): return AccountDialog
 
-
-        return creations[st]
+        elif isinstance(obj, Object):
+            _manager = obj[st]
+            if _manager and not isinstnce(_manager, list): return self.getNewObjectDialog(st, _manager)
 
     @property
     def selectedSubType(self): return self.subType.get()
 
     def getSubs(self):
         subType = self.selectedSubType
-        subs = self._sup[subType] or []
+        subs = self.obj[subType] or []
         return subs
     
     # @property
     def c_or_m(self):
         k = ('Client', 'Member')
-        g = self._sup.className in k
+        g = self.obj.className in k
         h = False
-        if not self._sup.manager.strManager: h = self._sup.region.className in k
+        if not self.obj.strManager and not self.obj.manager.strManager: h = self.obj.region.className in k
         return g or h
 
     def changeSubs(self, e=0):
         st = self.selectedSubType
         if self.new.get():
             
-            if self.c_or_m() and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self._sup.className}.', _type='error')
+            if self.c_or_m() and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self.obj.className}.', _type='error')
             
             else:
                 try:
                     dialog = self.getNewObjectDialog(st)
                     if dialog:
-                        manager = self._sup if isinstance(self._sup, ObjectsManager) else self._sup[st]
+                        manager = self.obj if isinstance(self.obj, ObjectsManager) else self.obj[st]
                         dialog(self, manager=manager)
                 except Exception as er: PRMP_MsgBox(self, title=er.__class__.__name__, message=er, _type='error')
         else:
             subs = self.getSubs()
             if subs: self.subsList.set(subs, showAttr='name')
-            columns = self.columns(self._sup)
+            columns = self.columns(self.obj)
             # print(columns)
             self.subs.setColumns(columns)
-            self.subs.viewAll(self._sup)
+            self.subs.viewAll(self.obj)
 
     def openSup(self):
         pass
