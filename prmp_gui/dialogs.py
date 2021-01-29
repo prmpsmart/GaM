@@ -174,12 +174,15 @@ class PRMP_MsgBox(PRMP_Dialog):
         self.msgFont = msgFont
         self._type = _type
         self.okText = okText
-        self.ask = ask
         self._cancel = cancel
         
-        if kwargs.get('callback'): self.ask = 1
-        if okText: self.ask = 0
-        
+        if kwargs.get('callback'): ask = 1
+        if okText: ask = 0
+
+        if ask: delay = 0
+        # print(ask, delay)
+        self.ask = ask
+         
         super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, delay=delay, **kwargs)
 
     def _setupDialog(self):

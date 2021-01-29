@@ -45,11 +45,11 @@ class ClientDialog(PersonDialog):
 
 
 class AreaDialog(GaM_Dialog):
-    def __init__(self, master=None, area=None, manager=None, **kwargs):
+    def __init__(self, master=None, area=None, manager=None, title='Area Dialog', **kwargs):
         self.area = area
         self.manager = manager
 
-        super().__init__(master, geo=(350, 300), values=area, **kwargs)
+        super().__init__(master, geo=(350, 300), values=area, title=title, **kwargs)
     
     def _setupDialog(self):
         self.addEditButton()

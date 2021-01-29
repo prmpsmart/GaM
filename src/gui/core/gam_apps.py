@@ -400,7 +400,7 @@ class ManagerHome(TreeColumns, GaM_App):
 
         elif isinstance(obj, Object):
             _manager = obj[st]
-            if _manager and not isinstnce(_manager, list): return self.getNewObjectDialog(st, _manager)
+            if _manager and not isinstance(_manager, list): return self.getNewObjectDialog(st, _manager)
 
     @property
     def selectedSubType(self): return self.subType.get()

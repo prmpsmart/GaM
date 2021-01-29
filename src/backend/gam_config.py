@@ -7,7 +7,7 @@ from ..utils.auths import Authorisation
 class GaM_Settings:
     TOP = None
     GaM = None
-    ThemeIndex = 38
+    ThemeIndex = 21
     SaveDir = ''
     Users = []
     Super_Users = []
@@ -67,8 +67,8 @@ class GaM_Settings:
             for k, v in data.items(): setattr(GaM_Settings, k, v)
             # saveDir
             # auths
-            cls.setLoads()
         except Exception as e: print(e)
+        cls.setLoads()
     
     @classmethod
     def setLoads(cls):
