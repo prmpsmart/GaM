@@ -267,11 +267,14 @@ class RecordsManager(ObjectsManager):
         kwargs: further params that a ObjectType might need.
         '''
         money = float(money)
+        if not money: return
+
         new = False
         record = None
         
         date = self.getDate(date)
-        if self.className == 'BroughtForwards': print(date, newRecord)
+        
+        # if self.className == 'BroughtForwards': print(date.date, newRecord, money)
         
         if newRecord: new = True
         else:

@@ -63,6 +63,9 @@ class BroughtForwards(DCRecordsManager):
     ObjectType = BroughtForward
     def __init__(self, account):
         super().__init__(account, True)
+    
+    def createRecord(self, money, **kwargs):
+        if money > 0: super().createRecord(money, notAdd=True, newRecord=False, **kwargs)
 
 class BroughtToOffices(DCRecordsManager):
     ObjectType = BroughtToOffice
@@ -119,7 +122,7 @@ class Contributions(DCRecordsManager):
                 if remain > 0: savRec = self.savings.addSaving(remain, note=note, coRecord=repRec, **kwargs)
 
             else: savRec = self.savings.addSaving(contr, coRecord=incRec, note=note, **kwargs)
-            self.account.balanceAccount()
+            self.account.balanceAccount(date=conRec.date)
             return conRec
 
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')

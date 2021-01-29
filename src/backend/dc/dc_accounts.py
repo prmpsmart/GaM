@@ -53,7 +53,7 @@ class DCAccount(Account):
         self.updateBroughtForwards(date)
     
     def updateBroughtForwards(self, date=None):
-        if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances), date=date, notAdd=True, newRecord=True)
+        if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances), date=date)
 
 
 class DCAccountsManager(AccountsManager):
@@ -121,7 +121,7 @@ class ClientAccount(DCAccount):
 
     def addContribution(self, contribution, **kwargs):
         rec = self.contributions.addContribution(contribution, **kwargs)
-        self.balanceAccount()
+        # self.balanceAccount(date=rec.date)
         return rec
     
     def addDebit(self, debit, _type='w', **kwargs):
