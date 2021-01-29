@@ -32,7 +32,6 @@ class GaM_Settings:
 
     @classmethod
     def compress(cls, data, destFile):
-        # temp = io.ByetsIO()
         compData = zlib.compress(data)
         file = open(destFile, 'wb')
         file.write(compData)
@@ -73,6 +72,7 @@ class GaM_Settings:
     
     @classmethod
     def setLoads(cls):
+        print(cls.ThemeIndex)
         PRMP_Theme.setThemeIndex(cls.ThemeIndex)
         Authorisation.load_users(cls.Users)
         Authorisation.load_super_users(cls.Super_Users)

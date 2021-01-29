@@ -32,15 +32,14 @@ class GaM_App(PRMP_MainWindow):
     def defaults(self):
         pass
 
-    def security(self):
-        pass
-
     def setMenus(self):
 
         def showSnS(obj):
             if obj: SortNSearch(self, obj=self.obj)
         def showOD(obj):
             if obj: ManagerHome(self, obj=self.obj, title=f'{self.obj.name} Details.')
+        def security(): from .auths_gui import Security; Security()
+
 
         self.viewMenu = None # search, details
         self.settingsMenu = None # load, save, security, theme, plot color, save path
@@ -50,7 +49,7 @@ class GaM_App(PRMP_MainWindow):
         for vie in view: self.viewMenu.add_command(**vie)
 
         self.settingsMenu = Menu(config=dict(tearoff=0))
-        settings = [dict(label='Load', command=self.load), dict(label='Save', command=self.save), dict(label='Security', command=self.security), dict(label='Others')]
+        settings = [dict(label='Load', command=self.load), dict(label='Save', command=self.save), dict(label='Security', command=security), dict(label='Others')]
         for sett in settings: self.settingsMenu.add_command(**sett)
 
         self.helpMenu = Menu(config=dict(tearoff=0))
