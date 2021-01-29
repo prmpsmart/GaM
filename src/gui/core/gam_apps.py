@@ -5,9 +5,9 @@ from ...backend.dc.dc_specials import *
 
 class GaM_App(PRMP_MainWindow):
 
-    def __init__(self, master=None, title='Goodness and Mercy', **kwargs):
+    def __init__(self, master=None, title='Goodness and Mercy', obj=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
-        
+        self.obj = obj
         self._save = GaM_Settings.threadSave
         self._load = GaM_Settings.threadLoad
 
@@ -34,14 +34,18 @@ class GaM_App(PRMP_MainWindow):
     def security(self):
         pass
 
-    
     def setMenus(self):
+
+        def showSnS(obj):
+            if obj: SortNSearch(self, sup=self.obj)
+        def showOD(obj):
+            if obj: ManagerHome(self, sup=self.obj, title=f'{self.obj.name} Details.')
 
         self.viewMenu = None # search, details
         self.settingsMenu = None # load, save, security, theme, plot color, save path
 
         self.viewMenu = Menu(config=dict(tearoff=0))
-        view = [dict(label='Search'), dict(label='Details')]
+        view = [dict(label='Search', command=lambda : showSnS(self.obj)), dict(label='Details', command=lambda : showOD(self.obj))]
         for vie in view: self.viewMenu.add_command(**vie)
 
         self.settingsMenu = Menu(config=dict(tearoff=0))
@@ -267,11 +271,10 @@ class SortNSearch(GaM_App):
 class ObjectHome(GaM_App):
     
     def __init__(self, master=None, geo=(1500, 800), title='Home', obj=None, **kwargs):
-        self.obj = obj
         self.sns = None
         self.objdet = None
 
-        super().__init__(master, geo=geo, title=title, **kwargs)
+        super().__init__(master, geo=geo, title=title, obj=obj, **kwargs)
     
     def _setupApp(self):
         obj = self.obj
@@ -344,7 +347,7 @@ class AccountHome(ObjectHome):
 
 class ManagerHome(TreeColumns, GaM_App):
     
-    def __init__(self, master=None, geo=(1200, 600), title='DC Object Details', sup=None, **kwargs):
+    def __init__(self, master=None, geo=(1200, 600), title='Object Details', sup=None, **kwargs):
         super().__init__(master, geo=geo, title=title, **kwargs)
 
         self._sup = sup
@@ -370,6 +373,7 @@ class ManagerHome(TreeColumns, GaM_App):
         creations = {'Accounts': AccountDialog, 'Records': RecordDialog, 'Persons': PersonDialog, 'Regions': None}
         
         className = self._sup.className
+        print(className)
 
         if (className == 'Client') and st == 'Accounts':
             from ..dc.dc_dialogs import ClientAccountDialog
@@ -377,13 +381,15 @@ class ManagerHome(TreeColumns, GaM_App):
         elif (className == 'ClientsManager'):
             from ..dc.dc_dialogs import ClientDialog
             return ClientDialog
-        elif className == 'AreasManager':
+        elif className in ('AreasManager', 'DCOffice'):
             from ..dc.dc_dialogs import AreaDialog
-            return AreaDialog
+            creations['Regions'] = AreaDialog
         elif st == 'Thrifts':
             from ..dc.dc_dialogs import ThriftDialog
             return ThriftDialog
     
+
+
         return creations[st]
 
     @property
@@ -397,7 +403,10 @@ class ManagerHome(TreeColumns, GaM_App):
     # @property
     def c_or_m(self):
         k = ('Client', 'Member')
-        return self._sup.className in k or self._sup.region.className in k
+        g = self._sup.className in k
+        h = False
+        if not self._sup.manager.strManager: h = self._sup.region.className in k
+        return g or h
 
     def changeSubs(self, e=0):
         st = self.selectedSubType
