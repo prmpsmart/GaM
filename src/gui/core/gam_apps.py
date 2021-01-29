@@ -17,7 +17,8 @@ class GaM_App(PRMP_MainWindow):
         self.defaults()
         self.setMenus()
 
-        self.paint()
+        # self.paint()
+        self.start()
     
     def save(self):
         self._save()
@@ -240,27 +241,24 @@ RLU = RegionLookUp
 
 
 class SortNSearch(GaM_App):
-    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.31, sup=None):
-        super().__init__(master, title=title, geo=geo, tw=1)
+    def __init__(self, master=None, title='Sort and Search', geo=(700, 850), longent=.31, **kwargs):
+        self.longent = longent
+        super().__init__(master, title=title, geo=geo, tw=1, **kwargs)
 
-        self._sup = sup
-
-        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=sup.name if sup else ''), command=self.openSup)
-
+    def _setupApp(self):
+        self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=self.obj.name if self.obj else ''), command=self.openSup)
         
-        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=longent+.05, relh=.99-.04-longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
+        self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=self.longent+.05, relh=.99-.04-self.longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
 
-        note = Notebook(self.container, place=dict(relx=.005, rely=.05, relh=longent, relw=.99))
+        note = Notebook(self.container, place=dict(relx=.005, rely=.05, relh=self.longent, relw=.99))
         
-        self.search = SearchDetails(note, results=self.results, sup=sup)
+        self.search = SearchDetails(note, results=self.results, obj=self.obj)
         note.add(self.search, padding=3)
         note.tab(0, text='Search', compound='left', underline='-1')
 
         self.sort = SortDetails(note)
         note.add(self.sort, padding=3)
         note.tab(1, text='Sort', compound='left', underline='-1')
-
-
 
         self.paint()
     

@@ -242,6 +242,7 @@ class UniqueID(Button):
 
     def set(self, obj): self.obj = obj
 
+
 class SearchPersonalDetails(LabelFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
@@ -317,10 +318,10 @@ class DateSearch(LabelFrame):
 
 
 class SearchDetails(Notebook):
-    def __init__(self, master, sup=None, results=None, **kwargs):
+    def __init__(self, master, obj=None, results=None, **kwargs):
         super().__init__(master, **kwargs)
 
-        self._sup = sup
+        self.obj = obj
         self.results = results
         
         self.personalDetails = SearchPersonalDetails(self, text='Personal Details')

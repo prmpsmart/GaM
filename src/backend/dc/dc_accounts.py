@@ -24,7 +24,6 @@ class DCAccount(Account):
         self.normalIncomes = NormalIncomes(self)
         self.paidouts = Paidouts(self)
         self.withdrawals = Withdrawals(self)
-
         
     def __int__(self): return int(self.balances)
     def __float__(self): return float(self.balances)
@@ -51,10 +50,10 @@ class DCAccount(Account):
     
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
-        self.updateBroughtForwards()
+        self.updateBroughtForwards(date)
     
-    def updateBroughtForwards(self):
-        if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances))
+    def updateBroughtForwards(self, date=None):
+        if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances), date=date, notAdd=True, newRecord=True)
 
 
 class DCAccountsManager(AccountsManager):

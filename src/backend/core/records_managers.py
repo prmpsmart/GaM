@@ -271,6 +271,7 @@ class RecordsManager(ObjectsManager):
         record = None
         
         date = self.getDate(date)
+        if self.className == 'BroughtForwards': print(date, newRecord)
         
         if newRecord: new = True
         else:
