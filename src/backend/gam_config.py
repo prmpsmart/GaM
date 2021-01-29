@@ -72,7 +72,6 @@ class GaM_Settings:
     
     @classmethod
     def setLoads(cls):
-        print(cls.ThemeIndex)
         PRMP_Theme.setThemeIndex(cls.ThemeIndex)
         Authorisation.load_users(cls.Users)
         Authorisation.load_super_users(cls.Super_Users)

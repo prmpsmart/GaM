@@ -165,7 +165,7 @@ CD = PRMP_CalendarDialog
 
 class PRMP_MsgBox(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, okText='', msgFont='DEFAULT_FONT', plenty=0, bell=True, msg='', **kwargs):
+    def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, okText='', msgFont='DEFAULT_FONT', plenty=0, bell=True, msg='', delay=1000, **kwargs):
         
         message = msg or message
         
@@ -180,7 +180,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         if kwargs.get('callback'): self.ask = 1
         if okText: self.ask = 0
         
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, delay=delay, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=self.geo[1]-50)

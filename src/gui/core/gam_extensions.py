@@ -26,7 +26,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
         if not kwargs.get('title'): kwargs.update(dict(title=obj.name))
         if create: kwargs.update(dict(manager=obj))
 
-        if isinstance(obj, (DCOffice, DCRegion, Office)): #Office is there for the mean time.
+        if isinstance(obj, (DCOffice, DCRegion)): #Office is there for the mean time.
             window = DC_RegionHome
             if not create: kwargs.update(region=obj)
 

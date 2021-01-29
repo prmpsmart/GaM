@@ -6,6 +6,7 @@ from .gam_dialogs import *
 from .gam_images import GAM_PNGS
 
 
+
 def show_admin_required(): PRMP_MsgBox(title="ADMIN Required", msg="An ADMIN permission is required.", _type="error", ask=0)
 
 def make_change(ordfunc=None, *args, **kwargs):
@@ -90,7 +91,7 @@ class Base_Password(PRMP_FillWidgets, Frame):
         self.action = Button(self, text='Action', relief="solid", command=self.make_change)
        
     def binds(self):
-        self.bind_all('<Return>', self.make_change)
+        # self.bind_all('<Return>', self.make_change)
         if self.old_is_password: self.old.bind("<KeyRelease>", self.old_show_star)
         
         if self.new_is_password: self.new.bind("<KeyRelease>", self.new_show_star)
@@ -425,6 +426,11 @@ class Add_User(Change_Password):
                     # self.save_data()
                     add = Authorisation.decify(add[0])
                     # dialogFunc(title="Add Successful", msg=f"User: {name}\nUsername: {username}\nis added SUCCESSFULLY ", which="info")
+                    self.emptyWidgets()
+                    
+                    self.password_confirm.config(text='')
+                    self.password_length.config(text='')
+
                     PRMP_MsgBox(self, title="Add Successful", msg=f"User: {name}\nUsername: {username}\nis added SUCCESSFULLY ")
                     self.emptyWidgets()
                 else: PRMP_MsgBox(self, title="Add ERROR", msg=add, _type="error")
@@ -456,6 +462,7 @@ class User_Login(Delete_User):
         self.init()
     
     def make_change(self, e=0):
+        print(e)
         if e:
             children = list(self.children.keys())
             child = str(e.widget).split('.')[-1]
@@ -469,7 +476,7 @@ class User_Login(Delete_User):
         
         if self.pass_count >= 3:
             self.after(2000, os.sys.exit)
-            self.informate("Incorrect Credentials and EXITING", "Too much unsuccessful logins exiting in 5 seconds", "info")
+            self.informate("Incorrect Credentials and EXITING", "Too much unsuccessful logins exiting in 5 seconds", "info", delay=5000)
         
         res = self.get(['username', 'password'])
         usr = res['username']
@@ -480,19 +487,18 @@ class User_Login(Delete_User):
             if log == 1:
                 self.emptyWidgets(['username', 'password'])
                 self.pass_count = 0
-                delay = 100
 
                 if self.callback: self.after(delay, self.callback)
                 
-                PRMP_MsgBox(title="Correct Credentials", msg="Correct Password\nLogin Successful.", which="info", delay=delay)
+                PRMP_MsgBox(title="Correct Credentials", msg="Correct Password\nLogin Successful.", which="info")
 
             elif log == 2: self.informate("Incorrect Credentials", "Wrong Password", "warn")
             else: self.informate("Incorrect Credentials", Authorisation.not_exist(usr), "error")
         else:  self.informate("Incorrect Credentials", "Enter valid credentials", "error")
 
-    def informate(self, title='', msg='', which=''):
+    def informate(self, title='', msg='', which='', **kwargs):
         # if which: dialogFunc(title=title, msg=msg,which=which)
-        PRMP_MsgBox(title=title, msg=msg,_type=which, ask=0)
+        PRMP_MsgBox(title=title, msg=msg,_type=which, ask=0, **kwargs)
     
     def place_widgs(self):
         super().place_widgs()
@@ -577,7 +583,6 @@ class Login(GaM_Dialog):
         self.header = PRMP_ImageLabel(self.container, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
 
         self.pass_login = User_Login(self.container, callback=self._callback, place=dict(relx=.05, rely=.35, relh=.63, relw=.9))
-
 
     def _callback(self):
         if self.callback: self.callback(self.destroy)

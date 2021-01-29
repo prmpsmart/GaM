@@ -11,11 +11,14 @@ def addNote(self):
 
 
 class DC_RegionHome(TreeColumns, RegionHome):
-    def _setupApp(self):
-        
-        super()._setupApp()
+    
+    def __init__(self, master=None, title='Region Home', region=None, **kwargs):
+        if region:
+            if region.className == 'Office': region = region.dcOffice
+        RegionHome.__init__(self, master, title=title, region=region, **kwargs)
 
-        # self.setTitle('DC Region Home')
+    def _setupApp(self):
+        super()._setupApp()
 
         self.subRegions.callback = self.selectedSubRegion
         self.accounts.callback = self.selectedAccount

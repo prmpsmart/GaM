@@ -2533,7 +2533,6 @@ class PRMP_MainWindow(PRMP_Mixins):
     def __init__(self, master=None, _ttk_=False, **kwargs):
         
         master = master or PRMP_Window.TOPEST
-
         
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, **kwargs)
