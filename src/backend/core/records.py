@@ -14,7 +14,7 @@ class Record(Object):
     _type = 'rec'
     subTypes = ['Co Records', 'Linked Records']
 
-    def __init__(self, manager, money, date=None, note='Note', coRecord=None, **kwargs):
+    def __init__(self, manager, money, note='Note', coRecord=None, **kwargs):
         self.money = money
         self.note = note
         self.__coRecord = coRecord
