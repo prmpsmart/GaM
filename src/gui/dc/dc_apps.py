@@ -94,20 +94,13 @@ class DC_Office(DC_RegionHome):
         self.subRegions.place(relx=.005, rely=.28, relh=.36, relw=.99)
         self.accounts.place(relx=.005, rely=.65, relh=.34, relw=.99)
 
-        self.frame2 = Frame(note)
+        self.frame2 = ProperDetails(note)
         note.add(self.frame2, padding=3)
         note.tab(1, text='Proper Details', compound='left', underline='-1')
 
         self.properDetails()
     
     def properDetails(self):
-        ''
+        
         pass
-
-
-
-
-
-
-
 

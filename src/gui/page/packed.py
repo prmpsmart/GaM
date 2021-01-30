@@ -7,8 +7,8 @@ from prmp_miscs.prmp_datetime import *
 
 StringVar = tk.StringVar
 
-
 class Thrift_Analysis:
+
  # class Thrift_Analysis(Frame):
     plots_figures = []
     def __init__p(self, master, small_details, full_details, details_output, **kw):
@@ -761,6 +761,7 @@ class Thrift_Analysis:
 
  ###### load and save
     def load(self): self.get_yr_lblcb.set(Years.years_names)
+
     def save(self): Threads.save_data()
 
     def default(self):
@@ -813,17 +814,11 @@ class Thrift_Analysis:
         for active in actives: active.config(state='active')
 
     def choosable(self):
-        self.load()
-
-        self.get_cl_lblcb.checked()
-        self.get_ar_lblcb.checked()
-        self.get_mn_lblcb.checked()
-        self.get_yr_lblcb.checked()
-
+        # self.load()
 
         choices = {'years':self.years_rb, 'months':self.months_rb, 'areas':self.areas_rb, 'clients':self.clients_rb, 'weeks':self.weeks_rb, 'days':self.days_rb}
         region = self.region_cbtn.get()
-        headers = []
+        headers = None
 
         if region == 'years':
             headers = ['years', 'months', 'areas']
@@ -843,8 +838,8 @@ class Thrift_Analysis:
 
         if headers:
             for header in headers:
-                choices[header]['state'] = 'normal'
-            for choice in remains: choices[choice].config(state='disabled')
+                choices[header].normal()
+            for choice in remains: choices[choice].disabled()
 
     def spec_choosable(self):
         self.s_d_month.checked()
@@ -962,18 +957,3 @@ class Thrift_Analysis:
 
         styles = [sty for sty in list(self.__dict__.values()) if isinstance(sty, TwoWidgets)]
         for style in styles: style.place_widgs()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

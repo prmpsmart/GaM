@@ -85,7 +85,6 @@ class AreaDialog(GaM_Dialog):
         self.destroyDialog()
 
 
-
 class ClientAccountDialog(AccountDialog):
 
     def _setupDialog(self):
@@ -399,10 +398,4 @@ class DailyContributionDailog(GaM_Dialog):
             self.dcContrib.addBTO(bto)
             self.totals._refresh()
         except AssertionError as error: PRMP_MsgBox(self, title=error.__class__.__name__, message=error, ask=0)
-
-
-
-
-
-
 
