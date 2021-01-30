@@ -124,7 +124,7 @@ class Contributions(DCRecordsManager):
 
             else: savRec = self.savings.addSaving(contr, coRecord=incRec, note=note, **kwargs)
             self.account.balanceAccount(date=conRec.date)
-            print(conRec.date)
+            # print(conRec.date)
             return conRec
 
         else: raise DCErrors.ContributionsError(f'Contributions will be {newContributions} which is more than 31')

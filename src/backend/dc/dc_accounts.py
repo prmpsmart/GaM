@@ -195,8 +195,6 @@ class ClientsAccounts(ObjectsMixins):
             if _recs:
                 recClass = recM.class_.ObjectType
                 money = 0
-                # print(recClass)
-                # print(_recs.records)
                 manager = _recs.manager
                 for _rec in _recs: money += float(_rec)
                 rec = recClass(manager, money, date=week)

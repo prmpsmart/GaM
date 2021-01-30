@@ -22,6 +22,9 @@ class SeasonRecord(ObjectsMixins):
         super().__init__(date=date, idReq=1)
         self._subs = records
         self._subs.sort()
+        
+        man = records[0].manager
+        for rec in records: assert rec.manager.className == man.className, 'Records of different manager types given.'
 
         
     
