@@ -1,5 +1,6 @@
 from ..core.bases import Object, ObjectsManager, PRMP_DateTime, ObjectSort
 
+
 class Records(Object, list):
     Manager = 'Thrift'
 

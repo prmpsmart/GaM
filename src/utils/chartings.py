@@ -1,9 +1,11 @@
 
-class _ChartSort:
-    
+class Chart_Sort:
+    records = ["clnt", "brf", "com", "sav", "deb", "not_paid", "upf", "pupf", "rupf", "bal", "def", "exc", "bto"]
+    class_xticks = ["Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paids", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
     def __init__(self, region, yaxis, month=None, area=None, week=None, day=None, spec=None, sole="", header=None):
         self.go = 0
         self.plot_data_sort(region, yaxis, area=area, sole=sole, month=month, header=header, week=week, day=day)
+
 
     def get_labels(self, yaxis):
         labels = []
@@ -27,8 +29,7 @@ class _ChartSort:
     def plot_data_sort(self, region, yaxis, month=None, area=None, week=None, day=None, spec=None, sole="", header=None):
         sub_regions = []
         columns = []
-        ## sub_Ys
-        clnt = []
+        ## sub_Ys        clnt = []
         brf = []
         com = []
         sav = []
@@ -90,7 +91,7 @@ class _ChartSort:
                 self.ys = column[1:]
                 self.labels = column[0]
                 self.go = 1
-                return 
+                return
 
         elif region.which == "area":
             if header == "areas": sub_regions = region.areas
@@ -172,7 +173,6 @@ class _ChartSort:
                 
                 if self.records[12] in yaxis: bto.append(data[13])
 
-
         if columns or sub_regions:
             for y in [clnt, brf, com, sav, deb, not_paid, upf, pupf, rupf, bal, def_, exc, bto]:
                 if y: ys.append(y)
@@ -183,13 +183,3 @@ class _ChartSort:
             
             self.labels = labels
             self.go = 1
-
-
-class ChartSort:
-    
-    def __init__(self, obj):
-        self.obj = obj
-    
-    def sort(self, labels=[], _type=None, attr='', **kwargs):
-        values = []
-        # for lbl in labels:

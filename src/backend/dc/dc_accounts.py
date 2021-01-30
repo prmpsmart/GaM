@@ -1,7 +1,7 @@
 
 from .dc_records_managers import *
 from ..core.accounts import PRMP_DateTime, Account, AccountsManager
-
+from ..core.mixins import Mixins
 
 class DCAccount(Account):
     Manager = 'DCAccountsManager'
@@ -135,6 +135,27 @@ class ClientAccount(DCAccount):
         pass
 
 
+class ClientsAccounts(Mixins):
+
+    def __init__(self, account):
+        assert account.className == 'AreaAccount' and account.region.className == 'Area', 'This account must be an instance of AreaAccount and its region an instance of Area.'
+        
+        self.master = self.manager = self.account = account
+        self._subs = []
+        self.name = f'{self.className}({self.account.name})'
+
+    def __str__(self): return self.name
+    def __repr__(self): return f'<{self}>'
+
+    def add(self, clientAccount):
+        if clientAccount not in self._subs: self._subs.append(clientAccount)
+    
+    @property
+    def date(self): return self.account.date
+
+    def subs(self): return self._subs
+
+
 class AreaAccount(DCAccount):
     Manager = 'AreaAccountsManager'
 
@@ -146,9 +167,12 @@ class AreaAccount(DCAccount):
         self.deficits = Deficits(self)
         self.ledgerNumbers = 0
         self._clientsAccounts = []
+
+        # self.clientsAccounts = ClientsAccounts(self)
     
     def addClientAccount(self, account):
         self._clientsAccounts.append(account)
+        # self.clientsAccounts.add(account)
         self.ledgerNumbers = len(self._clientsAccounts)
 
     
@@ -187,9 +211,9 @@ class AreaAccount(DCAccount):
         
     
     def addBto(self, bto, date=None):
-        clientsAccounts = self.clientsAccounts
+        clientsAccounts = self.getClientsAccounts()
 
-        incomes = [self.sumRecords(acc.incomes.sortSubsByDate(date)) for acc in clientsAccounts()]
+        incomes = [self.sumRecords(acc.incomes.sortSubsByDate(date)) for acc in clientsAccounts]
 
         contributed = sum(incomes)
 
@@ -201,12 +225,12 @@ class AreaAccount(DCAccount):
         if bto > contributed: self.excesses.createRecord(bto - contributed, date, coRecord=btoRec)
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date, coRecord=btoRec)
 
-    def clientsAccounts(self, month=None):
+    def getClientsAccounts(self, month=None):
         acs = self.manager.sortClientsAccountsByMonth(month or self.month)
         return sorted(acs)
 
     def getClientAccount(self, ledgerNumber, month=None):
-        clientsAccounts = self.clientsAccounts(month)
+        clientsAccounts = self.getClientsAccounts(month)
         for clientsAccount in clientsAccounts:
             if clientsAccount.ledgerNumber == int(ledgerNumber): return clientsAccount
 

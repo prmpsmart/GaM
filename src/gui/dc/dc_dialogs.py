@@ -329,15 +329,15 @@ class DailyContributionDailog(GaM_Dialog):
         self.update()
         self.emptyWidgets(self.thriftWidgets[:4])
 
-    def clientsAccounts(self):
-        if self._account: return self._account.clientsAccounts()
+    def getClientsAccounts(self):
+        if self._account: return self._account.getClientsAccounts()
         return []
 
     def setAreaAccountDependents(self, e=None):
         self._account = self.account.B.getObj()
         self.setClientNumbers()
 
-    def maxNum(self): return len(self.clientsAccounts())
+    def maxNum(self): return len(self.getClientsAccounts())
 
     def setClientNumbers(self):
         max_ = self.maxNum()
