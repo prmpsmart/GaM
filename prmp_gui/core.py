@@ -2,7 +2,7 @@ import os, time, random, ctypes, tkinter as tk
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
-import _tkinter
+import _tkinter, threading
 from prmp_miscs.prmp_pics import PRMP_Image
 from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
@@ -2352,6 +2352,7 @@ class PRMP_Window(PRMP_Widget):
     
     def destroySelf(self, e=0):
         self.closing()
+        # threading.Thread(target=self.save).start()
         self.save()
 
         def out(u):

@@ -8,6 +8,7 @@ class GaM_App(PRMP_MainWindow):
     def __init__(self, master=None, title='Goodness and Mercy', obj=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.obj = obj
+        
         self._save = GaM_Settings.threadSave
         self._load = GaM_Settings.threadLoad
 
@@ -21,6 +22,9 @@ class GaM_App(PRMP_MainWindow):
         self.start()
     
     def save(self):
+        # from .auths_gui import make_change
+        # make_change(self._save, silent=1)
+
         self._save()
         PRMP_MsgBox(title='Successful', message='Saving is successful.', )
 

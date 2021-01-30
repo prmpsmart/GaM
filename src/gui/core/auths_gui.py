@@ -9,7 +9,7 @@ from .gam_images import GAM_PNGS
 
 def show_admin_required(): PRMP_MsgBox(title="ADMIN Required", msg="An ADMIN permission is required, and any changes would not be saved.", _type="error", ask=0)
 
-def make_change(ordfunc=None, *args, **kwargs):
+def make_change(ordfunc=None, *args, silent=0, **kwargs):
     if Authorisation.is_admin():
         if ordfunc: ordfunc()
         elif args:
@@ -23,7 +23,7 @@ def make_change(ordfunc=None, *args, **kwargs):
                 else: func(vals)
         return True
     else:
-        show_admin_required()
+        if not silent: show_admin_required()
         return False
 
 
