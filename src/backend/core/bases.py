@@ -584,7 +584,7 @@ class ObjectsManager(ObjectsMixins):
         date = self.getDate(date)
         subs = []
         for sub in self:
-            if sub.date.week == int(date.week): subs.append(sub)
+            if sub.date.week == date.week: subs.append(sub)
         return subs
 
     def sortSubsIntoWeeksInMonth(self, month):

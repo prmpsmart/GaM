@@ -208,7 +208,6 @@ class ClientsAccounts(ObjectsMixins):
             recs = self.getRecs_Of_RM_Of_AccByWeek(acc, week)
             accsRecs.append(recs)
         return accsRecs
-        
 
 
 class AreaAccount(DCAccount):

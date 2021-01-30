@@ -475,8 +475,12 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def week(self):
         weeks = self.weekDates
         for wk in weeks:
-            if self in wk: return weeks.index(wk) + 1
+            _wk = [w.date for w in wk]
+            if self.date in _wk: return weeks.index(wk) + 1
         return 0
+    
+    @property
+    def weekName(self): return 'Week {}'.format(self.week)
     
     @classmethod
     def getDate(cls, status=0, form=1, day_=0):
