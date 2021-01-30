@@ -2552,7 +2552,10 @@ class PRMP_MainWindow(PRMP_Mixins):
         if attr != self._unget: return attr
         else: return getattr(self.root, name)
 
-    def __getattr__(self, name): return getattr(self.root, name)
+    def __getattr__(self, name):
+        return self[name]
+        # return getattr(self.root, name)
+
 MainWindow = PMW = PRMP_MainWindow
 
 #   scrollable widgets

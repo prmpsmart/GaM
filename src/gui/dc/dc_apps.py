@@ -43,7 +43,6 @@ class DC_RegionHome(TreeColumns, RegionHome):
         self.tree.viewAll(sub)
 
 
-
 class DC_AccountHome(TreeColumns, AccountHome):
     def _setupApp(self):
         super()._setupApp()
@@ -61,6 +60,9 @@ class DC_AccountHome(TreeColumns, AccountHome):
         self.tree.viewAll(sub)
 
 
+class AreaAccountDetails(GaM_App):
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, **kwargs)
 
 
 

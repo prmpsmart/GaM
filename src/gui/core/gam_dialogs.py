@@ -5,12 +5,11 @@ from ...backend.office.office_regions import Office
 
 
 class GaM_Dialog(PRMP_Dialog):
-    def __init__(self, master=None, delay=0, **kwargs): super().__init__(master, delay=delay, **kwargs)
+    # def __init__(self, master=None, delay=0, **kwargs): super().__init__(master, delay=delay, **kwargs)
 
     def defaults(self):
         self._save = GaM_Settings.threadSave
         self._load = GaM_Settings.threadLoad
-        self.root.save = self._save
 
     def save(self):
         # from .auths_gui import make_change

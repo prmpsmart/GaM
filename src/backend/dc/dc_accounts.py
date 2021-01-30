@@ -121,7 +121,6 @@ class ClientAccount(DCAccount):
 
     def addContribution(self, contribution, **kwargs):
         rec = self.contributions.addContribution(contribution, **kwargs)
-        # self.balanceAccount(date=rec.date)
         return rec
     
     def addDebit(self, debit, _type='w', **kwargs):
