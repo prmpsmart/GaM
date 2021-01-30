@@ -37,6 +37,9 @@ class CardDue(DCRecord): pass
 class Commission(DCRecord): pass
 
 class Contribution(DCRecord):
+
+    def __init__(self, *args, **kwargs):
+        print(kwargs, 'heee')
     
     def update(self, values={}, first=1):
         mn = 'money'

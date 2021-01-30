@@ -235,15 +235,16 @@ class ObjectSort(Mixins):
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
     
-    def __init__(self, date=None, previous=None):
+    def __init__(self, date=None, previous=None, idReq=0):
         self.__editableValues = []
+        
         self._date = self.getDate(date)
         self.objectSort = ObjectSort(self)
         
         self.previous = previous
         self.next = None
         
-        self._uniqueID = sha224(str(self).encode()).hexdigest()
+        if not idReq: self._uniqueID = sha224(str(self).encode()).hexdigest()
     
     @property
     def uniqueID(self): return self._uniqueID
@@ -569,21 +570,21 @@ class ObjectsManager(ObjectsMixins):
         return recs
     
     def sortSubsIntoDaysInWeek(self, week):
-        PRMP_DateTime.checkDateTime(week)
+        week = self.getDate(week)
         days = [sub for sub in self if sub.date.isSameWeek(week)]
         return days
     
     def sortSubsIntoDaysInMonth(self, month):
-        PRMP_DateTime.checkDateTime(month)
+        month = self.getDate(month)
         days = [sub for sub in self if sub.date.isSameMonth(month)]
         return days
     
     #Week Sorting
     def sortSubsByWeek(self, date):
-        PRMP_DateTime.checkDateTime(date)
+        date = self.getDate(date)
         subs = []
         for sub in self:
-            if sub.date.weekNum == int(date.weekNum): subs.append(sub)
+            if sub.date.week == int(date.week): subs.append(sub)
         return subs
 
     def sortSubsIntoWeeksInMonth(self, month):
@@ -597,13 +598,13 @@ class ObjectsManager(ObjectsMixins):
     def sortSubsByMonth(self, month): return self.sortSubsIntoDaysInMonth(month)
     
     def sortSubsIntoMonthsInYear(self, year):
-        PRMP_DateTime.checkDateTime(year)
+        year = self.getDate(year)
         yearSubs = [sub for sub in self if sub.date.isSameYear(year)]
         return yearSubs
     
     #Year Sorting
     def sortSubsByYear(self, year):
-        PRMP_DateTime.checkDateTime(year)
+        year = self.getDate(year)
         recs = [rec for rec in self if rec.date.isSameYear(year)]
         return recs
 

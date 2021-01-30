@@ -183,6 +183,33 @@ class ClientsAccounts(ObjectsMixins):
             recs = self.getRecs_Of_RM_Of_AccByDate(acc, date)
             accsRecs.append(recs)
         return accsRecs
+
+    def getRecs_Of_RM_Of_AccByWeek(self, account, week=None):
+        leng = len(account[:])
+        week = self.getDate(week)
+        
+        recs = []
+        for ind in range(leng):
+            recM = account[ind]
+            _recs = recM.sortRecordsByWeek(week)
+            if _recs:
+                recClass = recM.class_.ObjectType
+                money = 0
+                # print(recClass)
+                # print(_recs.records)
+                manager = _recs.manager
+                for _rec in _recs: money += float(_rec)
+                rec = recClass(manager, money, date=week)
+                recs.append(rec)
+        return recs
+
+    def getRecs_Of_RM_Of_AccsByWeek(self, week=None):
+        accs = self[:]
+        accsRecs = []
+        for acc in accs:
+            recs = self.getRecs_Of_RM_Of_AccByWeek(acc, week)
+            accsRecs.append(recs)
+        return accsRecs
         
 
 

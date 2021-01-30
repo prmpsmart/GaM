@@ -16,33 +16,32 @@ from .records import *
 
 class SeasonRecord(ObjectsMixins):
     maximum = 0
-    def __init__(self, records):
-        super().__init__(self)
-        assert records, 'Records cannot be empty.'
+    def __init__(self, records, date=None):
         if self.maximum: assert len(records) <= self.maximum, f'Records may not be more than {self.maximum}'
+
+        super().__init__(date=date, idReq=1)
+        self._subs = records
+        self._subs.sort()
+
         
-        man = records[0].manager
-        for rec in records:
-            assert rec.manager == man, 'Records of different managers given.'
-        
-        self.__records = records
-        self.__records.sort()
     
     def __int__(self): return sum([int(rec) for rec in self])
     def __float__(self): return sum([float(rec) for rec in self])
     
-    def __getitem__(self, num): return self.records[num]
+    # def __getitem__(self, num): return self.records[num]
     
-    def __len__(self): return len(self.records)
+    # def __len__(self): return len(self.records)
     
     @property
     def manager(self): return self.records[0].manager
     
-    @property
-    def date(self): return self.records[0].date
+    # @property
+    # def date(self): return self.records[0].date
     
     @property
-    def records(self): return self.__records
+    def subs(self): return self._subs
+    @property
+    def records(self): return self.subs
     
     def get(self, season, wh):
         if season == 'year':
@@ -58,30 +57,30 @@ class SeasonRecord(ObjectsMixins):
 class WeekRecord(SeasonRecord, CompareByWeek):
     maximum = 7
     
-    def __init__(self, records):
-        super().__init__(records)
+    def __init__(self, records, date=None):
+        SeasonRecord.__init__(self, records, date=date)
         self.recDayNames = [rec.date.dayName for rec in records]
     
     def __str__(self): return f'{self.manager} | {self.className}({self.weekMonthYear}) | {self.moneyWithSign}'
 
-    def __day(self, name):
+    def _day(self, name):
         if name in self.recDayNames:
             for rec in self:
                 if name.title() == rec.date.dayName: return rec
     @property
-    def sunday(self): return self.__day('Sunday')
+    def sunday(self): return self._day('Sunday')
     @property
-    def monday(self): return self.__day('Monday')
+    def monday(self): return self._day('Monday')
     @property
-    def tuesday(self): return self.__day('Tuesday')
+    def tuesday(self): return self._day('Tuesday')
     @property
-    def wednesday(self): return self.__day('Wednesday')
+    def wednesday(self): return self._day('Wednesday')
     @property
-    def thursday(self): return self.__day('Thursday')
+    def thursday(self): return self._day('Thursday')
     @property
-    def friday(self): return self.__day('Friday')
+    def friday(self): return self._day('Friday')
     @property
-    def saturday(self): return self.__day('Saturday')
+    def saturday(self): return self._day('Saturday')
 
 class MonthRecord(SeasonRecord, CompareByMonth):
     maximum = 5
@@ -345,16 +344,16 @@ class RecordsManager(ObjectsManager):
     
     def sortRecordsIntoDaysInWeek(self, week):
         days = self.sortSubsIntoDaysInWeek(week)
-        return WeekRecord(days)
+        if days: return WeekRecord(days)
     
     def sortRecordsIntoDaysInMonth(self, month):
         days = self.sortSubsIntoDaysInMonth(month)
         return MonthRecord(days)
     
     #Week Sorting
-    def sortRecordsByWeek(self, weekNum):
-        records = self.sortSubsByWeek(weekNum)
-        return WeekRecord(records)
+    def sortRecordsByWeek(self, week):
+        records = self.sortSubsByWeek(week)
+        if records: return WeekRecord(records)
 
     def sortRecordsIntoWeeksInMonth(self, month):
         weeksRec = self.sortSubsIntoWeeksInMonth(month)
