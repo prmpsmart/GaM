@@ -188,6 +188,7 @@ class DC_Overview(Frame):
         self.plotCanvas2.place(relx=.5, rely=.33, relh=.67, relw=.5)
     
     def updateDCDigits(self, account):
+        assert isinstance(account, Account)
         self.account = account
         self.month.set(self.account.month.monthYear)
         if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
@@ -302,7 +303,6 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         
         self.get = self.detailsPart.get
         self.set = self.detailsPart.set
-
 
         PRMP_Separator(self, place=dict(relx=.005, rely=.755, relh=.005, relw=.99))
 

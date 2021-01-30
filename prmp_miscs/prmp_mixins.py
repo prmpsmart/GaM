@@ -56,11 +56,23 @@ class PRMP_Mixins:
         PRMP_DateTime.checkDateTime(date)
         return date
 
-    def numWithCommas(self, num=None):
-        if num == None: num = int(self)
+    def numWithCommas(self, num=None, fl=0):
+        if num == None: num = self
+        
+        num = float(num) if fl else int(num)
         
         div = 3
         str_num = str(num)
+
+        if fl:
+            str_num, afterFloat = str_num.split('.')
+            if afterFloat == '0': afterFloat = '00'
+
+        minus = 0
+        if str_num.startswith('-'):
+            minus = 1
+            str_num = str_num[1:]
+
         num_list = list(str_num)
         num_len = len(str_num)
         num_rem = num_len % div
@@ -71,9 +83,15 @@ class PRMP_Mixins:
             num_list.insert(co - to, ",")
             co -= 3
             to += 1
-        return "".join(num_list)
+        
+        result = "".join(num_list)
+        if fl: result = result + '.' + afterFloat
+        
+        _minus = '-' if minus else ''
+        result = _minus + result
+        return result
     
-    def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num))
+    def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num, 1))
     
     def addSignToNum(self, num):
         try: float(num)

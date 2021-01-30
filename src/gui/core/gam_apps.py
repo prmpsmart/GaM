@@ -308,17 +308,19 @@ class RegionHome(ObjectHome):
 
         super().__init__(master, title=title, obj=region, **kwargs)
 
-    def _setupApp(self):
+    def _setupApp(self, cont=None):
         super()._setupApp()
         
         region = self.region = self.obj
         if region: self.setTitle(region.name)
 
-        self.details = RegionDetails(self.container, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
+        cont = cont or self.container
+
+        self.details = RegionDetails(cont, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
 
         subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
-        self.subRegions = SubsList(self.container, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
-        self.accounts = SubsList(self.container, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
+        self.subRegions = SubsList(cont, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
+        self.accounts = SubsList(cont, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
 
         if region:
             self.subRegions.set(region.subRegions, showAttr='name')

@@ -108,7 +108,7 @@ class RecordDialog(GaM_Dialog):
     def changeGeo(self):
         if self.chee.get():
             geo, relw = (600, 350), .5
-            self.coRecords.set(self.record.linkedRecords)
+            self.coRecords.set(self.record.linkedRecords, showAttr='name')
             self.coRecords.place(relx=relw, rely=0, relh=1, relw=relw)
         else:
             geo, relw = (350, 350), 1

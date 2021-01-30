@@ -14,11 +14,11 @@ from ...backend.office.office_regions import *
 
 def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
-    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog
+    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog, DC_Office
 
     from .gam_apps import RegionHome, AccountHome, ManagerHome
 
-    # print(obj)
+    print(obj)
 
     
     if obj:
@@ -27,7 +27,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
         if create: kwargs.update(dict(manager=obj))
 
         if isinstance(obj, (DCOffice, DCRegion)): #Office is there for the mean time.
-            window = DC_RegionHome
+            window = DC_RegionHome if obj.className != 'DCOffice' else DC_Office
             if not create: kwargs.update(region=obj)
 
         elif isinstance(obj, DCAccount):

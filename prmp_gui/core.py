@@ -2594,7 +2594,8 @@ class PRMP_ListBox(PRMP_Frame):
         self.clear()
         self.last = len(values)
         for val in values:
-            value = getattr(val, showAttr, None) if showAttr else str(val)
+            value = val[showAttr] if showAttr else str(val)
+            # value = getattr(val, showAttr, None) if showAttr else str(val)
             self.listbox.insert('end', value)
         self.values = values
     
