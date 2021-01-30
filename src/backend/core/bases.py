@@ -342,10 +342,7 @@ class ObjectsMixins(Mixins, CompareByDate):
     def date(self): return self._date
 
     @date.setter
-    def date(self, _date):
-        # assert isinstance(_date, PRMP_DateTime), f'{_date} an instance of  {_date.__class__}, is not an instance of PRMP_DateTime'
-        if isinstance(_date, str): _date = PRMP_DateTime.getDMYFromDate(_date)
-        self._date = _date
+    def date(self, _date): self._date = self.getDate(_date)
 
     # def __getattr__(self, attr, dontRaise=False):
     #     ret = self.getFromSelf(attr, self._unget)

@@ -1,7 +1,7 @@
 
 from .dc_records_managers import *
 from ..core.accounts import PRMP_DateTime, Account, AccountsManager
-from ..core.mixins import Mixins
+from ..core.bases import ObjectsMixins
 
 class DCAccount(Account):
     Manager = 'DCAccountsManager'
@@ -135,25 +135,55 @@ class ClientAccount(DCAccount):
         pass
 
 
-class ClientsAccounts(Mixins):
+class ClientsAccounts(ObjectsMixins):
 
     def __init__(self, account):
         assert account.className == 'AreaAccount' and account.region.className == 'Area', 'This account must be an instance of AreaAccount and its region an instance of Area.'
-        
+
         self.master = self.manager = self.account = account
         self._subs = []
-        self.name = f'{self.className}({self.account.name})'
-
+        super().__init__(date=account.date)
+    
+    @property
+    def name(self): return f'{self.className}({self.account.name})'
+    
     def __str__(self): return self.name
     def __repr__(self): return f'<{self}>'
 
     def add(self, clientAccount):
         if clientAccount not in self._subs: self._subs.append(clientAccount)
-    
-    @property
-    def date(self): return self.account.date
 
+    @property
     def subs(self): return self._subs
+
+    @property
+    def regions(self): return [acc.region for acc in self._subs]
+
+    def getRecs_Of_RM_Of_AccByDate(self, account, date=None):
+        leng = len(account[:])
+        date = self.getDate(date)
+        
+        recs = []
+        for ind in range(leng):
+            recM = account[ind]
+            _recs = recM.sortRecordsByDate(date)
+            if _recs:
+                recClass = recM.class_.ObjectType
+                money = 0
+                manager = _recs[0].manager
+                for _rec in _recs: money += float(_rec)
+                rec = recClass(manager, money, date=date)
+                recs.append(rec)
+        return recs
+
+    def getRecs_Of_RM_Of_AccsByDate(self, date=None):
+        accs = self[:]
+        accsRecs = []
+        for acc in accs:
+            recs = self.getRecs_Of_RM_Of_AccByDate(acc, date)
+            accsRecs.append(recs)
+        return accsRecs
+        
 
 
 class AreaAccount(DCAccount):
@@ -166,14 +196,13 @@ class AreaAccount(DCAccount):
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
         self.ledgerNumbers = 0
-        self._clientsAccounts = []
 
-        # self.clientsAccounts = ClientsAccounts(self)
+        if self.className == 'AreaAccount': self.clientsAccounts = ClientsAccounts(self)
     
     def addClientAccount(self, account):
-        self._clientsAccounts.append(account)
-        # self.clientsAccounts.add(account)
-        self.ledgerNumbers = len(self._clientsAccounts)
+        if account in self.clientsAccounts: return
+        self.clientsAccounts.add(account)
+        self.ledgerNumbers = len(self.clientsAccounts)
 
     
     @property
@@ -185,8 +214,10 @@ class AreaAccount(DCAccount):
     def btos(self): return self.broughtToOffices
     
     def _balanceAccount(self, date=None):
-        clientsAccounts = self._clientsAccounts
-        for a in self._clientsAccounts: a.balanceAccount()
+        clientsAccounts = self.clientsAccounts.subs
+        
+        for a in clientsAccounts: a.balanceAccount()
+
         if clientsAccounts:
 
             self.incomes.updateWithOtherManagers([account.incomes for account in clientsAccounts])
@@ -224,6 +255,10 @@ class AreaAccount(DCAccount):
 
         if bto > contributed: self.excesses.createRecord(bto - contributed, date, coRecord=btoRec)
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date, coRecord=btoRec)
+    
+    def updateClientsAccounts(self):
+        accs = self.getClientsAccounts()
+        for acc in accs: self.addClientAccount(acc)
 
     def getClientsAccounts(self, month=None):
         acs = self.manager.sortClientsAccountsByMonth(month or self.month)

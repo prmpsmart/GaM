@@ -52,6 +52,7 @@ class PRMP_Mixins:
         from .prmp_datetime import PRMP_DateTime
 
         if date == None: date = PRMP_DateTime.now()
+        elif isinstance(date, str): date = PRMP_DateTime.getDMYFromDate(date)
         PRMP_DateTime.checkDateTime(date)
         return date
 

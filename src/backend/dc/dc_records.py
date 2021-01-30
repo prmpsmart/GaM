@@ -3,7 +3,7 @@ from .dc_errors import DCErrors
 
 class DCRecord(Record):
     Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers', 'Withdrawals', 'Paidouts', 'NormalIncomes')
-    # def __init__(self, *args, **kwargs): super().__init__(*args, **kwargs)
+
     def update(self, values={}, first=1):
         if not first: super().update(values, first)
     

@@ -256,7 +256,7 @@ class RecordsManager(ObjectsManager):
     @property
     def dates(self): return [record.date for record in self]
     
-    def _setRecords(self, records): self.__records = records
+    def _setRecords(self, records): self._subs = records
     
     def createRecord(self, money, date=None, newRecord=True, notAdd=False, **kwargs):
         '''
