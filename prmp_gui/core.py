@@ -356,6 +356,7 @@ class PRMP_Theme(PRMP_Mixins):
             kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder', '_type', 'default']}
             
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
+            
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
             activebackground = kwargs.pop('activebackground', foreground)
             activeforeground = kwargs.pop('activeforeground', background)

@@ -5,6 +5,7 @@ from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
 from .prmp_mixins import PRMP_Mixins, PRMP_Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
+WEEKS = ['Week %d'%a for a in range(1, 6)]
 
 
 _DAYS_IN_MONTH = [-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
