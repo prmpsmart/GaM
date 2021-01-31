@@ -57,7 +57,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
         else: kwargs.update(obj=obj)
 
         win = window(self, **kwargs)
-        if not self: win.mainloop()
+        if not self: win.start()
 
 
 

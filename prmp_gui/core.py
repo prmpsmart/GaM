@@ -2006,10 +2006,6 @@ class PRMP_Window(PRMP_Widget):
 
         self.after(100, self.loadAfters)
     
-    def closing(self): pass
-
-    def save(self): pass
-    
     def withdrawTips(self):
         for tip in self.tips: tip.withdraw()
     
@@ -2348,6 +2344,10 @@ class PRMP_Window(PRMP_Widget):
     def addToMenu(self, widget, **kwargs):
         if self.menuBar: self.menuBar.addWidget(widget, **kwargs)
     
+    def closing(self): pass
+
+    def save(self): print('implement in subclasses')
+    
     def destroy(self):
         if self == self.topest:
             PRMP_Window.TOPEST = None
@@ -2368,7 +2368,7 @@ class PRMP_Window(PRMP_Widget):
         
         if self == self.topest:
             from .dialogs import PRMP_MsgBox
-            PRMP_MsgBox(title='Exit', message='Are you sure to exit?', callback=out)
+            PRMP_MsgBox(self, title='Exit', message='Are you sure to exit?', callback=out)
         else: self.destroy()
     
     def setTkIcon(self, icon):

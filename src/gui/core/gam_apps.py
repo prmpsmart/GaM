@@ -5,14 +5,16 @@ from ...backend.dc.dc_specials import *
 
 class GaM_App(PRMP_MainWindow):
 
+    _save = GaM_Settings.saveAll
+    _save = GaM_Settings.threadSave
+    _load = GaM_Settings.threadLoad
+
     def __init__(self, master=None, title='Goodness and Mercy', obj=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.obj = obj
         
-        self._save = GaM_Settings.threadSave
-        self._load = GaM_Settings.threadLoad
 
-        self.root.save = self._save
+        self.root.save = self.save
         self._setupApp()
 
         self.defaults()
@@ -22,13 +24,14 @@ class GaM_App(PRMP_MainWindow):
         self.start()
     
     def save(self):
+        print('love')
         # from .auths_gui import make_change
         # make_change(self._save, silent=1)
 
         self._save()
-        PRMP_MsgBox(title='Successful', message='Saving is successful.', )
+        # PRMP_MsgBox(title='Successful', message='Saving is successful.', )
 
-    def load(self): GaM_Settings.threadLoad()
+    def load(self): self._load()
     
     def _setupApp(self):
         pass

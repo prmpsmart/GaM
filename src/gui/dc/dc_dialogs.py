@@ -427,6 +427,10 @@ class PlotDialog(GaM_Dialog):
 
         note = Notebook(self.container, place=dict(relx=.005, rely=.005, relw=.28, relh=.595))
 
+        # self.frame2 = ProperDetails(note)
+        # note.add(self.frame2, padding=3)
+        # note.tab(0, text='Proper Details', compound='left', underline='-1')
+
 
     def chart_sort(self):
         return
