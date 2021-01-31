@@ -18,9 +18,6 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
     from .gam_apps import RegionHome, AccountHome, ManagerHome
 
-    print(obj)
-
-    
     if obj:
         window = ManagerHome
         if not kwargs.get('title'): kwargs.update(dict(title=obj.name))

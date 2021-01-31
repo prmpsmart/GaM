@@ -20,16 +20,16 @@ class GaM_App(PRMP_MainWindow):
         self.defaults()
         self.setMenus()
 
-        # self.paint()
         self.start()
     
-    def save(self):
-        print('love')
-        # from .auths_gui import make_change
-        # make_change(self._save, silent=1)
-
-        self._save()
-        # PRMP_MsgBox(title='Successful', message='Saving is successful.', )
+    def saveIt(self):
+        from .auths_gui import make_change
+        make_change(self._save, silent=1)
+        PRMP_MsgBox(self, title='Successful', message='Saving is successful.')
+    
+    def save(self, u=0):
+        if u: self.saveIt()
+        else: self._save()
 
     def load(self): self._load()
     
