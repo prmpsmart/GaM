@@ -6,7 +6,7 @@ from tkinter.colorchooser import askcolor
 
 
 
-class PlotDialog(Frame, Thrift_Analysis):
+class ChartOptions(Frame, Thrift_Analysis):
 
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
@@ -15,11 +15,11 @@ class PlotDialog(Frame, Thrift_Analysis):
         self.chart_lblfrm = LabelFrame(self, text='Chart Options', place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
 
        ### Fig number
-        self.fig = LabelSpin(self.chart_lblfrm, topKwargs=dict(text='Fig. No.'), bottomKwargs=dict(to=4, from_=1, increment=1), orient='h', place=dict(relx=.003, rely=.003, relh=.18, relw=.4))
+        self.fig = LabelSpin(self.chart_lblfrm, topKwargs=dict(text='Fig. No.'), bottomKwargs=dict(to=4, from_=1, increment=1), orient='h', place=dict(relx=.003, rely=.003, relh=.18, relw=.35))
 
        ###### Chart Type
         self.chart_type = None
-        self.chart_types = LabelCombo(self.chart_lblfrm,  topKwargs=dict(text='Chart Types'), bottomKwargs=dict(values=['Plot', 'Bar', 'Barh', 'Hist', 'Pie']), func=self.chart_types_choser, orient='h', place=dict(relx=.403, rely=.003, relh=.18, relw=.58))
+        self.chart_types = LabelCombo(self.chart_lblfrm,  topKwargs=dict(text='Chart Types'), bottomKwargs=dict(values=['Plot', 'Bar', 'Barh', 'Hist', 'Pie']), func=self.chart_types_choser, orient='h', place=dict(relx=.37, rely=.003, relh=.18, relw=.62), longent=.45)
 
        ########## Chart Types Options
         note = Notebook(self.chart_lblfrm, place=dict(relx=.003, rely=.2, relh=.8, relw=.99))
@@ -79,6 +79,11 @@ class PlotDialog(Frame, Thrift_Analysis):
 
         self.clear_btn = Button(self.chart_lblfrm, command=self.clear_plot, text='Clear', place=dict(relx=.72, rely=.7, relh=.2, relw=.2))
 
+     # Defaults
+        self.paint()
+        self.chart_types_choser()
+
+     
     def grid_decide(self):
         self.grid_style.checked()
 
@@ -95,31 +100,31 @@ class PlotDialog(Frame, Thrift_Analysis):
             options[-1].disabled()
 
     def grid_color_choser(self):
-        rgb_name, self.grid_color = askcolor(self.grid_color)
-        self.grid_color.config(background=self.grid_color)
+        rgb_name, self._grid_color = askcolor(self._grid_color)
+        self.grid_color.config(background=self._grid_color)
 
-    def grid_style_choser(self, e): self._grid_style = self.grid_style.get().lower()
+    def grid_style_choser(self, e=0): self._grid_style = self.grid_style.get().lower()
 
-    def chart_types_choser(self, e):
+    def chart_types_choser(self, e=0):
         self.chart_type = self.chart_types.get().lower()
 
         plot_conf = [ self.linestyle, self.marker]
         plot_dis = [self.linewidth, self.alpha]
 
         if self.chart_type != 'plot':
-            for conf in plot_conf: conf.disable()
+            for conf in plot_conf: conf.disabled()
             for dis in plot_dis: dis.disabled()
         else:
             for conf in plot_conf: conf.normal()
             for dis in plot_dis: dis.normal()
 
 
-        if self.chart_type not in ['bar', 'barh']: self.switch.disable()
+        if self.chart_type not in ['bar', 'barh']: self.switch.disabled()
         else: self.switch.normal()
 
         pie_conf = [self.explode, self.shadow, self.inapp]
         if self.chart_type != 'pie':
-            for conf in pie_conf: conf.disable()
+            for conf in pie_conf: conf.disabled()
         else:
             for conf in pie_conf: conf.normal()
 
