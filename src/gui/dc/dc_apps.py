@@ -98,9 +98,4 @@ class DC_Office(DC_RegionHome):
         note.add(self.frame2, padding=3)
         note.tab(1, text='Proper Details', compound='left', underline='-1')
 
-        self.properDetails()
-    
-    def properDetails(self):
-        
-        pass
 

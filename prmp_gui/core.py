@@ -416,7 +416,7 @@ class PRMP_Theme(PRMP_Mixins):
 
             elif wt == 'Scale': _dict.update(dict(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR))
                 
-            elif wt in ['Entry', 'Text', 'Listbox']:
+            elif wt in ['Entry', 'Text', 'Listbox', 'Spinbox']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
                 font = self.deriveFont(default='DEFAULT_FONT')
@@ -1555,14 +1555,16 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
             'TSpinbox': {
                 'configure': {
                     'foreground': text_foreground,
+                    'background': text_background,
                     'fieldbackground': text_background,
                     # 'arrowsize': 15,
                     # 'selectborderwidth': 2,
                     # 'padding': 2,
                     # 'insertwidth': 2,
-                    'arrowcolor': foreground,
+                    # 'arrowcolor': foreground,
+                    'arrowcolor': background,
                 },
-                'layout': [('Spinbox.border', {'children': [('Spinbox.field', {'side': 'top', 'sticky': 'we', 'children': [('null', {'side': 'right', 'sticky': '', 'children': [('Spinbox.uparrow', {'side': 'right', 'sticky': 'e'}), ('Spinbox.downarrow', {'side': 'right', 'sticky': 'e'})]}), ('Spinbox.padding', {'sticky': 'nswe', 'children': [('Spinbox.textarea', {'sticky': 'nswe'})]})]})]})]
+                'layout': [('Spinbox.border', {'children': [('Spinbox.field', {'side': 'top', 'sticky': 'we', 'children': [('null', {'side': 'right', 'sticky': '', 'children': [('Spinbox.uparrow', {'side': 'top', 'sticky': 'n'}), ('Spinbox.downarrow', {'side': 'right', 'sticky': 's'})]}), ('Spinbox.padding', {'sticky': 'nswe', 'children': [('Spinbox.textarea', {'sticky': 'nswe'})]})]})]})]
             },
             'Vertical.TScale': {
                 'configure': {
