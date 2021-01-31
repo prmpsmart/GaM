@@ -1821,6 +1821,9 @@ class PRMP_Spinbox(PRMP_Input, PRMP_, tk.Spinbox):
         tk.Spinbox.__init__(self, master, **config)
         PRMP_.__init__(self, prmp_master=master,**config, **kwargs)
         PRMP_Input.__init__(self, **kwargs)
+    
+    def get(self): return float(super().get())
+
 Spinbox = PSp = PRMP_Spinbox
 
 #   from ttk widgets --> PRMP_Style_

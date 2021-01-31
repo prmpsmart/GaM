@@ -2,6 +2,8 @@ from ..core.gam_apps import *
 from ...backend.dc.dc_regions import *
 from ...backend.dc.dc_specials import *
 from prmp_gui.plot_canvas import PRMP_PlotCanvas, random#, ChartSort
+from tkinter.colorchooser import askcolor
+
 
 
 # class DC_ChartSort(ChartSort): pass
@@ -531,4 +533,173 @@ class ProperDetails(Frame):
     def get_spec_day(self, e): pass
     
     def get_spec_area(self, e): pass
+
+
+class ChartOptions(Frame):
+
+    def __init__(self, master, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+                
+      ########## Chart Options
+        self.chart_lblfrm = LabelFrame(self, text='Chart Options', place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
+
+       ### Fig number
+        self.fig = LabelSpin(self.chart_lblfrm, topKwargs=dict(text='Fig. No.'), bottomKwargs=dict(to=4, from_=1, increment=1), orient='h', place=dict(relx=.003, rely=.003, relh=.18, relw=.35))
+
+       ###### Chart Type
+        self.chart_type = None
+        self.chart_types = LabelCombo(self.chart_lblfrm,  topKwargs=dict(text='Chart Types'), bottomKwargs=dict(values=['Plot', 'Bar', 'Barh', 'Hist', 'Pie']), func=self.chart_types_choser, orient='h', place=dict(relx=.37, rely=.003, relh=.18, relw=.62), longent=.42)
+
+       ########## Chart Types Options
+        note = Notebook(self.chart_lblfrm, place=dict(relx=.003, rely=.2, relh=.8, relw=.99))
+
+        self.grid_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.grid_options, padding=1)
+        note.tab(0, text='Grid Options',compound='left',underline='0')
+
+        self.plot_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.plot_options, padding=1)
+        note.tab(1, text='Plot Options',compound='left',underline='0')
+
+        self.bar_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.bar_options, padding=1)
+        note.tab(2, text='Bar Options',compound='left',underline='0')
+
+        self.pie_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.pie_options, padding=1)
+        note.tab(3, text='Pie Options',compound='left',underline='0')
+
+       ########## Grid lines
+        self._grid_color = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
+
+        self.grid_style = CheckCombo(self.grid_options, topKwargs=dict(text='Grid Style'), command=self.grid_decide, bottomKwargs=dict(values=['Solid', 'Dashed', 'Dashdot', 'Dotted']), orient='h', place=dict(relx=.02, rely=.02, relh=.25, relw=.65), longent=.4)
+
+        self.grid_width = LabelSpin(self.grid_options, topKwargs=dict(text='Grid Width'), bottomKwargs=dict(from_=.1, to=1, increment=.1), orient='h', place=dict(relx=.02, rely=.3, relh=.25, relw=.65))
+
+        self.grid_color = Button(self.grid_options, text='Color', command=self.grid_color_choser, place=dict(relx=.02, rely=.7, relh=.2, relw=.65,))
+
+       ### Plot options
+
+        self.marker = Checkbutton(self.plot_options, text='Marker', place=dict(relx=.02, rely=.048, relh=.23, relw=.3))
+
+        self.linestyle = Checkbutton(self.plot_options, text='Line Style', place=dict(relx=.02, rely=.338, relh=.22, relw=.3))
+
+        self.linewidth = LabelSpin(self.plot_options,  topKwargs=dict(text='Line Width'), bottomKwargs=dict(to=1, from_=.1, increment=.1), orient='h', place=dict(relx=.34, rely=.04, relh=.24, relw=.64))
+
+
+        self.alpha = LabelSpin(self.plot_options,  topKwargs=dict(text='Alpha'), bottomKwargs=dict(to=1, from_=.1, increment=.1), orient='h', place=dict(relx=.34, rely=.33, relh=.24, relw=.64))
+
+       ## Bar Options
+
+        self.switch = Checkbutton(self.bar_options, text='Switch', place=dict(relx=.02, rely=.14, relh=.25, relw=.3))
+
+       ###### Pie Options
+
+        self.inapp = Checkbutton(self.pie_options, text='Inapp', command=self.inapp_info, place=dict(relx=.02, rely=.04, relh=.24, relw=.32))
+
+        self.explode = Checkbutton(self.pie_options, text='Explode', place=dict(relx=.34, rely=.38, relh=.24, relw=.32))
+
+        self.shadow = Checkbutton(self.pie_options,text='Shadow', place=dict(relx=.66, rely=.71, relh=.24, relw=.32))
+
+     # Defaults
+        self.paint()
+        self.chart_types_choser()
+        self.grid_decide()
+
+    def grid_decide(self):
+        self.grid_style.checked()
+
+        options = [self.grid_style, self.grid_width, self.grid_color]
+
+        if self.grid_style.T.get():
+            for option in options[:-1]: option.normal('b')
+            options[-1].normal()
+        else:
+            self.grid_style.set('None')
+            self._grid_color = 'black'
+            for option in options[:-1]: option.disabled('b')
+            options[-1].disabled()
+
+    def grid_color_choser(self):
+        rgb_name, self._grid_color = askcolor(self._grid_color)
+        self.grid_color.config(background=self._grid_color)
+
+    def chart_types_choser(self, e=0):
+        self.chart_type = self.chart_types.get().lower()
+
+        plot_conf = [ self.linestyle, self.marker]
+        plot_dis = [self.linewidth, self.alpha]
+
+        if self.chart_type != 'plot':
+            for conf in plot_conf: conf.disabled()
+            for dis in plot_dis: dis.disabled()
+        else:
+            for conf in plot_conf: conf.normal()
+            for dis in plot_dis: dis.normal()
+
+
+        if self.chart_type not in ['bar', 'barh']: self.switch.disabled()
+        else: self.switch.normal()
+
+        pie_conf = [self.explode, self.shadow, self.inapp]
+        if self.chart_type != 'pie':
+            for conf in pie_conf: conf.disabled()
+        else:
+            for conf in pie_conf: conf.normal()
+
+    def alpha_choser(self):
+        num = self.alpha.get()
+        if num: return float(num)
+        else: return 0
+
+    def plot_color_choser(self):
+        self.plot_colors = []
+        rgb_name, plot_color = askcolor('blue')
+        self.plot_colors.append(plot_color)
+        self.plot_colors_btn.config(background=plot_color)
+
+    def plot_linewidth_choser(self):
+        num = self.linewidth.get()
+        if num: return float(num)
+        else: return 0
+
+    def inapp_info(self):
+        if self.inapp.get(): PRMP_MsgBox(title='Under Testing', message='Using Pie in Inapp will distrupt the other chart drawing', _type='warn', delay=0)
+
+    def get(self):
+        chartType = self.chart_types.get()
+        if not chartType: PRMP_MsgBox(self, title='Chart Type Error', message='Choose a valid chart type.', _type='error', delay=3000)
+
+        results = dict(figNum=self.fig.get(), chartType=chartType)
+
+        if self.grid_style.T.get():
+            grid_style = self.grid_style.get().lower()
+            if not grid_style: PRMP_MsgBox(self, title='Grid Style Error', message='Choose a valid grid style.', _type='error', delay=3000)
+
+            results['grid_style'] = grid_style
+            results['grid_width'] = self.grid_width.get()
+            results['grid_color'] = self._grid_color
+
+        if chartType == 'Plot':
+            results['marker'] = self.marker.get()
+            results['linestyle'] = self.linestyle.get()
+            results['linewidth'] = self.linewidth.get()
+            results['alpha'] = self.alpha.get()
+        elif chartType in ['Bar', 'Barh']: results['switch'] = self.switch.get()
+        elif chartType == 'Pie':
+            results['inapp'] = self.inapp.get()
+            results['explode'] = self.explode.get()
+            results['shadow'] = self.shadow.get()
+        
+        return results
+
+
+
+
+
+
+
+
+
+
 
