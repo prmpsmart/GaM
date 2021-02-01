@@ -2346,7 +2346,7 @@ class PRMP_Window(PRMP_Widget):
     
     def closing(self): pass
 
-    def save(self): print('implement in subclasses')
+    def save(self): print('implement save method in subclasses')
     
     def destroy(self):
         if self == self.topest:

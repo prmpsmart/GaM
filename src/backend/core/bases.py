@@ -56,7 +56,7 @@ class ObjectSort(Mixins):
     __ge_ge = (__ge, __ge)
     
     __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
-   #
+
     def __init__(self, object_=None): self.object = object_
 
     def getCompType(self, _type):
@@ -91,11 +91,12 @@ class ObjectSort(Mixins):
 
         subs = []
         __subs = []
-        if 'Record' in object_.mroStr: return subs
+        if 'Record' in object_.mroStr: return object_
 
         if getattr(object_, 'subRegions', None): __subs.append(object_.subRegions)
-        if getattr(object_, 'subs', None): __subs.append(object_.subs)
 
+        if getattr(object_, 'subs', None): __subs.append(object_.subs)
+        
         for s in __subs: subs.extend(s[:])
         
         allSubs = []
@@ -223,11 +224,12 @@ class ObjectSort(Mixins):
         subs = []
 
         object_ = object_ or self.object
+
         if not object_: return
 
         subs = self.getAllObjects(object_)
 
-        if validations: return self.sort(subs=subs, validations=validations)
+        if validations: return self.sort(subs=subs, validations=validations, _type=_type, object_=object_)
 
         return subs
 

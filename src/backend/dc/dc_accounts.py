@@ -54,6 +54,43 @@ class DCAccount(Account):
     
     def updateBroughtForwards(self, date=None):
         if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances), date=date)
+    
+    def getRecs_Of_RM_ByDate(self, date=None):
+        leng = len(self)
+        date = self.getDate(date)
+        
+        recs = []
+        for ind in range(leng):
+            recM = self[ind]
+            _recs = recM.sortRecordsByDate(date)
+            if _recs:
+                recClass = recM.class_.ObjectType
+                money = 0
+                manager = _recs[0].manager
+                for _rec in _recs: money += float(_rec)
+                rec = recClass(manager, money, date=date)
+                recs.append(rec)
+        return recs
+    
+    
+    def getRecs_Of_RM_ByWeek(self, week=None):
+        leng = len(self)
+        week = self.getDate(week)
+        
+        recs = []
+        for ind in range(leng):
+            recM = self[ind]
+            _recs = recM.sortRecordsByWeek(week)
+            if _recs:
+                recClass = recM.class_.ObjectType
+                money = 0
+                manager = _recs.manager
+                for _rec in _recs: money += float(_rec)
+                rec = recClass(manager, money, date=week)
+                recs.append(rec)
+        return recs
+
+
 
 
 class DCAccountsManager(AccountsManager):
@@ -158,22 +195,7 @@ class ClientsAccounts(ObjectsMixins):
     @property
     def regions(self): return [acc.region for acc in self._subs]
 
-    def getRecs_Of_RM_Of_AccByDate(self, account, date=None):
-        leng = len(account[:])
-        date = self.getDate(date)
-        
-        recs = []
-        for ind in range(leng):
-            recM = account[ind]
-            _recs = recM.sortRecordsByDate(date)
-            if _recs:
-                recClass = recM.class_.ObjectType
-                money = 0
-                manager = _recs[0].manager
-                for _rec in _recs: money += float(_rec)
-                rec = recClass(manager, money, date=date)
-                recs.append(rec)
-        return recs
+    def getRecs_Of_RM_Of_AccByDate(self, account, date=None): return account.getRecs_Of_RM_ByDate(date)
 
     def getRecs_Of_RM_Of_AccsByDate(self, date=None):
         accs = self[:]
@@ -183,22 +205,7 @@ class ClientsAccounts(ObjectsMixins):
             accsRecs.append(recs)
         return accsRecs
 
-    def getRecs_Of_RM_Of_AccByWeek(self, account, week=None):
-        leng = len(account[:])
-        week = self.getDate(week)
-        
-        recs = []
-        for ind in range(leng):
-            recM = account[ind]
-            _recs = recM.sortRecordsByWeek(week)
-            if _recs:
-                recClass = recM.class_.ObjectType
-                money = 0
-                manager = _recs.manager
-                for _rec in _recs: money += float(_rec)
-                rec = recClass(manager, money, date=week)
-                recs.append(rec)
-        return recs
+    def getRecs_Of_RM_Of_AccByWeek(self, account, week=None): return account.getRecs_Of_RM_ByWeek(week)
 
     def getRecs_Of_RM_Of_AccsByWeek(self, week=None):
         accs = self[:]

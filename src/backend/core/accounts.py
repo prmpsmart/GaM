@@ -38,6 +38,7 @@ class WeeklyAccounts(ObjectsMixins):
                 if oneWeek: self.__dict__[day] = self.__dict__[day][0]
                 else: self.__dict__[day] = sum(self.__dict__[day])
 
+
 class MonthlyAccounts(ObjectsMixins):
     def __init__(self, monthName, accounts, day=False):
         super().__init__()
@@ -52,8 +53,10 @@ class MonthlyAccounts(ObjectsMixins):
         else:
             self.days = accounts.sort()
 
+
 class YearlyAccounts(ObjectsMixins):
     pass
+
 
 class Account(Object):
     Manager = 'AccountsManager'
@@ -66,7 +69,8 @@ class Account(Object):
     
     def __eq__(self, account):
         if account == None: return False
-        return ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
+        try: res = ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
+        except AttributeError: return False
     
     def __str__(self): return f'{self.manager} | {self.name}'
     def __len__(self): return len(self.recordsManagers)
@@ -212,7 +216,24 @@ class AccountsManager(ObjectsManager):
             SubAccounts = Sub.accountsManager.sortSubsByMonth(month)
             accounts.extend(SubAccounts)
         return accounts
+
+
+
+
+class SameTimesAccounts(ObjectsMixins):
     
+    def __init__(self, obj):
+        self.obj = obj
+        self.subs = []
+    
+    def setStage(self):
+        pass
+
+
+
+
+
+
 
 
 
