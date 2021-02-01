@@ -104,6 +104,8 @@ class DCOffice(SubOffice):
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
         self.subRegionsActiveByMonth = self.accountsManager.subRegionsActiveByMonth
+        from ..dc.dc_sorts import DCSort
+        self.allSort = DCSort(self)
     
     @property
     def areasManager(self): return self.subRegionsManager
