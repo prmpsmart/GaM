@@ -219,7 +219,7 @@ class ObjectSort(Mixins):
 
         return objects
 
-    def search(self, _type=None, className='ObjectsMixins', value=None, attr='', searchType='', allSubs=False, object_=None, validations=[]):
+    def search(self, _type=None, className='ObjectsMixins', value=None, attr='', searchType='', allSubs=False, object_=None, validations=[], instance=None):
         results = []
         subs = []
 
@@ -230,6 +230,9 @@ class ObjectSort(Mixins):
         subs = self.getAllObjects(object_)
 
         if validations: return self.sort(subs=subs, validations=validations, _type=_type, object_=object_)
+
+        if instance: subs = [sub for sub in subs if instance in sub.mroStr]
+        # if instance: subs = [sub for sub in subs if isinstance(sub, instance)]
 
         return subs
 
