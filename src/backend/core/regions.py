@@ -1,6 +1,12 @@
-from .accounts import AccountsManager, DateTime, ObjectsMixins, Errors, Object, ObjectsManager, CompareByDate
+from .accounts import AccountsManager, PRMP_DateTime, ObjectsMixins, Errors, Object, ObjectsManager, CompareByDate
 from .records_managers import *
 import os
+
+'''
+DC Objects = Region, Person, Account, Records, Client, Area
+and Managers
+
+'''
 
 
 class Person(Object):
@@ -13,44 +19,58 @@ class Person(Object):
         
         if isinstance(manager, Region): date = manager.date
         
-        Object.__init__(self, manager, date=date, name=name)
+        super().__init__(manager, date=date, name=name)
 
         gender = gender.lower()
         
-        if gender in self._male:  self._gender = self._male[0].title()
-        elif gender in self._female:  self._gender = self._female[0].title()
+        if gender in self._male:  self.gender = self._male[0].title()
+        elif gender in self._female:  self.gender = self._female[0].title()
         
-        else: self._gender = 'Neutral'
+        else: self.gender = 'Neutral'
         
         self.phone = phone
         
         self.image = image
 
-        self.email = None
-        if self.checkEmail(email): self.email = email
+        self.__email = None
+        self.email = email
         
         self.address = address
+
+        self.addEditableValues(['gender', 'phone', 'image', 'email', 'address', 'name', 'date'])
     
     def __str__(self): return f'{self.manager} | {self.className}({self.name})'
     
     @property
-    def values(self): return {'name': self.name, 'gender': self.gender, 'address': self.address, 'image': self.image, 'email': self.email, 'manager': self.manager, 'phone': self.phone}
+    def values(self):
+        vals = super().values
+        vals.update({'manager': self.manager})
+        return vals
+
+    @property
+    def email(self): return self.__email
+
+    @email.setter
+    def email(self, email):
+        if email:
+            if self.checkEmail(email): self.__email = email
+            else: raise ValueError(f'{email} is not a valid emeail.')
 
 class Region(Object):
     AccountsManager = AccountsManager
     Manager = 'RegionsManager'
     SubRegionsManager = None
     PersonsManager = None
-    Person = None
     _type = 'reg'
     
+    subTypes = ['Regions', 'Accounts', 'Persons']
+
     
     def __init__(self, manager, name=None, date=None, location=None, phone=None, previous=None, number=None, **kwargs):
         
         Object.__init__(self, manager, previous=previous, date=date, name=name, number=number, **kwargs)
         
         
-        self._person = None
         self._personsManager = None
         self._subRegionsManager = None
         
@@ -62,29 +82,9 @@ class Region(Object):
         if self.SubRegionsManager:
             self._subRegionsManager = self.SubRegionsManager(self)
             
-            if self.PersonsManager: self._personsManager = self.PersonsManager(self)
-
-        else:
-            if self.Person: self._person = self.Person(manager=self, name=name, date=date, phone=phone, **kwargs)
-    
-    def __getattr__(self, name):
-        ret = self.getFromSelf(name, self._unget)
-        if str(ret) != self._unget: return ret
-
-        aret = getattr(self.accountsManager, name, self._unget)
-        if str(aret) != self._unget: return aret
-
-        sret = getattr(self.accountsManager, name, self._unget)
-        if str(sret) != self._unget: return sret
-
-        self.attrError(name)
-    
-    def __len__(self): return len(self.accountsManager)
+        if self.PersonsManager: self._personsManager = self.PersonsManager(self, name=name, date=date, phone=phone, **kwargs)
     
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
-    
-    @property
-    def subs(self): return self.subRegionsManager[:] if self.subRegionsManager else []
     
     @property
     def totalSubs(self): return len(self.subs)
@@ -115,7 +115,6 @@ class Region(Object):
     @property
     def level(self): return len(self.hierachy)
     
-    
     @property
     def idText(self):
         text = ''
@@ -140,7 +139,7 @@ class Region(Object):
     def hierachyNames(self): return [d.name for d in self.hierachy]
     
     @property
-    def reignMonths(self): return self.date - DateTime.now() + 1
+    def reignMonths(self): return self.date - PRMP_DateTime.now() + 1
     @property
     def reignMonthsYears(self): return divmod(self.reignMonths, 12)
     @property
@@ -167,22 +166,28 @@ class Region(Object):
         return manager.region
     
     @property
-    def person(self):
-        if self.personsManager: return self.personsManager.lastPerson
-        return self._person
-        
+    def person(self): return self.personsManager.lastPerson
+    
     @property
     def personsManager(self): return self._personsManager
+    
+    @property
+    def persons(self): return self.personsManager
+
     @property
     def location(self): return self._location
+
     @property
     def subRegionsManager(self): return self._subRegionsManager
     
     @property
-    def subs(self): return self.accountsManager if self.accountsManager else []
+    def subs(self): return self.accountsManager or []
     
     @property
-    def subRegions(self): return self.subRegionsManager if self.subRegionsManager else []
+    def subRegions(self): return self.subRegionsManager
+
+    @property
+    def regions(self): return self.subRegions
     
     @property
     def subRegionsCount(self): return len(self.subRegions)
@@ -193,19 +198,17 @@ class Region(Object):
     @property
     def accountsManager(self): return self._accountsManager
     
+    @property
+    def accounts(self): return self.accountsManager
+    
+    @property
+    def recordsManagers(self): return self.accountsManager.recordsManagers
+    
     def balanceAccounts(self, month=None):
         if month: self.accountsManager.balanceAccount(month)
         else: self.accountsManager.balanceAccounts()
     
-    def subRegionsActiveByMonth(self, month):
-        subRegions = []
-        for subRegion in self.subRegionsManager:
-            monthAccount = subRegion.accountsManager.getAccount(month)
-            if monthAccount != None: subRegions.append(subRegion)
-        return subRegions
-    
-    def sortAccountsByMonth(self, month): return self.accountsManager.sortAccountsByMonth(month)
-
+    def sortAccountsByMonth(self, month): return self.accountsManager.sortSubsByMonth(month)
 
  ########## Sorting
   # SubRegions
@@ -245,7 +248,7 @@ class Region(Object):
     def sortSubRegionsAccountsIntoWeeksInYear(self): return self.subRegionsManager.sortRegionsAccountsIntoWeeksInYear(date)
     
    #Month Sorting
-    def sortSubRegionsAccountsByMonth(self, month): return self.subRegionsManager.sortRegionsAccountsIntoMonthsInYear(date)
+    def sortSubRegionsAccountsByMonth(self, month): return self.subRegionsManager.sortRegionsAccountsIntoMonthsInYear(month)
         
     def sortSubRegionsAccountsIntoMonthsInYear(self): return self.subRegionsManager.sortRegionsAccountsIntoMonthsInYear(date)
     def sortSubRegionsAccountsIntoMonthsInYears(self): return self.subRegionsManager.sortRegionsAccountsIntoMonthsInYears(date)
@@ -261,11 +264,10 @@ class Staff(Region):
     def salariesManager(self): return self.accountsManager
     def paySalary(self, salary, date=None): self.salariesManager.addSalary(salary, date=date)
 
-
 class ThirdPartySurety(ObjectsMixins):
     
     def __init__(self, loanBondDetails=None, name='', dob='', maritalStatus='', phone='', address='', officeAddress='', religion='', homeTown='', stateOfOrigin='', occupation='', knowledgeOfMember='', email='', relationshipWithMember='', image='', date=None):
-    
+        super().__init__()
         self.loanBondDetails = loanBondDetails
         self.name = None
         
@@ -284,8 +286,6 @@ class ThirdPartySurety(ObjectsMixins):
         
         self.email = None
         if self.checkEmail(email): self.email = email
-
-
 
 class LoanBondDetails:
     _thirdPartySurety = ThirdPartySurety
@@ -309,5 +309,13 @@ class LoanBondDetails:
     
     def setThirdPartySurety(self, **kwargs): 
         self.thirdPartySurety = self._thirdPartySurety(self, **kwargs)
+
+
+
+
+
+
+
+
 
 

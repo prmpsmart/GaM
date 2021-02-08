@@ -127,8 +127,7 @@ class Gui(Reloader):
         self.root.bind_all("<Control-F>", self.fullscreen)
         self.root.bind_all("<Control-R>", self.reloader)
         self.root.bind_all("<Control-r>", self.reloader)
-        self.root.bind_all("<Control-U>", self.raw_exit)
-        self.root.bind_all("<Control-u>", self.raw_exit)
+        self.root.bind_all("<Control-/>", self.raw_exit)
     
     def fullscreen(self, e):
         if self.full:

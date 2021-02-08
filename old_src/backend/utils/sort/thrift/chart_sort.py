@@ -33,8 +33,7 @@ class Chart_Sort:
     def plot_data_sort(self, region, yaxis, month=None, area=None, week=None, day=None, spec=None, sole="", header=None):
         sub_regions = []
         columns = []
-        ## sub_Ys
-        clnt = []
+        ## sub_Ys        clnt = []
         brf = []
         com = []
         sav = []
@@ -96,7 +95,7 @@ class Chart_Sort:
                 self.ys = column[1:]
                 self.labels = column[0]
                 self.go = 1
-                return 
+                return
 
         elif region.which == "area":
             if header == "areas": sub_regions = region.areas
@@ -177,7 +176,6 @@ class Chart_Sort:
                 if self.records[11] in yaxis: exc.append(data[12])
                 
                 if self.records[12] in yaxis: bto.append(data[13])
-
 
         if columns or sub_regions:
             for y in [clnt, brf, com, sav, deb, not_paid, upf, pupf, rupf, bal, def_, exc, bto]:

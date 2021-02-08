@@ -1,17 +1,22 @@
 from .regions import *
 
-class RegionsManager(ObjectsManager, ObjectsMixins):
+
+class RegionsManager(ObjectsManager):
     ObjectType = Region
+    subTypes = ['Regions']
+    MultipleSubsPerMonth = True
+    subsName = 'Regions'
     
     def __init__(self, master):
         ObjectsManager.__init__(self, master)
         self.__master = master
         self.addRegion = self.addSub
         
-    def __len__(self): return len(self.regions)
-    def __repr__(self): return f'<{self}>'
-    def __str__(self): return f'{self.master} | {self.className}({self.master.name})'
+    def __str__(self): return f'{self.master} | {self.name}'
     
+    @property
+    def name(self): return f'{self.className}({self.master.name})'
+
     @property
     def firstRegion(self): return self.first
     @property
@@ -29,11 +34,6 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
     def getRegion(self, number=None, name=None, phone=None, email=None, image=None):
         ## provide mechanism to scan pictures.
         self.getSub(dict(number=number, name=name, phone=phone, email=email, image=image))
-        # for region in self.regions:
-        #     if number == region.number: return region
-        #     elif name == region.name: return region
-        #     elif phone == region.phone: return region
-        #     elif email == region.email: return region
             
     @classmethod
     def getFromAllRegions(cls, number):
@@ -48,42 +48,7 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
     
 
  ########## Sorting
-  # SubRegions
-   #Date Sorting
-    def sortRegionsByDate(self, date):
-        DateTime.checkDateTime(date)
-        clientsByDate = [client for client in self.clients if client.regDate == date]
-        return clientsByDate
-   #Day Sorting
-    def sortRegionsByDay(self):
-        pass
-    def sortRegionsIntoDaysInWeek(self):
-        pass
-    def sortRegionsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortRegionsByWeek(self):
-        pass
-    def sortRegionsIntoWeeksInMonth(self):
-        pass
-    def sortRegionsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortRegionsByMonth(self, month):
-        pass
-    def sortRegionsIntoMonthsInYear(self):
-        pass
-    def sortRegionsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortRegionsByYear(self):
-        pass
-    def sortRegionsIntoYears(self):
-        pass
-
+  
   # Regions Accounts
    #Date Sorting
     def sortRegionsAccountsByDate(self):
@@ -107,7 +72,7 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
     
    #Month Sorting
     def sortRegionsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
+        PRMP_DateTime.checkDateTime(month)
         clients = [client for client in self.clients if client.lastAccount.date.isSameMonth(month)]
         accounts = []
         for client in clients:
@@ -129,9 +94,38 @@ class RegionsManager(ObjectsManager, ObjectsMixins):
 
 class PersonsManager(ObjectsManager):
     ObjectType = Person
+    subTypes = ['Persons']
+    MultipleSubsPerMonth = True
+
+    
+    def __init__(self, master, **kwargs):
+        super().__init__(master)
+        self.createPerson(**kwargs)
+
+    @property
+    def firstPerson(self): return self.first
+    
     @property
     def lastPerson(self): return self.last
+
     def createPerson(self, **kwargs): return self.createSub(**kwargs)
+
+    @property
+    def name(self): return f'{self.className}({self.master.name})'
+
+    @property
+    def region(self): return self.master
+    
+    @property
+    def date(self): return self.master.date
+    
+    @property
+    def persons(self): return self.subs
+
+
+
+
+
 
 
 

@@ -4,12 +4,14 @@ from .coop_errors import CoopErrors
 
 class MemberDetail(Person):
     Manager = 'Member'
+    # def __init__(self, **kwargs): super().__init__(**kwargs)
     @property
     def member(self): return self.manager
 
 
 class CoopCO(Person):
     'Cooperative Cash Officer.'
+    Manager = 'CoopCOsManager'
 
 
 class CoopCOsManager(PersonsManager):
@@ -58,7 +60,7 @@ class CoopLoanBondDetails(LoanBondDetails):
     def unit(self): return self.member.unit
     
     def setDetails(self, members, accountName, accountNumber, bank, rate=.1, date=None):
-        validLoan = (int(self.loanBond.manager.savings) * 2)
+        validLoan = (float(self.loanBond.manager.savings) * 2)
         assert validLoan <= self.proposedLoan, f'Loan exceed maximum valid loan of {validLoan}.'
         
         self.setMemberSureties(members)
@@ -98,7 +100,7 @@ class Member(CoopRegion):
         super().__init__(manager=manager, name=name, **kwargs)
         
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | M{self.number}'
+    def spacedID(self): return f'{super().spacedID} | M{self.number}'
     @property
     def unit(self): return self.manager.unit
     @property
@@ -143,7 +145,7 @@ class Unit(CoopRegion):
         super().__init__(manager, nameFromNumber=True, **kwargs)
         
     @property
-    def spacedID(self): return f'{self.sup.spacedID} | U{self.number}'
+    def spacedID(self): return f'{super().spacedID} | U{self.number}'
     
     @property
     def office(self): return self.manager.office

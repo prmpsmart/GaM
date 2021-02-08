@@ -1,4 +1,4 @@
-from .date_time import DateTime, CompareByDate
+from prmp_miscs.prmp_datetime import PRMP_DateTime, CompareByDate
 from .bases import ObjectsMixins, Object, ObjectsManager
 from .errors import Errors
 
@@ -21,6 +21,7 @@ class DailyAccounts(ObjectsMixins):
 class WeeklyAccounts(ObjectsMixins):
     
     def __init__(self, week, days_accounts, oneWeek=False):
+        super().__init__()
         self.week = week
         self.monday = [day for day in days_accounts if day.date.dayName == 'Monday']
         self.tuesday = [day for day in days_accounts if day.date.dayName == 'Tueday']
@@ -37,8 +38,10 @@ class WeeklyAccounts(ObjectsMixins):
                 if oneWeek: self.__dict__[day] = self.__dict__[day][0]
                 else: self.__dict__[day] = sum(self.__dict__[day])
 
+
 class MonthlyAccounts(ObjectsMixins):
     def __init__(self, monthName, accounts, day=False):
+        super().__init__()
         self.monthName = monthName
         if day == False:
             self.week1 = [record for record in accounts if record.date.week == 1]
@@ -50,11 +53,15 @@ class MonthlyAccounts(ObjectsMixins):
         else:
             self.days = accounts.sort()
 
+
 class YearlyAccounts(ObjectsMixins):
     pass
 
+
 class Account(Object):
     Manager = 'AccountsManager'
+    subTypes = ['Records Managers']
+    Error = Errors
     
     def __init__(self, manager, **kwargs):
         assert manager != None, 'No manager passed.'
@@ -62,11 +69,13 @@ class Account(Object):
     
     def __eq__(self, account):
         if account == None: return False
-        return ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
+        try: res = ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
+        except AttributeError: return False
     
-    def __str__(self): return f'{self.manager} | {self.className}({self.date.dayMonthYear})'
+    def __str__(self): return f'{self.manager} | {self.name}'
     def __len__(self): return len(self.recordsManagers)
     def __int__(self): return self.balances
+    
     @property
     def name(self): return f'{self.className}({self.date.dayMonthYear})'
 
@@ -74,10 +83,10 @@ class Account(Object):
     def region(self): return self.manager.region
     
     @property
-    def subs(self): return self.recordsManagers
+    def subs(self): return self.recordsManagers or []
     
     @property
-    def recordsManagers(self): self.notImp()
+    def recordsManagers(self): return []
     
     @property
     def headers(self): return [rec.className for rec in self.recordsManagers]
@@ -88,80 +97,47 @@ class Account(Object):
     def previousAccount(self): return self.previous
     
     @property
-    def recordsManagersAsList(self): return [int(recordsManager) for recordsManager in self]
+    def recordsManagersAsList(self): return [float(recordsManager) for recordsManager in self]
     @property
-    def recordsManagersAsTupleFull(self): return [(recordsManager, int(recordsManager)) for recordsManager in self]
+    def recordsManagersAsTupleFull(self): return [(recordsManager, float(recordsManager)) for recordsManager in self]
     @property
-    def recordsManagersAsTupleShort(self): return [(recordsManager.shortName, int(recordsManager)) for recordsManager in self]
+    def recordsManagersAsTupleShort(self): return [(recordsManager.shortName, float(recordsManager)) for recordsManager in self]
     @property
-    def recordsManagersAsTuple(self): return [(recordsManager.className, int(recordsManager)) for recordsManager in self]
+    def recordsManagersAsTuple(self): return [(recordsManager.className, float(recordsManager)) for recordsManager in self]
     @property
-    def recordsManagersAsDict(self): return [{recordsManager.className: int(recordsManager)} for recordsManager in self]
+    def recordsManagersAsDict(self): return [{recordsManager.className: float(recordsManager)} for recordsManager in self]
     @property
-    def recordsManagersAsDictFull(self): return [{recordsManager: int(recordsManager)} for recordsManager in self]
+    def recordsManagersAsDictFull(self): return [{recordsManager: float(recordsManager)} for recordsManager in self]
     @property
-    def recordsManagersAsDictShort(self): return [{recordsManager.shortName: int(recordsManager)} for recordsManager in self]
+    def recordsManagersAsDictShort(self): return [{recordsManager.shortName: float(recordsManager)} for recordsManager in self]
 
     def _balanceAccount(self):
             pass
     def balanceAccount(self): self.notImp()
-    
-    
-   
-   ########## Sorting
-    #Date Sorting
-    def sortRecordManagersByDate(self, date): pass
-    
-    #Day Sorting
-    def sortRecordManagersByDay(self, day): pass
-    
-    def sortRecordManagersIntoDaysInWeek(self, week):
-        pass
-    def sortRecordManagersIntoDaysInMonth(self, month):
-        pass
-    
-    #Week Sorting
-    def sortRecordManagersByWeek(self):
-        pass
-    def sortRecordManagersIntoWeeksInMonth(self):
-        pass
-    def sortRecordManagersIntoWeeksInYear(self):
-        pass
-    
-    #Month Sorting
-    def sortRecordManagersByMonth(self, month): pass
-        
-    def sortRecordManagersIntoMonthsInYear(self):
-        pass
-    def sortRecordManagersIntoMonthsInYears(self):
-        pass
-    
-    #Year Sorting
-    def sortRecordManagersByYear(self):
-        pass
-    def sortRecordManagersIntoYears(self):
-        pass
 
 
 class AccountsManager(ObjectsManager):
     ObjectType = Account
+    subTypes = ['Accounts']
     
     def __init__(self, region, autoAccount=True, **kwargs):
         
         ObjectsManager.__init__(self, region)
         
         self.addAccount = self.addSub
-        self.createAccount = self.createSub
-        
+        self.getAccount = self.getSub
         if autoAccount == True: self.createAccount(**kwargs)
         
     def __eq__(self, manager):
         if manager == None: return False
         return self.region == manager.region
+    def __float__(self): return sum([float(acc.balances) for acc in self])
     def __int__(self): return sum([int(acc.balances) for acc in self])
     def __str__(self):
         if self.region != None: return f'{self.region} | {self.className}'
         return f'{self.className}'
+    
+    def createAccount(self, **kwargs): return self.createSub(**kwargs)
     
     @property
     def firstAccount(self): return self.first
@@ -170,6 +146,7 @@ class AccountsManager(ObjectsManager):
     
     @property
     def accounts(self): return self.subs
+    
     @property
     def region(self): return self.master
     @property
@@ -180,28 +157,22 @@ class AccountsManager(ObjectsManager):
 
     @property
     def overAllAccounts(self):
-        listOfTuple = []
+        # total accounts in this manager
         lengthOfAccounts = len(self)
-        if len(self):
-            gone = False
+        if lengthOfAccounts:
+            # total records manager in an account
             lengthOfRecordManagers = len(self[0])
-            listOfTuple = [['', 0] for _ in (range(lengthOfRecordManagers))]
+            containerDict = {}
             for account in self:
                 for recordManager in account:
-                    index = account[:].index(recordManager)
-                    if gone: assert listOfTuple[index][0] == recordManager.className
-                    else: listOfTuple[index][0] = recordManager.className
-                    listOfTuple[index][1] += int(recordManager)
-                gone = True
-                
-            return listOfTuple
+                    name = recordManager.className
+                    if name not in containerDict: containerDict[name] = 0
+                    containerDict[name] += float(recordManager)
+            return containerDict
         
-    def getAccount(self, month): return self.getSub({'date-m': month})
-    
     def balanceAccount(self, month=None):
         if month:
-            DateTime.checkDateTime(month)
-            account = self.getAccount(month)
+            account = self.getAccount(month=self.getDate(month))
             if account: account.balanceAccount()
         else:
             account = self.getLastAccount()
@@ -212,97 +183,57 @@ class AccountsManager(ObjectsManager):
         for accounts in self: accounts.balanceAccount()
         return self.accounts
     
-    def currentMonthAccounts(self): return self.sortAccountsByMonth(DateTime.now())
+    def currentMonthAccounts(self): return self.sortAccountsByMonth(PRMP_DateTime.now())
     
     def sortSubRegionsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
+        PRMP_DateTime.checkDateTime(month)
         subRegionsActiveByMonth = self.region.subRegionsActiveByMonth(month)
+        
         accounts = []
         for subRegion in subRegionsActiveByMonth:
-            subRegionsAccounts = subRegion.sortAccountsByMonth(month)
+            subRegionsAccounts = subRegion.sortAccountsByMonth(month) or []
             accounts.extend(subRegionsAccounts)
         return accounts
     
-    
- ########## Sorting
-  # SubRegions
-   #Date Sorting
-    def sortAccountsByDate(self, date):
-        DateTime.checkDateTime(date)
-        clientsByDate = [client for client in self.clients if client.regDate == date]
-        return clientsByDate
-   #Day Sorting
-    def sortAccountsByDay(self):
-        pass
-    def sortAccountsIntoDaysInWeek(self):
-        pass
-    def sortAccountsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortAccountsByWeek(self):
-        pass
-    def sortAccountsIntoWeeksInMonth(self):
-        pass
-    def sortAccountsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortAccountsByMonth(self, month):
-        accounts = [account for account in self.accounts if account.date.isSameMonth(month)]
-        return accounts
-    def sortAccountsIntoMonthsInYear(self):
-        pass
-    def sortAccountsIntoMonthsInYears(self):
-        pass
-    
-   #Year Sorting
-    def sortAccountsByYear(self):
-        pass
-    def sortAccountsIntoYears(self):
-        pass
-
-  # Accounts Accounts
-   #Date Sorting
-    def sortAccountsAccountsByDate(self):
-        pass
-
-   #Day Sorting
-    def sortAccountsAccountsByDay(self):
-        pass
-    def sortAccountsAccountsIntoDaysInWeek(self):
-        pass
-    def sortAccountsAccountsIntoDaysInMonth(self):
-        pass
-    
-   #Week Sorting
-    def sortAccountsAccountsByWeek(self):
-        pass
-    def sortAccountsAccountsIntoWeeksInMonth(self):
-        pass
-    def sortAccountsAccountsIntoWeeksInYear(self):
-        pass
-    
-   #Month Sorting
-    def sortAccountsAccountsByMonth(self, month):
-        DateTime.checkDateTime(month)
-        clients = [client for client in self.clients if client.lastAccount.date.isSameMonth(month)]
-        accounts = []
-        for client in clients:
-            clientAccounts = client.accountsManager.sortAccountsByMonth(month)
-            accounts.extend(clientAccounts)
-        return accounts
+    def subRegionsActiveByMonth(self, month):
+        subRegions = []
+        for subRegion in self.region.subRegionsManager:
+            monthAccount = subRegion.accountsManager.getAccount(month=month)
+            if monthAccount != None: subRegions.append(subRegion)
+        # or Subs = [Sub for Sub in self.Subs if Sub.lastAccount.date.isSameMonth(month)]
         
-    def sortAccountsAccountsIntoMonthsInYear(self):
-        pass
-    def sortAccountsAccountsIntoMonthsInYears(self):
-        pass
+        return subRegions
     
-   #Year Sorting
-    def sortAccountsAccountsByYear(self):
+    def sortSubsByMonth(self, month): return [sub for sub in self if sub.month.monthYear == month.monthYear]
+    
+    
+   #Month Sorting
+    def sortSubsAccountsByMonth(self, month):
+        PRMP_DateTime.checkDateTime(month)
+        Subs = self.subRegionsActiveByMonth(month)
+        accounts = []
+        for Sub in Subs:
+            SubAccounts = Sub.accountsManager.sortSubsByMonth(month)
+            accounts.extend(SubAccounts)
+        return accounts
+
+
+
+
+class SameTimesAccounts(ObjectsMixins):
+    
+    def __init__(self, obj):
+        self.obj = obj
+        self.subs = []
+    
+    def setStage(self):
         pass
-    def sortAccountsAccountsIntoYears(self):
-        pass
+
+
+
+
+
+
 
 
 

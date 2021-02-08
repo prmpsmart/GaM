@@ -1,287 +1,294 @@
 from .packed import *
-sys = os.sys
+from tkinter.colorchooser import askcolor
 
 
-class Toplevel1:
-    def __init__(self, top=None):
-        '''This class configures and populates the toplevel window.
-           top is the toplevel containing window.'''
-        _bgcolor = '#800080'  # Closest X11 color: 'magenta4'
-        _fgcolor = '#ffffff'  # X11 color: 'white'
-        _compcolor = '#d9d9d9' # X11 color: 'gray85'
-        _ana1color = '#d9d9d9' # X11 color: 'gray85'
-        _ana2color = '#ececec' # Closest X11 color: 'gray92'
-        font9 = "-family {Times New Roman} -size 11 -weight bold -slant roman -underline 0 -overstrike 0"
-        self.style = ttk.Style()
-        if sys.platform == "win32":
-            self.style.theme_use('winnative')
-        self.style.configure('.',background=_bgcolor)
-        self.style.configure('.',foreground=_fgcolor)
-        self.style.configure('.',font=font9)
-        self.style.map('.',background=[('selected', _compcolor), ('active',_ana2color)])
 
-        top.geometry("577x554")
-        top.title("New Toplevel")
-        top.configure(background="#800080")
 
-        self.Labelframe1 = tk.LabelFrame(top)
-        self.Labelframe1.place(relx=0.0, rely=0.0, relheight=0.226
-                , relwidth=0.468)
-        self.Labelframe1.configure(relief='groove')
-        self.Labelframe1.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Labelframe1.configure(foreground="black")
-        self.Labelframe1.configure(text='''DC Office Details''')
-        self.Labelframe1.configure(background="#800080")
 
-        self.Label1 = tk.Label(self.Labelframe1)
-        self.Label1.place(relx=0.037, rely=0.24, height=23, width=100
-                , bordermode='ignore')
-        self.Label1.configure(background="#800080")
-        self.Label1.configure(disabledforeground="#bf6030")
-        self.Label1.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1.configure(foreground="#ffffff")
-        self.Label1.configure(relief="groove")
-        self.Label1.configure(text='''Office''')
 
-        self.Label1_1 = tk.Label(self.Labelframe1)
-        self.Label1_1.place(relx=0.037, rely=0.48, height=23, width=100
-                , bordermode='ignore')
-        self.Label1_1.configure(activebackground="#ffaa7f")
-        self.Label1_1.configure(activeforeground="black")
-        self.Label1_1.configure(background="#800080")
-        self.Label1_1.configure(disabledforeground="#bf6030")
-        self.Label1_1.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_1.configure(foreground="#ffffff")
-        self.Label1_1.configure(highlightbackground="#ff8040")
-        self.Label1_1.configure(highlightcolor="black")
-        self.Label1_1.configure(relief="groove")
-        self.Label1_1.configure(text='''Areas''')
+class ChartOptions(Frame):
 
-        self.Label1_4 = tk.Label(self.Labelframe1)
-        self.Label1_4.place(relx=0.463, rely=0.24, height=23, width=130
-                , bordermode='ignore')
-        self.Label1_4.configure(activebackground="#ffaa7f")
-        self.Label1_4.configure(activeforeground="black")
-        self.Label1_4.configure(background="#0000ff")
-        self.Label1_4.configure(disabledforeground="#bf6030")
-        self.Label1_4.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_4.configure(foreground="#ffffff")
-        self.Label1_4.configure(highlightbackground="#ff8040")
-        self.Label1_4.configure(highlightcolor="black")
-        self.Label1_4.configure(relief="sunken")
-        self.Label1_4.configure(text='''Owode''')
+    def __init__(self, master, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+                
+      ########## Chart Options
+        self.chart_lblfrm = LabelFrame(self, text='Chart Options', place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
 
-        self.Label1_5 = tk.Label(self.Labelframe1)
-        self.Label1_5.place(relx=0.463, rely=0.48, height=23, width=130
-                , bordermode='ignore')
-        self.Label1_5.configure(activebackground="#ffaa7f")
-        self.Label1_5.configure(activeforeground="black")
-        self.Label1_5.configure(background="#0000ff")
-        self.Label1_5.configure(disabledforeground="#bf6030")
-        self.Label1_5.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_5.configure(foreground="#ffffff")
-        self.Label1_5.configure(highlightbackground="#ff8040")
-        self.Label1_5.configure(highlightcolor="black")
-        self.Label1_5.configure(relief="sunken")
-        self.Label1_5.configure(text='''6''')
+       ### Fig number
+        self.fig = LabelSpin(self.chart_lblfrm, topKwargs=dict(text='Fig. No.'), bottomKwargs=dict(to=4, from_=1, increment=1), orient='h', place=dict(relx=.003, rely=.003, relh=.18, relw=.35))
 
-        self.Label1_5 = tk.Label(self.Labelframe1)
-        self.Label1_5.place(relx=0.463, rely=0.72, height=23, width=130
-                , bordermode='ignore')
-        self.Label1_5.configure(activebackground="#ffaa7f")
-        self.Label1_5.configure(activeforeground="black")
-        self.Label1_5.configure(background="#0000ff")
-        self.Label1_5.configure(disabledforeground="#bf6030")
-        self.Label1_5.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_5.configure(foreground="#ffffff")
-        self.Label1_5.configure(highlightbackground="#ff8040")
-        self.Label1_5.configure(highlightcolor="black")
-        self.Label1_5.configure(relief="sunken")
-        self.Label1_5.configure(text='''1280''')
+       ###### Chart Type
+        self.chart_type = None
+        self.chart_types = LabelCombo(self.chart_lblfrm,  topKwargs=dict(text='Chart Types'), bottomKwargs=dict(values=['Plot', 'Bar', 'Barh', 'Hist', 'Pie']), func=self.chart_types_choser, orient='h', place=dict(relx=.37, rely=.003, relh=.18, relw=.62), longent=.45)
 
-        self.Label1_2 = tk.Label(self.Labelframe1)
-        self.Label1_2.place(relx=0.037, rely=0.72, height=23, width=100
-                , bordermode='ignore')
-        self.Label1_2.configure(activebackground="#ffaa7f")
-        self.Label1_2.configure(activeforeground="black")
-        self.Label1_2.configure(background="#800080")
-        self.Label1_2.configure(disabledforeground="#bf6030")
-        self.Label1_2.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_2.configure(foreground="#ffffff")
-        self.Label1_2.configure(highlightbackground="#ff8040")
-        self.Label1_2.configure(highlightcolor="black")
-        self.Label1_2.configure(relief="groove")
-        self.Label1_2.configure(text='''Clients''')
+       ########## Chart Types Options
+        note = Notebook(self.chart_lblfrm, place=dict(relx=.003, rely=.2, relh=.8, relw=.99))
 
-        self.Labelframe2 = tk.LabelFrame(top)
-        self.Labelframe2.place(relx=0.503, rely=0.0, relheight=0.28
-                , relwidth=0.47)
-        self.Labelframe2.configure(relief='groove')
-        self.Labelframe2.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Labelframe2.configure(foreground="black")
-        self.Labelframe2.configure(text='''Month''')
-        self.Labelframe2.configure(background="#800080")
+        self.grid_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.grid_options, padding=1)
+        note.tab(0, text='Grid Options',compound='left',underline='0')
 
-        self.Label1_3 = tk.Label(self.Labelframe2)
-        self.Label1_3.place(relx=0.037, rely=0.452, height=23, width=100
-                , bordermode='ignore')
-        self.Label1_3.configure(activebackground="#ffaa7f")
-        self.Label1_3.configure(activeforeground="black")
-        self.Label1_3.configure(background="#800080")
-        self.Label1_3.configure(disabledforeground="#bf6030")
-        self.Label1_3.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_3.configure(foreground="#ffffff")
-        self.Label1_3.configure(highlightbackground="#ff8040")
-        self.Label1_3.configure(highlightcolor="black")
-        self.Label1_3.configure(relief="groove")
-        self.Label1_3.configure(text='''Active Clients''')
+        self.plot_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.plot_options, padding=1)
+        note.tab(1, text='Plot Options',compound='left',underline='0')
 
-        self.Label1_5 = tk.Label(self.Labelframe2)
-        self.Label1_5.place(relx=0.48, rely=0.452, height=23, width=130
-                , bordermode='ignore')
-        self.Label1_5.configure(activebackground="#ffaa7f")
-        self.Label1_5.configure(activeforeground="black")
-        self.Label1_5.configure(background="#0000ff")
-        self.Label1_5.configure(disabledforeground="#bf6030")
-        self.Label1_5.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_5.configure(foreground="#ffffff")
-        self.Label1_5.configure(highlightbackground="#ff8040")
-        self.Label1_5.configure(highlightcolor="black")
-        self.Label1_5.configure(relief="sunken")
-        self.Label1_5.configure(text='''360''')
+        self.bar_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.bar_options, padding=1)
+        note.tab(2, text='Bar Options',compound='left',underline='0')
 
-        self.Label1_4 = tk.Label(self.Labelframe2)
-        self.Label1_4.place(relx=0.037, rely=0.194, height=32, width=249
-                , bordermode='ignore')
-        self.Label1_4.configure(activebackground="#ffaa7f")
-        self.Label1_4.configure(activeforeground="black")
-        self.Label1_4.configure(background="#800080")
-        self.Label1_4.configure(disabledforeground="#bf6030")
-        self.Label1_4.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_4.configure(foreground="#ffffff")
-        self.Label1_4.configure(highlightbackground="#ff8040")
-        self.Label1_4.configure(highlightcolor="black")
-        self.Label1_4.configure(relief="groove")
-        self.Label1_4.configure(text='''December 2020''')
+        self.pie_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.pie_options, padding=1)
+        note.tab(3, text='Pie Options',compound='left',underline='0')
 
-        self.Button1 = tk.Button(self.Labelframe2)
-        self.Button1.place(relx=0.037, rely=0.774, height=28, width=72
-                , bordermode='ignore')
-        self.Button1.configure(activebackground="#ececec")
-        self.Button1.configure(activeforeground="#ffffff")
-        self.Button1.configure(background="#800080")
-        self.Button1.configure(disabledforeground="#bf6030")
-        self.Button1.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Button1.configure(foreground="#ffffff")
-        self.Button1.configure(highlightbackground="#800080")
-        self.Button1.configure(highlightcolor="black")
-        self.Button1.configure(pady="0")
-        self.Button1.configure(text='''Previous''')
+       ########## Grid lines
+        self._grid_style = 'None'
+        self._grid_color = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
 
-        self.Button1_5 = tk.Button(self.Labelframe2)
-        self.Button1_5.place(relx=0.738, rely=0.774, height=28, width=59
-                , bordermode='ignore')
-        self.Button1_5.configure(activebackground="#ececec")
-        self.Button1_5.configure(activeforeground="#ffffff")
-        self.Button1_5.configure(background="#800080")
-        self.Button1_5.configure(disabledforeground="#bf6030")
-        self.Button1_5.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Button1_5.configure(foreground="#ffffff")
-        self.Button1_5.configure(highlightbackground="#800080")
-        self.Button1_5.configure(highlightcolor="black")
-        self.Button1_5.configure(pady="0")
-        self.Button1_5.configure(text='''Next''')
+        self.grid_style = CheckCombo(self.grid_options, topKwargs=dict(text='Grid Style'), func=self.grid_style_choser, command=self.grid_decide, bottomKwargs=dict(values=['None', 'Solid', 'Dashed', 'Dashdot', 'Dotted']), orient='h', place=dict(relx=.02, rely=.02, relh=.25, relw=.65), longent=.4)
 
-        self.Button1_6 = tk.Button(self.Labelframe2)
-        self.Button1_6.place(relx=0.406, rely=0.774, height=28, width=59
-                , bordermode='ignore')
-        self.Button1_6.configure(activebackground="#ececec")
-        self.Button1_6.configure(activeforeground="#ffffff")
-        self.Button1_6.configure(background="#800080")
-        self.Button1_6.configure(disabledforeground="#bf6030")
-        self.Button1_6.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Button1_6.configure(foreground="#ffffff")
-        self.Button1_6.configure(highlightbackground="#800080")
-        self.Button1_6.configure(highlightcolor="black")
-        self.Button1_6.configure(pady="0")
-        self.Button1_6.configure(text='''Current''')
+        self.grid_width = LabelSpin(self.grid_options, topKwargs=dict(text='Grid Width'), bottomKwargs=dict(from_=.1, to=1, increment=.1), orient='h', place=dict(relx=.02, rely=.3, relh=.25, relw=.65))
 
-        self.Labelframe3 = tk.LabelFrame(top)
-        self.Labelframe3.place(relx=0.0, rely=0.397, relheight=0.587
-                , relwidth=0.997)
-        self.Labelframe3.configure(relief='groove')
-        self.Labelframe3.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Labelframe3.configure(foreground="black")
-        self.Labelframe3.configure(text='''Account Highlight''')
-        self.Labelframe3.configure(background="#800080")
+        self.grid_color = Button(self.grid_options, text='Color', command=self.grid_color_choser, place=dict(relx=.02, rely=.7, relh=.2, relw=.65,))
 
-        self.Labelframe4 = tk.LabelFrame(self.Labelframe3)
-        self.Labelframe4.place(relx=0.017, rely=0.277, relheight=0.692
-                , relwidth=0.965, bordermode='ignore')
-        self.Labelframe4.configure(relief='groove')
-        self.Labelframe4.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Labelframe4.configure(foreground="black")
-        self.Labelframe4.configure(text='''Accounts''')
-        self.Labelframe4.configure(background="#800080")
+       ### Plot options
 
-        self.style.configure('Treeview.Heading',  font=font9)
-        self.Scrolledtreeview1 = ScrolledTreeView(self.Labelframe4)
-        self.Scrolledtreeview1.place(relx=0.018, rely=0.133, relheight=0.831
-                , relwidth=0.962, bordermode='ignore')
-        self.Scrolledtreeview1.configure(columns="Col1")
-        # build_treeview_support starting.
-        self.Scrolledtreeview1.heading("#0",text="Tree")
-        self.Scrolledtreeview1.heading("#0",anchor="center")
-        self.Scrolledtreeview1.column("#0",width="257")
-        self.Scrolledtreeview1.column("#0",minwidth="20")
-        self.Scrolledtreeview1.column("#0",stretch="1")
-        self.Scrolledtreeview1.column("#0",anchor="w")
-        self.Scrolledtreeview1.heading("Col1",text="Col1")
-        self.Scrolledtreeview1.heading("Col1",anchor="center")
-        self.Scrolledtreeview1.column("Col1",width="258")
-        self.Scrolledtreeview1.column("Col1",minwidth="20")
-        self.Scrolledtreeview1.column("Col1",stretch="1")
-        self.Scrolledtreeview1.column("Col1",anchor="w")
+        self.marker = Checkbutton(self.plot_options, text='Marker', place=dict(relx=.02, rely=.04, relh=.24, relw=.4))
 
-        self.Label1_3 = tk.Label(self.Labelframe3)
-        self.Label1_3.place(relx=0.017, rely=0.092, height=23, width=100
-                , bordermode='ignore')
-        self.Label1_3.configure(activebackground="#ffaa7f")
-        self.Label1_3.configure(activeforeground="black")
-        self.Label1_3.configure(background="#800080")
-        self.Label1_3.configure(disabledforeground="#bf6030")
-        self.Label1_3.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_3.configure(foreground="#ffffff")
-        self.Label1_3.configure(highlightbackground="#ff8040")
-        self.Label1_3.configure(highlightcolor="black")
-        self.Label1_3.configure(relief="groove")
-        self.Label1_3.configure(text='''Areas''')
+        self.linestyle = Checkbutton(self.plot_options, text='Line Style', place=dict(relx=.02, rely=.28, relh=.24, relw=.4))
 
-        self.Label1_3 = tk.Label(self.Labelframe3)
-        self.Label1_3.place(relx=0.017, rely=0.185, height=23, width=100
-                , bordermode='ignore')
-        self.Label1_3.configure(activebackground="#ffaa7f")
-        self.Label1_3.configure(activeforeground="black")
-        self.Label1_3.configure(background="#800080")
-        self.Label1_3.configure(disabledforeground="#bf6030")
-        self.Label1_3.configure(font="-family {Times New Roman} -size 11 -weight bold")
-        self.Label1_3.configure(foreground="#ffffff")
-        self.Label1_3.configure(highlightbackground="#ff8040")
-        self.Label1_3.configure(highlightcolor="black")
-        self.Label1_3.configure(relief="groove")
-        self.Label1_3.configure(text='''Clients''')
+        self.linewidth = LabelSpin(self.plot_options,  topKwargs=dict(text='Line Width'), bottomKwargs=dict(to=1, from_=.1, increment=.1), orient='h', place=dict(relx=.02, rely=.52, relh=.24, relw=.64))
 
-        self.TCombobox1 = ttk.Combobox(self.Labelframe3)
-        self.TCombobox1.place(relx=0.209, rely=0.092, relheight=0.074
-                , relwidth=0.249, bordermode='ignore')
-        self.TCombobox1.configure(textvariable=dcofficedetails_support.combobox)
-        self.TCombobox1.configure(takefocus="")
 
-        self.TCombobox1_4 = ttk.Combobox(self.Labelframe3)
-        self.TCombobox1_4.place(relx=0.209, rely=0.169, relheight=0.074
-                , relwidth=0.249, bordermode='ignore')
-        self.TCombobox1_4.configure(textvariable=dcofficedetails_support.combobox)
-        self.TCombobox1_4.configure(takefocus="")
+        self.alpha = LabelSpin(self.plot_options,  topKwargs=dict(text='Alpha'), bottomKwargs=dict(to=1, from_=.1, increment=.1), orient='h', place=dict(relx=.02, rely=.76, relh=.24, relw=.64))
+
+       ## Bar Options
+
+        self.switch = Checkbutton(self.bar_options, text='Switch', place=dict(relx=.02, rely=.14, relh=.25, relw=.3))
+
+       ###### Pie Options
+
+        self.inapp = Checkbutton(self.pie_options, text='Inapp', command=self.inapp_info, place=dict(relx=.02, rely=.04, relh=.24, relw=.32))
+
+        self.explode = Checkbutton(self.pie_options, text='Explode', place=dict(relx=.02, rely=.28, relh=.24, relw=.32))
+
+        self.shadow = Checkbutton(self.pie_options,text='Shadow', place=dict(relx=.02, rely=.52, relh=.24, relw=.32))
+
+      ############ Plot and Clear
+
+        self.plot_btn = Button(self.chart_lblfrm, command=self.chart_sort, text='Plot', place=dict(relx=.72, rely=.45, relh=.2, relw=.2))
+
+        self.clear_btn = Button(self.chart_lblfrm, command=self.clear_plot, text='Clear', place=dict(relx=.72, rely=.7, relh=.2, relw=.2))
+
+     # Defaults
+        self.paint()
+        self.chart_types_choser()
+        self.grid_decide()
+
+    def grid_decide(self):
+        self.grid_style.checked()
+
+        options = [self.grid_style, self.grid_width, self.grid_color]
+
+        if self.grid_style.T.get():
+            for option in options[:-1]: option.normal('b')
+            options[-1].normal()
+        else:
+            self._grid_style = 'None'
+            self.grid_style.set(self._grid_style)
+            self._grid_color = 'black'
+            for option in options[:-1]: option.disabled('b')
+            options[-1].disabled()
+
+    def grid_color_choser(self):
+        rgb_name, self._grid_color = askcolor(self._grid_color)
+        self.grid_color.config(background=self._grid_color)
+
+    def grid_style_choser(self, e=0): self._grid_style = self.grid_style.get().lower()
+
+    def chart_types_choser(self, e=0):
+        self.chart_type = self.chart_types.get().lower()
+
+        plot_conf = [ self.linestyle, self.marker]
+        plot_dis = [self.linewidth, self.alpha]
+
+        if self.chart_type != 'plot':
+            for conf in plot_conf: conf.disabled()
+            for dis in plot_dis: dis.disabled()
+        else:
+            for conf in plot_conf: conf.normal()
+            for dis in plot_dis: dis.normal()
+
+
+        if self.chart_type not in ['bar', 'barh']: self.switch.disabled()
+        else: self.switch.normal()
+
+        pie_conf = [self.explode, self.shadow, self.inapp]
+        if self.chart_type != 'pie':
+            for conf in pie_conf: conf.disabled()
+        else:
+            for conf in pie_conf: conf.normal()
+
+    def alpha_choser(self):
+        num = self.alpha.get()
+        if num: return float(num)
+        else: return 0
+
+    def plot_color_choser(self):
+        self.plot_colors = []
+        rgb_name, plot_color = askcolor('blue')
+        self.plot_colors.append(plot_color)
+        self.plot_colors_btn.config(background=plot_color)
+
+    def plot_linewidth_choser(self):
+        num = self.linewidth.get()
+        if num: return float(num)
+        else: return 0
+
+    def inapp_info(self):
+        if self.inapp.get(): PRMP_MsgBox(title='Under Testing', message='Using Pie in Inapp will distrupt the other chart drawing', _type='warn', delay=0)
+
+    def chart_sort(self):
+        str_region = self.region_cbtn.get()
+        datas = self.data_cbtn.get()
+        spec_datas = self.spec_cbtn.get() or None
+        month = area = day = week = None
+        sole = self.sole_cbtn.get()
+        go = 0
+        if str_region == 'years':
+            try:
+                region = self.plot_years
+
+                if self.plot_spec_cbtn.get() != '1':
+                    if sole == '1':
+                        title = 'ALL Years DETAILS'
+                        xlabel = 'Records'
+                        ylabel = ''
+                        go = 1
+                    elif datas == 'years':
+                        title = 'All Years'
+                        xlabel = 'Years'
+                        ylabel = 'Records'
+                        go = 1
+                    elif datas == 'months':
+                        title = 'Months in All Years'
+                        xlabel = 'Months'
+                        ylabel = 'Records'
+                        go = 1
+                    elif datas == 'areas':
+                        title = 'Areas in All Years'
+                        xlabel = 'Areas'
+                        ylabel = 'Records'
+                        go = 1
+                    else: PRMP_MsgBox(self, message='Choose Years or Months or Areas', title='Required Datas', _type='error'); go = 0
+                else:
+                    if spec_datas == 'spec_month':
+                        month = self.s_d_month.get()
+
+                        title = f'{month} in ALL Years'
+                        xlabel = 'Years'
+                        ylabel = 'Records'
+                        go = 1
+                    elif spec_datas == 'spec_area':
+                        area = self.s_d_area.get()
+
+                        title = f'{area} in ALL Years'
+                        xlabel = 'Years'
+                        ylabel = 'Records'
+                        go = 1
+            except: PRMP_MsgBox(self, title='Requires Regions', message='Not loaded', _type='error'); go = 0
+
+        elif str_region == 'year':
+            try:
+                region = self.plot_year
+                if self.plot_spec_cbtn.get() != '1':
+
+                    if sole == '1':
+                        title = f'{region} DETAILS'
+                        xlabel = 'Records'
+                        ylabel = ''
+                        go = 1
+                    elif datas == 'months':
+                        title = f'Months in Year {region}'
+                        xlabel = 'Months'
+                        ylabel = 'Records'
+                        go = 1
+                    elif datas == 'areas':
+                        title = f'Areas in Year {region}'
+                        xlabel = 'Areas'
+                        ylabel = 'Records'
+                        go = 1
+                    else: PRMP_MsgBox(self, message='Choose Months or Areas', title='Required Datas', _type='error'); go = 0
+                else:
+                    if spec_datas == 'spec_area':
+                        area = self.s_d_area.get()
+
+                        title = f'{area} in {region}'
+                        xlabel = 'Months'
+                        ylabel = 'Records'
+                        go = 1
+            except: PRMP_MsgBox(self, title='Requires Regions', message='Pick a valid Year', _type='error'); go = 0
+
+        elif str_region == 'month':
+            try:
+                region = self.plot_month
+
+                if sole == '1':
+                    title = f'{region} DETAILS'
+                    xlabel = 'Records'
+                    ylabel = ''
+                    go = 1
+                elif datas == 'areas':
+                    title = f'Areas in {region}'
+                    xlabel = 'Areas'
+                    ylabel = 'Records'
+                    go = 1
+                elif datas == 'weeks':
+                    title = f'Weeks in {region}'
+                    xlabel = 'Weeks'
+                    ylabel = 'Records'
+                    go = 1
+                else: PRMP_MsgBox(self, message='Choose Areas or Weeks', title='Required Datas', _type='error'); go = 0
+            except: PRMP_MsgBox(self, title='Requires Regions', message='Pick a valid Month', _type='error'); go = 0
+
+        elif str_region == 'area':
+            try:
+                region = self.plot_area
+                if sole == '1':
+                    title = f'{region} DETAILS'
+                    xlabel = 'Records'
+                    ylabel = ''
+                    go = 1
+                elif datas == 'weeks':
+                    title = f'Weeks in {region}'
+                    xlabel = 'Years'
+                    ylabel = 'Records'
+                    go = 1
+                else: PRMP_MsgBox(self, message='Choose Weeks', title='Required Datas', _type='error'); go = 0
+            except: PRMP_MsgBox(self, title='Requires Regions', message='Pick a valid Area', _type='error'); go = 0
+
+
+        else: PRMP_MsgBox(self, message='Choose All Years or Year or Month or Area_or Client', title='Required Regions', _type='error'); go = 0
+
+        if go:
+            self.sorted_datas = Chart_Sort(region=region, yaxis=self.get_datas(), sole=sole, month=month, area=area, header=datas)
+            self.sorted_datas.xlabel = xlabel
+            self.sorted_datas.ylabel = ylabel
+            self.sorted_datas.title = title
+            self.gather_to_plot()
+
+        elif go == 0: PRMP_MsgBox(self, message='This is not implemented yet Value = Zero', title='Not Implemented', _type='info')
+
+    def clear_plot(self):
+        num = self.fig.get()
+        if num:
+            num = int(num)
+            # fig = self.plots_figures[num - 1]
+            # fig.clear()
+        else: PRMP_MsgBox(self, message='Pick a chart number', title='Required Chart Number', _type='error')
+
+
+
+
 
 
 

@@ -1,26 +1,79 @@
-from .bases import Object, DateTime, Errors
+from .bases import Object, PRMP_DateTime, Errors
 from datetime import timedelta
 
 # Record is the {money, date} recieved daily a.k.a DayRecord
+
+class CoRecords(list):
+    def __bool__(self): return True
+    def addCoRecord(self, coRecord): self.append(coRecord)
+
 
 
 class Record(Object):
     Manager = 'RecordsManager'
     _type = 'rec'
-    
-    def __init__(self, manager, money, date=None, note='Note', **kwargs):
-        Object.__init__(self, manager, **kwargs)
+    subTypes = ['Co Records', 'Linked Records']
+
+    def __init__(self, manager, money, note='Note', coRecord=None, **kwargs):
         self.money = money
         self.note = note
+        self.__coRecord = coRecord
+        self.__coRecords = None
+        self.type = None
+
+        Object.__init__(self, manager, name=note, **kwargs)
+
+
+        if coRecord != None: coRecord.addCoRecord(self)
+        else:
+            self.__coRecords = CoRecords()
+            self.addCoRecord(self)
+
+        self.addEditableValues([{'value': 'money', 'type': int}, 'note', 'date'])
+
+    def addCoRecord(self, coRecord):
+        if coRecord in self.coRecords: return
+        self.coRecords.addCoRecord(coRecord)
+
+    def updateOtherCoRecord(self, other):
+        for rec in self.__coRecords: rec.addCoRecord(self)
     
-    def __int__(self): return self.money
+    def classInLinkedRecords(self, className): return className in [rec.className for rec in self]
+
+    cilr = classInLinkedRecords
+
+    def updateCoRecord(self):
+        for rec in self.__coRecords: rec.updateOtherCoRecord(self)
+
+    @property
+    def subs(self): return self.linkedRecords or []
+
+    @property
+    def coRecord(self): return self.__coRecord
+
+    @property
+    def coRecords(self):
+        if self.__coRecords != None: return self.__coRecords
+        elif self.__coRecord != None: return self.__coRecord.coRecords
+
+    @property
+    def linkedRecords(self): return [c for c in self.coRecords if c is not self]
+    
+    def update(self, values={}, first=1):
+        super().update(values)
+        if first:
+            for rec in self: rec.update(values, 0)
+        self.manager.update()
+    
+    def __int__(self): return int(self.money)
+    def __float__(self): return float(self.money)
     
     def __str__(self): return f'{self.manager} | {self.name}'
 
     def __repr__(self): return f'<{self.name}>'
 
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date}, {self.note})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date}, {self.note})'
 
     @property
     def region(self): return self.manager.region
@@ -30,6 +83,7 @@ class Record(Object):
     def add(self, money): self.money += money
     
     def substract(self, money): self.money -= money
+
 DayRecord = Record
 
 
@@ -38,19 +92,22 @@ class Repayment(Record):
     dueTime = 0
     duing =  True
     Manager = 'RepaymentsManager'
+    subTypes = ['Repayments']
+    ObjectType = None
     
     def __init__(self, manager, money, date=None, **kwargs):
         super().__init__(manager, money, date, **kwargs)
-        
         if self.duing: assert self.dueSeason and self.dueTime, 'Due Season and Time must be set.'
         
         if self.dueSeason == 'year': self.__dueDate = self.date + (self.dueTime * 12)
         elif self.dueSeason == 'month': self.__dueDate = self.date + self.dueTime
         elif self.dueSeason == 'day': self.__dueDate = self.date + timedelta(days=self.dueTime)
         
-        from .records_managers import RecordsManager
+        if not self.ObjectType:
+            from .records_managers import RecordsManager
+            self.ObjectType = RecordsManager
         
-        self.__repaymentsManager = RecordsManager(self)
+        self.__repaymentsManager = self.ObjectType(self)
     
     def __getitem__(self, num): return self.repaymentsManager[num]
     
@@ -60,22 +117,25 @@ class Repayment(Record):
     def records(self): return self.repaymentsManager.records
     
     @property
-    def isDue(self): return DateTime.now() > self.dueDate
+    def isDue(self): return PRMP_DateTime.now() > self.dueDate
     
     @property
     def dueDate(self): return self.__dueDate
     
     @property
-    def outstanding(self): return int(self) - self.repaid
+    def outstanding(self): return float(self) - self.repaid
     
     @property
-    def paid(self): return int(self) == self.repaid
+    def paid(self): return float(self) == self.repaid
     
     @property
-    def repaid(self): return int(self.repaymentsManager)
+    def repaid(self): return float(self.repaymentsManager)
     
     @property
     def repayment(self): return self.repaid
+    
+    @property
+    def repayments(self): return self.repaymentsManager
     
     @property
     def repaymentsManager(self): return self.__repaymentsManager
@@ -88,6 +148,9 @@ class Repayment(Record):
                 repayment = self.repaymentsManager.createRecord(repay, **kwargs)
                 if self.paid: self.completed()
                 return repayment
+    
+    @property
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date}, {self.note})'
     
     def completed(self): pass
 

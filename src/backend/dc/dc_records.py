@@ -1,45 +1,103 @@
-from src.backend.core.records_managers import Repayment, DateTime, RecordsManager, RepaymentsManager, Record
+from src.backend.core.records_managers import Repayment, PRMP_DateTime, RecordsManager, RepaymentsManager, Record
 from .dc_errors import DCErrors
 
 class DCRecord(Record):
-    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers')
+    Managers = ('Rates', 'CardDues', 'Contributions', 'Savings', 'BroughtForwards', 'Balances', 'Debits', 'Commissions', 'BroughtToOffices', 'Deficits', 'Excesses', 'Incomes', 'Transfers', 'Withdrawals', 'Paidouts', 'NormalIncomes')
+
+    def update(self, values={}, first=1):
+        if not first: super().update(values, first)
+    
+    def delete(self, called=0):
+        if called == 0:
+            for a in self: a.delete(1)
+        super().delete(called)
+
+
 
 class DCRepayment(Repayment):
-    Managers = ('Upfronts', )
+    
+    def delete(self, called=0):
+        if called == 0:
+            for a in self: a.delete(1)
+        self.manager.removeRecord(self, called)
+
+
+
+
+class Rate(DCRecord): pass
+
+class Balance(DCRecord): pass
+
+class BroughtForward(DCRecord): pass
+
+class BroughtToOffice(DCRecord): pass
+
+class CardDue(DCRecord): pass
+
+class Commission(DCRecord): pass
 
 class Contribution(DCRecord):
     
-    def __init__(self, manager, contrib, **kwargs):
-        self.__contrib = contrib
+    def update(self, values={}, first=1):
+        mn = 'money'
+        money = values.get(mn)
+        if money: self.checkNewUpdates(money)
+        super().update(values, 0)
         
-        rate = manager.master.rate
-        money = rate * contrib
+        if money: values[mn] = self.money * self.rate
 
-        super().__init__(manager, money, **kwargs)
+        if first:
+            for rec in self: rec.update(values, 0)
+        self.manager.update()
     
-    def __int__(self): return self.contributed
+    def checkNewUpdates(self, cont):
+        total = float(self.manager)
+        own = self.money
+
+        minusOwn = total - own
+
+        if (minusOwn + cont) >= 31.0: raise ValueError(f'Updating with {cont} makes the total contributions exceed 31.0 and the current is {total}.')
+        else: return True
     
     @property
-    def contributed(self): return self.__contrib
-    
-    @property
-    def savings(self): return super().__int__()
+    def rate(self): return self.manager.rate
+
+class Paidout(DCRecord): pass
+
+class Withdrawal(DCRecord): pass
 
 class Debit(DCRecord):
+    def update(self, values={}, first=1): super().update(values, first)
 
-     def __init__(self, manager, debit, _type='w', **kwargs):
-        if 'w' in _type: self._type = 'withdrawal'
-        else: self._type = 'paidout'
+class Deficit(DCRecord): pass
 
-        super().__init__(manager, debit, **kwargs)
+class Excesse(DCRecord): pass
+
+class NormalIncome(DCRecord): pass
+
+class Transfer(DCRecord): pass
+
+class Income(DCRecord): pass
+
+class Saving(DCRecord): pass
+
+class UpfrontRepayment(DCRecord): Manager = 'UpfrontRepaymentsManager'
+
+class UpfrontRepaymentsManager(RecordsManager):
+    ObjectType = UpfrontRepayment
+
+    def removeRecord(self, rec, called=0):
+        super().removeRecord(rec)
+        if called == 0: self.balance()
+
 
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1
     Manager = 'Upfronts'
+    ObjectType = UpfrontRepaymentsManager
 
-
-
+    def update(self, values={}, first=1): super().update(values, first)
 
 
 

@@ -1,6 +1,6 @@
 
 from .errors import Errors
-from .date_time import DateTime, CompareByMonth, CompareByWeek, CompareByYear, DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES, timedelta
+from prmp_miscs.prmp_datetime import *
 from .bases import ObjectsManager, ObjectsMixins
 from .records import *
 
@@ -16,31 +16,35 @@ from .records import *
 
 class SeasonRecord(ObjectsMixins):
     maximum = 0
-    def __init__(self, records):
-        assert records, 'Records cannot be empty.'
+    def __init__(self, records, date=None):
         if self.maximum: assert len(records) <= self.maximum, f'Records may not be more than {self.maximum}'
+
+        super().__init__(date=date, idReq=1)
+        self._subs = records
+        self._subs.sort()
         
         man = records[0].manager
-        for rec in records:
-            assert rec.manager == man, 'Records of different managers given.'
+        for rec in records: assert rec.manager.className == man.className, 'Records of different manager types given.'
+
         
-        self.__records = records
-        self.__records.sort()
     
     def __int__(self): return sum([int(rec) for rec in self])
+    def __float__(self): return sum([float(rec) for rec in self])
     
-    def __getitem__(self, num): return self.records[num]
+    # def __getitem__(self, num): return self.records[num]
     
-    def __len__(self): return len(self.records)
+    # def __len__(self): return len(self.records)
     
     @property
     def manager(self): return self.records[0].manager
     
-    @property
-    def date(self): return self.records[0].date
+    # @property
+    # def date(self): return self.records[0].date
     
     @property
-    def records(self): return self.__records
+    def subs(self): return self._subs
+    @property
+    def records(self): return self.subs
     
     def get(self, season, wh):
         if season == 'year':
@@ -56,30 +60,30 @@ class SeasonRecord(ObjectsMixins):
 class WeekRecord(SeasonRecord, CompareByWeek):
     maximum = 7
     
-    def __init__(self, records):
-        super().__init__(records)
+    def __init__(self, records, date=None):
+        SeasonRecord.__init__(self, records, date=date)
         self.recDayNames = [rec.date.dayName for rec in records]
     
     def __str__(self): return f'{self.manager} | {self.className}({self.weekMonthYear}) | {self.moneyWithSign}'
 
-    def __day(self, name):
+    def _day(self, name):
         if name in self.recDayNames:
             for rec in self:
                 if name.title() == rec.date.dayName: return rec
     @property
-    def sunday(self): return self.__day('Sunday')
+    def sunday(self): return self._day('Sunday')
     @property
-    def monday(self): return self.__day('Monday')
+    def monday(self): return self._day('Monday')
     @property
-    def tuesday(self): return self.__day('Tuesday')
+    def tuesday(self): return self._day('Tuesday')
     @property
-    def wednesday(self): return self.__day('Wednesday')
+    def wednesday(self): return self._day('Wednesday')
     @property
-    def thursday(self): return self.__day('Thursday')
+    def thursday(self): return self._day('Thursday')
     @property
-    def friday(self): return self.__day('Friday')
+    def friday(self): return self._day('Friday')
     @property
-    def saturday(self): return self.__day('Saturday')
+    def saturday(self): return self._day('Saturday')
 
 class MonthRecord(SeasonRecord, CompareByMonth):
     maximum = 5
@@ -95,7 +99,7 @@ class MonthRecord(SeasonRecord, CompareByMonth):
     def sortRecordsIntoWeeks(self):
         if self.__sorted: return self
         daysRec = [record for record in self if record.date.isSameMonth(self.date)]
-        weeks = DateTime.monthYearOfMonthWeekDays(dateObj=self.date)
+        weeks = PRMP_DateTime.monthYearOfMonthWeekDays(dateObj=self.date)
         week1 = []
         week2 = []
         week3 = []
@@ -213,22 +217,22 @@ class RecordsWithSameSeasons(SeasonRecord):
 class RecordsManager(ObjectsManager):
     lowest = 50
     ObjectType = Record
+    MultipleSubsPerMonth = True
+    subTypes = ['Records']
     
     def __init__(self, account=None): ObjectsManager.__init__(self, account)
     
-    def __int__(self): return self.totalMonies
+    def __float__(self): return float(self.totalMonies)
+    def __int__(self): return int(self.totalMonies)
     
     def __str__(self): return f'{self.account} | {self.name}'
     
     def __len__(self): return len(self.records)
 
     def __repr__(self): return f'<{self.name}>'
-
-    @property
-    def date(self): return self.account.date
     
     @property
-    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date})'
+    def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date})'
 
     @property
     def account(self): return self.master
@@ -240,39 +244,39 @@ class RecordsManager(ObjectsManager):
     def records(self): return self.subs
     
     @property
-    def lastMoney(self): return int(self.lastRecord) if self.last else 0
+    def lastMoney(self): return float(self.lastRecord) if self.last else 0
     
     @property
     def lastRecord(self): return self.last
     
     @property
-    def totalMonies(self): return sum([int(record) for record in self[:]])
+    def totalMonies(self): return sum([float(record) for record in self[:]])
     
     @property
-    def recordDateTuples(self): return [(str(record.date), int(record)) for record in self]
+    def recordDateTuples(self): return [(str(record.date), float(record)) for record in self]
     
     @property
     def dates(self): return [record.date for record in self]
     
-    def _setRecords(self, records): self.__records = records
+    def _setRecords(self, records): self._subs = records
     
     def createRecord(self, money, date=None, newRecord=True, notAdd=False, **kwargs):
         '''
-        money: type int; transaction to be in the record.
-        date: type DateTime; date of the transaction.
+        money: type float; transaction to be in the record.
+        date: type PRMP_DateTime; date of the transaction.
         newRecord: type bool; whether to create a new record or (add/set) to a record already done
         notAdd: type bool; useful when param newRecord=False, it\'s whether to set the money to a transaction already made or not
         kwargs: further params that a ObjectType might need.
         '''
-        money = int(money)
+        money = float(money)
+        if not money: return
+
         new = False
         record = None
         
-        # if money == 0: newRecord, notAdd = False, True
+        date = self.getDate(date)
         
-        # assert money != 0, 'Money must not be zero.'
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
+        # if self.className == 'BroughtForwards': print(date.date, newRecord, money)
         
         if newRecord: new = True
         else:
@@ -290,20 +294,15 @@ class RecordsManager(ObjectsManager):
             self.records.sort()
         
         return record
-        
+    
     def updateWithOtherManagers(self, managers):
         self.deleteSubs()
-        total = sum([int(manager) for manager in managers])
+        total = sum([float(manager) for manager in managers])
         self.createRecord(total, newRecord=False, notAdd=True)
     
-    def removeRecord(self, date):
-        for record in self:
-            if record.date == date: self.records.remove(record)
-            del record
-            return
+    def removeRecord(self, rec): self.removeSub(rec)
     
-    def removeRecordByIndex(self, index):
-        if len(self.records) >= index: del self.records[index]
+    def removeRecordByIndex(self, index): self.removeSubByIndex(index)
     
     def checkMoney(self, money):
         if (money < self.lowest): raise ValueError(f'Amount of {money} is too small.')
@@ -318,68 +317,58 @@ class RecordsManager(ObjectsManager):
             else: years.append(rec.year)
         return years
     
-    
     @property
-    def recordsAsList(self): return [int(record) for record in self]
+    def recordsAsList(self): return [float(record) for record in self]
     @property
-    def recordsAsTupleFull(self): return [(record, int(record)) for record in self]
+    def recordsAsTupleFull(self): return [(record, float(record)) for record in self]
     @property
-    def recordsAsTupleShort(self): return [(self.className, str(record.date), int(record)) for record in self]
+    def recordsAsTupleShort(self): return [(self.className, str(record.date), float(record)) for record in self]
     @property
-    def recordsAsTuple(self): return [(str(record.date), int(record)) for record in self]
+    def recordsAsTuple(self): return [(str(record.date), float(record)) for record in self]
     @property
-    def recordsAsDict(self): return [{str(record.date): int(record)} for record in self]
+    def recordsAsDict(self): return [{str(record.date): float(record)} for record in self]
     @property
-    def recordsAsDictFull(self): return [{record: int(record)} for record in self]
+    def recordsAsDictFull(self): return [{record: float(record)} for record in self]
     @property
-    def recordsAsDictShort(self): return [{str(record.date): int(record)} for record in self]
+    def recordsAsDictShort(self): return [{str(record.date): float(record)} for record in self]
 
     ############ Sorting
     #Date Sorting
     
     def sortRecordsByDate(self, date):
-        if date == None: date = DateTime.now()
-        DateTime.checkDateTime(date)
 
-        _rec = [rec for rec in self if str(rec.date) == str(date)]
+        _rec = self.sortSubsByDate(date)
         return _rec
     
     #Day Sorting
     def sortRecordsByDay(self, date):
-        recs = [record for record in self if record.date.dayName == date.dayName]
+        recs = self.sortSubsByDay(date)
         return RecordsWithSameSeasons(recs, date.dayName)
     
     def sortRecordsIntoDaysInWeek(self, week):
-        DateTime.checkDateTime(week)
-        days = [record for record in self if record.date.isSameWeek(week)]
-        return WeekRecord(days)
+        days = self.sortSubsIntoDaysInWeek(week)
+        if days: return WeekRecord(days)
     
     def sortRecordsIntoDaysInMonth(self, month):
-        DateTime.checkDateTime(month)
-        days = [record for record in self if record.date.isSameMonth(month)]
+        days = self.sortSubsIntoDaysInMonth(month)
         return MonthRecord(days)
     
     #Week Sorting
-    def sortRecordsByWeek(self, weekNum):
-        DateTime.checkDateTime(date)
-        records = []
-        for record in self:
-            if record.date.weekNum == int(weekNum): records.append(record)
-        return WeekRecord(records)
+    def sortRecordsByWeek(self, week):
+        records = self.sortSubsByWeek(week)
+        if records: return WeekRecord(records)
 
     def sortRecordsIntoWeeksInMonth(self, month):
-        daysRec = self.sortRecordsIntoDaysInMonth(month)
-        weeksRec = daysRec.sortRecordsIntoWeeks()
+        weeksRec = self.sortSubsIntoWeeksInMonth(month)
         return weeksRec
     
     def sortRecordsIntoWeeksInYear(self): pass
     
     #Month Sorting
-    def sortRecordsByMonth(self, month): return self.sortRecordsIntoDaysInMonth(month)
+    def sortRecordsByMonth(self, month): return self.sortSubsByMonth(month)
     
     def sortRecordsIntoMonthsInYear(self, year):
-        DateTime.checkDateTime(year)
-        yearRecs = [record for record in self if record.date.isSameYear(year)]
+        yearRecs = self.sortSubsIntoMonthsInYear(year)
         year = YearRecord(yearRecs)
         year.sortRecordsIntoMonths()
         return year
@@ -391,14 +380,11 @@ class RecordsManager(ObjectsManager):
     
     #Year Sorting
     def sortRecordsByYear(self, year):
-        DateTime.checkDateTime(year)
-        recs = [rec for rec in self if rec.date.isSameYear(year)]
+        recs = self.sortSubsByYear(year)
         return YearRecord(recs)
 
     def sortRecordsIntoYears(self):
-        years = self.recordsYears
-        yearsRecs = [self.sortRecordsByYear(DateTime.creatDateTime(year=year)) for year in years]
-        
+        yearsRecs = self.sortSubsIntoYears()
         return SeasonRecord(yearsRecs)
 
 class RepaymentsManager(RecordsManager):

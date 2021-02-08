@@ -11,7 +11,8 @@ class DCOfficeAccount(AreaAccount):
     Manager = 'DCOfficeAccountsManager'
 
     def _balanceAccount(self, date=None):
-        areasAccounts = self.clientsAccounts
+        areasAccounts = self.manager.sortSubRegionsAccountsByMonth(self.date)
+        for a in areasAccounts: a.balanceAccount()
         if areasAccounts:
             self.incomes.updateWithOtherManagers([account.incomes for account in areasAccounts])
             
@@ -28,16 +29,18 @@ class DCOfficeAccount(AreaAccount):
             self.upfronts.updateWithOtherManagers([account.upfronts for account in areasAccounts])
             
             self.excesses.updateWithOtherManagers([account.excesses for account in areasAccounts])
-
-            self.transfers.updateWithOtherManagers([account.transfers for account in areasAccounts])
             
             self.deficits.updateWithOtherManagers([account.deficits for account in areasAccounts])
             
             self.btos.updateWithOtherManagers([account.btos for account in areasAccounts])
         
-            for account in areasAccounts:
-                self.paidouts += account.paidouts
-                self.withdrawals += account.withdrawals
+            self.paidouts.updateWithOtherManagers([account.paidouts for account in areasAccounts])
+            
+            self.withdrawals.updateWithOtherManagers([account.withdrawals for account in areasAccounts])
+            
+            self.transfers.updateWithOtherManagers([account.transfers for account in areasAccounts])
+
+            self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in areasAccounts])
 
 
 class DCOfficeAccountsManager(AreaAccountsManager):

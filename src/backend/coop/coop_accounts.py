@@ -1,5 +1,5 @@
 from .coop_records import Expenses, Materials, Savings, Levies, Shares, LoanBonds, CoopErrors
-from ..core.accounts import DateTime, Account
+from ..core.accounts import PRMP_DateTime, Account
 
 
 class CoopAccount(Account):
@@ -57,7 +57,7 @@ class MemberAccount(CoopAccount):
     @property
     def validLoan(self):
         self.balanceAccount()
-        return int(self.savings) * self.loanRate
+        return float(self.savings) * self.loanRate
 
 
 class UnitAccount(CoopAccount):

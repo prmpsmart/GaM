@@ -168,7 +168,7 @@ class Chart(Frame):
         if expand: self.show(0)
         else:
             if inapp == "1":
-                self.subplot.pie(ys, labels=labels, explode=explode, autopct="%1.1f%%", shadow=shadow, labeldistance=1.)
+                self.subplot.pie(ys, labels=labels, explode=explode, autopct="%1.1f%%", shadow=shadow, labeldistance=1.1)
                 self.draw(left=0, bottom=.3, right=1, top=.88, wspace=.2, hspace=0)
             
             else: self.show(0)

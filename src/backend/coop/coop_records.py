@@ -1,4 +1,4 @@
-from ..core.records_managers import RecordsManager, DateTime, Repayment, RepaymentsManager, Loan, LoanBonds, LoanInterests, LoanBond, Record
+from ..core.records_managers import RecordsManager, PRMP_DateTime, Repayment, RepaymentsManager, Loan, LoanBonds, LoanInterests, LoanBond, Record
 
 from .coop_errors import CoopErrors
 
