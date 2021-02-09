@@ -163,7 +163,7 @@ class ThriftDetailsDialog(GaM_Dialog):
 
 class DailyContributionDailog(GaM_Dialog):
     
-    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1200, 800), **kwargs):
+    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1500, 800), **kwargs):
         self.dcContrib = dcContrib
         super().__init__(master, title=title, geo=geo, **kwargs)
     
@@ -188,8 +188,8 @@ class DailyContributionDailog(GaM_Dialog):
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.19, relh=.005, relw=.29))
 
-        self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.225, relw=.1, relh=.04))
-        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.225, relw=.15, relh=.04))
+        self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.225, relw=.1, relh=.04), command=self.addNewClient)
+        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.225, relw=.15, relh=.04), command=self.addNewClientAccount)
 
         self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.275, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged)
         
@@ -209,7 +209,7 @@ class DailyContributionDailog(GaM_Dialog):
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.663, relh=.005, relw=.29))
 
-        self.contributed = LabelSpin(self.container, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.685, relw=.22, relh=.05), orient='h', longent=.4)
+        self.contributed = LabelSpin(self.container, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.685, relw=.22, relh=.05), orient='h', longent=.4, bttk=1)
 
         self.delete = Button(self.container, text='Delete', place=dict(relx=.23, rely=.685, relw=.06, relh=.04), command=self.deleteThrift)
 
@@ -233,8 +233,9 @@ class DailyContributionDailog(GaM_Dialog):
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
     
     def defaults(self):
-        self.bind('<Up>', self.increaseClientNumber, '+')
-        self.bind('<Down>', self.decreaseClientNumber, '+')
+        self.bind('<Up>', lambda e: self.ledgerNumber.B.event_generate('<<Increment>>'), '+')
+        self.bind('<Down>', lambda e: self.ledgerNumber.B.event_generate('<<Decrement>>'), '+')
+
         self.bind('<Return>', self.addThrift, '+')
         
         self.container.bind('<1>', lambda e: self.focus())
@@ -242,13 +243,13 @@ class DailyContributionDailog(GaM_Dialog):
         self._account = None
         self._clientAccount = None
         
-        if self.dcContrib: self._area = self.dcContrib.manager.master
-        else: self._area = None
-
-        if self._area:
+        if self.dcContrib:
+            self._area = self.dcContrib.manager.master
             self.account.B.setObjs(self._area, 'name')
             self.area.set(self._area.name)
-        
+
+        else: self._area = None
+
         self.update()
 
         # self.editBtn.set(False)
@@ -259,9 +260,11 @@ class DailyContributionDailog(GaM_Dialog):
     def update(self):
         if not self.dcContrib: return
         if self._account: self.ledgerNumber.B.config(to=len(self._account), from_=1)
+
         self.contributed.B.config(to=len(self.dcContrib), from_=1)
         self.date.set(self.dcContrib.date.date)
         self.view.viewSubs(self.dcContrib)
+        self.bto.set(self.dcContrib.bto)        
         self.totals._refresh()
 
     def openArea(self): pass
@@ -271,8 +274,10 @@ class DailyContributionDailog(GaM_Dialog):
 
     def getDel(self):
         get = self.contributed.get() or 0
-        get = int(float(get))
-        return get
+        try:
+            get = int(float(get))
+            return get
+        except: pass
 
     def deleteThrift(self):
         get = self.getDel()
@@ -342,47 +347,23 @@ class DailyContributionDailog(GaM_Dialog):
         max_ = self.maxNum()
         
         self.ledgerNumber.B.configure(from_=1, to=max_ or 1, increment=1)
-    
-    def decreaseClientNumber(self, e=0):
-    
-        if e.widget in [self.account.B, self.contributed.B]: return
 
-        get = self.ledgerNumber.get() or 0
-        get = int(float(get))
+    def clientNumberChanged(self, e=0):  self.after(10, self._clientNumberChanged)
+
+    def getAccount(self):
         
-        if get == 0: val = self.maxNum()
-        elif get: val = get - 1
-        else: val = 1
-        
-        if e.widget != self.ledgerNumber.B: self.ledgerNumber.B.set(val)
-        self.ledgerNumber.B.event_generate('<<Decrement>>')
-
-    def increaseClientNumber(self, e=0):
-        if e.widget in [self.account.B, self.contributed.B]: return
-
-        maxNum = self.maxNum()
-        get = self.ledgerNumber.get() or maxNum
-        get = int(float(get))
-        val = maxNum
-
-        if get == maxNum: val = 1
-        else: val = get + 1
-        
-        if e.widget != self.ledgerNumber.B: self.ledgerNumber.B.set(val)
-
-        self.ledgerNumber.B.event_generate('<<Increment>>')
-
-    def clientNumberChanged(self, e=None):
-        if e.widget in [self.account.B, self.contributed.B]: return
-
-        num = self.ledgerNumber.get()
-        if num == None: return
         if not self._account:
             PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
             return
+        return self._account
+    
+    def _clientNumberChanged(self):
+        get = self.ledgerNumber.get()
+        num = int(float(get))
+        
+        account = self.getAccount()
 
-        num = int(num)
-        clientAccount = self._account.getClientAccount(num)
+        clientAccount = account.getClientAccount(num)
         
         if clientAccount:
             self._clientAccount = clientAccount
@@ -398,6 +379,30 @@ class DailyContributionDailog(GaM_Dialog):
             self.dcContrib.addBTO(bto)
             self.totals._refresh()
         except AssertionError as error: PRMP_MsgBox(self, title=error.__class__.__name__, message=error, ask=0)
+
+    def addNewClient(self):
+        account = self.getAccount()
+        if account:
+            # open a dialog for this purose
+            pass
+    
+    def addNewClientAccount(self):
+        account = self.getAccount()
+        if account:
+            # open a dialog for this purose
+            pass
+
+    def _addNewClient(self):
+        account = self.getAccount()
+        if account:
+            # open a dialog for this purose
+            pass
+    
+    def _addNewClientAccount(self):
+        account = self.getAccount()
+        if account:
+            # open a dialog for this purose
+            pass
 
 
 class PlotDialog(GaM_Dialog):

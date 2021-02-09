@@ -14,7 +14,11 @@ class Records(Object, list):
     def subs(self): return list(self)
 
 
-class Thrift(Object):
+class Common: col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
+
+
+
+class Thrift(Object, Common):
     Manager = 'DailyContribution'
     
     def __init__(self, manager, clientAccount=None, income=0, money=False, paidout=0, transfer=0, **kwargs):
@@ -148,15 +152,16 @@ class Thrift(Object):
     def delete(self):
         self.deleteRecords()
         self.manager.removeSub(self)
+    
+    @property
+    def datas(self): return self[self.col_attr]
 
 
-class DailyContribution(ObjectsManager):
+class DailyContribution(ObjectsManager, Common):
     Manager = 'DailyContributionsManager'
     ObjectType = Thrift
     MultipleSubsPerMonth = True
     subTypes = ['Thrifts']
-    
-    col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
     
     def __init__(self, manager, date=None, previous=None, number=0):
         super().__init__(manager, date=date, previous=previous)
@@ -167,35 +172,55 @@ class DailyContribution(ObjectsManager):
     @property
     def lastMonths(self):
         thrifts = [thf for thf in self if thf.account.date.monthYearTuple < self.date.monthYearTuple]
-        return sum([thrift.income for thrift in thrifts])
+        return thrifts
     @property
     def currentMonths(self):
         thrifts = [thf for thf in self if thf.account.date.monthYearTuple == self.date.monthYearTuple]
-        return sum([thrift.income for thrift in thrifts])
+        return thrifts
     @property
     def nextMonths(self):
         thrifts = [thf for thf in self if thf.account.date.monthYearTuple > self.date.monthYearTuple]
-        return sum([thrift.income for thrift in thrifts])
+        return thrifts
+    
+    @property
+    def lastMonthIncome(self): return sum(self.lastMonths)
+    @property
+    def currentMonthIncome(self): return sum(self.currentMonths)
+    @property
+    def nextMonthIncome(self): return sum(self.nextMonths)
+    
     @property
     def accounts(self): return len(self)
+    
+    @property
+    def contributed(self): return sum([thrift.contributed for thrift in self.thrifts])
+
     @property
     def cash(self): return sum([thrift.cash for thrift in self.thrifts])
+    
     @property
     def transfer(self): return sum([thrift.transfer for thrift in self.thrifts])
+    
     @property
     def paidout(self): return sum([thrift.paidout for thrift in self.thrifts])
+    
     @property
     def income(self): return sum([thrift.income for thrift in self.thrifts])
+    
     @property
     def saved(self): return sum([thrift.saved for thrift in self.thrifts])
+
     @property
     def upfrontRepay(self): return sum([thrift.upfrontRepay for thrift in self.thrifts])
+    
     @property
     def bto(self): return self.__bto
+    
     @property
     def excess(self):
         if self.bto > self.income: return self.bto - self.income
         return 0
+        
     @property
     def deficit(self):
         if self.bto < self.income: return self.income - self.bto
@@ -244,12 +269,13 @@ class DailyContribution(ObjectsManager):
         pass
 
     def addBTO(self, bto): self.__bto = bto
+    addBto = addBTO
 
     def update(self):
         for sub in self: sub.updateRecords()
     
     @property
-    def subsDatas(self): return [sub[self.col_attr] for sub in self]
+    def subsDatas(self): return [sub.datas for sub in self]
 
 
 class DailyContributionsManager(ObjectsManager):
@@ -259,6 +285,9 @@ class DailyContributionsManager(ObjectsManager):
 
     @property
     def region(self): return self.master
+
+    @property
+    def dailyContributions(self): return self.subs
     
     @property
     def name(self): return f'{self.className}({self.master.name})'

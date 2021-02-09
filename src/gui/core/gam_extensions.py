@@ -18,6 +18,9 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
     from .gam_apps import RegionHome, AccountHome, ManagerHome
 
+    _kwargs = kwargs.copy()
+    kwargs = _kwargs
+
     if obj:
         window = ManagerHome
         if not kwargs.get('title'): kwargs.update(dict(title=obj.name))
@@ -36,9 +39,6 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
         elif isinstance(obj, Person):
             window = PersonDialog
             if not create: kwargs.update(person=obj)
-        elif isinstance(obj, ObjectsManager):
-            window = ManagerHome
-            if not create: kwargs.update(title=f'{obj.name} Subscripts Details', obj=obj)
         elif isinstance(obj, Thrift):
             if not create:
                 window = ThriftDetailsDialog if not edit else ThriftDialog
@@ -46,10 +46,14 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
             else: window = ThriftDialog
         
         elif isinstance(obj, DailyContribution):
+            # print('true')
             if not create:
                 window = DailyContributionDailog
-                kwargs.update(title=obj.name, thrift=obj)
+                kwargs.update(title=obj.name, dcContrib=obj)
             else: window = ThriftDialog
+
+        elif isinstance(obj, ObjectsManager):
+            if not create: kwargs.update(title=f'{obj.name} Subscripts Details', obj=obj)
         
         else: kwargs.update(obj=obj)
 
@@ -65,7 +69,7 @@ class TreeColumns:
                 
         elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
         
-        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 50}, {'text': 'Name', 'attr': 'regionName', 'width': 150}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'contributions', 'type': int}]
+        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 150}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'contributions', 'type': int}]
         
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 

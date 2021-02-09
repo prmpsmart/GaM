@@ -387,9 +387,9 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
 
         PRMP_Separator(self, place=dict(relx=.002, rely=.185, relh=.01, relw=.996))
 
-        self.lastMonths = LabelEntry(self, topKwargs=dict(text='Last Month'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.21, relw=.3, relh=.16), orient='h')
-        self.currentMonths = LabelEntry(self, topKwargs=dict(text='Current'), bottomKwargs=dict(state='readonly'), place=dict(relx=.32, rely=.21, relw=.3, relh=.16), orient='h')
-        self.nextMonths = LabelEntry(self, topKwargs=dict(text='Next'), bottomKwargs=dict(state='readonly'), place=dict(relx=.633, rely=.21, relw=.3, relh=.16), orient='h')
+        self.lastMonthIncome = LabelEntry(self, topKwargs=dict(text='Last Month'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.21, relw=.3, relh=.16), orient='h')
+        self.currentMonthIncome = LabelEntry(self, topKwargs=dict(text='Current'), bottomKwargs=dict(state='readonly'), place=dict(relx=.32, rely=.21, relw=.3, relh=.16), orient='h')
+        self.nextMonthIncome = LabelEntry(self, topKwargs=dict(text='Next'), bottomKwargs=dict(state='readonly'), place=dict(relx=.633, rely=.21, relw=.3, relh=.16), orient='h')
 
         PRMP_Separator(self, place=dict(relx=.002, rely=.395, relh=.01, relw=.996))
 
@@ -409,7 +409,7 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         self.deficit = LabelEntry(self, topKwargs=dict(text='Deficit'), bottomKwargs=dict(state='readonly'), place=dict(relx=.75, rely=.77, relw=.22, relh=.16), orient='h')
         
         PRMP_FillWidgets.__init__(self, dcContrib)
-        self.addResultsWidgets(['lastMonths', 'currentMonths', 'nextMonths', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
+        self.addResultsWidgets(['lastMonthIncome', 'currentMonthIncome', 'nextMonthIncome', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
 
         self._refresh()
     
