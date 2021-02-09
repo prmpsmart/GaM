@@ -347,7 +347,7 @@ class SortDetails(Notebook):
 
 
 class SubsList(LabelFrame):
-    def __init__(self, master, listboxConfig={}, callback=None, totalConfig=dict(text='Total'), **kwargs):
+    def __init__(self, master, listboxConfig={}, callback=None, totalConfig=dict(text='Total'), values=[], valuesKwargs={}, **kwargs):
         super().__init__(master, **kwargs)
         
         self.callback = callback
@@ -359,6 +359,8 @@ class SubsList(LabelFrame):
         self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.125, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
         self.listbox.bind('<Double-1>', self.clicked)
+        
+        if values: self.set(values, **valuesKwargs)
 
     def set(self, values, **kwargs):
         if not values: return

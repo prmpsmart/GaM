@@ -161,6 +161,27 @@ class ThriftDetailsDialog(GaM_Dialog):
         self.set = self.thriftDetail.set
 
 
+class ClientsList(GaM_Dialog):
+    def __init__(self, master=None, area=None, title='Clients List', **kwargs):
+        self._area = area
+        super().__init__(master, title=title, **kwargs)
+    
+    def _setupDialog(self):
+        if self._area:
+            name = self._area.name
+            values = self._area.clientsManager
+            valuesKwargs = dict(showAttr='name')
+        else: name, values, valuesKwargs = '', [], {}
+
+        self.area = LabelLabel(self.container, bottomKwargs=dict(text=self._area.name if self._area else 'Area'), place=dict(relx=0, rely=0, relh=.12, relw=1), orient='h', longent=.3, topKwargs=dict(text='Area'))
+
+        self.clients = SubsList(self.container, callback=self.returnClient, place=dict(relx=0, rely=.12, relh=.88, relw=1), values=values, valuesKwargs=valuesKwargs)
+    
+    def returnClient(self, client):
+        self.destroy()
+        self.callback(client)
+
+
 class DailyContributionDailog(GaM_Dialog):
     
     def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1500, 800), **kwargs):
@@ -191,7 +212,7 @@ class DailyContributionDailog(GaM_Dialog):
         self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.225, relw=.1, relh=.04), command=self.addNewClient)
         self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.225, relw=.15, relh=.04), command=self.addNewClientAccount)
 
-        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.275, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged)
+        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.275, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged, bttk=1)
         
         self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.33, relw=.29, relh=.05), longent=.32, orient='h')
 
@@ -233,8 +254,8 @@ class DailyContributionDailog(GaM_Dialog):
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
     
     def defaults(self):
-        self.bind('<Up>', lambda e: self.ledgerNumber.B.event_generate('<<Increment>>'), '+')
-        self.bind('<Down>', lambda e: self.ledgerNumber.B.event_generate('<<Decrement>>'), '+')
+        # self.bind('<Up>', lambda e: self.ledgerNumber.B.event_generate('<<Increment>>'), '+')
+        # self.bind('<Down>', lambda e: self.ledgerNumber.B.event_generate('<<Decrement>>'), '+')
 
         self.bind('<Return>', self.addThrift, '+')
         
@@ -257,9 +278,9 @@ class DailyContributionDailog(GaM_Dialog):
 
     def getThriftDetails(self): return self.get(self.thriftWidgets)
 
-    def update(self):
+    def update(self, e=0):
         if not self.dcContrib: return
-        if self._account: self.ledgerNumber.B.config(to=len(self._account), from_=1)
+        if self._account: self.setClientNumbers()
 
         self.contributed.B.config(to=len(self.dcContrib), from_=1)
         self.date.set(self.dcContrib.date.date)
@@ -350,18 +371,23 @@ class DailyContributionDailog(GaM_Dialog):
 
     def clientNumberChanged(self, e=0):  self.after(10, self._clientNumberChanged)
 
-    def getAccount(self):
-        
-        if not self._account:
-            PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
-            return
-        return self._account
+    def getSomething(self, area=0):
+        if not area:
+            if not self._account:
+                PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
+                return
+            return self._account
+        else:
+            if not self._area:
+                PRMP_MsgBox(self, title='No Area', message=f'An area has not been given.', ask=0, _type='error')
+                return
+            return self._area
     
     def _clientNumberChanged(self):
         get = self.ledgerNumber.get()
         num = int(float(get))
         
-        account = self.getAccount()
+        account = self.getSomething()
 
         clientAccount = account.getClientAccount(num)
         
@@ -381,28 +407,26 @@ class DailyContributionDailog(GaM_Dialog):
         except AssertionError as error: PRMP_MsgBox(self, title=error.__class__.__name__, message=error, ask=0)
 
     def addNewClient(self):
-        account = self.getAccount()
-        if account:
-            # open a dialog for this purose
-            pass
+        area = self.getSomething(1)
+        if area: ClientDialog(self, manager=area.clientsManager, callback=self.update)
     
     def addNewClientAccount(self):
-        account = self.getAccount()
-        if account:
-            # open a dialog for this purose
-            pass
-
-    def _addNewClient(self):
-        account = self.getAccount()
-        if account:
-            # open a dialog for this purose
-            pass
+        area = self.getSomething(1)
+        if area: ClientsList(self, area=area, callback=self._addNewClientAccount)
     
-    def _addNewClientAccount(self):
-        account = self.getAccount()
+    def _addNewClientAccount(self, client):
+        if client: ClientAccountDialog(self, manager=client.accountsManager, callback=self._finalNewClientAccount)
+    
+    def _finalNewClientAccount(self, account):
+        self.update()
         if account:
-            # open a dialog for this purose
-            pass
+            name = account.month.monthYear
+            client = account.region.name
+            ledgerNumber = account.ledgerNumber
+
+            text= f'Account of month: {name}\nClient name: {client}\nLedger Number: {ledgerNumber}\nhas just been created.'
+
+            PRMP_MsgBox(self, title='Account creaetion is successful.', message=text, ask=0, delay=0)
 
 
 class PlotDialog(GaM_Dialog):

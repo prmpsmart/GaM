@@ -32,8 +32,8 @@ class DC_RegionHome(TreeColumns, RegionHome):
             self.overview.updateDCDigits(self.region.lastAccount)
     
     def selectedRegion(self, sub):
-        self.selected(sub)
         self.selectedAccount(sub[-1])
+        self.selected(sub)
 
     def selectedAccount(self, account):
         self.selected(account)

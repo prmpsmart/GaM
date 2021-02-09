@@ -166,7 +166,7 @@ class AccountDialog(GaM_Dialog):
     @property
     def result(self):
         res = super().result
-        if 'month' in res:
+        if isinstance(res, dict) and 'month' in res:
             res['date'] = res['month']
             del res['month']
         return res
