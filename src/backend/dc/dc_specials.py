@@ -14,7 +14,7 @@ class Records(Object, list):
     def subs(self): return list(self)
 
 
-class Common: col_attr = [{'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
+class Common: col_attr = ['number', {'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
 
 
 
@@ -116,6 +116,9 @@ class Thrift(Object, Common):
 
     @property
     def contributions(self): return self.clientAccount.contributions
+
+    @property
+    def newContributions(self): return float(self.contributions) + self.contributed
 
     @property
     def regionName(self): return self.region.name

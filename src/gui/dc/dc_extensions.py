@@ -273,9 +273,9 @@ class ThriftDetailPart(PRMP_FillWidgets, Frame):
 
         PRMP_Separator(self, place=dict(relx=.005, rely=.785, relh=.005, relw=.99))
 
-        self.uniqueID = LabelEntry(self, topKwargs=dict(text='Unique ID'), place=dict(relx=.005, rely=.799, relh=.2, relw=.99), bottomKwargs=dict(state='readonly', placeholder='Unique ID here.'))
+        # self.uniqueID = LabelEntry(self, topKwargs=dict(text='Unique ID'), place=dict(relx=.005, rely=.799, relh=.2, relw=.99), bottomKwargs=dict(state='readonly', placeholder='Unique ID here.'))
 
-        self.addResultsWidgets(['contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'uniqueID', 'cash'])
+        self.addResultsWidgets(['contributed', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
 
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
@@ -306,18 +306,27 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.get = self.detailsPart.get
         self.set = self.detailsPart.set
 
-        PRMP_Separator(self, place=dict(relx=.005, rely=.755, relh=.005, relw=.99))
 
-        records = LabelFrame(self, text='Records', place=dict(relx=.005, rely=.765, relw=.99, relh=.23))
+        records = LabelFrame(self, text='Records', place=dict(relx=.005, rely=.605, relw=.99, relh=.25))
 
-        self.contRecord = Button(records, text='Contribution', place=dict(relx=.005, rely=.005, relh=.25, relw=.4), command=self.openContRecord)
-        self.conTranRecord = Button(records, text='ConTransfer', place=dict(relx=.005, rely=.3, relh=.25, relw=.4), command=self.openConTranRecord)
-        self.tranRecord = Button(records, text='Transfer', place=dict(relx=.005, rely=.6, relh=.25, relw=.4), command=self.openTranRecord)
-        self.debRecord = Button(records, text='Debit', place=dict(relx=.55, rely=.005, relh=.25, relw=.4), command=self.openDebRecord)
-        self.paidoutRecord = Button(records, text='Paidout', place=dict(relx=.55, rely=.3, relh=.25, relw=.4), command=self.openPaidoutRecord)
+        self.contRecord = Button(records, text='Contribution', place=dict(relx=.005, rely=.005, relh=.3, relw=.4), command=self.openContRecord)
+        self.conTranRecord = Button(records, text='ConTransfer', place=dict(relx=.005, rely=.345, relh=.3, relw=.4), command=self.openConTranRecord)
+        self.tranRecord = Button(records, text='Transfer', place=dict(relx=.005, rely=.685, relh=.3, relw=.4), command=self.openTranRecord)
 
-        self.updateBtn = Button(records, text='Update', place=dict(relx=.56, rely=.6, relh=.25, relw=.4), command=self.openThrift)
+        self.debRecord = Button(records, text='Debit', place=dict(relx=.55, rely=.005, relh=.3, relw=.4), command=self.openDebRecord)
+        self.paidoutRecord = Button(records, text='Paidout', place=dict(relx=.55, rely=.345, relh=.3, relw=.4), command=self.openPaidoutRecord)
+        self.editBtn = Button(records, text='Edit', place=dict(relx=.55, rely=.685, relh=.3, relw=.4), command=self.openThrift)
+
+        self.updateBtn = Button(self, text='Update', place=dict(relx=.005, rely=.88, relh=.07, relw=.4), command=self.updateThriftRecords)
+
+        self.uniqueIDBtn = UniqueID(self, place=dict(relx=.55, rely=.88, relh=.07, relw=.4), obj=self.thrift)
+
+    def updateThriftRecords(self): PRMP_MsgBox(self, title='Confirmation', message='Are you sure to update the records of this thrift?', callback=self._updateThriftRecords, ask=1)
     
+    def _updateThriftRecords(self, w):
+        if w and self.thrift: self.thrift.updateRecords()
+        self.loadOtherObjects()
+
     def loadOtherObjects(self):
         if self.thrift:
             self._account = self.thrift.account
@@ -332,38 +341,47 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
     def openManager(self):
         if self._manager:
             from .dc_dialogs import DailyContributionDailog
-            DailyContributionDailog(self, dailyContribution=self._manager)
+            DailyContributionDailog(self, dcContrib=self._manager)
+    
     def openAccount(self):
         if self._account:
-            from .dc_dialogs import AccountDetailsDailog
-            AccountDetailsDailog(self, dailyContribution=self._account)
+            from .dc_apps import DC_AccountHome
+            DC_AccountHome(account=self._account, tm=1, tw=0, resize=(1,1))
+    
     def openContRecord(self):
         if self._contRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._contRecord)
+    
     def openPaidoutRecord(self):
         if self._paidoutRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._paidoutRecord)
+    
     def openTranRecord(self):
         if self._tranRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._tranRecord)
+    
     def openConTranRecord(self):
         if self._conTranRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._conTranRecord)
+    
     def openDebRecord(self):
         if self._debRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._debRecord)
+    
     def openThrift(self):
         from .dc_dialogs import ThriftDialog
         self.thriftDialog = ThriftDialog(self, thrift=self.thrift, callback=self.update)
+    
     def changeStates(self, r=0):
         for rw in [self.getFromSelf(w) for w in self.resultsWidgets]:
             if r: rw.readonly()
             else: rw.normal()
+    
     def update(self, thrift):
         if thrift is self.thrift:
             self.changeStates()

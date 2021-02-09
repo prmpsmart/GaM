@@ -2704,7 +2704,7 @@ class PRMP_TreeView(PRMP_Frame):
     def updateHeading(self):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
-            self.column(column.index, width=column.width, minwidth=80, stretch=1,  anchor="center")
+            self.column(column.index, width=column.width, stretch=1,  anchor="center")#, minwidth=80)
     
     def _set(self, obj=None, parent='', subs='subs', op=1):
         name, *columns = self.columns.get(obj)

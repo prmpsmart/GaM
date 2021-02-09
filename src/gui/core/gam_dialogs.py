@@ -153,8 +153,10 @@ class AccountDialog(GaM_Dialog):
         self.addEditButton()
         
         self.month = LabelMonthYearButton(self.container, topKwargs=dict(config=dict(text='Month')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4)
+        
+        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.005, y=55, h=40, relw=.8), orient='h', longent=.4)
 
-        self.addResultsWidgets('month')
+        self.addResultsWidgets(['month', 'date'])
     
     def action(self):
         if self.result:
@@ -163,13 +165,13 @@ class AccountDialog(GaM_Dialog):
         
             elif self.manager: PRMP_MsgBox(self, title='Account Creation', message='Are you sure to create a new account?', _type='question', callback=self.newAccount)
             else: PRMP_MsgBox(self, title='Account Dialog Error', message='No Account or Manager is given.', _type='error', ask=0)
-    @property
-    def result(self):
-        res = super().result
-        if isinstance(res, dict) and 'month' in res:
-            res['date'] = res['month']
-            del res['month']
-        return res
+    # @property
+    # def result(self):
+    #     res = super().result
+    #     if isinstance(res, dict) and 'month' in res:
+    #         res['date'] = res['month']
+    #         del res['month']
+    #     return res
         
     def updateAccount(self, w):
         if w: self.account.update(self.result)

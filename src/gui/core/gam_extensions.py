@@ -14,7 +14,7 @@ from ...backend.office.office_regions import *
 
 def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
-    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog, DC_Office
+    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog, DC_Office, ClientAccountDialog, ClientAccount
 
     from .gam_apps import RegionHome, AccountHome, ManagerHome
 
@@ -31,7 +31,10 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
             if not create: kwargs.update(region=obj)
 
         elif isinstance(obj, DCAccount):
-            window = DC_AccountHome
+            if edit:
+                if isinstance(obj, ClientAccount): window = ClientAccountDialog
+                else: window = AccountDialog
+            else: window = DC_AccountHome
             if not create: kwargs.update(account=obj)
         elif isinstance(obj, Record):
             window = RecordDialog
@@ -65,11 +68,11 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 class TreeColumns:
     @staticmethod
     def columns(sup):
-        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
                 
-        elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': int}, {'text': 'Note', 'width': 200}]
+        elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
         
-        elif isinstance(sup, (DailyContribution)): return [{'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 150}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'contributions', 'type': int}]
+        elif isinstance(sup, (DailyContribution)): return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
         
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 

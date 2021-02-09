@@ -45,8 +45,10 @@ class DC_RegionHome(TreeColumns, RegionHome):
 
 
 class DC_AccountHome(TreeColumns, AccountHome):
+
     def _setupApp(self):
         super()._setupApp()
+        # print('here')
 
         self.recordsManagers.callback = self.selectedRecordsManager
 

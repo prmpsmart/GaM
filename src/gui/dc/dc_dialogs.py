@@ -91,7 +91,7 @@ class ClientAccountDialog(AccountDialog):
         super()._setupDialog()
         self.addEditButton()
         
-        self.rate = LabelEntry(self.container, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='money'),orient='h', place=dict(relx=.005, y=52, h=40, relw=.8), longent=.4)
+        self.rate = LabelEntry(self.container, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='money'),orient='h', place=dict(relx=.005, y=100, h=40, relw=.8), longent=.4)
         
         self.addResultsWidgets('rate')
 
@@ -149,7 +149,7 @@ class ThriftDialog(GaM_Dialog):
 
 
 class ThriftDetailsDialog(GaM_Dialog):
-    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, geo=(350, 550), values={}, **kwargs):
+    def __init__(self, master=None, title='Thrift Details Dialog', thrift=None, geo=(450, 650), values={}, **kwargs):
         self.thrift = thrift
         self.values = values
         super().__init__(master, geo=geo, title=title, **kwargs)
@@ -209,12 +209,16 @@ class DailyContributionDailog(GaM_Dialog):
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.19, relh=.005, relw=.29))
 
-        self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.225, relw=.1, relh=.04), command=self.addNewClient)
-        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.225, relw=.15, relh=.04), command=self.addNewClientAccount)
+        self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.205, relw=.1, relh=.04), command=self.addNewClient)
+        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.205, relw=.15, relh=.04), command=self.addNewClientAccount)
 
-        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.275, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged, bttk=1)
+        self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.255, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged, bttk=1)
         
-        self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.33, relw=.29, relh=.05), longent=.32, orient='h')
+        self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.31, relw=.27, relh=.05), longent=.32, orient='h')
+
+        self.rate = LabelLabel(self.container, topKwargs=dict(text='Cl. Rate'), place=dict(relx=.005, rely=.361, relw=.1, relh=.05), orient='h')
+        
+        self.clientMonth = LabelLabel(self.container, topKwargs=dict(text='Cl. Month'), place=dict(relx=.13, rely=.361, relw=.15, relh=.05), orient='h')
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.412, relh=.005, relw=.29))
 
@@ -290,7 +294,7 @@ class DailyContributionDailog(GaM_Dialog):
 
     def openArea(self): pass
 
-    def processInput(self):
+    def processInput(self, e=0):
         pass
 
     def getDel(self):
@@ -343,13 +347,14 @@ class DailyContributionDailog(GaM_Dialog):
 
     def _addThrift(self, e=0):
         thriftDetails = self.getThriftDetails()
-        try: assert self._account == thriftDetails['account'], 'No area account is selected.'
-        except AssertionError:
-            PRMP_MsgBox(self, title='Account Error', message='No area account is selected.', ask=0, _type='error')
+        try:
+            assert self._account is thriftDetails['account'], 'No area account is selected.'
+        except AssertionError as e:
+            PRMP_MsgBox(self, title='Account Error', message=e, ask=0, _type='error')
             return
 
         try: self.dcContrib.createThrift(**thriftDetails)
-        except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error')
+        except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error', delay=5000)
 
         self.update()
         self.emptyWidgets(self.thriftWidgets[:4])
@@ -359,7 +364,7 @@ class DailyContributionDailog(GaM_Dialog):
         return []
 
     def setAreaAccountDependents(self, e=None):
-        self._account = self.account.B.getObj()
+        self._account = self.account.get()
         self.setClientNumbers()
 
     def maxNum(self): return len(self.getClientsAccounts())
@@ -374,12 +379,12 @@ class DailyContributionDailog(GaM_Dialog):
     def getSomething(self, area=0):
         if not area:
             if not self._account:
-                PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
+                # PRMP_MsgBox(self, title='No Area Account', message=f'An area account has not been choosen.', ask=0, _type='error')
                 return
             return self._account
         else:
             if not self._area:
-                PRMP_MsgBox(self, title='No Area', message=f'An area has not been given.', ask=0, _type='error')
+                # PRMP_MsgBox(self, title='No Area', message=f'An area has not been given.', ask=0, _type='error')
                 return
             return self._area
     
@@ -388,20 +393,23 @@ class DailyContributionDailog(GaM_Dialog):
         num = int(float(get))
         
         account = self.getSomething()
+        if not account: return
 
         clientAccount = account.getClientAccount(num)
         
         if clientAccount:
             self._clientAccount = clientAccount
             self.clientName.set(self._clientAccount.region.name)
+            self.rate.set(self._clientAccount.rate)
+            self.clientMonth.set(self._clientAccount.month.monthYear)
         else:
             self._clientAccount = None
-            PRMP_MsgBox(self, title='Not Found', message=f'No Client with account\'s ledger number = {num}.', ask=0, _type='error')
+            # PRMP_MsgBox(self, title='Not Found', message=f'No Client with account\'s ledger number = {num}.', ask=0, _type='error')
 
     def addBTO(self):
         bto = self.bto.get()
         try:
-            assert bto, 'Brought to office cannot be less than 0'
+            assert bto > 0, 'Brought to office cannot be less than 0'
             self.dcContrib.addBTO(bto)
             self.totals._refresh()
         except AssertionError as error: PRMP_MsgBox(self, title=error.__class__.__name__, message=error, ask=0)
@@ -426,7 +434,7 @@ class DailyContributionDailog(GaM_Dialog):
 
             text= f'Account of month: {name}\nClient name: {client}\nLedger Number: {ledgerNumber}\nhas just been created.'
 
-            PRMP_MsgBox(self, title='Account creaetion is successful.', message=text, ask=0, delay=0)
+            PRMP_MsgBox(self, title='Account creation is successful.', message=text, ask=0, delay=0)
 
 
 class PlotDialog(GaM_Dialog):
