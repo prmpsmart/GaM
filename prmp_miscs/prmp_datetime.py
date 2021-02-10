@@ -229,6 +229,10 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     date_fmt = "%d/%m/%Y"
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
     Errors = PRMP_Errors.PRMP_DateTimeError
+
+    timedelta = datetime.timedelta
+
+
     # the __add__ and __sub__ are implementaions are purely by PRMPSmart@gmail.com
 
     def __getitem__(self, item):
@@ -237,7 +241,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         return PRMP_Mixins.__getitem__(self, item)
 
     def __add__(self, add_month):
-        if isinstance(add_month, datetime.timedelta): return self.createDateTime(obj=super().__add__(add_month))
+        if isinstance(add_month, self.timedelta): return self.createDateTime(obj=super().__add__(add_month))
 
         elif isinstance(add_month, int):
             months = self.month + add_month
@@ -256,7 +260,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
                 return self.createDateTime(self.year + div, mod, self.day)
 
     def __sub__(self, sub_month):
-        if isinstance(sub_month, datetime.timedelta): return self.createDateTime(obj=super().__sub__(sub_month))
+        if isinstance(sub_month, self.timedelta): return self.createDateTime(obj=super().__sub__(sub_month))
 
         elif isinstance(sub_month, self.__class__): return self.diffInMonth(sub_month)
         elif isinstance(sub_month, int):
@@ -426,6 +430,8 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     def isSameDay(self, date): return self.day == date.day
 
+    def isSameDayName(self, date): return self.dayName == date.dayName
+
     def isSameYear(self, date): return self.year == date.year
 
     def isSameMonth(self, date): return self.month == date.month
@@ -498,7 +504,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def getDate(cls, status=0, form=1, day_=0):
 
         now = cls.now()
-        days = datetime.timedelta(status)
+        days = cls.timedelta(status)
         day = now + days
 
         if form == 0: fmt = "%D"

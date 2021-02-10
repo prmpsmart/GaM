@@ -250,7 +250,7 @@ class ObjectSort(Mixins):
         return objects
 
     def sortSubsBySeasons(self, date, seasons=[], attr='date', **kwargs):
-        _types = {'year': 'isSameYear', 'month': 'isSameMonth', 'week': 'isSameWeek', 'day': 'isSameDay', 'date': 'isSameDate'}
+        _types = {'year': 'isSameYear', 'month': 'isSameMonth', 'week': 'isSameWeek', 'day': 'isSameDay', 'date': 'isSameDate', 'dayName': 'isSameDayName'}
 
         validations = []
 

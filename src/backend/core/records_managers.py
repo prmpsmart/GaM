@@ -342,7 +342,7 @@ class RecordsManager(ObjectsManager):
     #Day Sorting
     def sortRecordsByDay(self, date):
         recs = self.sortSubsByDay(date)
-        return RecordsWithSameSeasons(recs, date.dayName)
+        if recs: return RecordsWithSameSeasons(recs, date.dayName)
 
     def sortRecordsIntoDaysInWeek(self, week):
         days = self.sortSubsIntoDaysInWeek(week)
