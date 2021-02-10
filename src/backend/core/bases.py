@@ -223,7 +223,18 @@ class ObjectSort(Mixins):
 
         return objects
 
-    def search(self, _type=None, className='ObjectsMixins', value=None, attr='', searchType='', allSubs=False, object_=None, validations=[], instance=None):
+    def sortSubsBySeasons(self, date, seasons=[], attr='date', **kwargs):
+        _types = {'year': 'isSameYear', 'month': 'isSameMonth', 'week': 'isSameWeek', 'day': 'isSameDay', 'date': 'isSameDate'}
+
+        validations = []
+
+        for season in seasons:
+            validation = dict(value=True, attrMethod=_types[season], attr=attr, attrMethodParams=[date])
+            validations.append(validation)
+
+        return self.sort(validations=validations, **kwargs)
+
+    def search(self, _type=None, value=None, attr='', searchType='', allSubs=False, object_=None, validations=[], instance=None):
         results = []
         subs = []
 
