@@ -2,7 +2,7 @@ from ..core.gam_dialogs import *
 from .dc_extensions import *
 
 class ClientDialog(PersonDialog):
-    
+
     def __init__(self, master=None, title='New Client Dialog', manager=None, client=None, geo=(550, 500), **kwargs):
         self.client = client
         self.manager = manager
@@ -11,19 +11,19 @@ class ClientDialog(PersonDialog):
                 kwargs['person'] = client
                 self.manager = self.client.manager
         super().__init__(master=master, title=title, geo=geo, manager=self.manager, **kwargs)
-    
+
     def _setupDialog(self):
         super()._setupDialog()
 
         clientDetails = PRMP_LabelFrame(self, config=dict(text='Client Details'))
         clientDetails.place(x=2, y=290, h=100, relw=.35)
-        
+
         self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number'),orient='h', place=dict(relx=.02, rely=0, relh=.45, relw=.8), longent=.45)
-        
+
         self.cardDue = PRMP_Checkbutton(clientDetails, text='Card Due', place=dict(relx=.02, rely=.5, relh=.45, relw=.8))
 
         self.addResultsWidgets(['rate', 'cardDue'])
-    
+
     def action(self, e=0):
         # print(self.result)
         if self.result:
@@ -50,7 +50,7 @@ class AreaDialog(GaM_Dialog):
         self.manager = manager
 
         super().__init__(master, geo=(350, 300), values=area, title=title, **kwargs)
-    
+
     def _setupDialog(self):
         self.addEditButton()
         # name readonly
@@ -63,11 +63,11 @@ class AreaDialog(GaM_Dialog):
         # unique_id
         UniqueID(self.container, place=dict(relx=.5, rely=.5, relw=.35, relh=.12), obj=self.area)
         self.addResultsWidgets(['name', 'date'])
-        
+
     def action(self):
         if self.result:
             if self.area: PRMP_MsgBox(self, title='Edit Area Details', message='Are you sure to edit the details of this area?', _type='question', callback=self.updateArea)
-            
+
             elif self.manager: PRMP_MsgBox(self, title='area Creation', message='Are you sure to create a new area?', _type='question', callback=self.newArea)
 
             else: PRMP_MsgBox(self, title='Area Dialog Error', message='No Area or Manager is given.', _type='error', ask=0)
@@ -90,9 +90,9 @@ class ClientAccountDialog(AccountDialog):
     def _setupDialog(self):
         super()._setupDialog()
         self.addEditButton()
-        
+
         self.rate = LabelEntry(self.container, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='money'),orient='h', place=dict(relx=.005, y=100, h=40, relw=.8), longent=.4)
-        
+
         self.addResultsWidgets('rate')
 
 
@@ -109,7 +109,7 @@ class ThriftDialog(GaM_Dialog):
 
         self.get = self.thrifts.get
         self.set = self.thrifts.set
-        
+
         for k in self.thrifts.resultsWidgets: self.__dict__[k] = self.thrifts.__dict__[k]
 
         self.addResultsWidgets(self.thrifts.resultsWidgets)
@@ -126,10 +126,10 @@ class ThriftDialog(GaM_Dialog):
     def action(self):
         if self.result:
             if self.thrift: PRMP_MsgBox(self, title='Edit thrift Details', message='Are you sure to edit the details of this thrift?', _type='question', callback=self.updateThrift)
-            
+
             elif self.manager: PRMP_MsgBox(self, title='Thrift Creation', message='Are you sure to create a new Thrift?', _type='question', callback=newThrift)
             else: PRMP_MsgBox(self, title='Thrift Dialog Error', message='No Thrift or Manager is given.', _type='error', ask=0)
-    
+
     def updateThrift(self, w):
         if w:
             try:
@@ -138,7 +138,7 @@ class ThriftDialog(GaM_Dialog):
 
             except Exception as error: PRMP_MsgBox(self, title='Thrift Update Error', message=error, _type='error', ask=0)
         self.destroyDialog()
-    
+
     def newThrift(self, w):
         if w:
             try:
@@ -156,7 +156,7 @@ class ThriftDetailsDialog(GaM_Dialog):
 
     def _setupDialog(self):
         self.thriftDetail = ThriftDetail(self.container, place=dict(relx=.02, rely=.005, relh=.99, relw=.96), thrift=self.thrift, values=self.values)
-        
+
         self.get = self.thriftDetail.get
         self.set = self.thriftDetail.set
 
@@ -165,7 +165,7 @@ class ClientsList(GaM_Dialog):
     def __init__(self, master=None, area=None, title='Clients List', **kwargs):
         self._area = area
         super().__init__(master, title=title, **kwargs)
-    
+
     def _setupDialog(self):
         if self._area:
             name = self._area.name
@@ -176,21 +176,21 @@ class ClientsList(GaM_Dialog):
         self.area = LabelLabel(self.container, bottomKwargs=dict(text=self._area.name if self._area else 'Area'), place=dict(relx=0, rely=0, relh=.12, relw=1), orient='h', longent=.3, topKwargs=dict(text='Area'))
 
         self.clients = SubsList(self.container, callback=self.returnClient, place=dict(relx=0, rely=.12, relh=.88, relw=1), values=values, valuesKwargs=valuesKwargs)
-    
+
     def returnClient(self, client):
         self.destroy()
         self.callback(client)
 
 
 class DailyContributionDailog(GaM_Dialog):
-    
+
     def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1500, 800), **kwargs):
         self.dcContrib = dcContrib
         super().__init__(master, title=title, geo=geo, **kwargs)
-    
+
     def changeDate(self, date):
         if date: self.totals.date.set(date.date)
-    
+
     def _placeSubmitButton(self):
         x, y = self.containerGeo
         self.submitBtn.place(x=120 , y=y-40, h=30, w=60)
@@ -204,20 +204,20 @@ class DailyContributionDailog(GaM_Dialog):
 
         self.account = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.06, relw=.2, relh=.1), longent=.4, func=self.setAreaAccountDependents)
         self.account.get = self.account.B.getObj
-        
+
         self.month = LabelMonthYearButton(self.container, topKwargs=dict(text='Month'), place=dict(relx=.21, rely=.06, relw=.08, relh=.1), longent=.4)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.19, relh=.005, relw=.29))
 
-        self.newClient = Button(self.container, text='New Client', place=dict(relx=.007, rely=.205, relw=.1, relh=.04), command=self.addNewClient)
-        self.newClientAccount = Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.205, relw=.15, relh=.04), command=self.addNewClientAccount)
+        Button(self.container, text='New Client', place=dict(relx=.007, rely=.205, relw=.1, relh=.04), command=self.addNewClient)
+        Button(self.container, text='New Client Account', place=dict(relx=.11, rely=.205, relw=.15, relh=.04), command=self.addNewClientAccount)
 
         self.ledgerNumber = LabelSpin(self.container, topKwargs=dict(text='Ledger Number'), place=dict(relx=.005, rely=.255, relw=.25, relh=.05), longent=.43, orient='h', func=self.clientNumberChanged, bttk=1)
-        
+
         self.clientName = LabelLabel(self.container, topKwargs=dict(text='Client Name'), place=dict(relx=.005, rely=.31, relw=.27, relh=.05), longent=.32, orient='h')
 
         self.rate = LabelLabel(self.container, topKwargs=dict(text='Cl. Rate'), place=dict(relx=.005, rely=.361, relw=.1, relh=.05), orient='h')
-        
+
         self.clientMonth = LabelLabel(self.container, topKwargs=dict(text='Cl. Month'), place=dict(relx=.13, rely=.361, relw=.15, relh=.05), orient='h')
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.412, relh=.005, relw=.29))
@@ -230,23 +230,23 @@ class DailyContributionDailog(GaM_Dialog):
         self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.57, relh=.05, relw=.14))
 
         self.ready = Checkbutton(self.container, text='Ready?', place=dict(relx=.2, rely=.525, relh=.04, relw=.07))
-        self.addThriftBtn = Button(self.container, text='Add Thrift', place=dict(relx=.18, rely=.575, relh=.04, relw=.09), command=self.addThrift)
+        Button(self.container, text='Add Thrift', place=dict(relx=.18, rely=.575, relh=.04, relw=.09), command=self.addThrift)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.663, relh=.005, relw=.29))
 
         self.contributed = LabelSpin(self.container, topKwargs=dict(text='Contributed'), place=dict(relx=.005, rely=.685, relw=.22, relh=.05), orient='h', longent=.4, bttk=1)
 
-        self.delete = Button(self.container, text='Delete', place=dict(relx=.23, rely=.685, relw=.06, relh=.04), command=self.deleteThrift)
+        Button(self.container, text='Delete', place=dict(relx=.23, rely=.685, relw=.06, relh=.04), command=self.deleteThrift)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.765, relh=.005, relw=.29))
 
         self.bto = LabelEntry(self.container, topKwargs=dict(text='Brought To Office'), place=dict(relx=.005, rely=.8, relw=.2, relh=.05), orient='h', longent=.6, bottomKwargs=dict(placeholder='Enter B-T-O', _type='money'))
 
-        self.addBto = Button(self.container, text='Add B-T-O', place=dict(relx=.21, rely=.805, relw=.08, relh=.04), command=self.addBTO)
+        Button(self.container, text='Add B-T-O', place=dict(relx=.21, rely=.805, relw=.08, relh=.04), command=self.addBTO)
 
         PRMP_Separator(self.container, place=dict(relx=.005, rely=.882, relh=.005, relw=.29))
 
-        self.manUpdate = Button(self.container, text='Update', place=dict(relx=.225, rely=.945, relw=.07, relh=.04), command=self.update)
+        Button(self.container, text='Update', place=dict(relx=.225, rely=.945, relw=.07, relh=.04), command=self.dcUpdate)
 
 
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
@@ -254,20 +254,20 @@ class DailyContributionDailog(GaM_Dialog):
 
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
 
-        self.addResultsWidgets(['area', 'date', 'ledgerNumber', 'clientName', 'month', 'newClientAccount', 'newClient', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'delete', 'bto', 'addBto', 'ready', 'addThriftBtn', 'manUpdate'])
+        self.addResultsWidgets(['date', 'ledgerNumber', 'clientName', 'month', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'bto'])
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
-    
+
     def defaults(self):
         # self.bind('<Up>', lambda e: self.ledgerNumber.B.event_generate('<<Increment>>'), '+')
         # self.bind('<Down>', lambda e: self.ledgerNumber.B.event_generate('<<Decrement>>'), '+')
 
         self.bind('<Return>', self.addThrift, '+')
-        
+
         self.container.bind('<1>', lambda e: self.focus())
 
         self._account = None
         self._clientAccount = None
-        
+
         if self.dcContrib:
             self._area = self.dcContrib.manager.master
             self.account.B.setObjs(self._area, 'name')
@@ -282,6 +282,12 @@ class DailyContributionDailog(GaM_Dialog):
 
     def getThriftDetails(self): return self.get(self.thriftWidgets)
 
+    def dcUpdate(self): PRMP_MsgBox(self, title='Update Confirmation.', message='Are you sure to update this Daily Contribution?', ask=1, callback=self._dcUpdate)
+    def _dcUpdate(self, w):
+        if not w: return
+        self.dcContrib.updateThrifts()
+        self.update()
+
     def update(self, e=0):
         if not self.dcContrib: return
         if self._account: self.setClientNumbers()
@@ -289,10 +295,10 @@ class DailyContributionDailog(GaM_Dialog):
         self.contributed.B.config(to=len(self.dcContrib), from_=1)
         self.date.set(self.dcContrib.date.date)
         self.view.viewSubs(self.dcContrib)
-        self.bto.set(self.dcContrib.bto)        
+        self.bto.set(self.dcContrib.bto)
         self.totals._refresh()
 
-    def openArea(self): pass
+    def openArea(self): openCores(self, obj=self._area)
 
     def processInput(self, e=0):
         pass
@@ -319,7 +325,7 @@ class DailyContributionDailog(GaM_Dialog):
             ask = 0
             _type = 'error'
             callback = None
-        
+
         PRMP_MsgBox(self, title=title, message=message, ask=ask, _type=_type, callback=callback)
 
     def _deleteThrift(self, w):
@@ -327,7 +333,7 @@ class DailyContributionDailog(GaM_Dialog):
             get = self.getDel()
             # print(get)
             self.dcContrib.removeSubByIndex(get - 1)
-            
+
             self.update()
             PRMP_MsgBox(self, title='Removed Successful.', message=f'Thrift No. {get} has been successfully removed. ', ask=0, _type='info')
 
@@ -341,7 +347,7 @@ class DailyContributionDailog(GaM_Dialog):
         else:
             PRMP_MsgBox(self, title='Ready to continue?', message='Are you sure to add this transaction?', _type='warn', callback=self.isReady)
             return
-    
+
     def isReady(self, w):
         if w: self._addThrift()
 
@@ -371,7 +377,7 @@ class DailyContributionDailog(GaM_Dialog):
 
     def setClientNumbers(self):
         max_ = self.maxNum()
-        
+
         self.ledgerNumber.B.configure(from_=1, to=max_ or 1, increment=1)
 
     def clientNumberChanged(self, e=0):  self.after(10, self._clientNumberChanged)
@@ -387,16 +393,16 @@ class DailyContributionDailog(GaM_Dialog):
                 # PRMP_MsgBox(self, title='No Area', message=f'An area has not been given.', ask=0, _type='error')
                 return
             return self._area
-    
+
     def _clientNumberChanged(self):
         get = self.ledgerNumber.get()
         num = int(float(get))
-        
+
         account = self.getSomething()
         if not account: return
 
         clientAccount = account.getClientAccount(num)
-        
+
         if clientAccount:
             self._clientAccount = clientAccount
             self.clientName.set(self._clientAccount.region.name)
@@ -417,14 +423,14 @@ class DailyContributionDailog(GaM_Dialog):
     def addNewClient(self):
         area = self.getSomething(1)
         if area: ClientDialog(self, manager=area.clientsManager, callback=self.update)
-    
+
     def addNewClientAccount(self):
         area = self.getSomething(1)
         if area: ClientsList(self, area=area, callback=self._addNewClientAccount)
-    
+
     def _addNewClientAccount(self, client):
         if client: ClientAccountDialog(self, manager=client.accountsManager, callback=self._finalNewClientAccount)
-    
+
     def _finalNewClientAccount(self, account):
         self.update()
         if account:
@@ -441,7 +447,7 @@ class PlotDialog(GaM_Dialog):
 
     def __init__(self, master=None, title='Plot Dialog', geo=(1500, 800), **kwargs):
         super().__init__(master, title=title, geo=geo, tm=0, **kwargs)
-    
+
     def _setupDialog(self):
 
         self.chartOptions = ChartOptions(self.container, place=dict(relx=.005, rely=.6, relw=.28, relh=.35))
@@ -455,7 +461,7 @@ class PlotDialog(GaM_Dialog):
         self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
 
         self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
-        
+
       ############ Plot and Clear
 
         self.plot_btn = Button(self.container, command=self.chart_sort, text='Plot', place=dict(relx=.02, rely=.952, relh=.044, relw=.1))
