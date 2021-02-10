@@ -134,7 +134,7 @@ class ObjectSort(Mixins):
     def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
         '''
         validations = [
-            {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': [], 'attrMethodParams': [], 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
+            {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': {}, 'attrMethodParams': {}, 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
         objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
@@ -180,7 +180,7 @@ class ObjectSort(Mixins):
                         if not meth:
                             valid = False
                             break
-                        if methodParams: val = meth(*methodParams)
+                        if methodParams: val = meth(**methodParams)
                         else: val = meth()
                     elif attr:
                         # attr_ = getattr(obj, attr, None)
@@ -194,7 +194,7 @@ class ObjectSort(Mixins):
                             if not attrMeth:
                                 valid = False
                                 break
-                            if attrMethodParams: val = attrMeth(*attrMethodParams)
+                            if attrMethodParams: val = attrMeth(**attrMethodParams)
                             else: val = attrMeth()
                         else: val = attr_
                     if val:
@@ -229,7 +229,7 @@ class ObjectSort(Mixins):
         validations = []
 
         for season in seasons:
-            validation = dict(value=True, attrMethod=_types[season], attr=attr, attrMethodParams=[date])
+            validation = dict(value=True, attrMethod=_types[season], attr=attr, attrMethodParams=dict(date=date))
             validations.append(validation)
 
         return self.sort(validations=validations, **kwargs)

@@ -123,9 +123,7 @@ class PRMP_Mixins:
         else:
             for cl in self.mro:
                 ret = cl.__dict__.get(name, unget)
-                if ret != unget:
-                    if isinstance(ret, property): return ret.fget(self)
-                    return ret
+                if ret != unget: return ret.__get__(self)
         return unget
 
     def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
