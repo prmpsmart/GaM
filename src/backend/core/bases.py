@@ -125,19 +125,18 @@ class ObjectSort(Mixins):
                 if _addObjs:
                     addObjs = _addObjs[:]
                     objects.extend(addObjs)
-            objects.extend(object_.subs[:])
 
         if attrs and not subs: objects = [object_[attr] for attr in attrs]
 
         return objects
 
-    def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[]):
+    def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[], manAttrs=['subs']):
         '''
         validations = [
             {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': {}, 'attrMethodParams': {}, 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
-        objects = self.getObjects(object_=object_, subs=subs, attrs=attrs)
+        objects = self.getObjects(object_=object_, subs=subs, attrs=attrs, manAttrs=manAttrs)
         if not objects: return
 
         if validations:

@@ -5,7 +5,7 @@ class DCSort(ObjectSort):
     def __init__(self, region):
         super().__init__(region)
 
-    # def sortSubsBySeasons(self): pass
+    def sortSubsMonthBySeasons(self, *args, attr='month', **kwargs): return self.sortSubsBySeasons(*args, attr=attr, **kwargs)
 
 
 
