@@ -5,7 +5,7 @@ from ..core.bases import ObjectsMixins
 
 class DCAccount(Account):
     Manager = 'DCAccountsManager'
-    
+
     def __init__(self, manager, month=None, **kwargs):
         assert month, 'Month that this account belongs to must be given.'
 
@@ -24,7 +24,7 @@ class DCAccount(Account):
         self.normalIncomes = NormalIncomes(self)
         self.paidouts = Paidouts(self)
         self.withdrawals = Withdrawals(self)
-        
+
     def __int__(self): return int(self.balances)
     def __float__(self): return float(self.balances)
     @property
@@ -35,54 +35,54 @@ class DCAccount(Account):
     def region(self):
         if self.manager: return self.manager.region
         return None
-    
+
     @property
     def recordsManagers(self): return [self.broughtForwards, self.incomes, self.normalIncomes, self.transfers, self.savings, self.debits, self.withdrawals, self.paidouts, self.upfronts, self.balances]
 
     @property
     def pendingUpfronts(self): return self.upfronts.lastRecord.outstanding
-    
+
     @property
     def repaidUpfront(self):
         if len(self.upfronts): return self.upfronts.lastRecord.repaid
 
     def addBroughtForward(self, bf, date=None, **kwargs): return self.broughtForwards.createRecord(bf, date=date, **kwargs)
-    
+
     def balanceAccount(self, date=None):
         self._balanceAccount(date)
         self.updateBroughtForwards(date)
-    
+
     def updateBroughtForwards(self, date=None):
         if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances), date=date)
-    
+
     def getRecs_Of_RM_ByDate(self, date=None):
         leng = len(self)
         date = self.getDate(date)
-        
+
         recs = []
         for ind in range(leng):
             recM = self[ind]
+
             _recs = recM.sortRecordsByDate(date)
             if _recs:
-                recClass = recM.class_.ObjectType
+                recClass = recM.ObjectType
                 money = 0
-                manager = _recs[0].manager
                 for _rec in _recs: money += float(_rec)
-                rec = recClass(manager, money, date=date)
+                rec = recClass(recM, money, date=date)
                 recs.append(rec)
         return recs
-    
-    
+
+
     def getRecs_Of_RM_ByWeek(self, week=None):
         leng = len(self)
         week = self.getDate(week)
-        
+
         recs = []
         for ind in range(leng):
             recM = self[ind]
             _recs = recM.sortRecordsByWeek(week)
             if _recs:
-                recClass = recM.class_.ObjectType
+                recClass = recM.ObjectType
                 money = 0
                 manager = _recs.manager
                 for _rec in _recs: money += float(_rec)
@@ -95,10 +95,10 @@ class DCAccount(Account):
 
 class DCAccountsManager(AccountsManager):
     ObjectType = DCAccount
-    
+
     def __init__(self, region, **kwargs):
         super().__init__(region, **kwargs)
-    
+
     @property
     def overAllAccounts(self):
         # total accounts in this manager
@@ -108,19 +108,19 @@ class DCAccountsManager(AccountsManager):
             if name not in containerDict: containerDict[name] = 0
             containerDict[name] += float(recordManager)
         return containerDict
-    
-    
+
+
     def createAccount(self, month=None, **kwargs):
         month = self.getDate(month)
         return super().createAccount(month=month, **kwargs)
-    
+
     @property
     def recordsManagers(self): return self.last if len(self) else []
 
 
 class ClientAccount(DCAccount):
     Manager = 'ClientAccountsManager'
-    
+
     def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, month=None, **kwargs):
         self.areaAccount = areaAccount
         if month: assert month.monthYear == areaAccount.month.monthYear, 'ClientAccount month must be same as AreaAccount month.'
@@ -132,40 +132,40 @@ class ClientAccount(DCAccount):
 
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate)
-    
+
     @property
     def name(self): return f'{self.className}({self.region.name} | {self._month.monthYear} | Ledger-Number No. {self.ledgerNumber})'
-    
+
     def income(self, date=None):
         date = self.getDate(date)
         return sum([rec.savings for rec in self.contributions if rec.date.month == date.month])
-    
+
     @property
     def recordsManagers(self):
         recordsManagers_ =  super().recordsManagers
         recordsManagers_.insert(1, self.rates)
         recordsManagers_.insert(2, self.contributions)
         return recordsManagers_
-    
+
     @property
     def rate(self): return float(self.rates)
 
     def _balanceAccount(self, date=None):
         rate = float(self.rates)
         bal = float(self.broughtForwards) + float(self.savings) - float(self.upfronts.outstanding) - float(self.debits) - rate
-        
+
         self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 
     def addContribution(self, contribution, **kwargs):
         rec = self.contributions.addContribution(contribution, **kwargs)
         return rec
-    
+
     def addDebit(self, debit, _type='w', **kwargs):
         self._balanceAccount()
         rec = self.debits.addDebit(debit, _type=_type, **kwargs)
         self.balanceAccount()
         return rec
-    
+
     def addUpfront(self, upfront):
         # assert PRMP_DateTime.now().isSameMonth(month)
         pass
@@ -179,10 +179,10 @@ class ClientsAccounts(ObjectsMixins):
         self.master = self.manager = self.account = account
         self._subs = []
         super().__init__(date=account.date)
-    
+
     @property
     def name(self): return f'{self.className}({self.account.name})'
-    
+
     def __str__(self): return self.name
     def __repr__(self): return f'<{self}>'
 
@@ -228,49 +228,49 @@ class AreaAccount(DCAccount):
         self.ledgerNumbers = 0
 
         if self.className == 'AreaAccount': self.clientsAccounts = ClientsAccounts(self)
-    
+
     def addClientAccount(self, account):
         if account in self.clientsAccounts: return
         self.clientsAccounts.add(account)
         self.ledgerNumbers = len(self.clientsAccounts)
 
-    
+
     @property
     def recordsManagers(self):
         recordsManagers =  super().recordsManagers + [self.broughtToOffices, self.excesses, self.deficits]
         return recordsManagers
-    
+
     @property
     def btos(self): return self.broughtToOffices
-    
+
     def _balanceAccount(self, date=None):
         clientsAccounts = self.clientsAccounts.subs
-        
+
         for a in clientsAccounts: a.balanceAccount()
 
         if clientsAccounts:
 
             self.incomes.updateWithOtherManagers([account.incomes for account in clientsAccounts])
-            
+
             self.balances.updateWithOtherManagers([account.balances for account in clientsAccounts])
-            
+
             self.commissions.updateWithOtherManagers([account.rates for account in clientsAccounts])
-            
+
             self.debits.updateWithOtherManagers([account.debits for account in clientsAccounts])
-            
+
             self.savings.updateWithOtherManagers([account.savings for account in clientsAccounts])
-            
+
             self.upfronts.updateWithOtherManagers([account.upfronts for account in clientsAccounts])
-            
+
             self.paidouts.updateWithOtherManagers([account.paidouts for account in clientsAccounts])
-            
+
             self.withdrawals.updateWithOtherManagers([account.withdrawals for account in clientsAccounts])
-            
+
             self.transfers.updateWithOtherManagers([account.transfers for account in clientsAccounts])
 
             self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in clientsAccounts])
-        
-    
+
+
     def addBto(self, bto, date=None):
         clientsAccounts = self.getClientsAccounts()
 
@@ -279,13 +279,13 @@ class AreaAccount(DCAccount):
         contributed = sum(incomes)
 
         transfers = self.sumRecords(self.transfers.sortRecordsByDate(date))
-        
+
         btoRec = self.btos.createRecord(bto, date)
         bto += transfers
 
         if bto > contributed: self.excesses.createRecord(bto - contributed, date, coRecord=btoRec)
         elif contributed > bto: self.deficits.createRecord(contributed - bto, date, coRecord=btoRec)
-    
+
     def updateClientsAccounts(self):
         accs = self.getClientsAccounts()
         for acc in accs: self.addClientAccount(acc)
@@ -303,14 +303,14 @@ class AreaAccount(DCAccount):
 class ClientAccountsManager(DCAccountsManager):
     ObjectType = ClientAccount
     MultipleSubsPerMonth = True
-    
+
     def __init__(self, region, **kwargs):
         self.startRate = kwargs.get('rate', 0)
         super().__init__(region, **kwargs)
-    
+
     @property
     def areaAccountsManager(self): return self.master.accountsManager
-    
+
     def createAccount(self, rate=0, month=None, **kwargs):
         area = self.region.sup
         areaAcc = area.accountsManager.getAccount(month=month)
@@ -326,17 +326,17 @@ class ClientAccountsManager(DCAccountsManager):
 
     def changeRate(self, rate):
         if self.lastAccount: self.lastAccount.rates.setRate(rate)
-    
+
     def addContribution(self, contribution, month=None, **kwargs):
         if month == None: month = PRMP_DateTime.now()
         account = self.sortSubsByMonth(month)[0]
         return account.addContribution(contribution, **kwargs)
-    
+
     def addDebit(self, debit, month):
         if month == None: month = PRMP_DateTime.now()
         monthAcc = self.accountManager.getAccount(month=month)
         if monthAcc: monthAcc.debits.addDebit(debit)
-    
+
     def addUpfront(self, upfront, month):
         assert PRMP_DateTime.now().isSameMonth(month)
         pass
@@ -344,10 +344,10 @@ class ClientAccountsManager(DCAccountsManager):
 
 class AreaAccountsManager(DCAccountsManager):
     ObjectType = AreaAccount
-    
+
     @property
     def clientsManager(self): return self.region.clientsManager
-    
+
     def sortClientsAccountsByMonth(self, month): return self.sortSubRegionsAccountsByMonth(month)
 
 
