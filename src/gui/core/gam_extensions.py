@@ -47,7 +47,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
                 window = ThriftDetailsDialog if not edit else ThriftDialog
                 kwargs.update(title=obj.name, thrift=obj)
             else: window = ThriftDialog
-        
+
         elif isinstance(obj, DailyContribution):
             # print('true')
             if not create:
@@ -57,7 +57,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
         elif isinstance(obj, ObjectsManager):
             if not create: kwargs.update(title=f'{obj.name} Subscripts Details', obj=obj)
-        
+
         else: kwargs.update(obj=obj)
 
         win = window(self, **kwargs)
@@ -69,20 +69,20 @@ class TreeColumns:
     @staticmethod
     def columns(sup):
         if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
-                
+
         elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
-        
+
         elif isinstance(sup, (DailyContribution)): return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
-        
+
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
 
 
 
 class RegionRadioCombo(RadioCombo):
-    
+
     def __init__(self, master=None, region=None, regionLevel=5, recievers=[], **kwargs):
         super().__init__(master, **kwargs)
-        
+
         self._subRegionDict = {}
         self.subRegionDict = {}
         self.set(region)
@@ -90,38 +90,38 @@ class RegionRadioCombo(RadioCombo):
         self.region = region
         self._receivers = recievers
         self.regionLevel = regionLevel
-    
+
     def addReceiver(self, receiver):
         if receiver not in self._receivers: self._receivers.append(receiver)
-        elif isinstance(receiver, (list, tuple)): 
+        elif isinstance(receiver, (list, tuple)):
             for recv in receiver: self.addReceiver(recv)
-    
+
     def clicked(self, e=0):
         val = super().clicked()
         regVal = self.get()
-        
+
         if regVal and self._receivers:
             for recv in self._receivers: recv((self, regVal))
-    
+
     def get(self):
         val = self.B.get()
         regVal = self.subRegionDict.get(val)
         _regval = self._subRegionDict.get(val)
-        
+
         if regVal: return regVal
         elif _regval: return _regval
         else: return self.choosen
-    
+
     def receiver(self, tup):
         wid, region = tup
         self.var.set(self.val)
         wid.unlight()
         self.light()
         self.set(region)
-        
+
     def processRegionSubs(self, region):
         rm = region.subRegions
-        
+
         if rm:
             for region in rm:
                 rname = region.name
@@ -131,7 +131,7 @@ class RegionRadioCombo(RadioCombo):
                 name = f'{number})  {rname}'
                 self.subRegionDict[name] = region
         # else: self.subRegionDict[region.name] = region
-    
+
     def setKeys(self, region=None):
         if region:
             self.processRegionSubs(region)
@@ -139,45 +139,50 @@ class RegionRadioCombo(RadioCombo):
             if keys:
                 self.changeValues(keys)
                 self.B.set(keys[0])
-        
+
     def set(self, region):
         if region:
             self.subRegionDict = {}
             self._subRegionDict = {}
             regionLevel = len(region.hierachy)
-            
+
             assert regionLevel  == self.regionLevel, f'Incorrect region of level {regionLevel} given, level must be {self.regionLevel}'
             self.setKeys(region)
             self.region = region
-    
+
     def getSubKeys(self):
         keys = list(self.subRegionDict.keys())
         keys.sort()
-        
+
         return keys
 RRC = RegionRadioCombo
 
 
 class Hierachy(PRMP_TreeView):
-    
+
     def __init__(self, master=None, columns=[], toggleOpen=True, **kwargs):
         self._toggleOpen = False
         self.toop = toggleOpen
         self.last = []
         super().__init__(master=master, columns=columns, **kwargs)
 
-    
+
     def toggleOpen(self, e=0):
         if self._toggleOpen: self._toggleOpen = False
         else: self._toggleOpen = True
         self.viewAll(*self.last)
-    
+
     def bindings(self):
         super().bindings()
         self.treeview.bind('<Control-Return>', self.viewRegion)
         if self.toop:
             self.treeview.bind('<Control-o>', self.toggleOpen)
             self.treeview.bind('<Control-O>', self.toggleOpen)
+
+        self.treeview.bind('<Control-r>', self.reload)
+        self.treeview.bind('<Control-R>', self.reload)
+
+    def reload(self, e=0): self.viewAll(*self.last)
 
     def viewRegion(self, e=0):
         current = self.selected()
@@ -204,20 +209,20 @@ class Hierachy(PRMP_TreeView):
                     item_ = self.insert(item, text=a.name)
                     # f, *g = self.columns.get(a)
                     # item_ = self.insert(item, text=f, values=g)
-        
+
                     self.ivd[item_] = a
                 return
             elif isinstance(obj, ObjectsMixins): subs = obj.subs
-        
+
         if isinstance(subs, list):
             for sub in subs:
                 if sub: self._viewAll(sub, item)
-    
+
     def viewAll(self, obj, parent=''):
         if not parent: self.clear()
         self._viewAll(obj, parent)
         self.last = obj, parent
-        
+
     def viewSubs(self, obj): self.viewAll(obj[:])
 H = Hierachy
 
@@ -228,7 +233,7 @@ class UniqueID(Button):
 
         self.obj = obj
         self.view = None
-    
+
     def popUp(self):
         if self.view: self.view.destroy()
 
@@ -286,7 +291,7 @@ class SearchRecordDetails(LabelFrame):
 
 
 class DateSearch(LabelFrame):
-    
+
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
@@ -305,7 +310,7 @@ class DateSearch(LabelFrame):
 
         self.setRadioGroups([self.day, self.week, self.month, self.year])
 
-        
+
         self.seasonNames = tk.StringVar()
         self.seasonNames.set('sub')
 
@@ -327,11 +332,11 @@ class SearchDetails(Notebook):
 
         self.obj = obj
         self.results = results
-        
+
         self.personalDetails = SearchPersonalDetails(self, text='Personal Details')
         self.add(self.personalDetails, padding=3)
         self.tab(0, text='Regions', compound='left', underline='-1')
-        
+
         self.recordDetails = SearchRecordDetails(self, text='Record Details')
         self.add(self.recordDetails, padding=3)
         self.tab(1, text='Records', compound='left', underline='-1')
@@ -352,24 +357,34 @@ class SortDetails(Notebook):
 class SubsList(LabelFrame):
     def __init__(self, master, listboxConfig={}, callback=None, totalConfig=dict(text='Total'), values=[], valuesKwargs={}, **kwargs):
         super().__init__(master, **kwargs)
-        
+
         self.callback = callback
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.12, relw=.5), topKwargs=totalConfig, orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
+        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.13, relw=.35), topKwargs=totalConfig, orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
+
+        Button(self, place=dict(relx=.4, rely=0, relh=.1, relw=.25), text='Reload', command=self.reload)
 
         self.dialog = Checkbutton(self, place=dict(relx=.68, rely=0, relh=.1, relw=.3), text='Dialog?')
-        
-        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.125, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
+
+        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.135, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
         self.listbox.bind('<Double-1>', self.clicked)
-        
+
+        self.values = values
+        self.valuesKwargs = valuesKwargs
         if values: self.set(values, **valuesKwargs)
+
+    def reload(self): self.set(self.values, **self.valuesKwargs)
 
     def set(self, values, **kwargs):
         if not values: return
+
+        self.values = values
+        self.valuesKwargs = kwargs
+
         self.listbox.set(values, **kwargs)
         self.total.set(self.listbox.last)
-    
+
     def clicked(self, selected=None, event=None):
         selected = selected[0]
 
@@ -392,7 +407,7 @@ class RegionDetails(PRMP_FillWidgets, LabelFrame):
         self.addResultsWidgets(['office', 'department', 'sup', 'sub'])
 
         self.set(region)
-    
+
     def set(self, region):
         if not region: return
         vs = ['office', 'department', 'sup', 'sub']
@@ -419,7 +434,7 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
 
         self.region = region
         PRMP_FillWidgets.__init__(self)
-        
+
         self.persons = LabelLabel(self, topKwargs=dict(config=dict(text='Persons')), place=dict(relx=.02, rely=0, relh=.22, relw=.4), orient='h', longent=.5)
 
         self.subs = LabelLabel(self, topKwargs=dict(config=dict(text='Total Subs', anchor='center')), place=dict(relx=.02, rely=.24, relh=.22, relw=.4), orient='h', longent=.55)
@@ -445,7 +460,7 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
         self.addResultsWidgets(['persons', 'subs', 'actSubs', 'accounts', 'actSubsAccs'])
 
         self.set()
-    
+
     def set(self):
         if self.region:
             values = dict(
@@ -464,14 +479,14 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
                 values.update(dict(
                     actSubsAccs=len(self.region.accounts.sortSubsByDate(PRMP_DateTime.now()))
                 ))
-            
+
             if values: super().set(values)
-    
+
     def openSNS(self):
         if self.sns: self.sns.destroy()
         self.sns = self.SNS(self, sup=self.region)
         self.sns.mainloop()
-    
+
     def openObjDet(self):
         if self.objdet:
             self.objdet.destroy()

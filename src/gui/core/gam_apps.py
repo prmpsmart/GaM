@@ -12,7 +12,7 @@ class GaM_App(PRMP_MainWindow):
     def __init__(self, master=None, title='Goodness and Mercy', obj=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.obj = obj
-        
+
 
         self.root.save = self.save
         self._setupApp()
@@ -21,18 +21,18 @@ class GaM_App(PRMP_MainWindow):
         self.setMenus()
 
         self.start()
-    
+
     def saveIt(self):
         from .auths_gui import make_change
         make_change(self._save, silent=1)
         PRMP_MsgBox(self, title='Successful', message='Saving is successful.')
-    
+
     def save(self, u=0):
         if u: self.saveIt()
         else: self._save()
 
     def load(self): self._load()
-    
+
     def _setupApp(self):
         pass
 
@@ -45,6 +45,9 @@ class GaM_App(PRMP_MainWindow):
             if obj: SortNSearch(self, obj=self.obj)
         def showOD(obj):
             if obj: ManagerHome(self, obj=self.obj, title=f'{self.obj.name} Details.')
+        def updateObj(obj):
+            if isinstance(obj, Account): obj.balanceAccount()
+
         def security(): from .auths_gui import Security; Security()
 
 
@@ -52,7 +55,7 @@ class GaM_App(PRMP_MainWindow):
         self.settingsMenu = None # load, save, security, theme, plot color, save path
 
         self.viewMenu = Menu(config=dict(tearoff=0))
-        view = [dict(label='Search', command=lambda : showSnS(self.obj)), dict(label='Details', command=lambda : showOD(self.obj))]
+        view = [dict(label='Search', command=lambda : showSnS(self.obj)), dict(label='Details', command=lambda : showOD(self.obj)), dict(label='Update Current Object', command=lambda : updateObj(self.obj))]
         for vie in view: self.viewMenu.add_command(**vie)
 
         self.settingsMenu = Menu(config=dict(tearoff=0))
@@ -69,9 +72,9 @@ class GaM_App(PRMP_MainWindow):
 
 
 class RegionLookUp(GaM_App, PRMP_FillWidgets):
-    
+
     def __init__(self, master=None, title='Region Details', geo=(650, 270), expandGeo=(800, 600), values={}, region=None, tm=1, gaw=1, **kwargs):
-        
+
         self.region = region
         self.personDialog = None
         self.switchState = None
@@ -80,98 +83,98 @@ class RegionLookUp(GaM_App, PRMP_FillWidgets):
         self.expandGeo = expandGeo
 
         GaM_App.__init__(self, master, title=title, geo=geo, gaw=gaw, ntb=1, tm=tm, atb=1, asb=1, **kwargs)
-        
+
         PRMP_FillWidgets.__init__(self, values=values)
-        
-        
+
+
         self._setupApp()
 
         self.set()
         self.paint()
-        
+
     def regionChanged(self, region):
         region = region[1]
         if not region or (region is self.region): return
-    
+
         self.region = region
         self.setTitle(region.idText)
-        
+
         person = region.person
         if person: self.set(dict(image=person.image))
 
         # self.loadAccounts(region)
-    
+
     def _setupApp(self):
         # hierachy
 
         self.hierachy = PRMP_LabelFrame(self.container, config=dict(text='Hierachy'))
         self.hierachy.place(x=2, y=2, h=170, relw=.6)
-        
+
         self.hierachyVar = tk.StringVar()
         self.hierachyVar.set('sub')
-        
+
         self.office = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Office', style='Group.TRadiobutton', variable=self.hierachyVar, value='off')), bottomKwargs=dict(placeholder='Enter Office Name'), orient='h', place=dict(relx=.02, rely=0, relh=.25, relw=.96), longent=.3, regionLevel=1, recievers=[self.regionChanged], dot=1, tttk=1)
-        
+
         self.department = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Department', style='Group.TRadiobutton', variable=self.hierachyVar, value='dep')), orient='h', place=dict(relx=.02, rely=.25, relh=.25, relw=.96), longent=.35, regionLevel=2, recievers=[self.regionChanged], dot=1, tttk=1)
         self.office.addReceiver(self.department.receiver)
-        
+
         self.sup = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Superscript', style='Group.TRadiobutton', variable=self.hierachyVar, value='sup')), orient='h', place=dict(relx=.02, rely=.5, relh=.25, relw=.96), longent=.35, regionLevel=3, recievers=[self.regionChanged], dot=1, tttk=1)
         self.department.addReceiver(self.sup.receiver)
-        
+
         self.sub = RegionRadioCombo(self.hierachy,  topKwargs=dict(config=dict(text='Subscript', value='sub', style='Group.TRadiobutton', variable= self.hierachyVar)), orient='h', place=dict(relx=.02, rely=.75, relh=.25, relw=.96), longent=.3, regionLevel=4, recievers=[self.regionChanged], dot=1, tttk=1)
         self.sup.addReceiver(self.sub.receiver)
-        
-        # workers in the region or the individual 
+
+        # workers in the region or the individual
         persons = PRMP_Button(self.container, config=dict(text='Persons', command=self.showPersons))
         persons.place(x=2, y=175, h=24, w=80)
-        
+
         switch = PRMP_Button(self.container, config=dict(text='Switch?', command=self.switch))
         switch.place(x=100, y=175, h=24, w=90)
-        
+
         new = PRMP_Checkbutton(self.container, config=dict(text='New Dialog ?'))
         new.place(x=208, y=175, h=24, w=140)
-       
-        
+
+
         self.image = PRMP_ImageLabel(self.container, status='Profile Picture')
         self.image.place(relx=.61, y=10, h=170, relw=.382)
-        
-        
-    
+
+
+
        # accounts
         self.accounts = PRMP_LabelFrame(self.container, config=dict(text='Accounts'))
         self.accountsHie = Hierachy(self.accounts, status='Accounts Details')
         self.accounts.sub = self.placeAccounts
-        
+
        # subregions
         self.subRegions = PRMP_LabelFrame(self.container, config=dict(text='Sub Regions'))
         self.subRegionsHie = Hierachy(self.subRegions, status='Sub Regions Details')
         self.subRegions.sub = self.placeSubRegions
-        
-        
+
+
         self.addResultsWidgets(['office', 'department', 'sup', 'image', 'sub'])
-        
+
         self.setRadioGroups([self.office, self.department, self.sub, self.sup])
 
-        
+
         if self.region:
             for wid in [self.office, self.department, self.sub, self.sup]:
                 if self.region.level == wid.regionLevel: wid.set(self.region)
-        
-        
+
+
     def showPersons(self, e=0):
         if self.personDialog: self.personDialog.destroy()
         if self.region:
             if self.region.level == 5:
                 self.personDialog = PersonDialog(self,  values=self.region.person.values, side=self.side)
             else: print('Level not upto')
-    
+
     def loadAccounts(self, region):
         if region:
             acc = region.accountsManager
             headers = [{'text': 'Name', 'width': 120}, 'Date', *[{'type': int, 'text': a} for a in acc.headers]]
             self.accountsHie.setColumns(headers)
             self.accountsHie.set(acc, 1)
-    
+
     def switch(self):
         # to switch between subregions and accounts
         val = self.hierachyVar.get()
@@ -185,35 +188,35 @@ class RegionLookUp(GaM_App, PRMP_FillWidgets):
             else:
                 self.showAccountsContainer()
                 self.switchState = False
-            
+
         elif self.switchState == True:
             self.showAccountsContainer()
             self.switchState = False
-            
+
         elif self.switchState == False:
             self.unExpand()
             self.switchState = None
-        
+
     def loadRegion(self, region=None, account=1):
         if region:
             self.region = region
             self.titleBar.config(text=f'{self.region} Details Dialog')
-        
+
     def unExpand(self):
         self.accounts.place_forget()
         self.changeGeometry(self.geo_)
-    
+
     def isMaximized(self):
         self.update()
         if self._sub: self._sub.sub()
-    
+
     isNormal = isMaximized
-        
+
     def expand(self):
         self.resize = (1, 1)
         self.changeGeometry(self.expandGeo)
         self.update()
-    
+
     def placeSubs(self, sub=None):
         if sub: self._sub = sub
         if self._sub:
@@ -221,26 +224,26 @@ class RegionLookUp(GaM_App, PRMP_FillWidgets):
             w, h = self._sub.master.tupled_winfo_geometry[:2]
             h -= 205
             self._sub.place(x=2, y=203, h=h, w=w-8)
-        
+
     def showSubRegionsContainer(self):
         self.expand()
         self.placeSubRegions()
-        
+
     def showAccountsContainer(self):
         self.subRegions.place_forget()
         self.expand()
         self.placeAccounts()
-        
+
     def placeAccounts(self):
         self.placeSubs(self.accounts)
         self.accounts.update()
         hx, hy = self.accounts.tupled_winfo_geometry[:2]
         self.accountsHie.place(x=2, y=0, w=hx-8, h=hy-30)
-        
+
     def placeSubRegions(self):
         self.placeSubs(self.subRegions)
         self.subRegions.update()
-        
+
         hx, hy = self.subRegions.tupled_winfo_geometry[:2]
         self.subRegionsHie.place(x=2, y=0, w=hx-8, h=hy-24)
 RLU = RegionLookUp
@@ -253,11 +256,11 @@ class SortNSearch(GaM_App):
 
     def _setupApp(self):
         self.sup = LabelButton(self.container, place=dict(relx=.005, rely=.005, relh=.04, relw=.99), orient='h', longent=.2, topKwargs=dict(text='Sup'), bottomKwargs=dict(text=self.obj.name if self.obj else ''), command=self.openSup)
-        
+
         self.results = PRMP_TreeView(LabelFrame(self.container, text='Results', place=dict(relx=.005, rely=self.longent+.05, relh=.99-.04-self.longent, relw=.99)), place=dict(relx=0, rely=0, relh=1 , relw=1))
 
         note = Notebook(self.container, place=dict(relx=.005, rely=.05, relh=self.longent, relw=.99))
-        
+
         self.search = SearchDetails(note, results=self.results, obj=self.obj)
         note.add(self.search, padding=3)
         note.tab(0, text='Search', compound='left', underline='-1')
@@ -267,24 +270,24 @@ class SortNSearch(GaM_App):
         note.tab(1, text='Sort', compound='left', underline='-1')
 
         self.paint()
-    
+
     def openSup(self):
         pass
 
 
 class ObjectHome(GaM_App):
-    
+
     def __init__(self, master=None, geo=(1500, 800), title='Home', obj=None, **kwargs):
         self.sns = None
         self.objdet = None
 
         super().__init__(master, geo=geo, title=title, obj=obj, **kwargs)
-    
+
     def _setupApp(self):
         obj = self.obj
 
         self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=obj.date.date if obj else ''))
-        
+
         UniqueID(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=obj)
 
         Button(self.container, place=dict(relx=.005, rely=.94, relh=.04, relw=.08), text='Object Details', command=self.openObjDet)
@@ -292,12 +295,12 @@ class ObjectHome(GaM_App):
         Button(self.container, place=dict(relx=.1, rely=.94, relh=.04, relw=.1), text='Sort and Search', command=self.openSNS)
 
         self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
-    
+
     def openSNS(self):
         if self.sns: self.sns.destroy()
         self.sns = SortNSearch(self, sup=self.obj)
         self.sns.mainloop()
-    
+
     def openObjDet(self):
         if self.objdet:
             self.objdet.destroy()
@@ -313,7 +316,7 @@ class RegionHome(ObjectHome):
 
     def _setupApp(self, cont=None):
         super()._setupApp()
-        
+
         region = self.region = self.obj
         if region: self.setTitle(region.name)
 
@@ -331,14 +334,14 @@ class RegionHome(ObjectHome):
 
 
 class AccountHome(ObjectHome):
-    
+
     def __init__(self, master=None, title='Account Home', account=None, **kwargs):
 
         super().__init__(master, title=title, obj=account, **kwargs)
 
     def _setupApp(self):
         super()._setupApp()
-        
+
         account = self.account = self.obj
         name, self._manager = (account.manager.name, account.manager) if account else ('', None)
 
@@ -352,7 +355,7 @@ class AccountHome(ObjectHome):
 
 
 class ManagerHome(TreeColumns, GaM_App):
-    
+
     def __init__(self, master=None, geo=(1200, 600), title='Object Details', obj=None, **kwargs):
         super().__init__(master, geo=geo, title=title, obj=obj, **kwargs)
 
@@ -361,7 +364,7 @@ class ManagerHome(TreeColumns, GaM_App):
         if self.obj: self.setTitle(self.obj.name)
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
-        
+
         self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=self.obj.name if self.obj else 'Name'))
 
         self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=self.obj.subTypes if self.obj else []), orient='h', longent=.4, func=self.changeSubs)
@@ -373,11 +376,11 @@ class ManagerHome(TreeColumns, GaM_App):
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
         self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
-        
+
         self.paint()
-    
+
     def getNewObjectDialog(self, st, obj=None):
-        
+
         className = self.obj.className
         # print(className)
         obj = obj or self.obj
@@ -418,7 +421,7 @@ class ManagerHome(TreeColumns, GaM_App):
         subType = self.selectedSubType
         subs = self.obj[subType] or []
         return subs
-    
+
     # @property
     def c_or_m(self):
         k = ('Client', 'Member')
@@ -430,9 +433,9 @@ class ManagerHome(TreeColumns, GaM_App):
     def changeSubs(self, e=0):
         st = self.selectedSubType
         if self.new.get():
-            
+
             if self.c_or_m() and (st == 'Persons'): PRMP_MsgBox(self, title='Creation Error ', message=f'Only one person is valid for {self.obj.className}.', _type='error')
-            
+
             else:
                 try:
                     dialog = self.getNewObjectDialog(st)
@@ -460,11 +463,11 @@ class GaM_Home(GaM_App):
 
     def __init__(self, title='Goodness and Mercy.', geo=(1000, 700), **kwargs):
         super().__init__(title=title, geo=geo, **kwargs)
-        
+
         # self.setMenus()
         self.mainloop()
 
-        
+
     def _setupApp(self):
         offices
 
@@ -483,9 +486,9 @@ class GaM_Home(GaM_App):
         dcaccounts
         coopaccounts
 
-        
-        
-        
+
+
+
         pass
 
 

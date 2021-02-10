@@ -58,7 +58,7 @@ class DC_AccountHome(TreeColumns, AccountHome):
             self.recordsManagers.place(relx=.005, rely=.13, relh=.36, relw=.24)
             self.subAccounts = SubsList(self.container, text='Clients Accounts', place=dict(relx=.005, rely=.5, relh=.36, relw=.24), callback=self.selected)
             
-            if self.account: self.subAccounts.set(self.account.clientsAccounts, showAttr={'region': 'name'})
+            if self.account: self.subAccounts.set(self.account.getClientsAccounts(), showAttr={'region': 'name'})
 
         self.selected(self.account)
 
