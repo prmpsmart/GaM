@@ -22,7 +22,7 @@ class PRMP_Mixins:
     _previous = '◄'
     _forward = '⏭'
     _backward = '⏮'
-    
+
     dollar = chr(36)
     euro = chr(163)
     yen = chr(165)
@@ -33,21 +33,21 @@ class PRMP_Mixins:
         downArrow = chr(11015)
         x_btn1 = chr(10060)
         x_btn2 = chr(10062)
-        
+
         max_ = chr(9645)
         min_ = chr(10134)
-    
+
         naira = chr(8358)
         _moneySign = naira + chr(32)
-        
+
 
     Errors = PRMP_Errors
     containers = list, set, tuple
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-    
+
     @property
     def mroStr(self): return [s.__name__ for s in self.mro]
-    
+
     def getDate(self, date=None):
         from .prmp_datetime import PRMP_DateTime
 
@@ -58,9 +58,9 @@ class PRMP_Mixins:
 
     def numWithCommas(self, num=None, fl=0):
         if num == None: num = self
-        
+
         num = float(num) if fl else int(num)
-        
+
         div = 3
         str_num = str(num)
 
@@ -83,32 +83,32 @@ class PRMP_Mixins:
             num_list.insert(co - to, ",")
             co -= 3
             to += 1
-        
+
         result = "".join(num_list)
         if fl: result = result + '.' + afterFloat
-        
+
         _minus = '-' if minus else ''
         result = _minus + result
         return result
-    
+
     def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num, 1))
-    
+
     def addSignToNum(self, num):
         try: float(num)
         except:
             if num == self._moneySign: return num
-            
+
         return '{} {}'.format(self._moneySign, num)
-    
+
     numberToMoney = addSignToMoney = addSignToNum
 
     def stripSignFromNum(self, num):
         num = num.replace(self._moneySign, '')
         num = num.replace(' ', '')
         return num.replace(' ', '').replace(self._moneySign, '')
-    
+
     moneyToNumber = stripSignFromMoney = stripSignFromNum
-    
+
     @property
     def mro(self): return self.class_.__mro__
 
@@ -127,15 +127,15 @@ class PRMP_Mixins:
                     if isinstance(ret, property): return ret.fget(self)
                     return ret
         return unget
-        
+
     def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
-    
+
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
-    
+
     def checkFile(self, file): return os.path.isfile(file)
     def checkDir(self, dir_): return os.path.isdir(dir_)
     def checkPath(self, path): return os.path.exists(path)
-    
+
     def checkNumber(self, number):
         strNum = str(number)
         dot = '.'
@@ -144,7 +144,7 @@ class PRMP_Mixins:
             strNum = strNum.replace(dot, '')
         test = strNum.isdigit()
         return test
-    
+
     def checkMoney(self, money):
         try:
             if self._moneySign in money:
@@ -158,7 +158,7 @@ class PRMP_Mixins:
 
     @property
     def className(self): return self.__class__.__name__
-    
+
     @property
     def AlphabetsSwitch(self):
         d = {}
@@ -166,7 +166,7 @@ class PRMP_Mixins:
             d[chr(n)] = chr(n+32)
             d[chr(n+32)] = chr(n)
         return d
-    
+
     def propertize(self, name):
         if name.startswith('_'): return name
         if name:
@@ -174,12 +174,12 @@ class PRMP_Mixins:
             nm = name.replace(' ', '')
             fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
             return fin
-    
+
     def testPrint(self, *args):
         print()
         for a in args: print(a, '=')
         print()
-    
+
     def __bool__(self): return True
 
     def getImageData(self, image):
@@ -200,19 +200,70 @@ class PRMP_Mixins:
         listNum = list(strNum)
         if len(listNum) <= 3: return num
         app = listNum[size]
-        
+
         listNum[size:] = ['0' for _ in range(size, len(listNum))]
         add = 0 if int(app) < 5 else 1
         adx = int(listNum[size - 1]) + add
         listNum[size - 1] = str(adx)
         retur = ''.join(listNum)
         return int(retur)
-    
+
     def stripZeros(self, num, app=1):
         num = self.approximate(num, app)
         strNum = str(num)
         listNum = list(strNum)
         return strNum.strip('0')
+
+
+    # def __getattr__(self, attr, dontRaise=False):
+    #     ret = self.getFromSelf(attr, self._unget)
+    #     if ret != self._unget: return ret
+    #     elif not dontRaise: self.attrError(attr)
+
+    # def __setattr__(self, attr, value): return None
+
+    # def __setitem__(self, key, value):
+    #     var = self.getFromSelf(self.propertize(key))
+    #     var = value
+
+    def __getitem__(self, item):
+        if isinstance(item, self.containers):
+            res = []
+            for it in item: res.append(self[it])
+            return res
+
+        elif isinstance(item, str): return self.getFromSelf(self.propertize(item))
+
+        elif isinstance(item, dict):
+            res = []
+            for k, v in item.items():
+                head = self[k]
+                if isinstance(v, dict):
+                    tail = []
+                    tail_props = [(g, h) for g, h in v.items()]
+                    last = tail_props[-1]
+                    count = 0
+                    length_of_tail_props = len(tail_props)
+                    while count < length_of_tail_props:
+                        tail_prop = tail_props[count]
+                        try: tail_1 = head[tail_prop[0]]
+                        except: tail_1  = getattr(head, tail_prop[0])
+
+                        try: tail_2 = tail_1[tail_prop[1]]
+                        except: tail_2  = getattr(tail_1, tail_prop[1])
+
+                        tail.append(tail_2)
+                        count += 1
+                else:
+                    if head:
+                        try: tail = head[v]
+                        except: tail = getattr(head, v)
+                    else: self.attrError(k)
+                res.append(tail)
+            return res if len(res) > 1 else res[0]
+
+        return self.subs[item]
+
 
 
 
