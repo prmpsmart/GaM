@@ -283,6 +283,7 @@ class DailyContributionDailog(GaM_Dialog):
     def getThriftDetails(self): return self.get(self.thriftWidgets)
 
     def dcUpdate(self): PRMP_MsgBox(self, title='Update Confirmation.', message='Are you sure to update this Daily Contribution?', ask=1, callback=self._dcUpdate)
+
     def _dcUpdate(self, w):
         if not w: return
         self.dcContrib.updateThrifts()
