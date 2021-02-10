@@ -422,9 +422,14 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     def isSameYear(self, date): return self.year == date.year
 
-    def isSameMonth(self, date): return self.monthYearTuple == date.monthYearTuple
+    def isSameMonth(self, date): return self.month == date.month
 
-    def isSameWeek(self, date): return self.weekMonthYearTuple == date.weekMonthYearTuple
+    def isSameWeek(self, date): return self.week == date.week
+
+    def isSameMonthYear(self, date): return self.monthYearTuple == date.monthYearTuple
+
+    def isSameWeekMonthYear(self, date): return self.weekMonthYearTuple == date.weekMonthYearTuple
+
 
     @classmethod
     def monthWeekDays(cls, year=None, month=None, monday=False, dateObj=None):

@@ -49,12 +49,12 @@ class ObjectSort(Mixins):
     __gt_le = (__gt, __le)
     __gt_gt = (__gt, __gt)
     __gt_ge = (__gt, __ge)
-    
+
     __ge_lt = (__ge, __lt)
     __ge_le = (__ge, __le)
     __ge_gt = (__ge, __gt)
     __ge_ge = (__ge, __ge)
-    
+
     __ranges = (__lt_lt, __lt_le, __lt_gt, __lt_ge, __le_lt, __le_le, __le_gt, __le_ge, __gt_lt, __gt_le, __gt_gt, __gt_ge, __ge_lt, __ge_le, __ge_gt, __ge_ge)
 
     def __init__(self, object_=None): self.object = object_
@@ -70,7 +70,7 @@ class ObjectSort(Mixins):
             equation = f'{a} {comp} {b}'
             # print(equation)
             return eval(equation)
-    
+
     def getRangeType(self, _type):
         t1, t2 = _type
         for r in self.__ranges:
@@ -85,7 +85,7 @@ class ObjectSort(Mixins):
             equation = f'{a} {r1} {b} {r2} {c}'
             # print(equation)
             return eval(equation)
-    
+
     def getAllObjects(self, object_=None):
         object_ = object_ or self.object
 
@@ -96,9 +96,9 @@ class ObjectSort(Mixins):
         if getattr(object_, 'subRegions', None): __subs.append(object_.subRegions)
 
         if getattr(object_, 'subs', None): __subs.append(object_.subs)
-        
+
         for s in __subs: subs.extend(s[:])
-        
+
         allSubs = []
         allSubs.extend(subs)
 
@@ -108,10 +108,10 @@ class ObjectSort(Mixins):
             allSubs.extend(new_)
 
         return allSubs
-    
-    def getObjects(self, object_=None, subs=[], attrs=[]):
+
+    def getObjects(self, object_=None, subs=[], attrs=[], manAttrs=[]):
         object_ = object_ or self.object
-        
+
         if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
 
         if attrs and not object_: raise ValueError('This ObjectSort instance has no attributed object.')
@@ -120,9 +120,13 @@ class ObjectSort(Mixins):
 
         objects = subs.copy()
         if object_ and not objects:
-            if getattr(object_, 'subRegions', None): objects.extend(object_.subRegions[:])
+            for addAttr in manAttrs:
+                _addObjs = getattr(object_, addAttr, None)
+                if _addObjs:
+                    addObjs = _addObjs[:]
+                    objects.extend(addObjs)
             objects.extend(object_.subs[:])
-        
+
         if attrs and not subs: objects = [object_[attr] for attr in attrs]
 
         return objects
@@ -162,7 +166,7 @@ class ObjectSort(Mixins):
                     attr = validation.get('attr')
                     attrMethod = validation.get('attrMethod')
                     attrMethodParams = validation.get('attrMethodParams')
-                    
+
                     valueType = validation.get('valueType')
 
                     comp = validation.get('comp', 'eq')
@@ -211,7 +215,7 @@ class ObjectSort(Mixins):
                     else: valid = False
 
                 if valid: validated.append(obj)
-            
+
             objects = validated
 
         # last one
@@ -239,27 +243,27 @@ class ObjectSort(Mixins):
 
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
-    
+
     def __init__(self, date=None, previous=None, idReq=0):
         self.__editableValues = []
-        
+
         self._date = self.getDate(date)
         self.objectSort = ObjectSort(self)
-        
+
         self.previous = previous
         self.next = None
-        
+
         if not idReq: self._uniqueID = sha224(str(self).encode()).hexdigest()
-    
+
     @property
     def uniqueID(self): return self._uniqueID
-    
+
     @property
     def sort(self): return self.objectSort.sort
 
     @property
     def search(self): return self.objectSort.search
-    
+
     def __str__(self): return f'{self.manager} | {self.name}'
 
     def __repr__(self): return f'<{self.name}>'
@@ -275,8 +279,8 @@ class ObjectsMixins(Mixins, CompareByDate):
             if isinstance(child, (list, tuple)):
                 for ch in child: self.addEditableValues(ch)
             else: self.__editableValues.append(child)
-        
-    
+
+
     def update(self,  values={}):
         edit = self.editableValues
 
@@ -287,7 +291,7 @@ class ObjectsMixins(Mixins, CompareByDate):
             if _type: val = _type(val)
             if val: setattr(self, key, val)
             # print(key, val)
-    
+
     @property
     def values(self):
         vals = {}
@@ -296,28 +300,28 @@ class ObjectsMixins(Mixins, CompareByDate):
             if isinstance(key, dict): key = key['value']
             vals[key] = self[key]
         return vals
-    
+
     def __repr__(self): return f'<{self.name}>'
-    
+
     def sumRecords(self, records): return sum(float(rec) for rec in records)
-    
+
     @property
     def withCommas(self): return self.numWithCommas(self.money)
 
     @property
     def strManager(self): return isinstance(self.manager, str)
-    
+
     def __len__(self):
         try: return len(self[:])
         except: return 1
-    
+
     def get(self, attr, default=None):
         try: return self[attr]
         except: return default
-    
+
     @property
     def moneyWithSign(self): return f'{self._moneySign}{float(self)}'
-    
+
     @property
     def regDate(self): return self.date
     @property
@@ -334,16 +338,16 @@ class ObjectsMixins(Mixins, CompareByDate):
     def monthYearTuple(self): return self.date.monthYearTuple
     @property
     def weekMonthYearTuple(self): return self.date.weekMonthYearTuple
-    
+
     @property
     def monthYear(self): return self.date.monthYear
-    
+
     @property
     def weekMonthYear(self): return self.date.weekMonthYear
-   
+
     @property
     def week(self): return self.date.week
-    
+
     @property
     def date(self): return self._date
 
@@ -354,13 +358,13 @@ class ObjectsMixins(Mixins, CompareByDate):
     #     ret = self.getFromSelf(attr, self._unget)
     #     if ret != self._unget: return ret
     #     elif not dontRaise: self.attrError(attr)
-    
+
     # def __setattr__(self, attr, value): return None
-    
+
     # def __setitem__(self, key, value):
     #     var = self.getFromSelf(self.propertize(key))
     #     var = value
-    
+
     def __getitem__(self, item):
         if isinstance(item, self.containers):
             res = []
@@ -383,7 +387,7 @@ class ObjectsMixins(Mixins, CompareByDate):
                         tail_prop = tail_props[count]
                         try: tail_1 = head[tail_prop[0]]
                         except: tail_1  = getattr(head, tail_prop[0])
-                        
+
                         try: tail_2 = tail_1[tail_prop[1]]
                         except: tail_2  = getattr(tail_1, tail_prop[1])
 
@@ -403,26 +407,26 @@ class ObjectsMixins(Mixins, CompareByDate):
 class Object(CompareByNumber, ObjectsMixins):
     Manager = 'ObjectsManager'
     Managers = ()
-    
+
     def __eq__(self, other):
         if other == None: return False
         return self is other
-    
+
     def __init__(self, manager=None, number=None, name=None, nameFromNumber=False, sup=None, date=None, previous=None, **kwargs):
-        
+
         if not isinstance(manager, str): assert (manager.className == self.Manager) or (manager.className in self.Managers), f'Manager of {self.className} should be {self.Manager} or in {self.Managers} not {manager.className}.'
-        
+
         self._number = number
         self._sup = sup
-        
+
         self._name = name if not nameFromNumber else f'{self.className} {self.number}'
         self._manager = manager
 
         ObjectsMixins.__init__(self, date=date, previous=previous)
-        
+
     @property
     def id(self): return ''.join(self.spacedID.split(' | ')).replace('GaM', 'A')
-    
+
     def delete(self, called=0):
         if self.next: self.next.previous = self.previous
         if self.previous: self.previous.next = self.next
@@ -431,15 +435,15 @@ class Object(CompareByNumber, ObjectsMixins):
 
     @property
     def sup(self): return self._sup
-    
+
     @property
     def spacedID(self):
         'override in subclass'
         return 'id | object'
-    
+
     @property
     def subs(self): return []
-    
+
     @property
     def name(self):
         try:
@@ -448,15 +452,15 @@ class Object(CompareByNumber, ObjectsMixins):
         return super().name
     @name.setter
     def name(self, n): self._name = n
-    
+
     @property
     def manager(self): return self._manager
-    
+
     @property
     def master(self):
         if isinstance(self.manager, str): return self.manager
         return self.manager.master
-    
+
     @property
     def number(self): return self._number
 
@@ -467,25 +471,25 @@ class ObjectsManager(ObjectsMixins):
 
     @property
     def objectName(self): return self.ObjectType.__name__
-    
+
     def __init__(self, master=None, date=None, previous=None):
         assert master != None, 'Master can not be None.'
         self._master = master
         self._subs = []
         ObjectsMixins.__init__(self, date=date or master.date, previous=previous)
-    
+
     def __len__(self): return len(self.subs)
-    
+
     def __str__(self): return f'{self.master} | {self.name}'
-    
+
     @property
     def master(self): return self._master
     @property
     def manager(self): return self._master
-    
+
     @property
     def subs(self): return self._subs
-    
+
     @subs.setter
     def subs(self, subs): self._subs = subs
 
@@ -496,7 +500,7 @@ class ObjectsManager(ObjectsMixins):
             first_ = self[0]
             assert first_.previous == None, f'{self} is not the first.'
             return first_
-        
+
     @property
     def last(self):
         if len(self):
@@ -504,9 +508,9 @@ class ObjectsManager(ObjectsMixins):
             last_ = self[-1]
             assert last_.next == None, f'{self} is not the last.'
             return last_
-    
+
     def addSub(self, sub): self._subs.append(sub)
-    
+
     def getSub(self, **attrs_vals):
         if len(self):
             for sub in self:
@@ -515,7 +519,7 @@ class ObjectsManager(ObjectsMixins):
                     if val == None: v = True
 
                     elif attr == 'month': v = getattr(sub, attr).monthYear == val.monthYear
-                    
+
                     elif 'date' in attr:
                         if '-' in attr:
                             w = attr.split('-')[1]
@@ -524,13 +528,13 @@ class ObjectsManager(ObjectsMixins):
                             elif w == 'y': v = sub.date.isSameYear(val)
                             elif w == 't': v = sub.date.isSameDate(val)
                         else: v = sub.date == val
-                        
+
                     else: v = getattr(sub, attr) == val
-                        
+
                     count.append(v)
 
                 if count.count(True) == len(count): return sub
-    
+
     def createSub(self, *args, date=None, month=None, **kwargs):
         last = self.last
         subsByMonth = self.sortSubsByMonth(month or PRMP_DateTime.now())
@@ -538,29 +542,29 @@ class ObjectsManager(ObjectsMixins):
         if not self.MultipleSubsPerMonth:
             if len(subsByMonth): raise self.Errors(f'Multiple {self.ObjectType.__name__} can\'t be created within a month.')
         else: last = subsByMonth[-1] if len(subsByMonth) else None
-            
+
         if month: kwargs = dict(month=month, **kwargs)
 
         sub = self.ObjectType(self, *args, previous=last, number=len(self)+1, date=date, **kwargs)
 
         if last: last.next = sub
-        
+
         self.addSub(sub)
-        
+
         return sub
-    
+
     def deleteSubs(self): self._subs = []
-    
+
     def removeSub(self, sub):
         if sub in self: self._subs.remove(sub)
-    
+
     def removeSubByIndex(self, index):
         if len(self.subs) >= index:
             sub = self.subs[index]
             sub.delete()
             self.removeSub(sub)
         else: raise ValueError(f'Total Subs is not upto {index}.')
-    
+
  ########## Sorting
 
     def sortSubsByDate(self, date):
@@ -568,22 +572,22 @@ class ObjectsManager(ObjectsMixins):
 
         _rec = [rec for rec in self if str(rec.date) == str(date)]
         return _rec
-    
+
     #Day Sorting
     def sortSubsByDay(self, date):
         recs = [sub for sub in self if sub.date.dayName == date.dayName]
         return recs
-    
+
     def sortSubsIntoDaysInWeek(self, week):
         week = self.getDate(week)
         days = [sub for sub in self if sub.date.isSameWeek(week)]
         return days
-    
+
     def sortSubsIntoDaysInMonth(self, month):
         month = self.getDate(month)
         days = [sub for sub in self if sub.date.isSameMonth(month)]
         return days
-    
+
     #Week Sorting
     def sortSubsByWeek(self, date):
         date = self.getDate(date)
@@ -596,17 +600,17 @@ class ObjectsManager(ObjectsMixins):
         daysSub = self.sortSubsIntoDaysInMonth(month)
         weeksSub = daysSub.sortSubsIntoWeeks()
         return weeksSub
-    
+
     def sortSubsIntoWeeksInYear(self): pass
-    
+
     #Month Sorting
     def sortSubsByMonth(self, month): return self.sortSubsIntoDaysInMonth(month)
-    
+
     def sortSubsIntoMonthsInYear(self, year):
         year = self.getDate(year)
         yearSubs = [sub for sub in self if sub.date.isSameYear(year)]
         return yearSubs
-    
+
     #Year Sorting
     def sortSubsByYear(self, year):
         year = self.getDate(year)
