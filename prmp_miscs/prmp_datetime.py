@@ -230,6 +230,9 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
     Errors = PRMP_Errors.PRMP_DateTimeError
     # the __add__ and __sub__ are implementaions are purely by PRMPSmart@gmail.com
+
+    def __init__(self, *args): datetime.datetime.__init__(self, *args)
+
     def __add__(self, add_month):
         if isinstance(add_month, datetime.timedelta): return self.createDateTime(obj=super().__add__(add_month))
 
