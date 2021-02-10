@@ -22,30 +22,30 @@ class SeasonRecord(ObjectsMixins):
         super().__init__(date=date, idReq=1)
         self._subs = records
         self._subs.sort()
-        
+
         man = records[0].manager
         for rec in records: assert rec.manager.className == man.className, 'Records of different manager types given.'
 
-        
-    
+
+
     def __int__(self): return sum([int(rec) for rec in self])
     def __float__(self): return sum([float(rec) for rec in self])
-    
+
     # def __getitem__(self, num): return self.records[num]
-    
+
     # def __len__(self): return len(self.records)
-    
+
     @property
     def manager(self): return self.records[0].manager
-    
+
     # @property
     # def date(self): return self.records[0].date
-    
+
     @property
     def subs(self): return self._subs
     @property
     def records(self): return self.subs
-    
+
     def get(self, season, wh):
         if season == 'year':
             for rec in self:
@@ -59,11 +59,11 @@ class SeasonRecord(ObjectsMixins):
 
 class WeekRecord(SeasonRecord, CompareByWeek):
     maximum = 7
-    
+
     def __init__(self, records, date=None):
         SeasonRecord.__init__(self, records, date=date)
         self.recDayNames = [rec.date.dayName for rec in records]
-    
+
     def __str__(self): return f'{self.manager} | {self.className}({self.weekMonthYear}) | {self.moneyWithSign}'
 
     def _day(self, name):
@@ -87,15 +87,15 @@ class WeekRecord(SeasonRecord, CompareByWeek):
 
 class MonthRecord(SeasonRecord, CompareByMonth):
     maximum = 5
-    
+
     def __init__(self, records, weeks=False):
         super().__init__(records)
         self.__weeks = []
         self.__sorted = False
         if weeks: self.sortRecordsIntoWeeks()
-    
+
     def __str__(self): return f'{self.manager} | {self.className}({self.monthYear}) | {self.moneyWithSign}'
-    
+
     def sortRecordsIntoWeeks(self):
         if self.__sorted: return self
         daysRec = [record for record in self if record.date.isSameMonth(self.date)]
@@ -111,11 +111,11 @@ class MonthRecord(SeasonRecord, CompareByMonth):
             elif dayRec.date.monthYear in weeks[2]: week3.append(dayRec)
             elif dayRec.date.monthYear in weeks[3]: week4.append(dayRec)
             elif dayRec.date.monthYear in weeks[4]: week5.append(dayRec)
-        
+
         self.__weeks = [WeekRecord(week1), WeekRecord(week2),  WeekRecord(week3),  WeekRecord(week4),  WeekRecord(week5)]
         self.__sorted = True
         return self
-    
+
     @property
     def __week(self, num):
         try: return self.__weeks[num]
@@ -133,14 +133,14 @@ class MonthRecord(SeasonRecord, CompareByMonth):
 
 class YearRecord(SeasonRecord, CompareByYear):
     maximum = 12
-    
+
     def __init__(self, records, months=False):
         super().__init__(records)
         self.__months = []
         if months: self.recMonthNames = [rec.date.monthName for rec in records]
-    
+
     def __str__(self): return f'{self.manager} | {self.className}({self.year}) | {self.moneyWithSign}'
-    
+
     def sortRecordsIntoMonths(self):
         jan = []
         feb = []
@@ -154,7 +154,7 @@ class YearRecord(SeasonRecord, CompareByYear):
         octo = []
         nov = []
         dec = []
-        
+
         for rec in self:
             if rec.monthName == MONTHS_NAMES[1]: jan.append(rec)
             elif rec.monthName == MONTHS_NAMES[2]: feb.append(rec)
@@ -168,17 +168,17 @@ class YearRecord(SeasonRecord, CompareByYear):
             elif rec.monthName == MONTHS_NAMES[10]: octo.append(rec)
             elif rec.monthName == MONTHS_NAMES[11]: nov.append(rec)
             elif rec.monthName == MONTHS_NAMES[12]: dec.append(rec)
-            
+
         self.__months = [MonthRecord(jan), MonthRecord(mar), MonthRecord(feb), MonthRecord(apr), MonthRecord(may), MonthRecord(jun), MonthRecord(jul), MonthRecord(aug), MonthRecord(sep), MonthRecord(octo), MonthRecord(nov), MonthRecord(dec)]
         self.recMonthNames = [rec.date.monthName for rec in self.__months]
-    
+
     def __year(self, monthName):
         try:
             if monthName in self.recMonthNames:
                 for rec in self.__months:
                     if monthName == rec.date.monthName: return rec
         except: pass
-        
+
     @property
     def months(self): return self.__months
     @property
@@ -207,11 +207,11 @@ class YearRecord(SeasonRecord, CompareByYear):
     def december(self): return self.__year(MONTHS_NAMES[12])
 
 class RecordsWithSameSeasons(SeasonRecord):
-    
+
     def __init__(self, records, name):
         super().__init__(records)
         self.__class__.__name__ = name
-    
+
     def __str__(self): return f'{self.manager} | {self.className}s | {self.moneyWithSign}'
 
 class RecordsManager(ObjectsManager):
@@ -219,47 +219,47 @@ class RecordsManager(ObjectsManager):
     ObjectType = Record
     MultipleSubsPerMonth = True
     subTypes = ['Records']
-    
+
     def __init__(self, account=None): ObjectsManager.__init__(self, account)
-    
+
     def __float__(self): return float(self.totalMonies)
     def __int__(self): return int(self.totalMonies)
-    
+
     def __str__(self): return f'{self.account} | {self.name}'
-    
+
     def __len__(self): return len(self.records)
 
     def __repr__(self): return f'<{self.name}>'
-    
+
     @property
     def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date})'
 
     @property
     def account(self): return self.master
-    
+
     @property
     def region(self): return self.account.region
-    
+
     @property
     def records(self): return self.subs
-    
+
     @property
     def lastMoney(self): return float(self.lastRecord) if self.last else 0
-    
+
     @property
     def lastRecord(self): return self.last
-    
+
     @property
     def totalMonies(self): return sum([float(record) for record in self[:]])
-    
+
     @property
     def recordDateTuples(self): return [(str(record.date), float(record)) for record in self]
-    
+
     @property
     def dates(self): return [record.date for record in self]
-    
+
     def _setRecords(self, records): self._subs = records
-    
+
     def createRecord(self, money, date=None, newRecord=True, notAdd=False, **kwargs):
         '''
         money: type float; transaction to be in the record.
@@ -273,11 +273,11 @@ class RecordsManager(ObjectsManager):
 
         new = False
         record = None
-        
+
         date = self.getDate(date)
-        
+
         # if self.className == 'BroughtForwards': print(date.date, newRecord, money)
-        
+
         if newRecord: new = True
         else:
             if date in list(self.dates):
@@ -288,27 +288,27 @@ class RecordsManager(ObjectsManager):
                     if notAdd: record.set(money)
                     else: record.add(money)
             else: new = True
-            
+
         if new:
             record = self.createSub(money, date=date, **kwargs)
             self.records.sort()
-        
+
         return record
-    
+
     def updateWithOtherManagers(self, managers):
         self.deleteSubs()
         total = sum([float(manager) for manager in managers])
         self.createRecord(total, newRecord=False, notAdd=True)
-    
+
     def removeRecord(self, rec): self.removeSub(rec)
-    
+
     def removeRecordByIndex(self, index): self.removeSubByIndex(index)
-    
+
     def checkMoney(self, money):
         if (money < self.lowest): raise ValueError(f'Amount of {money} is too small.')
         if (money % 5) != 0: raise ValueError(f'Amount of {money} is not valid.')
         return 1
-    
+
     @property
     def recordsYears(self):
         years = []
@@ -316,7 +316,7 @@ class RecordsManager(ObjectsManager):
             if rec.year in years: continue
             else: years.append(rec.year)
         return years
-    
+
     @property
     def recordsAsList(self): return [float(record) for record in self]
     @property
@@ -334,25 +334,24 @@ class RecordsManager(ObjectsManager):
 
     ############ Sorting
     #Date Sorting
-    
-    def sortRecordsByDate(self, date):
 
+    def sortRecordsByDate(self, date):
         _rec = self.sortSubsByDate(date)
         return _rec
-    
+
     #Day Sorting
     def sortRecordsByDay(self, date):
         recs = self.sortSubsByDay(date)
         return RecordsWithSameSeasons(recs, date.dayName)
-    
+
     def sortRecordsIntoDaysInWeek(self, week):
         days = self.sortSubsIntoDaysInWeek(week)
         if days: return WeekRecord(days)
-    
+
     def sortRecordsIntoDaysInMonth(self, month):
         days = self.sortSubsIntoDaysInMonth(month)
         return MonthRecord(days)
-    
+
     #Week Sorting
     def sortRecordsByWeek(self, week):
         records = self.sortSubsByWeek(week)
@@ -361,23 +360,23 @@ class RecordsManager(ObjectsManager):
     def sortRecordsIntoWeeksInMonth(self, month):
         weeksRec = self.sortSubsIntoWeeksInMonth(month)
         return weeksRec
-    
+
     def sortRecordsIntoWeeksInYear(self): pass
-    
+
     #Month Sorting
     def sortRecordsByMonth(self, month): return self.sortSubsByMonth(month)
-    
+
     def sortRecordsIntoMonthsInYear(self, year):
         yearRecs = self.sortSubsIntoMonthsInYear(year)
         year = YearRecord(yearRecs)
         year.sortRecordsIntoMonths()
         return year
-    
+
     def sortRecordsIntoMonthsInYears(self):
         yearsRecs = YearRecord(self.records)
         yearsRecs.sortRecordsIntoMonths()
         return yearsRecs
-    
+
     #Year Sorting
     def sortRecordsByYear(self, year):
         recs = self.sortSubsByYear(year)
@@ -389,29 +388,29 @@ class RecordsManager(ObjectsManager):
 
 class RepaymentsManager(RecordsManager):
     ObjectType = Repayment
-    
+
     @property
     def paid(self):
         for repay in self[:]:
             if repay and (not repay.paid): return False
         return True
-    
+
     @property
     def outstanding(self):
         out = 0
         for record in self:
             if record: out += record.outstanding
         return out
-    
+
     @property
     def repaid(self):
         rep = 0
         for record in self: rep += record.repaid
         return rep
-    
+
     def updateWithOtherManagers(self, managers):
         self.subs = managers
-        
+
     def addRepayment(self, repay, **kwargs):
         outs = self.outstanding
         if repay > outs: raise Errors.RepaymentError(f'Repay of {repay} is > Outstanding of {outs} ')
@@ -433,19 +432,19 @@ class SalariesManager(RecordsManager):
 
 class LoanInterests(RepaymentsManager):
     ObjectType = LoanInterest
-    
+
     def __init__(self, manager):
         super().__init__(manager)
         self.addLoanInterest(date=manager.date)
-    
+
     def addLoanInterest(self, **kwargs):
         interestRate = self.loan.interestRate
         interest = self.loan.outstanding * interestRate
         self.createRecord(interest, interestRate=interestRate, **kwargs)
-        
+
     @property
     def loan(self): return self.account
-    
+
     @property
     def paid(self):
         for interest in self:
@@ -454,7 +453,7 @@ class LoanInterests(RepaymentsManager):
 
 class LoanBonds(RepaymentsManager):
     ObjectType = LoanBond
-    
+
     @property
     def validLoan(self): return self.account.validLoan
 
@@ -463,13 +462,13 @@ class LoanBonds(RepaymentsManager):
         go = 1
         if last:
             outstandingLoan = last.outstandingLoan
-            
+
             if last.paid and last.granted:
                 if last.paidLoan: pass
                 elif outstandingLoan: raise Errors.LoanBondsError(f'There is a paid loan bond with an outstanding loan ({outstandingLoan}).')
             elif not last.granted: raise Errors.LoanBondsError('There is a paid loan bond with a pending loan.')
             else: raise Errors.LoanBondsError('There is an outstanding loan bond not yet paid.')
-            
+
         loanBond = self.createRecord(money,  proposedLoan=proposedLoan, **kwargs)
         return loanBond
 

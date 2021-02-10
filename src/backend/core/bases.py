@@ -29,10 +29,10 @@ class ObjectSort(Mixins):
    #
     __lt = ('lt', '<')
     __le = ('le', '<=')
-    __eq = ('eq', '==')
-    __ne = ('ne', '!=')
     __gt = ('gt', '>')
     __ge = ('ge', '>=')
+    __eq = ('eq', '==')
+    __ne = ('ne', '!=')
     __comparisons = (__lt, __le, __eq, __ne, __gt, __ge)
 
     __lt_lt = (__lt, __lt)
@@ -67,9 +67,16 @@ class ObjectSort(Mixins):
     def compare(self, a, b, _type='=='):
         comp = self.getCompType(_type)
         if comp:
-            equation = f'{a} {comp} {b}'
-            # print(equation)
-            return eval(equation)
+            # equation = f'{a} {comp} {b}'
+            # # print(equation)
+            # return eval(equation)
+
+            if comp == self.__lt[1]: return a < b
+            elif comp == self.__le[1]: return a <= b
+            elif comp == self.__eq[1]: return a == b
+            elif comp == self.__ne[1]: return a != b
+            elif comp == self.__gt[1]: return a > b
+            elif comp == self.__ge[1]: return a >= b
 
     def getRangeType(self, _type):
         t1, t2 = _type
@@ -82,9 +89,29 @@ class ObjectSort(Mixins):
         rang = self.getRangeType(_type)
         if rang:
             r1, r2 = rang
-            equation = f'{a} {r1} {b} {r2} {c}'
-            # print(equation)
-            return eval(equation)
+            # equation = f'{a} {r1} {b} {r2} {c}'
+            # # print(equation)
+            # return eval(equation)
+
+            if r1 == self.__lt[1] and r2 == self.__lt[1]: return a < b < c
+            elif r1 == self.__lt[1] and r2 == self.__le[1]: return a < b <= c
+            elif r1 == self.__lt[1] and r2 == self.__gt[1]: return a < b > c
+            elif r1 == self.__lt[1] and r2 == self.__ge[1]: return a < b >= c
+
+            elif r1 == self.__le[1] and r2 == self.__lt[1]: return a <= b < c
+            elif r1 == self.__le[1] and r2 == self.__le[1]: return a <= b <= c
+            elif r1 == self.__le[1] and r2 == self.__gt[1]: return a <= b > c
+            elif r1 == self.__le[1] and r2 == self.__ge[1]: return a <= b >= c
+
+            elif r1 == self.__gt[1] and r2 == self.__lt[1]: return a > b < c
+            elif r1 == self.__gt[1] and r2 == self.__le[1]: return a > b <= c
+            elif r1 == self.__gt[1] and r2 == self.__gt[1]: return a > b > c
+            elif r1 == self.__gt[1] and r2 == self.__ge[1]: return a > b >= c
+
+            elif r1 == self.__ge[1] and r2 == self.__lt[1]: return a >= b < c
+            elif r1 == self.__ge[1] and r2 == self.__le[1]: return a >= b <= c
+            elif r1 == self.__ge[1] and r2 == self.__gt[1]: return a >= b > c
+            elif r1 == self.__ge[1] and r2 == self.__ge[1]: return a >= b >= c
 
     def getAllObjects(self, object_=None):
         object_ = object_ or self.object
@@ -112,7 +139,7 @@ class ObjectSort(Mixins):
     def getObjects(self, object_=None, subs=[], attrs=[], manAttrs=[]):
         object_ = object_ or self.object
 
-        if subs and object_: raise ValueError('If this ObjectSort instance has an attributed object or an object_ is passed to sort method, subs should not be passed.')
+        if subs: return subs
 
         if attrs and not object_: raise ValueError('This ObjectSort instance has no attributed object.')
 
@@ -149,7 +176,7 @@ class ObjectSort(Mixins):
                     if not valid: break
 
                     className = validation.get('className')
-                    if className and (obj.className != className):
+                    if className and (className not in obj.mroStr):
                         valid = False
                         break
                     mroStr = validation.get('mroStr')
@@ -334,29 +361,29 @@ class ObjectsMixins(Mixins, CompareByDate):
 
     @property
     def regDate(self): return self.date
-    @property
-    def day(self): return self.date.day
-    @property
-    def dayName(self): return self.date.dayName
-    @property
-    def month(self): return self.date.month
-    @property
-    def monthName(self): return self.date.monthName
-    @property
-    def year(self): return self.date.year
-    @property
-    def monthYearTuple(self): return self.date.monthYearTuple
-    @property
-    def weekMonthYearTuple(self): return self.date.weekMonthYearTuple
+    # @property
+    # def day(self): return self.date.day
+    # @property
+    # def dayName(self): return self.date.dayName
+    # @property
+    # def month(self): return self.date.month
+    # @property
+    # def monthName(self): return self.date.monthName
+    # @property
+    # def year(self): return self.date.year
+    # @property
+    # def monthYearTuple(self): return self.date.monthYearTuple
+    # @property
+    # def weekMonthYearTuple(self): return self.date.weekMonthYearTuple
 
-    @property
-    def monthYear(self): return self.date.monthYear
+    # @property
+    # def monthYear(self): return self.date.monthYear
 
-    @property
-    def weekMonthYear(self): return self.date.weekMonthYear
+    # @property
+    # def weekMonthYear(self): return self.date.weekMonthYear
 
-    @property
-    def week(self): return self.date.week
+    # @property
+    # def week(self): return self.date.week
 
     @property
     def date(self): return self._date
