@@ -588,3 +588,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @classmethod
     def ord2ymd(cls, ord_): return _ord2ymd(ord_)
+
+    def addTimes(self, **kwargs): return self + self.timedelta(**kwargs)
+
+    def addMonths(self, months): return self + months
