@@ -1,8 +1,10 @@
 from .dc_records import *
+from .dc_sorts import DCSort
 
 
 class DCRecordsManager(RecordsManager):
     ObjectType = DCRecord
+    ObjectSortClass = DCSort
 
     def __init__(self, account, lastRecord=False):
         self._lastRecord = lastRecord

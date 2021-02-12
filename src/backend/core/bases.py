@@ -281,11 +281,13 @@ class ObjectSort(Mixins):
 class ObjectsMixins(Mixins, CompareByDate):
     subTypes = ['subs']
 
+    ObjectSortClass = ObjectSort
+
     def __init__(self, date=None, previous=None, idReq=0):
         self.__editableValues = []
 
         self._date = self.getDate(date)
-        self.objectSort = ObjectSort(self)
+        self.objectSort = self.ObjectSortClass(self)
 
         self.previous = previous
         self.next = None

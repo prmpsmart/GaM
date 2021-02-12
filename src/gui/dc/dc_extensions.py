@@ -566,7 +566,7 @@ class OneInAll(PRMP_FillWidgets, LabelFrame):
 
         self.isOneinAll = Checkbutton(self, text='This?', place=dict(relx=.78, rely=.66, relh=.325, relw=.18))
 
-        self.addResultsWidgets(['months', 'weeks', 'days'])
+        # self.addResultsWidgets(['months', 'weeks', 'days'])
 
 
     def get(self, e=0):
@@ -576,8 +576,9 @@ class OneInAll(PRMP_FillWidgets, LabelFrame):
         val = ''
         if oneInAll == '0': oneInAll = ''
         if oneInAll:
-            wid = self.getFromSelf(oneInAll)
-            if wid: val = wid.get()
+            # wid = self.getFromSelf(oneInAll)
+            # if wid: val = wid.get()
+            val = PRMP_FillWidgets.get(self, [oneInAll])
 
         res = [oneInAll, val]
         return res
@@ -600,19 +601,12 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         self.addResultsWidgets(['date', 'dataChoose'])
 
     def parser(self):
-        gets = self.get()
-
-        date = gets['date']
-        dataChoose = gets['dataChoose']
+        date = self.date.get()
 
       # date verification
         if not date:
             PRMP_MsgBox(self, title='Date Error', message='Please choose a date', _type='error', delay=1500)
             return
-
-      # dataChoose verification
-        if not dataChoose[0]: dataChoose[0] = 'month'
-        if not dataChoose[1]: dataChoose[1] = 'subs'
 
       # oneInAll verification
         if self.oneInAll.isOneinAll.get():
@@ -626,11 +620,27 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                 if not specVal:
                     PRMP_MsgBox(self, title=f'{spec} Error', message=f'Please choose a valid {spec.title()} type !', _type='error', delay=1500)
                     return
+                else:
+                    # now to the oneInAll deals
+                    pass
 
         else:
-            pass
+            season, which = self.dataChoose.get()
 
-        print(gets)
+         # dataChoose verification
+            season = season or 'month'
+            which = which or 'subs'
+
+            # now to the dataChoose deals
+
+            if which == 'subs':
+                'will now go to the subs accounts details'
+                pass
+            else:
+                'will now go to self accounts details'
+                pass
+
+
 
 
 

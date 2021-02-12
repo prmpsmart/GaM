@@ -5,6 +5,7 @@ from ..core.bases import ObjectsMixins
 
 class DCAccount(Account):
     Manager = 'DCAccountsManager'
+    ObjectSortClass = DCSort
 
     def __init__(self, manager, month=None, **kwargs):
         assert month, 'Month that this account belongs to must be given.'
