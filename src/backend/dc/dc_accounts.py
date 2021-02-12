@@ -56,7 +56,7 @@ class DCAccount(Account):
     def updateBroughtForwards(self, date=None):
         if self.nextAccount: self.nextAccount.addBroughtForward(float(self.balances), date=date)
 
-    def getRecs_Of_RM_By_Seasons(self, date=None, **kwargs):
+    def get_RMs_By_Seasons(self, date=None, **kwargs):
         leng = len(self)
         date = self.getDate(date)
 
@@ -70,13 +70,13 @@ class DCAccount(Account):
 
         return recs
 
-    def getRecs_Of_RM_ByDate(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['date'], **kwargs)
+    def getRecs_Of_RM_ByDate(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['date'], **kwargs)
 
-    def getRecs_Of_RM_ByDay(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['day'], **kwargs)
+    def getRecs_Of_RM_ByDay(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['day'], **kwargs)
 
-    def getRecs_Of_RM_ByDayName(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['dayName'], **kwargs)
+    def getRecs_Of_RM_ByDayName(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['dayName'], **kwargs)
 
-    def getRecs_Of_RM_ByWeek(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['week'], **kwargs)
+    def getRecs_Of_RM_ByWeek(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['week'], **kwargs)
 
 
 class DCAccountsManager(AccountsManager):
@@ -95,13 +95,28 @@ class DCAccountsManager(AccountsManager):
             containerDict[name] += float(recordManager)
         return containerDict
 
-
     def createAccount(self, month=None, **kwargs):
         month = self.getDate(month)
         return super().createAccount(month=month, **kwargs)
 
     @property
     def recordsManagers(self): return self.last if len(self) else []
+
+    def gets_RecM_Of_Accs_By_Seasons(self, date=None, **kwargs):
+        leng = len(self)
+        date = self.getDate(date)
+
+        recM_Names = [recM.className for recM in self.first]
+
+        accs = []
+        for ind in range(leng):
+            acc = self[ind]
+            _recs = acc.objectSort.sortSubsBySeasons(date, **kwargs)
+            if _recs:
+                rec = acc.recordsAsRecord(_recs, date)
+                recs.append(rec)
+
+        return recs
 
 
 class ClientAccount(DCAccount):

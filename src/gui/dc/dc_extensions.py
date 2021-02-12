@@ -676,7 +676,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                         datas = []
 
                         for ac in caseObj:
-                            data = ac.getRecs_Of_RM_By_Seasons(date, seasons=[season])
+                            data = ac.get_RMs_By_Seasons(date, seasons=[season])
                             datas.append(data)
 
                     if season == 'year': pass
