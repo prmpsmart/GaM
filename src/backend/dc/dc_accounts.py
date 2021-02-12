@@ -64,37 +64,17 @@ class DCAccount(Account):
             recM = self[ind]
             _recs = recM.objectSort.sortSubsBySeasons(date, **kwargs)
             if _recs:
-                recClass = recM.ObjectType
-                money = 0
-                for _rec in _recs: money += float(_rec)
-                rec = recClass(recM, money, date=date)
+                rec = recM.recordsAsRecord(_recs, date)
                 recs.append(rec)
         return recs
 
     def getRecs_Of_RM_ByDate(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['date'], **kwargs)
-    # def getRecs_Of_RM_ByDate(self, date=None):
-    #     leng = len(self)
-    #     date = self.getDate(date)
-
-    #     recs = []
-    #     for ind in range(leng):
-    #         recM = self[ind]
-    #         _recs = recM.sortRecordsByDate(date)
-    #         if _recs:
-    #             recClass = recM.ObjectType
-    #             money = 0
-    #             for _rec in _recs: money += float(_rec)
-    #             rec = recClass(recM, money, date=date)
-    #             recs.append(rec)
-    #     return recs
 
     def getRecs_Of_RM_ByDay(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['day'], **kwargs)
-    
+
     def getRecs_Of_RM_ByDayName(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['dayName'], **kwargs)
 
     def getRecs_Of_RM_ByWeek(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['week'], **kwargs)
-
-
 
 
 class DCAccountsManager(AccountsManager):

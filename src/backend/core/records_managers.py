@@ -332,6 +332,13 @@ class RecordsManager(ObjectsManager):
     @property
     def recordsAsDictShort(self): return [{str(record.date): float(record)} for record in self]
 
+    def recordsAsRecord(self, records, date):
+        if records:
+            money = .0
+            for _rec in records: money += float(_rec)
+            rec = self.ObjectType(self, money, date=date)
+            return rec
+
     ############ Sorting
     #Date Sorting
 
