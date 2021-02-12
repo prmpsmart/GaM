@@ -641,8 +641,8 @@ class PRMP_Widget(PRMP_Theme):
             if self.variable.get() == self.value: self.light()
             else: self.unlight()
 
-    def switchGroup(self, e):
-        self.var.set(self.val)
+    def switchGroup(self, e=0):
+        if e: self.var.set(self.val)
         for w in self.toggleGroup:
             if w == self: self.light()
             else: w.unlight()
@@ -693,7 +693,7 @@ class PRMP_Widget(PRMP_Theme):
             try: self.TKClass.state(self, s)
             except:
                 if self.children:
-                    for child in children: child.state(s)
+                    for child in self.winfo_children(): child.state(s)
 
 
     def config(self, **kwargs):

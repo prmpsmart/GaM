@@ -15,7 +15,7 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, values)
         font = self.DEFAULT_FONT.copy()
-        font['size'] = 20
+        font['size'] = 2
      # Incomes
         self._incomes = incomes = LabelFrame(self, text='Incomes')
         Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
@@ -467,19 +467,81 @@ class DataChoose(LabelFrame):
         self.season = tk.StringVar()
         self.season.set('0')
 
-        self.years = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Years', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+        relief = 'flat'
 
-        self.year = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Year', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+     # years
+        self.years = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Years', variable=self.season, value='years'), bottom=Frame, bottomKwargs=dict(relief=relief), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.22)
 
-        self.month = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Month', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+        yearsFrame = self.years.Bottom
+        self.yearsVar = tk.StringVar()
 
-        self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+        years = Radiobutton(yearsFrame, text='Years', place=dict(relx=.01, rely=.005, relw=.27, relh=.98), variable=self.yearsVar, value='years')
+        months = Radiobutton(yearsFrame, text='Months', place=dict(relx=.29, rely=.005, relw=.32, relh=.98), variable=self.yearsVar, value='months')
+        subs = Radiobutton(yearsFrame, text='Subs', place=dict(relx=.615, rely=.005, relw=.24, relh=.98), variable=self.yearsVar, value='subs')
 
-        self.day = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Day', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+        self.setRadioGroups([years, months, subs])
 
-        # self.setRadioGroups([self.years, self.months, self.areas, self.clients, self.weeks, self.days])
+     # year
+        self.year = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Year', variable=self.season, value='year'), bottom=Frame, bottomKwargs=dict(relief=relief), place=dict(relx=.01, rely=.2, relw=.98, relh=.19), orient='h', longent=.22)
+
+        yearFrame = self.year.Bottom
+        self.yearVar = tk.StringVar()
+
+        months = Radiobutton(yearFrame, text='Months', place=dict(relx=.01, rely=.005, relw=.32, relh=.98), variable=self.yearVar, value='months')
+        subs = Radiobutton(yearFrame, text='Subs', place=dict(relx=.34, rely=.005, relw=.24, relh=.98), variable=self.yearVar, value='subs')
+
+        self.setRadioGroups([months, subs])
 
 
+     # month
+        self.month = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Month', variable=self.season, value='month'), bottom=Frame, bottomKwargs=dict(relief=relief), place=dict(relx=.01, rely=.40, relw=.98, relh=.19), orient='h', longent=.22)
+
+        monthFrame = self.month.Bottom
+        self.monthVar = tk.StringVar()
+
+        month = Radiobutton(monthFrame, text='month', place=dict(relx=.01, rely=.005, relw=.27, relh=.98), variable=self.monthVar)
+        months = Radiobutton(monthFrame, text='Months', place=dict(relx=.29, rely=.005, relw=.32, relh=.98), variable=self.monthVar)
+        subs = Radiobutton(monthFrame, text='Subs', place=dict(relx=.615, rely=.005, relw=.24, relh=.98), variable=self.monthVar)
+
+        self.setRadioGroups([month, months, subs])
+
+
+     # week
+        self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season, value='week'), bottom=Frame, bottomKwargs=dict(relief=relief), place=dict(relx=.01, rely=.60, relw=.98, relh=.19), orient='h', longent=.22)
+
+        weekFrame = self.week.Bottom
+        self.weekVar = tk.StringVar()
+
+        days = Radiobutton(weekFrame, text='Days', place=dict(relx=.01, rely=.005, relw=.32, relh=.98), variable=self.weekVar, value='days')
+        subs = Radiobutton(weekFrame, text='Subs', place=dict(relx=.34, rely=.005, relw=.24, relh=.98), variable=self.weekVar, value='subs')
+
+        self.setRadioGroups([days, subs])
+
+     # day
+        self.day = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Day', variable=self.season, value='day'), bottom=Frame, bottomKwargs=dict(relief=relief), place=dict(relx=.01, rely=.80, relw=.98, relh=.19), orient='h', longent=.22)
+
+        dayFrame = self.day.Bottom
+        self.dayVar = tk.StringVar()
+
+        subs = Radiobutton(dayFrame, text='Subs', place=dict(relx=.01, rely=.005, relw=.24, relh=.98), variable=self.dayVar, value='subs')
+
+        # self.setRadioGroups([days, subs])
+
+
+
+        self.setRadioGroups([self.years, self.month, self.week, self.day, self.year])
+
+        self.day.switchGroup()
+
+    def get(self):
+        season = self.season.get()
+        val = ''
+        if season:
+            wid = self.getFromSelf(season)
+            var = self.getFromSelf(f'{season}Var')
+            val = var.get()
+
+        return (season, val)
 
 
 class ProperDetails(Frame):
@@ -592,7 +654,6 @@ class ProperDetails(Frame):
     def get_spec_area(self, e): pass
 
 
-
 class ProperDetails2(Frame):
 
     def __init__(self, master, **kwargs):
@@ -600,8 +661,7 @@ class ProperDetails2(Frame):
 
         self.dates = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.25), relief='groove')
 
-        self.data_lblfrm = DataChoose(self, text='Datas', place=dict(relx=.005, rely=.27, relw=.99, relh=.6))
-
+        self.data_lblfrm = DataChoose(self, text='Datas', place=dict(relx=.005, rely=.27, relw=.99, relh=.5))
 
 
 
