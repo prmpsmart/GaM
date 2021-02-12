@@ -126,6 +126,8 @@ class PRMP_Mixins:
                 if ret != unget: return ret.__get__(self)
         return unget
 
+    # get = getFromSelf
+
     def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
 
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False

@@ -297,6 +297,8 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def __str__(self): return repr(self)
     # def __str__(self): return self.strftime(self.date_fmt)
 
+    def get(self, name, default=''): return self.getFromSelf(name, default)
+
     @property
     def date(self): return self.strftime(self.date_fmt)
 

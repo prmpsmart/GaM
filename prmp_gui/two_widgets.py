@@ -12,67 +12,78 @@ class TwoWidgets(PRMP_Frame):
     events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
-    
-    def __init__(self, master, top='', bottom='',  orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, tttk=False, bttk=False, func=None, **kwargs):
+
+    def __init__(self, master, top='', bottom='', orient='v', relief='groove', command=None, longent=.5, widthent=0, topKwargs=dict(), bottomKwargs=dict(), disableOnToggle=True, dot=None, tttk=False, bttk=False, func=None, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.top = top.lower()
-        self.bottom = bottom.lower()
         self.orient = orient
         self.longent = longent
         self.widthent = widthent
-        
+
         if dot != None: disableOnToggle = dot
         self.disableOnToggle = disableOnToggle
-        
-        
+
+# top part
+        self.top = top.lower()
+
         if tttk: top_wid = self.stop_widgets[top]
         else: top_wid = self.top_widgets[top]
 
-        if bttk: bottom_wid = self.sbottom_widgets[bottom]
-        else: bottom_wid = self.bottom_widgets[bottom]
-        
         top_defaults = {k:v for k, v in self.top_defaults.items()}
-        
+
         if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
         else: topKw = dict(**topKwargs)
-        
+
         self.Top = top_wid(self, **topKw)
         text = topKwargs.get('text')
         if not text:
             config = topKwargs.get('config')
             if config: text = config.get('text')
-        
-        placeholder = bottomKwargs.get('placeholder', f'Enter {text}.')
-        
-        if bottom in ['label', 'datebutton', 'button']:
-            bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
-            if self._ttk_: bottomKw['style'] = 'entry.Label'
+
+# bottom part
+        if isinstance(bottom, str):
+            self.bottom = bottom.lower()
+
+            if bttk: bottom_wid = self.sbottom_widgets[bottom]
+            else: bottom_wid = self.bottom_widgets[bottom]
+
+            placeholder = bottomKwargs.get('placeholder', f'Enter {text}.')
+
+            if bottom in ['label', 'datebutton', 'button']:
+                bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
+                if self._ttk_: bottomKw['style'] = 'entry.Label'
+            else:
+                if bottomKwargs.get('placeholder', None) != None: bottomKw = dict(**bottomKwargs)
+                else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
+
+            if bottom == 'datebutton': placeholder = 'Choose Date'
+
         else:
-            if bottomKwargs.get('placeholder', None) != None: bottomKw = dict(**bottomKwargs)
-            else: bottomKw = dict(placeholder=placeholder, **bottomKwargs)
-        
-        if bottom == 'datebutton': placeholder = 'Choose Date'
-        
+            self.bottom = bottom.__name__.lower()
+
+            bottom_wid = bottom
+            placeholder = ''
+            bottomKw = bottomKwargs.copy()
+
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
-        
+
         events = self.events.get(bottom)
         if events:
             for event in events:
                 self.Bottom.bind(event, self.clicked, '+')
                 if func: self.Bottom.bind(event, func, '+')
-        
+
         self.B = self.Bottom
         self.T = self.Top
-        
+
         self.val, self.var = self.value, self.variable = self.T.val, self.T.var
 
         self.rt = None
-        
+
         if self.value and self.variable: self.checked()
-        
+
         self.place_widgs()
-        
+
     def clicked(self, e=0): return self.B.get()
 
     @property
@@ -82,38 +93,38 @@ class TwoWidgets(PRMP_Frame):
     @value.setter
     def value(self, v): return
     @variable.setter
-    def variable(self, v): return 
-    
+    def variable(self, v): return
+
     def light(self):
         # print(self)
         self.normal('b')
         self.T.light()
         self.B.focus()
-    
+
     def unlight(self):
         # self.readonly()
         self.disabled('b')
         self.T.unlight()
-    
+
     def verify(self): return self.Bottom.verify()
-    
+
     def toggleSwitch(self):
         self.onFg = False
         if self.toggleGroup: self.T.bind('<1>', self.switchGroup)
-        
+
     def readonly(self):
         try: self.Bottom.readonly()
         except Exception as e: self.disabled('b')
-        
+
     def disabled(self, wh=''):
         if not self.disableOnToggle: return
-        
+
         if wh == 't': self.Top.disabled()
         elif wh == 'b': self.Bottom.disabled()
         else:
             self.Top.disabled()
             self.Bottom.disabled()
-    
+
 
     def active(self, wh=''):
         if wh == 't': self.Top.active()
@@ -121,21 +132,21 @@ class TwoWidgets(PRMP_Frame):
         else:
             self.Top.active()
             self.Bottom.active()
-    
+
     def normal(self, wh=''):
         if wh == 't': self.Top.normal()
         elif wh == 'b': self.Bottom.normal()
         else:
             self.Top.normal()
             self.Bottom.normal()
-        
-    
+
+
     def set(self, values): self.Bottom.set(values)
-    
+
     def get(self): return self.Bottom.get()
-    
+
     def changeValues(self, values): self.Bottom.changeValues(values)
-    
+
     def config(self, **kwargs): self.Top.configure(**kwargs)
 
     def place_widgs(self):
@@ -183,7 +194,7 @@ class LabelCombo(TwoWidgets):
     def __init__(self, master, **kwargs):
 
         super().__init__(master, top='label', bottom='combobox', **kwargs)
-        
+
         self.choosen = None
 LC = LabelCombo
 

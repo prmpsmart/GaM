@@ -10,7 +10,7 @@ from tkinter.colorchooser import askcolor
 
 
 class DC_Digits(PRMP_FillWidgets, Frame):
-    
+
     def __init__(self, master, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, values)
@@ -74,19 +74,19 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         self._balances.place(relx=.75, rely=0, relh=1, relw=.25)
 
     def update(self, account):
-        
+
         debits = account.debits
         upfronts = account.upfronts
-        
+
         fillDict = dict(
             incomes=int(account.incomes),
             savings=int(account.savings),
-        
+
             debits=int(debits),
 
             withdrawals=int(account.withdrawals),
             paidouts=int(account.paidouts),
-        
+
             upfronts=int(upfronts),
             repaid=int(upfronts.repaid),
             overdue=int(upfronts.overdue),
@@ -95,7 +95,7 @@ class DC_Digits(PRMP_FillWidgets, Frame):
             broughts=int(account.broughtForwards),
             transfers=int(account.transfers)
             )
-        
+
         if not isinstance(account.region, Client):
             not_client = dict(
                 commissions=int(account.commissions),
@@ -106,19 +106,19 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         else:
             client = dict(commissions=account.rate)
             fillDict.update(client)
-        
+
         for key in fillDict:
             val = fillDict[key]
             new_val = self.numWithSign_Commas(val)
             fillDict[key] = new_val
-        
+
         fillDict['comm'] = 'Commissions' if not isinstance(account.region, Client) else 'Rate'
 
         self.fill(fillDict)
 
 
 class DC_Overview(Frame):
-    
+
     def __init__(self, master, title='DC Overview', orient='v', obj=None, account=None, **kwargs):
         super().__init__(master, title=title, **kwargs)
         self.obj = obj
@@ -126,7 +126,7 @@ class DC_Overview(Frame):
         if not account:
             if isinstance(obj, AccountsManager): account = obj.lastAccount
             elif isinstance(obj, Region): account = obj.lastAccount
-        
+
         self.account = account
 
         self.month = LabelLabel(self, topKwargs=dict(text='Month'), orient='h', longent=.3)
@@ -151,12 +151,12 @@ class DC_Overview(Frame):
         if self.account: self.updateDCDigits(self.account)
 
         self.topest.addAfters(self.afterload)
-    
+
     def afterload(self):
         self.plotCanvas1.draw()
         self.plotCanvas2.draw()
         self.testDraw()
-    
+
     def testDraw(self):
         # xs = list(range(1, 10))
         xs = [chr(64+a) for a in range(1, 10)]
@@ -166,7 +166,7 @@ class DC_Overview(Frame):
         self.plotCanvas1.doPloting(chart='plot', ys=ys, xticks=xs, labels=lbls, grid=dict(lw=1, ls=ls, c='red'), marker=1)
         self.plotCanvas2.doPloting(chart='pie', ys=ys, labels=xs, explode=9, expand=0, shadow=9, title='Love', inApp=0)
 
-    
+
     def placeVertically(self):
         self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
         self.ledgerNumber.place(relx=.31, rely=.002, relh=.05, relw=.2)
@@ -188,14 +188,14 @@ class DC_Overview(Frame):
         self.dcDigits.placeHorizontally()
         self.plotCanvas1.place(relx=0, rely=.33, relh=.67, relw=.5)
         self.plotCanvas2.place(relx=.5, rely=.33, relh=.67, relw=.5)
-    
+
     def updateDCDigits(self, account):
         assert isinstance(account, Account)
         self.account = account
         self.month.set(self.account.month.monthYear)
         if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
         self.dcDigits.update(account)
-    
+
     def next(self):
         if not self.account: return
         _next = self.account.next
@@ -215,11 +215,11 @@ class ThriftInput(PRMP_FillWidgets, Frame):
         self.thrift = thrift
         PRMP_FillWidgets.__init__(self, thrift or values)
         self.manager = manager
-        
+
         _date = ''
         if thrift:_date = thrift.date.date
         elif manager:_date = manager.date.date
-        
+
         state = (None, None)
         if thrift: state = 'readonly', 'disabled'
 
@@ -234,26 +234,26 @@ class ThriftInput(PRMP_FillWidgets, Frame):
         self.paidout = LabelEntry(self, topKwargs=dict(text='Paidout'), bottomKwargs=dict(_type='money'), orient='h', place=dict(relx=.005, rely=.54, relh=.18, relw=.6))
 
         self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.73, relh=.18, relw=.6), orient='h', longent=.46, bottomKwargs=dict(state='readonly', placeholder=_date))
-        
+
         self.addResultsWidgets(['ledgerNumber', 'month', '_income', 'money', 'paidout', 'transfer'])
-    
+
     def get(self):
         res = super().get()
 
         res['income'] = res['_income']
         del res['_income']
-        
+
         if self.thrift: del res['ledgerNumber'], res['month']
 
         return res
 
 
 class ThriftDetailPart(PRMP_FillWidgets, Frame):
-    
+
     def __init__(self, master, dc=None, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, dc or values)
-        
+
         _date = ''
         if dc: _date = dc.date.date
         self.date = LabelEntry(self, topKwargs=dict(text='Date'), place=dict(relx=.005, rely=.005, relh=.1, relw=.7), orient='h', bottomKwargs=dict(state='readonly', placeholder=_date))
@@ -279,13 +279,13 @@ class ThriftDetailPart(PRMP_FillWidgets, Frame):
 
 
 class ThriftDetail(PRMP_FillWidgets, Frame):
-    
+
     def __init__(self, master, thrift=None, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, thrift or values)
 
         self.thrift = thrift
-        
+
         self._account = None
         self._manager = None
         self._paidoutRecord = None
@@ -300,9 +300,9 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.clientAccount = Button(self, text='Client Account', place=dict(relx=.4, rely=.01, relh=.06, relw=.55), command=self.openAccount)
 
         self.detailsPart = ThriftDetailPart(self, place=dict(relx=.002, rely=.075, relh=.67, relw=.996), dc=thrift)
-        
+
         for k in self.detailsPart.resultsWidgets: self.__dict__[k] = self.detailsPart.__dict__[k]
-        
+
         self.get = self.detailsPart.get
         self.set = self.detailsPart.set
 
@@ -322,7 +322,7 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         self.uniqueIDBtn = UniqueID(self, place=dict(relx=.55, rely=.88, relh=.07, relw=.4), obj=self.thrift)
 
     def updateThriftRecords(self): PRMP_MsgBox(self, title='Confirmation', message='Are you sure to update the records of this thrift?', callback=self._updateThriftRecords, ask=1)
-    
+
     def _updateThriftRecords(self, w):
         if w and self.thrift: self.thrift.updateRecords()
         self.loadOtherObjects()
@@ -331,7 +331,7 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         if self.thrift:
             self._account = self.thrift.account
             self._manager = self.thrift.manager
-            
+
             self._paidoutRecord = self.thrift.paidoutRecord
             self._contRecord = self.thrift.contRecord
             self._tranRecord = self.thrift.tranRecord
@@ -342,46 +342,46 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
         if self._manager:
             from .dc_dialogs import DailyContributionDailog
             DailyContributionDailog(self, dcContrib=self._manager)
-    
+
     def openAccount(self):
         if self._account:
             from .dc_apps import DC_AccountHome
             DC_AccountHome(account=self._account, tm=1, tw=0, resize=(1,1))
-    
+
     def openContRecord(self):
         if self._contRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._contRecord)
-    
+
     def openPaidoutRecord(self):
         if self._paidoutRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._paidoutRecord)
-    
+
     def openTranRecord(self):
         if self._tranRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._tranRecord)
-    
+
     def openConTranRecord(self):
         if self._conTranRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._conTranRecord)
-    
+
     def openDebRecord(self):
         if self._debRecord:
             from .dc_dialogs import RecordDialog
             RecordDialog(self, record=self._debRecord)
-    
+
     def openThrift(self):
         from .dc_dialogs import ThriftDialog
         self.thriftDialog = ThriftDialog(self, thrift=self.thrift, callback=self.update)
-    
+
     def changeStates(self, r=0):
         for rw in [self.getFromSelf(w) for w in self.resultsWidgets]:
             if r: rw.readonly()
             else: rw.normal()
-    
+
     def update(self, thrift):
         if thrift is self.thrift:
             self.changeStates()
@@ -391,14 +391,14 @@ class ThriftDetail(PRMP_FillWidgets, Frame):
 
 
 class DailyContTotal(PRMP_FillWidgets, Frame):
-    
+
     def __init__(self, master, dcContrib=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
 
         self.dcContrib = dcContrib
 
         self.date = LabelLabel(self, topKwargs=dict(text='Date'), place=dict(relx=.007, rely=.01, relw=.3, relh=.16), orient='h')
-        
+
         UniqueID(self, place=dict(relx=.63, rely=.01, relw=.15, relh=.16), obj=dcContrib)
 
         Button(self, text='Refresh', place=dict(relx=.83, rely=.01, relw=.15, relh=.16), command=self.refresh)
@@ -418,19 +418,19 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         self.income = LabelEntry(self, topKwargs=dict(text='Income'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.585, relw=.22, relh=.15), orient='h')
         self.saved = LabelEntry(self, topKwargs=dict(text='Saved'), bottomKwargs=dict(state='readonly'), place=dict(relx=.26, rely=.585, relw=.22, relh=.15), orient='h')
         self.upfrontRepay = LabelEntry(self, topKwargs=dict(text='Upfront Repay'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.585, relw=.32, relh=.15), orient='h')
-        
+
         PRMP_Separator(self, place=dict(relx=.002, rely=.75, relh=.01, relw=.996))
 
 
         self.bto = LabelEntry(self, topKwargs=dict(text='Brought To Office'), bottomKwargs=dict(state='readonly'), place=dict(relx=.007, rely=.77, relw=.4, relh=.16), orient='h')
         self.excess = LabelEntry(self, topKwargs=dict(text='Excess'), bottomKwargs=dict(state='readonly'), place=dict(relx=.52, rely=.77, relw=.22, relh=.16), orient='h')
         self.deficit = LabelEntry(self, topKwargs=dict(text='Deficit'), bottomKwargs=dict(state='readonly'), place=dict(relx=.75, rely=.77, relw=.22, relh=.16), orient='h')
-        
+
         PRMP_FillWidgets.__init__(self, dcContrib)
         self.addResultsWidgets(['lastMonthIncome', 'currentMonthIncome', 'nextMonthIncome', 'accounts', 'bto', 'excess', 'deficit', 'transfer', 'income', 'paidout', 'saved', 'upfrontRepay', 'cash'])
 
         self._refresh()
-    
+
     def _refresh(self):
         if  not self.dcContrib: return
         self.date.set(self.dcContrib.date.date)
@@ -443,8 +443,47 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
         PRMP_MsgBox(self, title='Successful', message='The refresh is successful.', ask=0, okText='Ok')
 
 
+class DateDetails(PRMP_FillWidgets, LabelFrame):
+    def __init__(self, master, date=None, text='Date Details', **kwargs):
+        LabelFrame.__init__(self, master, text=text, **kwargs)
+        PRMP_FillWidgets.__init__(self, date)
+        self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.6, relh=.3), orient='h')
+
+        self.monthName = LabelLabel(self, topKwargs=dict(text='Month'), place=dict(relx=.02, rely=.35, relw=.3, relh=.6))
+        self.week = LabelLabel(self, topKwargs=dict(text='Week'), place=dict(relx=.35, rely=.35, relw=.3, relh=.6))
+        self.dayName = LabelLabel(self, topKwargs=dict(text='Day Name'), place=dict(relx=.68, rely=.35, relw=.3, relh=.6))
+
+        self.addResultsWidgets(['monthName', 'week', 'dayName'])
+
+        self.get = self.date.get
+
+    def update(self, date): self.set(date)
+
+
+class DataChoose(LabelFrame):
+    def __init__(self, master, text='Data Choose', **kwargs):
+        super().__init__(master, text=text, **kwargs)
+
+        self.season = tk.StringVar()
+        self.season.set('0')
+
+        self.years = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Years', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+
+        self.year = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Year', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+
+        self.month = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Month', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+
+        self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+
+        self.day = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Day', variable=self.season), bottom=Frame, bottomKwargs=dict(relief='groove'), place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.3)
+
+        # self.setRadioGroups([self.years, self.months, self.areas, self.clients, self.weeks, self.days])
+
+
+
+
 class ProperDetails(Frame):
-    
+
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
 
@@ -549,15 +588,28 @@ class ProperDetails(Frame):
     def get_spec_week(self, e): pass
 
     def get_spec_day(self, e): pass
-    
+
     def get_spec_area(self, e): pass
+
+
+
+class ProperDetails2(Frame):
+
+    def __init__(self, master, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+
+        self.dates = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.25), relief='groove')
+
+        self.data_lblfrm = DataChoose(self, text='Datas', place=dict(relx=.005, rely=.27, relw=.99, relh=.6))
+
+
 
 
 class ChartOptions(Frame):
 
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
-                
+
       ########## Chart Options
         self.chart_lblfrm = LabelFrame(self, text='Chart Options', place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
 
@@ -708,7 +760,7 @@ class ChartOptions(Frame):
             results['inapp'] = self.inapp.get()
             results['explode'] = self.explode.get()
             results['shadow'] = self.shadow.get()
-        
+
         return results
 
 
