@@ -451,30 +451,29 @@ class PlotDialog(GaM_Dialog):
 
     def _setupDialog(self):
 
-        self.chartOptions = ChartOptions(self.container, place=dict(relx=.005, rely=.6, relw=.28, relh=.35))
+        note = Notebook(self.container, place=dict(relx=.005, rely=.005, relw=.28, relh=.64))
+
+        self.frame2 = ProperDetails(note)
+        note.add(self.frame2, padding=3)
+        note.tab(0, text='Proper Details', compound='left', underline='-1')
+
+        self.chartOptions = ChartOptions(self.container, place=dict(relx=.005, rely=.65, relw=.28, relh=.3))
 
         fr = Frame(self.container, place=dict(relx=.285, rely=.005, relw=.711, relh=.99))
 
-        from prmp_gui.plot_canvas import PRMP_PlotCanvas
-        self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
-        self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
-        self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))
-        self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
+        # from prmp_gui.plot_canvas import PRMP_PlotCanvas
+        # self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
+        # self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
+        # self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))
+        # self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
 
-        self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
+        # self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
 
       ############ Plot and Clear
 
         self.plot_btn = Button(self.container, command=self.chart_sort, text='Plot', place=dict(relx=.02, rely=.952, relh=.044, relw=.1))
 
         self.clear_btn = Button(self.container, command=self.clear_plot, text='Clear', place=dict(relx=.16, rely=.952, relh=.044, relw=.1))
-
-        note = Notebook(self.container, place=dict(relx=.005, rely=.005, relw=.28, relh=.595))
-
-        self.frame2 = ProperDetails(note)
-        note.add(self.frame2, padding=3)
-        note.tab(0, text='Proper Details', compound='left', underline='-1')
-
 
     def chart_sort(self):
         return

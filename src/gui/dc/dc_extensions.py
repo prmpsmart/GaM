@@ -447,7 +447,8 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, date=None, text='Date Details', **kwargs):
         LabelFrame.__init__(self, master, text=text, **kwargs)
         PRMP_FillWidgets.__init__(self, date)
-        self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.6, relh=.3), orient='h')
+
+        self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.6, relh=.325), orient='h')
 
         self.monthName = LabelLabel(self, topKwargs=dict(text='Month'), place=dict(relx=.02, rely=.35, relw=.3, relh=.6))
         self.week = LabelLabel(self, topKwargs=dict(text='Week'), place=dict(relx=.35, rely=.35, relw=.3, relh=.6))
@@ -468,7 +469,6 @@ class DataChoose(LabelFrame):
         self.season.set('0')
 
         relief = 'solid'
-        self.bind('<1>', self.get)
 
      # years
         self.years = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Years', variable=self.season, value='years'), bottom=Frame, place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.22)
@@ -550,16 +550,27 @@ class OneInAll(LabelFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)\
 
-        self.spec_cbtn = tk.StringVar()
-        self.spec_cbtn.set('0')
+        self.oneInAll = tk.StringVar()
+        self.oneInAll.set('0')
 
-        self.month = RadioCombo(self, topKwargs=dict(text='Months', variable=self.spec_cbtn, value='spec_month'), bottomKwargs=dict(values=MONTHS_NAMES[1:]), orient='h', place=dict(relx=.005, rely=.005, relh=.3, relw=.99))
+        self.months = RadioCombo(self, topKwargs=dict(text='Months', variable=self.oneInAll, value='months'), bottomKwargs=dict(values=MONTHS_NAMES[1:]), orient='h', place=dict(relx=.005, rely=.005, relh=.325, relw=.99))
 
-        self.week = RadioCombo(self, topKwargs=dict(text='Weeks', variable=self.spec_cbtn, value='spec_week'), bottomKwargs=dict(values=WEEKS), orient='h', place=dict(relx=.005, rely=.32, relh=.3, relw=.99))
+        self.weeks = RadioCombo(self, topKwargs=dict(text='Weeks', variable=self.oneInAll, value='weeks'), bottomKwargs=dict(values=WEEKS), orient='h', place=dict(relx=.005, rely=.32, relh=.325, relw=.99))
 
-        self.day = RadioCombo(self, topKwargs=dict(text='Days', variable=self.spec_cbtn, value='spec_day'), bottomKwargs=dict(values=DAYS_NAMES), orient='h', place=dict(relx=.005, rely=.66, relh=.3, relw=.99))
+        self.days = RadioCombo(self, topKwargs=dict(text='Days', variable=self.oneInAll, value='days'), bottomKwargs=dict(values=DAYS_NAMES), orient='h', place=dict(relx=.005, rely=.66, relh=.325, relw=.99))
 
-        self.setRadioGroups([self.month, self.week, self.day])
+        self.setRadioGroups([self.months, self.weeks, self.days])
+
+    def get(self, e=0):
+        oneInAll = self.oneInAll.get()
+        val = ''
+        if oneInAll == '0': oneInAll = ''
+        if oneInAll:
+            wid = self.getFromSelf(oneInAll)
+            if wid: val = wid.get()
+
+        res = (oneInAll, val)
+        return res
 
 
 class ProperDetails2(Frame):
@@ -677,12 +688,11 @@ class ProperDetails(Frame):
     def __init__(self, master, **kwargs):
         Frame.__init__(self, master, **kwargs)
 
-        self.dates = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.24), relief='groove')
+        self.dates = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove')
 
-        self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.25, relw=.99, relh=.5))
+        self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.45))
 
-        self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.755, relw=.99, relh=.24))
-
+        self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.725, relw=.99, relh=.27))
 
 
 class ChartOptions(Frame):
