@@ -470,9 +470,7 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
             accounts = self.obj.accountsManager.objectSort.sortSubsBySeasons(date, attr='month')
 
             accLen = len(accounts)
-            from_ = 1 if accLen else 0
-            self.account.B.configure(from_=from_, to=accLen)
-
+            self.account.B.configure(from_=0, to=accLen)
 
 
 class DataChoose(LabelFrame):
@@ -672,7 +670,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                         if season == 'month':
                             if which == 'weeks':
                                 weekDates = date.oneDateinWeeks
-                                
+
 
                     else:
                         datas = []
