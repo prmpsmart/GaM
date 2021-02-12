@@ -446,7 +446,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
 
     @classmethod
-    def monthWeekDays(cls, year=None, month=None, monday=False, dateObj=None):
+    def _monthWeekDays(cls, year=None, month=None, monday=False, dateObj=None):
         'getting the weeks in a month'
         if dateObj: year, month = dateObj.year, dateObj.month
 
@@ -472,6 +472,8 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
         return weeks
 
+    def monthWeekDays(self, **kwargs): return self._monthWeekDays(dateObj=self, **kwargs)
+
     @classmethod
     def getMonthYearOfDateTimes(cls, dts): return [dt.monthYear for dt in dts]
 
@@ -482,7 +484,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         return weeks_monthYear
 
     @property
-    def weekDates(self): return self.monthWeekDays(self.year, self.month)
+    def weekDates(self): return self.monthWeekDays()
 
     @property
     def monthDates(self):
@@ -490,6 +492,12 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         for week in self.weekDates:
             for day in week: days.append(day)
         return days
+
+    @property
+    def monthOnlyDates(self):
+        dates = self.monthDates
+        days = [day for day in dates if self.isSameMonthYear(day)]
+        return dates
 
     @property
     def week(self):
