@@ -533,7 +533,7 @@ class DataChoose(LabelFrame):
 
         self.day.switchGroup()
 
-        Button(self, text='Load', command=generalAction, place=dict(relx=.7, rely=.65, relw=.28, relh=.3))
+        Button(self, text='Load', command=generalAction, place=dict(relx=.78, rely=.76, relw=.2, relh=.22))
 
     def get(self, e=0):
         season = self.season.get()
@@ -544,26 +544,34 @@ class DataChoose(LabelFrame):
             var = self.getFromSelf(f'{season}Var')
             if var: val = var.get()
 
-        res = (season, val)
+        res = [season, val]
         return res
 
 
-class OneInAll(LabelFrame):
+class OneInAll(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)\
+        LabelFrame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self)
 
         self.oneInAll = tk.StringVar()
         self.oneInAll.set('0')
 
-        self.months = RadioCombo(self, topKwargs=dict(text='Months', variable=self.oneInAll, value='months'), bottomKwargs=dict(values=MONTHS_NAMES[1:]), orient='h', place=dict(relx=.005, rely=.005, relh=.325, relw=.99))
+        self.months = RadioCombo(self, topKwargs=dict(text='Months', variable=self.oneInAll, value='months'), bottomKwargs=dict(values=MONTHS_NAMES[1:]), orient='h', place=dict(relx=.005, rely=.005, relh=.325, relw=.69))
 
-        self.weeks = RadioCombo(self, topKwargs=dict(text='Weeks', variable=self.oneInAll, value='weeks'), bottomKwargs=dict(values=WEEKS), orient='h', place=dict(relx=.005, rely=.32, relh=.325, relw=.99))
+        self.weeks = RadioCombo(self, topKwargs=dict(text='Weeks', variable=self.oneInAll, value='weeks'), bottomKwargs=dict(values=WEEKS), orient='h', place=dict(relx=.005, rely=.32, relh=.325, relw=.69))
 
-        self.days = RadioCombo(self, topKwargs=dict(text='Days', variable=self.oneInAll, value='days'), bottomKwargs=dict(values=DAYS_NAMES), orient='h', place=dict(relx=.005, rely=.66, relh=.325, relw=.99))
+        self.days = RadioCombo(self, topKwargs=dict(text='Days', variable=self.oneInAll, value='days'), bottomKwargs=dict(values=DAYS_NAMES), orient='h', place=dict(relx=.005, rely=.66, relh=.325, relw=.69))
 
         self.setRadioGroups([self.months, self.weeks, self.days])
 
+        self.isOneinAll = Checkbutton(self, text='This?', place=dict(relx=.78, rely=.66, relh=.325, relw=.18))
+
+        self.addResultsWidgets(['months', 'weeks', 'days'])
+
+
     def get(self, e=0):
+        PRMP_FillWidgets.get(self)
+
         oneInAll = self.oneInAll.get()
         val = ''
         if oneInAll == '0': oneInAll = ''
@@ -571,25 +579,58 @@ class OneInAll(LabelFrame):
             wid = self.getFromSelf(oneInAll)
             if wid: val = wid.get()
 
-        res = (oneInAll, val)
+        res = [oneInAll, val]
         return res
 
 
-class ProperDetails(Frame):
+class ProperDetails(PRMP_FillWidgets, Frame):
 
     def __init__(self, master, region=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self)
 
         self.region = region
 
-        self.dates = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove')
+        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove')
 
         self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.45), generalAction=self.parser)
 
         self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.725, relw=.99, relh=.27))
 
+        self.addResultsWidgets(['date', 'dataChoose'])
+
     def parser(self):
-        pass
+        gets = self.get()
+
+        date = gets['date']
+        dataChoose = gets['dataChoose']
+
+      # date verification
+        if not date:
+            PRMP_MsgBox(self, title='Date Error', message='Please choose a date', _type='error', delay=1500)
+            return
+
+      # dataChoose verification
+        if not dataChoose[0]: dataChoose[0] = 'month'
+        if not dataChoose[1]: dataChoose[1] = 'subs'
+
+      # oneInAll verification
+        if self.oneInAll.isOneinAll.get():
+            oneInAll = self.oneInAll.get()
+            spec = oneInAll[0]
+            if not spec:
+                PRMP_MsgBox(self, title='One in All Error', message='Please choose among [Months, Weeks, Days]', _type='error', delay=1500)
+                return
+            else:
+                specVal = oneInAll[1]
+                if not specVal:
+                    PRMP_MsgBox(self, title=f'{spec} Error', message=f'Please choose a valid {spec.title()} type !', _type='error', delay=1500)
+                    return
+
+        else:
+            pass
+
+        print(gets)
 
 
 
