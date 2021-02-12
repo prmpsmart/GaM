@@ -487,6 +487,20 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def weekDates(self): return self.monthWeekDays()
 
     @property
+    def oneDateInWeeks(self):
+        weekDates = self.weekDates
+        one = weekDates[0]
+        last = weekDates[-1]
+
+        dates = []
+
+        for week in weekDates:
+            if week == one: dates.append(week[-1])
+            elif week == last: dates.append(week[0])
+            else: dates.append(week[3])
+
+        return dates
+    @property
     def monthDates(self):
         days = []
         for week in self.weekDates:
@@ -497,7 +511,32 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def monthOnlyDates(self):
         dates = self.monthDates
         days = [day for day in dates if self.isSameMonthYear(day)]
-        return dates
+        return days
+
+    @property
+    def allSpecDaysDates(self):
+        allDates = self.monthOnlyDates
+        leng = range(len(self.daysNames))
+
+        specs = [[] for a in leng]
+
+        for date in allDates:
+            for day in leng:
+                dayName = self.daysNames[day]
+                if date.dayName == dayName: specs[day].append(date)
+
+        return specs
+
+    @property
+    def specDaysDates(self):
+        allDates = self.allSpecDaysDates
+        leng = range(len(allDates))
+
+        specs = [a[0] for a in allDates]
+
+        return specs
+
+
 
     @property
     def week(self):

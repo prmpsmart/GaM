@@ -615,9 +615,11 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         # self.addResultsWidgets(['date', 'dataChoose'])
 
     def parser(self):
+        if not self.obj: return
+
         date_acc = self.date.get()
         date = date_acc['date']
-        account = date_acc['account']
+        _account = date_acc['account']
 
       # date verification
         if not date:
@@ -653,8 +655,35 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                 'will now go to the subs accounts details'
                 pass
             else:
-                'will now go to self accounts details'
-                pass
+                if isinstance(self.obj, DCRegion):
+                    caseObj = self.obj.accountsManager
+                    acc = 0
+
+                    if _account:
+                        _account = int(_account)
+                        caseObj = caseObj[_account]
+                        acc = 1
+
+                    objSort = case.objectSort
+
+                    if acc:
+                        datas = caseObj.sortSubsBySeasons(date, seasons=[season])
+
+                        if season == 'month':
+                            if which == 'weeks':
+                                weekDates = date.oneDateinWeeks
+                                
+
+                    else:
+                        datas = []
+
+                        for ac in caseObj:
+                            data = ac.getRecs_Of_RM_By_Seasons(date, seasons=[season])
+                            datas.append(data)
+
+                    if season == 'year': pass
+
+                    # account = if isinstance(self.obj, Client)
 
 
 

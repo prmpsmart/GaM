@@ -67,6 +67,7 @@ class DCAccount(Account):
             if _recs:
                 rec = recM.recordsAsRecord(_recs, date)
                 recs.append(rec)
+
         return recs
 
     def getRecs_Of_RM_ByDate(self, date=None, **kwargs): return self.getRecs_Of_RM_By_Seasons(date=date, seasons=['date'], **kwargs)
