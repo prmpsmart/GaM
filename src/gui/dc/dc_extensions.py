@@ -468,6 +468,7 @@ class DataChoose(LabelFrame):
         self.season.set('0')
 
         relief = 'solid'
+        self.bind('<1>', self.get)
 
      # years
         self.years = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Years', variable=self.season, value='years'), bottom=Frame, place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.22)
@@ -525,20 +526,24 @@ class DataChoose(LabelFrame):
 
         subs = Radiobutton(dayFrame, text='Subs', place=dict(relx=.01, rely=.005, relw=.24, relh=.98), variable=self.dayVar, value='subs', relief=relief)
 
+        self.setRadioGroups([subs])
+
 
         self.setRadioGroups([self.years, self.month, self.week, self.day, self.year])
 
         self.day.switchGroup()
 
-    def get(self):
+    def get(self, e=0):
         season = self.season.get()
         val = ''
+        if season == '0': season = ''
         if season:
             wid = self.getFromSelf(season)
             var = self.getFromSelf(f'{season}Var')
-            val = var.get()
+            if var: val = var.get()
 
-        return (season, val)
+        res = (season, val)
+        return res
 
 
 class OneInAll(LabelFrame):
@@ -555,11 +560,6 @@ class OneInAll(LabelFrame):
         self.day = RadioCombo(self, topKwargs=dict(text='Days', variable=self.spec_cbtn, value='spec_day'), bottomKwargs=dict(values=DAYS_NAMES), orient='h', place=dict(relx=.005, rely=.66, relh=.3, relw=.99))
 
         self.setRadioGroups([self.month, self.week, self.day])
-
-
-
-
-
 
 
 class ProperDetails2(Frame):
