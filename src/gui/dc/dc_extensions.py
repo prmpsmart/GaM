@@ -190,11 +190,12 @@ class DC_Overview(Frame):
         self.plotCanvas2.place(relx=.5, rely=.33, relh=.67, relw=.5)
 
     def updateDCDigits(self, account):
-        assert isinstance(account, Account)
-        self.account = account
-        self.month.set(self.account.month.monthYear)
-        if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
-        self.dcDigits.update(account)
+        if account:
+            assert isinstance(account, Account)
+            self.account = account
+            self.month.set(self.account.month.monthYear)
+            if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
+            self.dcDigits.update(account)
 
     def next(self):
         if not self.account: return
@@ -444,11 +445,15 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
 
 
 class DateDetails(PRMP_FillWidgets, LabelFrame):
-    def __init__(self, master, date=None, text='Date Details', **kwargs):
+    def __init__(self, master, date=None, obj=None, text='Date Details', **kwargs):
         LabelFrame.__init__(self, master, text=text, **kwargs)
         PRMP_FillWidgets.__init__(self, date)
 
-        self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.6, relh=.325), orient='h')
+        self.obj = obj
+
+        self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.45, relh=.325), orient='h', longent=.4)
+
+        self.account = LabelSpin(self, topKwargs=dict(text='Accounts'), place=dict(relx=.5, rely=.02, relw=.5, relh=.325), bttk=1, orient='h', longent=.6, bottomKwargs=dict(placeholder=''))
 
         self.monthName = LabelLabel(self, topKwargs=dict(text='Month'), place=dict(relx=.02, rely=.35, relw=.3, relh=.6))
         self.week = LabelLabel(self, topKwargs=dict(text='Week'), place=dict(relx=.35, rely=.35, relw=.3, relh=.6))
@@ -456,9 +461,18 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
 
         self.addResultsWidgets(['monthName', 'week', 'dayName'])
 
-        self.get = self.date.get
+    def get(self): return PRMP_FillWidgets.get(self, ['date', 'account'])
 
-    def update(self, date): self.set(date)
+    def update(self, date):
+        self.set(date)
+
+        if isinstance(self.obj, DCRegion):
+            accounts = self.obj.accountsManager.objectSort.sortSubsBySeasons(date, attr='month')
+
+            accLen = len(accounts)
+            from_ = 1 if accLen else 0
+            self.account.B.configure(from_=from_, to=accLen)
+
 
 
 class DataChoose(LabelFrame):
@@ -586,22 +600,24 @@ class OneInAll(PRMP_FillWidgets, LabelFrame):
 
 class ProperDetails(PRMP_FillWidgets, Frame):
 
-    def __init__(self, master, region=None, **kwargs):
+    def __init__(self, master, obj=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
 
-        self.region = region
+        self.obj = obj
 
-        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove')
+        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj)
 
         self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.45), generalAction=self.parser)
 
         self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.725, relw=.99, relh=.27))
 
-        self.addResultsWidgets(['date', 'dataChoose'])
+        # self.addResultsWidgets(['date', 'dataChoose'])
 
     def parser(self):
-        date = self.date.get()
+        date_acc = self.date.get()
+        date = date_acc['date']
+        account = date_acc['account']
 
       # date verification
         if not date:

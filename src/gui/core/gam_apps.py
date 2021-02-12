@@ -286,6 +286,15 @@ class ObjectHome(GaM_App):
     def _setupApp(self):
         obj = self.obj
 
+
+        self.detailsNote = Notebook(self.container, place=dict(relx=.005, rely=.005, relh=.87, relw=.24))
+
+        self.frame1 = Frame(self.detailsNote)
+        self.detailsNote.add(self.frame1, padding=3)
+        self.detailsNote.tab(0, text='Details', compound='left', underline='-1')
+
+
+
         self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=obj.date.date if obj else ''))
 
         UniqueID(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=obj)
@@ -314,19 +323,19 @@ class RegionHome(ObjectHome):
 
         super().__init__(master, title=title, obj=region, **kwargs)
 
-    def _setupApp(self, cont=None):
+    def _setupApp(self):
         super()._setupApp()
 
         region = self.region = self.obj
         if region: self.setTitle(region.name)
 
-        cont = cont or self.container
-
-        self.details = RegionDetails(cont, text='Details', place=dict(relx=.005, rely=.005, relh=.24, relw=.24), region=region)
+        self.details = RegionDetails(self.frame1, text='Details', place=dict(relx=.005, rely=.005, relh=.27, relw=.99), region=region)
 
         subs = region.subRegions.subsName if region and region.subRegions else 'Subs'
-        self.subRegions = SubsList(cont, text=subs, place=dict(relx=.005, rely=.25, relh=.3, relw=.24))
-        self.accounts = SubsList(cont, text='Accounts', place=dict(relx=.005, rely=.57, relh=.3, relw=.24))
+
+        self.subRegions = SubsList(self.frame1, text=subs, place=dict(relx=.005, rely=.28, relh=.36, relw=.99))
+
+        self.accounts = SubsList(self.frame1, text='Accounts', place=dict(relx=.005, rely=.65, relh=.34, relw=.99))
 
         if region:
             self.subRegions.set(region.subRegions, showAttr='name')
@@ -345,11 +354,13 @@ class AccountHome(ObjectHome):
         account = self.account = self.obj
         name, self._manager = (account.manager.name, account.manager) if account else ('', None)
 
-        self.manager = LabelButton(self.container, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.12, relw=.24), bottomKwargs=dict(command=self.openManager, text=name))
 
-        self.recordsManagers = SubsList(self.container, text='Records Managers', place=dict(relx=.005, rely=.15, relh=.6, relw=.24))
+        self.manager = LabelButton(self.frame1, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.15, relw=.99), bottomKwargs=dict(command=self.openManager, text=name))
+
+        self.recordsManagers = SubsList(self.frame1, text='Records Managers', place=dict(relx=.005, rely=.16, relh=.63, relw=.99))
 
         if account: self.recordsManagers.set(account, showAttr='name')
+
     def openManager(self):
         if self._manager: openCores(self._manager, edit=0)
 
