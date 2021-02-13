@@ -820,6 +820,7 @@ class PRMP_Camera(PRMP_Frame):
         if success:
             dif = 20
             w_h = self.width-dif, self.height-dif
+            if w_h[0] < 0 and w_h[1] < 0: return
             self._image = Image.fromarray(frame)
             image = self._image.copy()
             image.thumbnail(w_h)
