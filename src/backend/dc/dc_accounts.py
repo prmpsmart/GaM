@@ -102,21 +102,20 @@ class DCAccountsManager(AccountsManager):
     @property
     def recordsManagers(self): return self.last if len(self) else []
 
-    def gets_RecM_Of_Accs_By_Seasons(self, date=None, **kwargs):
-        leng = len(self)
+    def sortAccountsIntoMonths(self, date=None, **kwargs):
         date = self.getDate(date)
-
-        recM_Names = [recM.className for recM in self.first]
+        monthsDates = date.monthsInYear
 
         accs = []
-        for ind in range(leng):
-            acc = self[ind]
-            _recs = acc.objectSort.sortSubsBySeasons(date, **kwargs)
-            if _recs:
-                rec = acc.recordsAsRecord(_recs, date)
-                recs.append(rec)
+        for monthDate in monthsDates:
+            _accs = self.sortSubsByMonth(monthDate)
+            leng = len(_accs)
+            if not leng:
+                acc = self.ObjectType(self, month=monthDate, date=monthDate)
+                accs.append(acc)
+            elif leng: accs.append(_accs[-1])
 
-        return recs
+        return accs
 
 
 class ClientAccount(DCAccount):
@@ -124,7 +123,7 @@ class ClientAccount(DCAccount):
 
     def __init__(self, manager, ledgerNumber=0, rate=0, areaAccount=None, month=None, **kwargs):
         self.areaAccount = areaAccount
-        if month: assert month.monthYear == areaAccount.month.monthYear, 'ClientAccount month must be same as AreaAccount month.'
+        if month and ledgerNumber: assert month.monthYear == areaAccount.month.monthYear, 'ClientAccount month must be same as AreaAccount month.'
 
         rate = float(rate)
         self.ledgerNumber = ledgerNumber
@@ -132,7 +131,7 @@ class ClientAccount(DCAccount):
         super().__init__(manager, month=month or areaAccount.month, **kwargs)
 
         self.contributions = Contributions(self)
-        self.rates = Rates(self, rate)
+        self.rates = Rates(self, rate, ledgerNumber)
 
     @property
     def name(self): return f'{self.className}({self.region.name} | {self._month.monthYear} | Ledger-Number No. {self.ledgerNumber})'

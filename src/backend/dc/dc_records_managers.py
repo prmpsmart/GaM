@@ -28,9 +28,9 @@ class Rates(DCRecordsManager):
     ObjectType = Rate
     lowest = 50
 
-    def __init__(self, accounts, rate):
+    def __init__(self, accounts, rate, raw=0):
         super().__init__(accounts, True)
-        self.setRate(rate)
+        self.setRate(rate, raw)
 
     def __int__(self):
         try: return int(self[-1])
@@ -52,7 +52,8 @@ class Rates(DCRecordsManager):
         if rate < cls.lowest: raise DCErrors.RatesError(f'Rate ({rate}) must not be less than {cls.lowest}')
         return True
 
-    def setRate(self, rate):
+    def setRate(self, rate, raw=0):
+        if not raw: return
         if self.checkRate(rate): self.createRecord(rate)
 
 class Balances(DCRecordsManager):

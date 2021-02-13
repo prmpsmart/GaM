@@ -14,12 +14,12 @@ from .errors import Errors
 
 
 class DailyAccounts(ObjectsMixins):
-    # 
+    #
     pass
 
 
 class WeeklyAccounts(ObjectsMixins):
-    
+
     def __init__(self, week, days_accounts, oneWeek=False):
         super().__init__()
         self.week = week
@@ -30,7 +30,7 @@ class WeeklyAccounts(ObjectsMixins):
         self.friday = [day for day in days_accounts if day.date.dayName == 'Friday']
         self.saturday = [day for day in days_accounts if day.date.dayName == 'Saturday']
         self.sunday = [day for day in days_accounts if day.date.dayName == 'Sunday']
-        
+
         for day in self.__dict__:
             if '_' in day: continue
             if not self.__dict__[day]: continue
@@ -62,32 +62,32 @@ class Account(Object):
     Manager = 'AccountsManager'
     subTypes = ['Records Managers']
     Error = Errors
-    
+
     def __init__(self, manager, **kwargs):
         assert manager != None, 'No manager passed.'
         Object.__init__(self, manager, **kwargs)
-    
+
     def __eq__(self, account):
         if account == None: return False
         try: res = ((self.number == account.number) and super().__eq__(account) and self.manager is account.manager)
         except AttributeError: return False
-    
+
     def __str__(self): return f'{self.manager} | {self.name}'
     def __len__(self): return len(self.recordsManagers)
     def __int__(self): return self.balances
-    
+
     @property
     def name(self): return f'{self.className}({self.date.dayMonthYear})'
 
     @property
     def region(self): return self.manager.region
-    
+
     @property
     def subs(self): return self.recordsManagers or []
-    
+
     @property
     def recordsManagers(self): return []
-    
+
     @property
     def headers(self): return [rec.className for rec in self.recordsManagers]
 
@@ -95,7 +95,7 @@ class Account(Object):
     def nextAccount(self): return self.next
     @property
     def previousAccount(self): return self.previous
-    
+
     @property
     def recordsManagersAsList(self): return [float(recordsManager) for recordsManager in self]
     @property
@@ -119,15 +119,15 @@ class Account(Object):
 class AccountsManager(ObjectsManager):
     ObjectType = Account
     subTypes = ['Accounts']
-    
+
     def __init__(self, region, autoAccount=True, **kwargs):
-        
+
         ObjectsManager.__init__(self, region)
-        
+
         self.addAccount = self.addSub
         self.getAccount = self.getSub
         if autoAccount == True: self.createAccount(**kwargs)
-        
+
     def __eq__(self, manager):
         if manager == None: return False
         return self.region == manager.region
@@ -136,17 +136,17 @@ class AccountsManager(ObjectsManager):
     def __str__(self):
         if self.region != None: return f'{self.region} | {self.className}'
         return f'{self.className}'
-    
+
     def createAccount(self, **kwargs): return self.createSub(**kwargs)
-    
+
     @property
     def firstAccount(self): return self.first
     @property
     def lastAccount(self): return self.last
-    
+
     @property
     def accounts(self): return self.subs
-    
+
     @property
     def region(self): return self.master
     @property
@@ -169,7 +169,7 @@ class AccountsManager(ObjectsManager):
                     if name not in containerDict: containerDict[name] = 0
                     containerDict[name] += float(recordManager)
             return containerDict
-        
+
     def balanceAccount(self, month=None):
         if month:
             account = self.getAccount(month=self.getDate(month))
@@ -178,35 +178,35 @@ class AccountsManager(ObjectsManager):
             account = self.getLastAccount()
             if account: account.balanceAccount()
         return account
-    
+
     def balanceAccounts(self):
         for accounts in self: accounts.balanceAccount()
         return self.accounts
-    
+
     def currentMonthAccounts(self): return self.sortAccountsByMonth(PRMP_DateTime.now())
-    
+
     def sortSubRegionsAccountsByMonth(self, month):
         PRMP_DateTime.checkDateTime(month)
         subRegionsActiveByMonth = self.region.subRegionsActiveByMonth(month)
-        
+
         accounts = []
         for subRegion in subRegionsActiveByMonth:
             subRegionsAccounts = subRegion.sortAccountsByMonth(month) or []
             accounts.extend(subRegionsAccounts)
         return accounts
-    
+
     def subRegionsActiveByMonth(self, month):
         subRegions = []
         for subRegion in self.region.subRegionsManager:
             monthAccount = subRegion.accountsManager.getAccount(month=month)
             if monthAccount != None: subRegions.append(subRegion)
         # or Subs = [Sub for Sub in self.Subs if Sub.lastAccount.date.isSameMonth(month)]
-        
+
         return subRegions
-    
-    def sortSubsByMonth(self, month): return [sub for sub in self if sub.month.monthYear == month.monthYear]
-    
-    
+
+    def sortSubsByMonth(self, month): return [sub for sub in self if sub.month.isSameMonthYear(month)]
+
+
    #Month Sorting
     def sortSubsAccountsByMonth(self, month):
         PRMP_DateTime.checkDateTime(month)
@@ -218,14 +218,12 @@ class AccountsManager(ObjectsManager):
         return accounts
 
 
-
-
 class SameTimesAccounts(ObjectsMixins):
-    
+
     def __init__(self, obj):
         self.obj = obj
         self.subs = []
-    
+
     def setStage(self):
         pass
 

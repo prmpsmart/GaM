@@ -536,6 +536,19 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
         return specs
 
+    @property
+    def monthsInYear(self):
+        currentMonth = self.month
+        months = range(1, 13)
+        monthsDates = []
+
+        for month in months:
+            if month < currentMonth: monthsDates.append(self - month)
+            elif month == currentMonth: monthsDates.append(self)
+            elif month > currentMonth:
+                diff = month - currentMonth
+                monthsDates.append(self + diff)
+        return monthsDates
 
 
     @property
