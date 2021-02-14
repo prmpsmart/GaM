@@ -609,10 +609,14 @@ class PRMP_Calendar(Frame):
         def choosen(self, e=0):
             if self.day:
                 if self.notPart: return
+
                 b4 = PRMP_Calendar.choosen
                 PRMP_Calendar.choosen = self
+
                 if b4: b4.offButton()
+                
                 self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
+
                 self.returnMethod(self.day)
 
     def __init__(self, master=None, month=None, dest='', callback=None, min_=None, max_=None, **kwargs):
@@ -624,7 +628,7 @@ class PRMP_Calendar(Frame):
         self.min = PRMP_DateTime.getDMYFromDate(min_)
         self.max = PRMP_DateTime.getDMYFromDate(max_)
         self.__date = None
-        self.month = month
+        self.day = self.month = month
         self.callback = callback
         self.dest = dest
         self.daysButtons = []
@@ -725,7 +729,11 @@ class PRMP_Calendar(Frame):
             DayLabel = self.daysButtons[index]
             if DayLabel == self.reset: continue
 
-            if day.month == self.month.month: DayLabel.config(day=day)
+            if day.month == self.month.month:
+                DayLabel.config(day=day)
+                if self.month.isSameDay(day):
+                    DayLabel.choosen()
+                    print('here')
             else: DayLabel.empty()
 
         for btn in remainingBtns:
