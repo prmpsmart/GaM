@@ -496,30 +496,102 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
 
 
 class AttributesCreator(LabelFrame):
-    def __init__(self, master, listboxConfig={}, callback=None, values=[], **kwargs):
+    def __init__(self, master, listboxConfig={}, callback=None, values={}, **kwargs):
         super().__init__(master, **kwargs)
 
         self.callback = callback
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.13, relw=.55), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
+        Label(self, text='Topmost   Attributes', place=dict(relx=0, rely=0, relw=.25, relh=.07))
 
-        self.listbox = ListBox(self, place=dict(relx=0, rely=.135, relh=.865, relw=1), listboxConfig=dict(config=dict(selectmode='multiple'), values=values))
+        self.listbox = ListBox(self, place=dict(relx=0, rely=.08, relh=.84, relw=.25), listboxConfig=dict(config=dict(selectmode='multiple'), values=values), bindings=[('<Return>', self.clicked, '')])
 
-        self.listbox.bindings([('<Return>', self.clicked, '')])
+        self.total = LabelLabel(self, place=dict(relx=0, rely=.93, relh=.07, relw=.2), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
+
+        PRMP_Separator(self, place=dict(relx=.255, rely=0, relh=1, relw=.05), config=dict(orient='vertical'))
+
+        self.treeview = PRMP_Treeview(self, place=dict(relx=.265, rely=0, relh=.9, relw=.735))
+        self.treeview.heading('#0', text='Attributes')
+        self.ivd = self.treeview.ivd
+        self.treeview.bind('<Delete>', self.deleteAttribute)
+
+        self.entry = LabelEntry(self, place=dict(relx=.265, rely=.91, relw=.5, relh=.085), orient='h', longent=.4, topKwargs=dict(text='Enter Attribute'), bottomKwwargs=dict(placeholder=''))
+        self.entry.B.bind('<Return>', self.addAtrribute)
+
+        Button(self, text='Delete', place=dict(relx=.85, rely=.915, relh=.07, relw=.1), command=self.deleteAttribute)
 
         self.values = values
+        self._foc = None
         if values: self.set(values)
 
-    def set(self, values):
-        if not values: return
-        self.values = values
-        self.listbox.set(values)
+    def addAtrribute(self, e=0):
+        get = self.entry.get()
+        if not get: return
+        item = self.treeview.focus() or ''
+        self.treeview.insert(item, text=get)
+        # self.treeview.focus('')
+        self.reloadListBox()
+
+
+    def deleteAttribute(self, e=0):
+        self._foc = focus = self.treeview.focus()
+
+        _all = 'all attributes' if not focus else f'this attribute --> {self.ivd[focus]}'
+
+        PRMP_MsgBox(self, title='Delete Attribute', message=f'Are you sure to delete {_all}', ask=1, callback=self._delete)
+
+    def _delete(self, w):
+        if w:
+            if not self._foc: self.treeview.deleteAll()
+            else: self.treeview.delete(self._foc)
+
+        self.reloadListBox()
+
+    def reloadListBox(self):
+        self.listbox.clear()
+        tops = self.treeview.get_children()
+        for top in tops: self.listbox.insert(self.ivd[top])
         self.total.set(self.listbox.last)
+
 
     def clicked(self, event=None, selected=None):
         selected = self.listbox.selected
+        self.treeview.see
 
-        print(selected)
+    def set(self, values):
+        self.values = values
+        self.setListBox(values)
+        self.setTreeview(values)
+
+    def get(self):
+        # get_children
+        pass
+
+    def setListBox(self, values):
+        for value in values:
+            if isinstance(value, dict): val = value.keys()[0]
+            elif isinstance(value, (str, bytes)): val = value
+            self.listbox.insert(val)
+
+    def getListBox(self):
+        # get_children
+        pass
+
+    def setTreeview(self, values, parent=''):
+        if isinstance(values, list):
+            for value in values: self.setTreeview(value, parent)
+
+        elif isinstance(values, dict):
+            for key, value in values.items():
+                item = self.treeview.insert(parent, text=key)
+                self.setTreeview(value, item)
+
+        elif isinstance(values, (str, bytes)):
+            self.treeview.insert(parent, text=values)
+            pass
+
+    def getTreeview(self):
+        # get_children
+        pass
 
 
 

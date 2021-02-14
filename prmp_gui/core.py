@@ -1040,8 +1040,8 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
 
     def __init__(self, master=None, config={}, values=[], callback=None, defBinds=1, bindings=[], **kwargs):
 
-        self.values = values
-        self.last = None
+        self.values = values.copy()
+        self.last = 0
         self.callback = callback
 
         defaultBinds = [('<<ListboxSelect>>', self.clicked, '+')]
@@ -1056,11 +1056,18 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     def bindings(self, binds):
         for bind, func, sign in binds: self.bind(bind, func, sign)
 
-    def clear(self): self.delete(0, self.last)
+    def clear(self):
+        self.delete(0, self.last)
+        self.values = []
+
+    def insert(self, value, position='end'):
+        self.values.append(value)
+        self.last = len(self.values)
+        tk.Listbox.insert(self, position, value)
+
 
     def set(self, values, showAttr=''):
         self.clear()
-        self.last = len(values)
         for val in values:
             value = val[showAttr] if showAttr else str(val)
             # value = getattr(val, showAttr, None) if showAttr else str(val)
@@ -1070,7 +1077,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     def clicked(self, e=0):
         if self.callback:
             selected = self.selected
-            if selected: self.callback( event=e, selected=self.selected)
+            if selected: self.callback(event=e, selected=self.selected)
 
     @property
     def selected(self):
@@ -1740,9 +1747,45 @@ Style = PSt = PRMP_Style
 class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
     TKClass = ttk.Treeview
 
-    def __init__(self, master=None, config={}, **kwargs):
+    def __init__(self, master=None, config={}, callback=None, **kwargs):
         ttk.Treeview.__init__(self, master, **config)
         PRMP_Style_.__init__(self, prmp_master=master,**config, **kwargs)
+        self.bind('<<TreeviewSelect>>', self.selected)
+
+        self.ivd = self.itemsValuesDict = {}
+        self.firstItem = None
+        self.callback = callback
+        self.current = None
+
+    def insert(self, item, position='end',  value=None, text='', **kwargs):
+        newItem = ttk.Treeview.insert(self, item, position, text=text, **kwargs)
+
+        self.ivd[newItem] = value or text
+
+        return newItem
+
+
+    def delete(self, *items):
+        for item in items:
+            children = self.get_children(item)
+            for child in children:
+                if child in self.ivd: del self.ivd[child]
+            if item in self.ivd: del self.ivd[item]
+        ttk.Treeview.delete(self, items)
+
+    def selected(self, e=0):
+        item = self.focus()
+        self.current = self.ivd.get(item)
+        if self.callback: self.callback(self.current)
+        return self.current
+
+    def deleteAll(self):
+        children = self.get_children()
+        for child in children: self.delete(child)
+
+
+
+
 Treeview = PTv = PRMP_Treeview
 
 #   common to tk and ttk
@@ -2726,31 +2769,18 @@ class PRMP_TreeView(PRMP_Frame):
         self.yscrollbar.pack(side="right", fill="y")
         bound_to_mousewheel(0, self)
 
-        self.ivd = self.itemsValuesDict = {}
-        self.firstItem = None
-        self.current = None
         self.attributes = []
 
-        self.bindings()
-
-    def bindings(self):
-        self.tree.bind('<<TreeviewSelect>>', self.selected)
-
-    def selected(self, e=0):
-        item = self.tree.focus()
-        self.current = self.ivd.get(item)
-        return self.current
-
-    def insert(self, item, position='end',  **kwargs): return self.treeview.insert(item, position, **kwargs)
+        self.selected = self.treeview.selected
+        self.ivd = self.treeview.ivd
+        self.insert = self.treeview.insert
+        self.heading = self.treeview.heading
+        self.column = self.treeview.column
 
     def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
         font = Font(**font)
         # return self.tree.tag_configure(tagName, font=font, **kwargs)
         return self.tree.tag_configure(tagName, **kwargs)
-
-    def heading(self, item, **kwargs): return self.treeview.heading(item, **kwargs)
-
-    def column(self, item, **kwargs): return self.treeview.column(item, **kwargs)
 
     def treeviewConfig(self, **kwargs): self.treeview.configure(**kwargs)
 
@@ -2775,10 +2805,8 @@ class PRMP_TreeView(PRMP_Frame):
 
         # the fourth value of this [text, attr, width, value] can be used in sorting, it wont insert the region and its columns both into self.tree and self.ivd if not equal to value
 
-        item = self.insert(parent, text=name, values=columns, tag=tag, open=op)
+        item = self.insert(parent, text=name, values=columns, tag=tag, open=op, value=obj)
         self.tag_config(tag)
-
-        self.ivd[item] = obj
 
         if self.firstItem == None:
             self.firstItem = item
