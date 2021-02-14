@@ -495,6 +495,35 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
 
 
 
+class AttributesCreator(LabelFrame):
+    def __init__(self, master, listboxConfig={}, callback=None, values=[], **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.callback = callback
+
+        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.13, relw=.55), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
+
+        self.listbox = ListBox(self, place=dict(relx=0, rely=.135, relh=.865, relw=1), listboxConfig=dict(config=dict(selectmode='multiple'), values=values))
+
+        self.listbox.bindings([('<Return>', self.clicked, '')])
+
+        self.values = values
+        if values: self.set(values)
+
+    def set(self, values):
+        if not values: return
+        self.values = values
+        self.listbox.set(values)
+        self.total.set(self.listbox.last)
+
+    def clicked(self, event=None, selected=None):
+        selected = self.listbox.selected
+
+        print(selected)
+
+
+
+
 
 
 

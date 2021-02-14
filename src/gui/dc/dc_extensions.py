@@ -687,7 +687,6 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
 
 
-
 class ChartOptions(Frame):
 
     def __init__(self, master, **kwargs):

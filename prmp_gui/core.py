@@ -1035,11 +1035,51 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
 Text = PTx = PRMP_Text
 
 class PRMP_Listbox(PRMP_, tk.Listbox):
+    selectmodes = ['single', 'browse', 'multiple', 'extended']
     TKClass = tk.Listbox
 
-    def __init__(self, master=None, config={}, **kwargs):
+    def __init__(self, master=None, config={}, values=[], callback=None, defBinds=1, bindings=[], **kwargs):
+
+        self.values = values
+        self.last = None
+        self.callback = callback
+
+        defaultBinds = [('<<ListboxSelect>>', self.clicked, '+')]
+
         tk.Listbox.__init__(self, master=master, **config)
         PRMP_.__init__(self, prmp_master=master, **config, **kwargs)
+
+        if defBinds: self.bindings(defaultBinds)
+        self.bindings(bindings)
+
+
+    def bindings(self, binds):
+        for bind, func, sign in binds: self.bind(bind, func, sign)
+
+    def clear(self): self.delete(0, self.last)
+
+    def set(self, values, showAttr=''):
+        self.clear()
+        self.last = len(values)
+        for val in values:
+            value = val[showAttr] if showAttr else str(val)
+            # value = getattr(val, showAttr, None) if showAttr else str(val)
+            self.insert('end', value)
+        self.values = values
+
+    def clicked(self, e=0):
+        if self.callback:
+            selected = self.selected
+            if selected: self.callback( event=e, selected=self.selected)
+
+    @property
+    def selected(self):
+        sels = self.curselection()
+        if sels:
+            select = []
+            for sel in sels: select.append(self.values[sel])
+            return select
+
 Listbox = PLb = PRMP_Listbox
 
 # based on ttk only
@@ -2611,22 +2651,20 @@ MainWindow = PMW = PRMP_MainWindow
 #   scrollable widgets
 
 class PRMP_ListBox(PRMP_Frame):
-    selection_modes = ['single', 'browse', 'multiple', 'extended']
 
     def __getattr__(self, attr):
         ret = self.getFromSelf(attr, self._unget)
         if ret != self._unget: return ret
         else: return getattr(self.listbox, attr)
 
-    def __init__(self, master=None, columns=[], callback=None, listboxConfig={}, **kwargs):
+    def __init__(self, master=None, listboxConfig={}, **kwargs):
         super().__init__(master=master, **kwargs)
 
-        self.values = []
-        self.last = None
-        self.callback = callback
+        self.listbox = PRMP_Listbox(self, **listboxConfig)
 
-        self.listbox = PRMP_Listbox(self, config=listboxConfig)
-        self.listbox.bind('<<ListboxSelect>>', self.clicked)
+        self.clear = self.listbox.clear
+        self.set = self.listbox.set
+        self.clicked = self.listbox.clicked
 
         self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.listbox.xview))
         self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.listbox.yview))
@@ -2638,29 +2676,10 @@ class PRMP_ListBox(PRMP_Frame):
 
         bound_to_mousewheel(0, self)
 
-    def clear(self): self.delete(0, self.last)
-
-    def set(self, values, showAttr=''):
-        self.clear()
-        self.last = len(values)
-        for val in values:
-            value = val[showAttr] if showAttr else str(val)
-            # value = getattr(val, showAttr, None) if showAttr else str(val)
-            self.listbox.insert('end', value)
-        self.values = values
-
-    def clicked(self, e=0):
-        if self.callback:
-            selected = self.selected
-            if selected: self.callback(selected=self.selected, event=e)
-
     @property
-    def selected(self):
-        sels = self.listbox.curselection()
-        if sels:
-            select = []
-            for sel in sels: select.append(self.values[sel])
-            return select
+    def selected(self): return self.listbox.selected
+
+
 ListBox = PLB = PRMP_ListBox
 
 class PRMP_TreeView(PRMP_Frame):
