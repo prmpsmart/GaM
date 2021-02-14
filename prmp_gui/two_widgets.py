@@ -24,21 +24,31 @@ class TwoWidgets(PRMP_Frame):
         self.disableOnToggle = disableOnToggle
 
 # top part
-        self.top = top.lower()
 
-        if tttk: top_wid = self.stop_widgets[top]
-        else: top_wid = self.top_widgets[top]
+        if isinstance(top, str):
+            self.top = top.lower()
 
-        top_defaults = {k:v for k, v in self.top_defaults.items()}
+            if tttk: top_wid = self.stop_widgets[top]
+            else: top_wid = self.top_widgets[top]
 
-        if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
-        else: topKw = dict(**topKwargs)
+            top_defaults = {k:v for k, v in self.top_defaults.items()}
+
+            if top in ['checkbutton', 'radiobutton']: topKw = dict(command=command or self.checked, **topKwargs)
+            else: topKw = dict(**topKwargs)
+
+        else:
+            self.top = top.__name__.lower()
+
+            top_wid = top
+            placeholder = ''
+            topKw = topKwargs.copy()
 
         self.Top = top_wid(self, **topKw)
         text = topKwargs.get('text')
         if not text:
             config = topKwargs.get('config')
             if config: text = config.get('text')
+
 
 # bottom part
         if isinstance(bottom, str):

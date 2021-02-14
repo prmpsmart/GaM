@@ -354,11 +354,23 @@ class DCOffice_StartDialog(Office_StartDialog):
 
 
 
-class AttributesCreatorDialog(GaM_Dialog):
+class AttributesExplorerDialog(GaM_Dialog):
 
-    def __init__(self, master=None, title='Attributes Creator Dialog', geo=(500, 500), **kwargs): super().__init__(master, title=title, geo=geo, **kwargs)
+    def __init__(self, master=None, title='Attributes Explorer Dialog', geo=(600, 500), obj=None, **kwargs):
+        self.obj = obj
+        super().__init__(master, title=title, geo=geo, **kwargs)
 
-    def _setupDialog(self): AttributesCreator(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), values=self.values)
+    def _setupDialog(self): AttributesExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), values=self.values, obj=self.obj)
+
+
+class AttributesViewerDialog(GaM_Dialog):
+
+    def __init__(self, master=None, title='Attributes Viewer Dialog', geo=(600, 500), obj=None, attr=None, **kwargs):
+        self.attr = attr
+        self.obj = obj
+        super().__init__(master, title=title, geo=geo, **kwargs)
+
+    def _setupDialog(self): AttributesViewer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), attr=self.attr, obj=self.obj)
 
 
 
