@@ -1757,6 +1757,23 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
         self.callback = callback
         self.current = None
 
+    def getChildren(self, item=None):
+        children = self.get_children(item)
+        childrenList = []
+
+        for child in children:
+            childValue = self.ivd[child]
+            childDicts = self.getChildren(child)
+            if childDicts: childValue = {childValue: childDicts}
+
+            childrenList.append(childValue)
+
+        leng = len(childrenList)
+
+        if not leng: return None
+        elif leng > 1: return childrenList
+        else: return childrenList[0]
+
     def insert(self, item, position='end',  value=None, text='', **kwargs):
         newItem = ttk.Treeview.insert(self, item, position, text=text, **kwargs)
 

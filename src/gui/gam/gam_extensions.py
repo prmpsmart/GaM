@@ -501,23 +501,26 @@ class AttributesCreator(LabelFrame):
 
         self.callback = callback
 
-        Label(self, text='Topmost   Attributes', place=dict(relx=0, rely=0, relw=.25, relh=.07))
+        Label(self, text='Top Attrs', place=dict(relx=0, rely=0, relw=.35, relh=.07))
 
-        self.listbox = ListBox(self, place=dict(relx=0, rely=.08, relh=.84, relw=.25), listboxConfig=dict(config=dict(selectmode='multiple'), values=values), bindings=[('<Return>', self.clicked, '')])
+        self.listbox = ListBox(self, place=dict(relx=0, rely=.08, relh=.84, relw=.35), listboxConfig=dict(config=dict(selectmode='multiple'), values=values), bindings=[('<Return>', self.clicked, '')])
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=.93, relh=.07, relw=.2), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
+        self.total = LabelLabel(self, place=dict(relx=0, rely=.93, relh=.07, relw=.3), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
 
-        PRMP_Separator(self, place=dict(relx=.255, rely=0, relh=1, relw=.05), config=dict(orient='vertical'))
+        PRMP_Separator(self, place=dict(relx=.355, rely=0, relh=1, relw=.05), config=dict(orient='vertical'))
 
-        self.treeview = PRMP_Treeview(self, place=dict(relx=.265, rely=0, relh=.9, relw=.735))
+        self.treeview = PRMP_Treeview(self, place=dict(relx=.37, rely=0, relh=.8, relw=.625))
         self.treeview.heading('#0', text='Attributes')
         self.ivd = self.treeview.ivd
         self.treeview.bind('<Delete>', self.deleteAttribute)
 
-        self.entry = LabelEntry(self, place=dict(relx=.265, rely=.91, relw=.5, relh=.085), orient='h', longent=.4, topKwargs=dict(text='Enter Attribute'), bottomKwwargs=dict(placeholder=''))
+        self.entry = LabelEntry(self, place=dict(relx=.37, rely=.81, relw=.45, relh=.085), orient='h', longent=.25, topKwargs=dict(text='New'), bottomKwwargs=dict(placeholder=''))
         self.entry.B.bind('<Return>', self.addAtrribute)
 
-        Button(self, text='Delete', place=dict(relx=.85, rely=.915, relh=.07, relw=.1), command=self.deleteAttribute)
+        self.top = Checkbutton(self, text='Top?', place=dict(relx=.85, rely=.815, relh=.07, relw=.12))
+
+        Button(self, text='Delete', place=dict(relx=.52, rely=.915, relh=.07, relw=.15), command=self.deleteAttribute)
+        Button(self, text='Get', place=dict(relx=.7, rely=.915, relh=.07, relw=.15), command=self.getAttributes)
 
         self.values = values
         self._foc = None
@@ -526,11 +529,11 @@ class AttributesCreator(LabelFrame):
     def addAtrribute(self, e=0):
         get = self.entry.get()
         if not get: return
-        item = self.treeview.focus() or ''
+        item = '' if self.top.get() else self.treeview.focus()
         self.treeview.insert(item, text=get)
         # self.treeview.focus('')
-        self.reloadListBox()
-
+        self.setListBox()
+        self.entry.B.clear()
 
     def deleteAttribute(self, e=0):
         self._foc = focus = self.treeview.focus()
@@ -543,10 +546,9 @@ class AttributesCreator(LabelFrame):
         if w:
             if not self._foc: self.treeview.deleteAll()
             else: self.treeview.delete(self._foc)
+        self.setListBox()
 
-        self.reloadListBox()
-
-    def reloadListBox(self):
+    def setListBox(self):
         self.listbox.clear()
         tops = self.treeview.get_children()
         for top in tops: self.listbox.insert(self.ivd[top])
@@ -559,22 +561,24 @@ class AttributesCreator(LabelFrame):
 
     def set(self, values):
         self.values = values
-        self.setListBox(values)
         self.setTreeview(values)
+        self.setListBox()
 
-    def get(self):
-        # get_children
-        pass
+    def getAttributes(self):
+        listbox = self.listbox.selected
+        if not listbox: listbox = self.listbox.values
 
-    def setListBox(self, values):
-        for value in values:
-            if isinstance(value, dict): val = value.keys()[0]
-            elif isinstance(value, (str, bytes)): val = value
-            self.listbox.insert(val)
+        result = []
 
-    def getListBox(self):
-        # get_children
-        pass
+        tops = self.treeview.getChildren()
+
+        for top in tops:
+            val = top if isinstance(top, str) else list(top.keys())[0]
+
+            if val in listbox: result.append(top)
+
+        print(result)
+
 
     def setTreeview(self, values, parent=''):
         if isinstance(values, list):
@@ -589,9 +593,6 @@ class AttributesCreator(LabelFrame):
             self.treeview.insert(parent, text=values)
             pass
 
-    def getTreeview(self):
-        # get_children
-        pass
 
 
 
