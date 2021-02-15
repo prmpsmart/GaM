@@ -1,2 +1,2 @@
 from .coop_dialogs import *
-from ..core.gam_apps import *
+from ..gam.gam_apps import *

@@ -293,8 +293,8 @@ def askPath(opened=False, folder=False, many=False, save=False):
     else: return filedialog.askdirectory()
 
 def dialogFunc(ask=0, path=0, obj=None, **kwargs):
-    if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, _return=0)
-    elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj)
+    if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
+    elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
     elif path: return askPath(**kwargs)
     elif ask: return confirmDialog(**kwargs)
     else: return showDialog(**kwargs)

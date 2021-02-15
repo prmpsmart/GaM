@@ -1,4 +1,4 @@
-from ..core.gam_apps import *
+from ..gam.gam_apps import *
 from ...backend.dc.dc_regions import *
 from ...backend.dc.dc_specials import *
 from prmp_gui.plot_canvas import PRMP_PlotCanvas, random#, ChartSort

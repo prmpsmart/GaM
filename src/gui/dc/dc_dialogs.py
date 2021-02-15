@@ -1,4 +1,4 @@
-from ..core.gam_dialogs import *
+from ..gam.gam_dialogs import *
 from .dc_extensions import *
 
 class ClientDialog(PersonDialog):

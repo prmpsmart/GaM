@@ -582,10 +582,8 @@ class PRMP_Calendar(Frame):
             background, foreground = kwargs.get('background'), kwargs.get('foreground')
             self.configure(**kwargs)
 
-            if foreground:
-                self['foreground'] = foreground
-            if background:
-                self['bg'] = background
+            if foreground: self['foreground'] = foreground
+            if background: self['background'] = background
 
         @property
         def now(self):
@@ -614,7 +612,7 @@ class PRMP_Calendar(Frame):
                 PRMP_Calendar.choosen = self
 
                 if b4: b4.offButton()
-                
+
                 self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
 
                 self.returnMethod(self.day)
@@ -628,7 +626,7 @@ class PRMP_Calendar(Frame):
         self.min = PRMP_DateTime.getDMYFromDate(min_)
         self.max = PRMP_DateTime.getDMYFromDate(max_)
         self.__date = None
-        self.day = self.month = month
+        self.month = month
         self.callback = callback
         self.dest = dest
         self.daysButtons = []
@@ -729,11 +727,9 @@ class PRMP_Calendar(Frame):
             DayLabel = self.daysButtons[index]
             if DayLabel == self.reset: continue
 
-            if day.month == self.month.month:
+            if self.month.isSameMonthYear(day):
                 DayLabel.config(day=day)
-                if self.month.isSameDay(day):
-                    DayLabel.choosen()
-                    print('here')
+                if self.month.isSameDate(day): DayLabel.choosen()
             else: DayLabel.empty()
 
         for btn in remainingBtns:

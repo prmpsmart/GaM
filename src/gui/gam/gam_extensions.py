@@ -14,20 +14,25 @@ from ...backend.office.office_regions import *
 
 def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
 
-    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog, DC_Office, ClientAccountDialog, ClientAccount
+    from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog, ClientAccountDialog, ClientAccount
 
     from .gam_apps import RegionHome, AccountHome, ManagerHome
 
     _kwargs = kwargs.copy()
     kwargs = _kwargs
 
+    non = 1
+
     if obj:
         window = ManagerHome
-        if not kwargs.get('title'): kwargs.update(dict(title=obj.name))
+        try:
+            if not kwargs.get('title'): kwargs.update(dict(title=obj.name))
+        except: pass
+
         if create: kwargs.update(dict(manager=obj))
 
-        if isinstance(obj, (DCOffice, DCRegion)): #Office is there for the mean time.
-            window = DC_RegionHome if obj.className != 'DCOffice' else DC_Office
+        if isinstance(obj, DCRegion): #Office is there for the mean time.
+            window = DC_RegionHome
             if not create: kwargs.update(region=obj)
 
         elif isinstance(obj, DCAccount):
@@ -47,21 +52,22 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
                 window = ThriftDetailsDialog if not edit else ThriftDialog
                 kwargs.update(title=obj.name, thrift=obj)
             else: window = ThriftDialog
-
         elif isinstance(obj, DailyContribution):
             # print('true')
             if not create:
                 window = DailyContributionDailog
                 kwargs.update(title=obj.name, dcContrib=obj)
             else: window = ThriftDialog
-
         elif isinstance(obj, ObjectsManager):
             if not create: kwargs.update(title=f'{obj.name} Subscripts Details', obj=obj)
+        else:
+            kwargs.update(obj=obj)
+            non = 1
 
-        else: kwargs.update(obj=obj)
-
-        win = window(self, **kwargs)
-        if not self: win.start()
+        if not non:
+            win = window(self, **kwargs)
+            if not self: win.start()
+        else: dialogFunc(**kwargs)
 
 
 
@@ -524,7 +530,7 @@ class AttributesViewer(LabelFrame):
         self.details = Button(self, text='Further Details', place=dict(relx=0, rely=.9, relh=.1, relw=1), command=self.open)
 
 
-    def openMaster(self): openCores(self.obj)
+    def openMaster(self): dialogFunc(obj=self.obj)
 
     def open(self):
         pass

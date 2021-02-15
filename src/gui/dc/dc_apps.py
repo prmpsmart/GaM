@@ -1,5 +1,5 @@
 from .dc_dialogs import *
-# from ..core.gam_dialogs import Notebook
+# from ..gam.gam_dialogs import Notebook
 
 def addNote(self):
     self.overview = DC_Overview(self.note, region=self.obj)
@@ -63,7 +63,7 @@ class DC_AccountHome(TreeColumns, AccountHome):
 
         if isinstance(self.account, AreaAccount):
             self.recordsManagers.place(relx=.005, rely=.13, relh=.36, relw=.24)
-            
+
             self.subAccounts = SubsList(self.container, text='Clients Accounts', place=dict(relx=.005, rely=.5, relh=.36, relw=.24), callback=self.selected)
 
             if self.account: self.subAccounts.set(self.account.getClientsAccounts(), showAttr={'region': 'name'})
