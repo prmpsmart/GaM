@@ -25,7 +25,7 @@ class DC_RegionHome(TreeColumns, RegionHome):
     def _defs(self):
         self.subRegions.callback = self.selectedRegion
         self.accounts.callback = self.selectedAccount
-        addNote(self, obj=self.obj)
+        addNote(self, obj=self.obj, values=self.columns(self.region))
 
         self.details.bind('<1>', lambda e: self.defaults(1))
 
