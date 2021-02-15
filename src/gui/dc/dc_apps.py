@@ -1,7 +1,7 @@
 from .dc_dialogs import *
 # from ..gam.gam_dialogs import Notebook
 
-def addNote(self):
+def addNote(self, **kwargs):
     self.overview = DC_Overview(self.note, region=self.obj)
     self.note.add(self.overview, padding=3)
     self.note.tab(0, text='Overview', compound='left', underline='-1')
@@ -9,6 +9,10 @@ def addNote(self):
     self.tree = Hierachy(self.note)
     self.note.add(self.tree, padding=3)
     self.note.tab(1, text='Tree', compound='left', underline='-1')
+
+    self.attributes = AttributesExplorer(self.note, **kwargs)
+    self.note.add(self.attributes, padding=3)
+    self.note.tab(2, text='Attributes', compound='left', underline='-1')
 
 
 class DC_RegionHome(TreeColumns, RegionHome):
@@ -21,7 +25,7 @@ class DC_RegionHome(TreeColumns, RegionHome):
     def _defs(self):
         self.subRegions.callback = self.selectedRegion
         self.accounts.callback = self.selectedAccount
-        addNote(self)
+        addNote(self, obj=self.obj)
 
         self.details.bind('<1>', lambda e: self.defaults(1))
 

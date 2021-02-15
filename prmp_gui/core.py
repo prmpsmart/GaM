@@ -1082,9 +1082,10 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     @property
     def selected(self):
         sels = self.curselection()
+        # print(sels, 'sels')
         if sels:
             select = []
-            for sel in sels: select.append(self.values[sel])
+            for sel in sels: select.append(self.values[sel]); print(sel)
             return select
 
 Listbox = PLb = PRMP_Listbox

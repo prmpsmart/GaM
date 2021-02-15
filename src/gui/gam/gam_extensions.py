@@ -580,12 +580,15 @@ class AttributesExplorer(LabelFrame):
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')
 
         attrs = self.getAttributes()
-        leng = len(attrs)
+        if attrs:
+            leng = len(attrs)
 
-        if not leng: PRMP_MsgBox(self, title='Attribute Error', message='Choose an attribute from the listbox!')
-        elif leng > 1: PRMP_MsgBox(self, title='Attribute Error', message='Choose only one attribute from the listbox!')
-        else:
-            pass
+            if not leng: PRMP_MsgBox(self, title='Attribute Error', message='Choose an attribute from the listbox!')
+            elif leng > 1: PRMP_MsgBox(self, title='Attribute Error', message='Choose only one attribute from the listbox!')
+            else:
+                attr = attrs[0]
+                value = self.obj[attr]
+                openCores(obj=value)
 
     def addAtrribute(self, e=0):
         get = self.entry.get()
@@ -615,7 +618,6 @@ class AttributesExplorer(LabelFrame):
         for top in tops: self.listbox.insert(self.ivd[top])
         self.total.set(self.listbox.last)
 
-
     def clicked(self, event=None, selected=None):
         selected = self.listbox.selected
         self.treeview.see
@@ -626,18 +628,10 @@ class AttributesExplorer(LabelFrame):
         self.setListBox()
 
     def getAttributes(self):
-        listbox = self.listbox.selected
-        if not listbox: listbox = self.listbox.values
-
-        result = []
-        # print(listbox)
         tops = self.treeview.getChildren()
-        if isinstance(tops, list):
-            for top in tops:
-                val = top if isinstance(top, str) else list(top.keys())[0]
-                if val in listbox: result.append(top)
-        elif isinstance(tops, str):
-            if tops in listbox: result.append(tops)
+        listbox = self.listbox.curselection()
+        if not listbox: listbox = range(self.listbox.last)
+        result = [tops[num] for num in listbox] if isinstance(tops, (tuple, list)) else [tops]
 
         return result
 

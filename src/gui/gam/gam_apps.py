@@ -503,26 +503,3 @@ class GaM_Home(GaM_App):
         pass
 
 
-
-
-class AttributesExplorerApp(GaM_App):
-
-    def __init__(self, master=None, title='Attributes Explorer App', geo=(600, 500), obj=None, **kwargs):
-        self.obj = obj
-        super().__init__(master, title=title, geo=geo, **kwargs)
-
-    def _setupApp(self): AttributesExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), values=self.values, obj=self.obj)
-
-
-class AttributesViewerApp(GaM_App):
-
-    def __init__(self, master=None, title='Attributes Viewer App', geo=(600, 500), obj=None, attr=None, **kwargs):
-        self.attr = attr
-        super().__init__(master, title=title, geo=geo, obj=obj, **kwargs)
-
-    def _setupApp(self): AttributesViewer(self.container, attr=self.attr, obj=self.obj, place=dict(relx=.02, rely=.02, relh=.96, relw=.96))
-
-
-
-
-
