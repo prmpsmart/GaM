@@ -12,7 +12,7 @@ from ...backend.dc.dc_specials import *
 from ...backend.office.office_regions import *
 
 
-def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
+def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
 
     from ..dc.dc_apps import ThriftDialog, ThriftDetailsDialog, DailyContributionDailog, DC_RegionHome, DC_AccountHome, PersonDialog, RecordDialog, AccountDialog, DailyContributionDailog, ClientAccountDialog, ClientAccount
 
@@ -21,7 +21,7 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
     _kwargs = kwargs.copy()
     kwargs = _kwargs
 
-    non = 1
+    non = 0
 
     if obj:
         window = ManagerHome
@@ -65,8 +65,8 @@ def openCores(self=None, obj=None, create=0, edit=0, **kwargs):
             non = 1
 
         if not non:
-            win = window(self, **kwargs)
-            if not self: win.start()
+            win = window(master, **kwargs)
+            if not master: win.start()
         else: dialogFunc(**kwargs)
 
 

@@ -611,19 +611,18 @@ class PRMP_Calendar(Frame):
             self.config(text='', state='disabled', relief='flat', background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
 
         def clicked(self, e=0):
-            if self.day:
-                if self.notPart: return
+            b4 = PRMP_Calendar.choosen
+            PRMP_Calendar.choosen = self
 
-                b4 = PRMP_Calendar.choosen
-                PRMP_Calendar.choosen = self
+            if b4: b4.offButton()
 
-                if b4: b4.offButton()
-
-                self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
+            self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
 
         def choosen(self, e=0):
-            self.clicked()
-            self.returnMethod(self.day)
+            if self.day:
+                if self.notPart: return
+                self.clicked()
+                self.returnMethod(self.day)
 
     def __init__(self, master=None, month=None, dest='', callback=None, min_=None, max_=None, **kwargs):
         super().__init__(master, **kwargs)

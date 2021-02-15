@@ -1063,7 +1063,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     def insert(self, value, position='end'):
         self.values.append(value)
         self.last = len(self.values)
-        tk.Listbox.insert(self, position, value)
+        tk.Listbox.insert(self, position, str(value))
 
 
     def set(self, values, showAttr=''):
@@ -1071,7 +1071,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
         for val in values:
             value = val[showAttr] if showAttr else str(val)
             # value = getattr(val, showAttr, None) if showAttr else str(val)
-            self.insert('end', value)
+            self.insert(value)
         self.values = values
 
     def clicked(self, e=0):
