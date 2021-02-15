@@ -112,7 +112,6 @@ PD = PRMP_Dialog
 class PRMP_CalendarDialog(PRMP_Dialog):
 
     def __init__(self, master=None, month=None, dest='', title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, **kwargs):
-
         self.min = min_
         self.max = max_
         self.month = month

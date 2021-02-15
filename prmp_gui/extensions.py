@@ -541,11 +541,15 @@ class PRMP_Calendar(Frame):
         days_fg = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
         days_bg = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
         notPart = False # for buttons not part of the days button
+        count = 0
 
         def __init__(self, master=None, returnMethod=None, **kw):
             super().__init__(master=master, background=self.days_bg, foreground=self.days_fg, font=PRMP_Theme.DEFAULT_FONT, **kw)
             self.day = None
             self.returnMethod = returnMethod
+
+            # name='DAY'+str(PRMP_Calendar.DayLabel.count)
+            # PRMP_Calendar.DayLabel.count += 1
 
             self.bind('<Enter>', self.onButton)
             self.bind('<Leave>', self.offButton)
@@ -559,7 +563,8 @@ class PRMP_Calendar(Frame):
                 else: self.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
         @property
-        def status(self): return self.day
+        def status(self):
+            if self.day: return self.day.date
 
         def offButton(self, e=0):
             if self.notPart: return
@@ -581,6 +586,7 @@ class PRMP_Calendar(Frame):
 
             background, foreground = kwargs.get('background'), kwargs.get('foreground')
             self.configure(**kwargs)
+            # print(kwargs)
 
             if foreground: self['foreground'] = foreground
             if background: self['background'] = background
@@ -604,7 +610,7 @@ class PRMP_Calendar(Frame):
             self.day = None
             self.config(text='', state='disabled', relief='flat', background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
 
-        def choosen(self, e=0):
+        def clicked(self, e=0):
             if self.day:
                 if self.notPart: return
 
@@ -615,7 +621,9 @@ class PRMP_Calendar(Frame):
 
                 self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
 
-                self.returnMethod(self.day)
+        def choosen(self, e=0):
+            self.clicked()
+            self.returnMethod(self.day)
 
     def __init__(self, master=None, month=None, dest='', callback=None, min_=None, max_=None, **kwargs):
         super().__init__(master, **kwargs)
@@ -729,14 +737,12 @@ class PRMP_Calendar(Frame):
 
             if self.month.isSameMonthYear(day):
                 DayLabel.config(day=day)
-                if self.month.isSameDate(day): DayLabel.choosen()
+                if self.month.isSameDate(day): DayLabel.clicked()
             else: DayLabel.empty()
 
         for btn in remainingBtns:
             if btn == self.reset: continue
             btn.empty()
-
-        # for dayBtn in self.daysButtons: dayBtn.offButton()
 
     @property
     def date(self): return self.__date

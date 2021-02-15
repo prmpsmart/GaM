@@ -529,13 +529,11 @@ class AttributesViewer(LabelFrame):
 
         self.details = Button(self, text='Further Details', place=dict(relx=0, rely=.9, relh=.1, relw=1), command=self.open)
 
-
-    def openMaster(self): dialogFunc(obj=self.obj)
+    def openMaster(self): openCores(master=self, obj=self.obj)
 
     def open(self):
-        pass
-
-
+        if isinstance(self._value, (int, str, list, tuple, dict)): AttributesExplorer(self, values=self._value)
+        else: openCores(master=self, obj=self._value)
 
 
 class AttributesExplorer(LabelFrame):
