@@ -10,9 +10,12 @@ def addNote(self, **kwargs):
     self.note.add(self.tree, padding=3)
     self.note.tab(1, text='Tree', compound='left', underline='-1')
 
-    self.attributes = AttributesExplorer(self.note, **kwargs)
-    self.note.add(self.attributes, padding=3)
+    frame = Frame(self.note)
+    self.note.add(frame, padding=3)
     self.note.tab(2, text='Attributes', compound='left', underline='-1')
+
+    self._columns = ColumnsExplorer(frame, obj=self, place=dict(relx=0, rely=0, relw=1, relh=.48))
+    self.attributes = AttributesExplorer(frame, place=dict(relx=0, rely=.5, relw=1, relh=.48), **kwargs)
 
 
 class DC_RegionHome(TreeColumns, RegionHome):
