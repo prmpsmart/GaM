@@ -2765,6 +2765,8 @@ class PRMP_TreeView(PRMP_Frame):
         self.setColumns(columns)
         self.create()
 
+    def bindings(self): pass
+
     def create(self):
         if self.treeview:
             self.treeview.destroy()
@@ -2794,6 +2796,8 @@ class PRMP_TreeView(PRMP_Frame):
         self.insert = self.treeview.insert
         self.heading = self.treeview.heading
         self.column = self.treeview.column
+
+        self.bindings()
 
     def tag_config(self, tagName, font=PRMP_Theme.DEFAULT_FONT, **kwargs):
         font = Font(**font)

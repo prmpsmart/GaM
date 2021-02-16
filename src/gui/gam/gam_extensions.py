@@ -172,6 +172,7 @@ class Hierachy(PRMP_TreeView):
         self.last = []
         super().__init__(master=master, columns=columns, **kwargs)
 
+        self.bindings()
 
     def toggleOpen(self, e=0):
         if self._toggleOpen: self._toggleOpen = False
@@ -179,7 +180,6 @@ class Hierachy(PRMP_TreeView):
         self.viewAll(*self.last)
 
     def bindings(self):
-        super().bindings()
         self.treeview.bind('<Control-Return>', self.viewRegion)
         if self.toop:
             self.treeview.bind('<Control-o>', self.toggleOpen)
@@ -191,6 +191,7 @@ class Hierachy(PRMP_TreeView):
     def reload(self, e=0): self.viewAll(*self.last)
 
     def viewRegion(self, e=0):
+        print(e)
         current = self.selected()
         if current: openCores(self, current)
 
