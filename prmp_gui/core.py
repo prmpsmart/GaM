@@ -2778,7 +2778,6 @@ class PRMP_TreeView(PRMP_Frame):
             self.yscrollbar.destroy()
             del self.yscrollbar
 
-
         self.t = self.tree = self.treeview = PRMP_Treeview(self)
         self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
         self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))

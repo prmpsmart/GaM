@@ -180,7 +180,7 @@ class Hierachy(PRMP_TreeView):
         self.viewAll(*self.last)
 
     def bindings(self):
-        self.treeview.bind('<Control-Return>', self.viewRegion)
+        self.treeview.bind('<Control-v>', self.viewRegion)
         if self.toop:
             self.treeview.bind('<Control-o>', self.toggleOpen)
             self.treeview.bind('<Control-O>', self.toggleOpen)
