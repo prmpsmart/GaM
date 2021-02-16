@@ -1040,7 +1040,9 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
 
     def __init__(self, master=None, config={}, values=[], callback=None, defBinds=1, bindings=[], **kwargs):
 
-        self.values = values.copy()
+        if isinstance(values, (list, tuple, dict)): self.values = values.copy()
+        else: self.values = values
+        
         self.last = 0
         self.callback = callback
 

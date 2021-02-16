@@ -510,13 +510,13 @@ class AttributesViewer(LabelFrame):
 
         self.name.set(self.attr)
 
-        self.type = LabelEntry(self, place=dict(relx=0, rely=.15, relh=.15, relw=1), topKwargs=dict(text='attr Type'), bottomKwargs=dict(state='readonly'), orient='h', longent=.23)
-
-        self.type.set(self._type)
-
-        self.value = LabelText(self, place=dict(relx=0, rely=.3, relh=.45, relw=1), topKwargs=dict(text='attr Value'), bottomKwargs=dict(state='disabled'), orient='h', longent=.3)
+        self.value = LabelText(self, place=dict(relx=0, rely=.15, relh=.45, relw=1), topKwargs=dict(text='attr Value'), bottomKwargs=dict(state='disabled'), orient='h', longent=.3)
 
         self.value.set(self._value)
+
+        self.valueType = LabelEntry(self, place=dict(relx=0, rely=.6, relh=.15, relw=1), topKwargs=dict(text='value Type'), bottomKwargs=dict(state='readonly'), orient='h', longent=.23)
+
+        self.valueType.set(self._type)
 
         self.mastertype = TwoWidgets(self, place=dict(relx=0, rely=.76, relh=.14, relw=1), topKwargs=dict(text='master Type', command=self.openMaster), bottomKwargs=dict(state='readonly'), orient='h', longent=.22, top=Button, bottom='entry')
 
