@@ -2081,6 +2081,8 @@ class PRMP_Window(PRMP_Widget):
     TKICON = ''
     PRMPICON = ''
 
+    TKClass = None
+
     def start(self):
         self.paint()
         self.mainloop()
@@ -2174,6 +2176,7 @@ class PRMP_Window(PRMP_Widget):
 
         if addTitleBar:
             if toolWindow: self.__r = 1
+            elif self.resize.count(True) > 1: self.__r = 2
             else: self.__r = 0
             self.addTitleBar()
             self.setPRMPIcon(prmpIcon or PRMP_Window.PRMPICON)
@@ -2378,7 +2381,7 @@ class PRMP_Window(PRMP_Widget):
         self.setGeometry(points)
 
     def topOfScreen(self): [self.topLeftOfScreen, self.topRightOfScreen, self.centerOfTopOfScreen][self.getWhichSide()]()
-    def bottomOfScreen(self): [self.bottomLeftOfScreen, self.bottomRightOfScreen, self.centerOfBotomOfScreen][self.getWhichSide()]()
+    def bottomOfScreen(self): [self.bottomLeftOfScreen, self.bottomRightOfScreen, self.centerOfBottomOfScreen][self.getWhichSide()]()
     def rightOfScreen(self): [self.bottomRightOfScreen, self.topRightOfScreen, self.centerOfRightOfScreen][self.getWhichSide()]()
     def leftOfScreen(self): [self.bottomLeftOfScreen, self.topLeftOfScreen, self.centerOfLeftOfScreen][self.getWhichSide()]()
 
@@ -2425,16 +2428,16 @@ class PRMP_Window(PRMP_Widget):
                 self.addWindowToTaskBar()
 
     def maximize(self, e=0):
-        if self.__r: return
-        if self.resize.count(True) < 2: return
+        if self.__r != 2: return
 
         if self.zoomed:
             self.zoomed = False
-            self.state('normal')
+            self.TKClass.state(self, 'normal')
             self.isNormal()
+
         else:
             self.zoomed = True
-            self.state('zoomed')
+            self.TKClass.state(self, 'zoomed')
             self.isMaximized()
 
     def isMaximized(self): pass
@@ -2458,7 +2461,7 @@ class PRMP_Window(PRMP_Widget):
 
         fr = F(self)
 
-        if not self.__r:
+        if self.__r != 1:
             self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20))
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
@@ -2487,7 +2490,7 @@ class PRMP_Window(PRMP_Widget):
         self.placeTitlebar()
 
     def addToMenu(self, widget, **kwargs):
-        if self.menuBar: self.menuBar.addWidget(widget, **kwargs)
+        if self.titleBar and self.menuBar: self.menuBar.addWidget(widget, **kwargs)
 
     def closing(self): pass
 
@@ -2533,7 +2536,7 @@ class PRMP_Window(PRMP_Widget):
 
             if x < 0: return
             w = 30
-            if not self.__r:
+            if self.__r != 1:
                 self._min.place(x=x-90, rely=0, relh=1, w=30)
                 self._max.place(x=x-60, rely=0, relh=1, w=30)
                 w = 90
@@ -2614,12 +2617,14 @@ class PRMP_Window(PRMP_Widget):
 PW = PRMP_Window
 
 class PRMP_Tk(PRMP_Window, tk.Tk):
+    TKClass = tk.Tk
     def __init__(self, _ttk_=False, **kwargs):
         tk.Tk.__init__(self)
         PRMP_Window.__init__(self, _ttk_=_ttk_, **kwargs)
 Tk = PT = PRMP_Tk
 
 class PRMP_Toplevel(PRMP_Window, tk.Toplevel):
+    TKClass = tk.Toplevel
     def __init__(self, master=None, _ttk_=False, **kwargs):
         tk.Toplevel.__init__(self, master)
         if master:
@@ -2718,10 +2723,10 @@ class PRMP_ListBox(PRMP_Frame):
         if ret != self._unget: return ret
         else: return getattr(self.listbox, attr)
 
-    def __init__(self, master=None, listboxConfig={}, **kwargs):
+    def __init__(self, master=None, listboxConfig={}, callback=None, **kwargs):
         super().__init__(master=master, **kwargs)
 
-        self.listbox = PRMP_Listbox(self, **listboxConfig)
+        self.listbox = PRMP_Listbox(self, callback=callback, **listboxConfig)
 
         self.clear = self.listbox.clear
         self.set = self.listbox.set

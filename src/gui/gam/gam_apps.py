@@ -40,6 +40,7 @@ class GaM_App(PRMP_MainWindow):
         pass
 
     def setMenus(self):
+        if not self.titleBar: return
 
         def showSnS(obj):
             if obj: SortNSearch(self, obj=self.obj)

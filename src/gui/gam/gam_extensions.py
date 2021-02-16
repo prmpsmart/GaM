@@ -64,7 +64,7 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
             kwargs.update(obj=obj)
             non = 1
 
-        if not non:
+        if non == 0:
             win = window(master, **kwargs)
             if not master: win.start()
         else: dialogFunc(**kwargs)
@@ -180,7 +180,7 @@ class Hierachy(PRMP_TreeView):
         self.viewAll(*self.last)
 
     def bindings(self):
-        self.treeview.bind('<Control-v>', self.viewRegion)
+        self.treeview.bind('<Control-Return>', self.viewRegion, '+')
         if self.toop:
             self.treeview.bind('<Control-o>', self.toggleOpen)
             self.treeview.bind('<Control-O>', self.toggleOpen)
@@ -191,9 +191,8 @@ class Hierachy(PRMP_TreeView):
     def reload(self, e=0): self.viewAll(*self.last)
 
     def viewRegion(self, e=0):
-        print(e)
         current = self.selected()
-        if current: openCores(self, current)
+        if current: openCores(master=self, obj=current)
 
     def _viewAll(self, obj, parent=''):
         if not obj: return
@@ -204,20 +203,14 @@ class Hierachy(PRMP_TreeView):
         else:
             raw = self.columns.get(obj)
             first, *columns = raw
-            item = self.insert(parent, text=first, values=columns, open=self._toggleOpen)
-            # print(columns)
-            self.ivd[item] = obj
+            item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
+
             subs = []
 
             if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts, obj.persons] + [obj['dailyContributions']] or []
             elif isinstance(obj, Record):
-                # insert
                 for a in obj:
-                    item_ = self.insert(item, text=a.name)
-                    # f, *g = self.columns.get(a)
-                    # item_ = self.insert(item, text=f, values=g)
-
-                    self.ivd[item_] = a
+                    item_ = self.insert(item, text=a.name, value=a)
                 return
             elif isinstance(obj, ObjectsMixins): subs = obj.subs
 
@@ -394,6 +387,7 @@ class SubsList(LabelFrame):
 
     def clicked(self, selected=None, event=None):
         selected = selected[0]
+        print('ioio')
 
         if self.dialog.get(): openCores(self, selected)
         elif self.callback: self.callback(selected)
@@ -503,7 +497,7 @@ class FurtherDetails(PRMP_FillWidgets, LabelFrame):
 
 class AttributesViewer(LabelFrame):
 
-    def __init__(self, master, attr, obj, **kwargs):
+    def __init__(self, master, attr='', obj=None, **kwargs):
         super().__init__(master, **kwargs)
 
         self.obj = obj
@@ -544,7 +538,6 @@ class AttributesExplorer(LabelFrame):
         self.callback = callback
         self.obj = obj
 
-
         frame1 = Frame(self, place=dict(relx=0, rely=0, relw=.44, relh=1))
 
         Label(frame1, text='Top Attrs', place=dict(relx=0, rely=0, relw=1, relh=.07))
@@ -554,7 +547,6 @@ class AttributesExplorer(LabelFrame):
         self.total = LabelLabel(frame1, place=dict(relx=0, rely=.93, relh=.07, relw=.6), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
 
         Button(frame1, text='Open', place=dict(relx=.65, rely=.93, relh=.07, relw=.25), command=self.openAttribute)
-
 
         PRMP_Separator(self, place=dict(relx=.445, rely=0, relh=1, relw=.05), config=dict(orient='vertical'))
 
@@ -573,9 +565,14 @@ class AttributesExplorer(LabelFrame):
         Button(frame2, text='Delete', place=dict(relx=.1, rely=.915, relh=.07, relw=.25), command=self.deleteAttribute)
         Button(frame2, text='Get', place=dict(relx=.65, rely=.915, relh=.07, relw=.25), command=self.getAttributes)
 
-        self.values = values
         self._foc = None
-        if values: self.set(values)
+
+        if obj and not values:
+            keys = list(obj.__dict__.keys())
+            values = [key.strip('_') for key in keys if '__' not in key]
+
+        self.values = values
+        self.set(values)
 
     def openAttribute(self):
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')
@@ -588,8 +585,10 @@ class AttributesExplorer(LabelFrame):
             elif leng > 1: PRMP_MsgBox(self, title='Attribute Error', message='Choose only one attribute from the listbox!')
             else:
                 attr = attrs[0]
-                value = self.obj[attr]
-                openCores(obj=value)
+                # value = self.obj[attr]
+                # openCores(obj=value)
+                from .gam_dialogs import AttributesViewerDialog
+                AttributesViewerDialog(self, attr=attr, obj=self.obj)
 
     def addAtrribute(self, e=0):
         get = self.entry.get()
@@ -624,6 +623,7 @@ class AttributesExplorer(LabelFrame):
         self.treeview.see
 
     def set(self, values):
+        if not values: return
         self.values = values
         self.setTreeview(values)
         self.setListBox()
@@ -635,7 +635,6 @@ class AttributesExplorer(LabelFrame):
         result = [tops[num] for num in listbox] if isinstance(tops, (tuple, list)) else [tops]
 
         return result
-
 
     def setTreeview(self, values, parent=''):
         if isinstance(values, list):
