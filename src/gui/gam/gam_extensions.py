@@ -201,8 +201,9 @@ class Hierachy(PRMP_TreeView):
             subs = obj
             item = parent
         else:
-            raw = self.columns.get(obj)
+            raw = self.columns.getFromObj(obj)
             first, *columns = raw
+            
             item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
 
             subs = []
@@ -650,18 +651,44 @@ class AttributesExplorer(LabelFrame):
             pass
 
 
+class ColumnViewer(LabelFrame):
+
+    def __init__(self, master, column=None, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.text = LabelEntry(self, place=dict(relx=0, rely=0, relh=.2, relw=1), topKwargs=dict(text='text'), orient='h', longent=.3)
+
+        self.attr = LabelEntry(self, place=dict(relx=0, rely=.2, relh=.2, relw=1), topKwargs=dict(text='attr'), orient='h', longent=.3)
+
+        self.value = LabelEntry(self, place=dict(relx=0, rely=.4, relh=.2, relw=1), topKwargs=dict(text='value'), orient='h', longent=.3)
+
+        self._width = LabelEntry(self, place=dict(relx=0, rely=.6, relh=.2, relw=1), topKwargs=dict(text='width'), orient='h', longent=.3)
+
+        if column:
+            self.text.set(column.text)
+            self.attr.set(column.attr)
+            self.value.set(column.value)
+            self._width.set(column.width)
+
+    def openMaster(self): openCores(master=self, obj=self.obj)
+
+    def open(self):
+        if isinstance(self._value, (int, str, list, tuple, dict)): ColumnExplorer(self, values=self._value)
+        else: openCores(master=self, obj=self._value)
+
+
 class ColumnsExplorer(LabelFrame):
-    def __init__(self, master, listboxConfig={}, callback=None, obj=None, values={}, **kwargs):
+    def __init__(self, master, listboxConfig={}, callback=None,  columns=None, **kwargs):
         super().__init__(master, **kwargs)
 
         self.callback = callback
-        self.obj = obj
+        self.columns = columns
 
         frame1 = Frame(self, place=dict(relx=0, rely=0, relw=.44, relh=1))
 
         Label(frame1, text='Top Attrs', place=dict(relx=0, rely=0, relw=1, relh=.07))
 
-        self.listbox = ListBox(frame1, place=dict(relx=0, rely=.08, relh=.84, relw=1), listboxConfig=dict(config=dict(selectmode='multiple'), values=values), bindings=[('<Return>', self.clicked, '')])
+        self.listbox = ListBox(frame1, place=dict(relx=0, rely=.08, relh=.84, relw=1), listboxConfig=dict(config=dict(selectmode='multiple')), bindings=[('<Return>', self.clicked, '')])
 
         self.total = LabelLabel(frame1, place=dict(relx=0, rely=.93, relh=.07, relw=.6), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
 
@@ -671,10 +698,10 @@ class ColumnsExplorer(LabelFrame):
 
         frame2 = Frame(self, place=dict(relx=.455, rely=0, relw=.545, relh=1))
 
-        self.treeview = PRMP_Treeview(frame2, place=dict(relx=0, rely=0, relh=.8, relw=1))
-        self.treeview.heading('#0', text='Attributes')
-        self.ivd = self.treeview.ivd
-        self.treeview.bind('<Delete>', self.deleteAttribute)
+        self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.8, relw=1), columns=['index', 'text', 'attr', 'width', 'value'])
+        # self.treeview.heading('#0', text='Attributes')
+        # self.ivd = self.treeview.ivd
+        # self.treeview.bind('<Delete>', self.deleteAttribute)
 
         self.entry = LabelEntry(frame2, place=dict(relx=0, rely=.81, relw=.65, relh=.085), orient='h', longent=.25, topKwargs=dict(text='New'), bottomKwwargs=dict(placeholder=''))
         self.entry.B.bind('<Return>', self.addAtrribute)
@@ -686,12 +713,11 @@ class ColumnsExplorer(LabelFrame):
 
         self._foc = None
 
-        if obj and not values:
-            keys = list(obj.__dict__.keys())
-            values = [key.strip('_') for key in keys if '__' not in key]
+        # if obj and not values:
+        #     keys = list(obj.__dict__.keys())
+        #     values = [key.strip('_') for key in keys if '__' not in key]
 
-        self.values = values
-        self.set(values)
+        if columns: self.treeview.viewSubs(columns)
 
     def openAttribute(self):
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')

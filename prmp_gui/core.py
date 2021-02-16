@@ -1042,7 +1042,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
 
         if isinstance(values, (list, tuple, dict)): self.values = values.copy()
         else: self.values = values
-        
+
         self.last = 0
         self.callback = callback
 
@@ -2766,11 +2766,10 @@ class PRMP_TreeView(PRMP_Frame):
         self.xscrollbar = None
         self.yscrollbar = None
         self.obj = None
+        self.firstItem = None
 
         self.columns = Columns(columns)
-
         self.setColumns(columns)
-        self.create()
 
     def bindings(self): pass
 
@@ -2828,7 +2827,7 @@ class PRMP_TreeView(PRMP_Frame):
             self.column(column.index, width=column.width, stretch=1,  anchor="center")#, minwidth=80)
 
     def _set(self, obj=None, parent='', subs='subs', op=1):
-        name, *columns = self.columns.get(obj)
+        name, *columns = self.columns.getFromObj(obj)
         tag = 'prmp'
 
         # the fourth value of this [text, attr, width, value] can be used in sorting, it wont insert the region and its columns both into self.tree and self.ivd if not equal to value

@@ -61,7 +61,7 @@ def create_container(func):
     return wrapped
 
 def copyClassMethods(obj, copyClass, *args):
-    
+
     for key, val in copyClass.__dict__.items():
         if key.startswith('__'): continue
         if callable(val):
@@ -71,15 +71,15 @@ def copyClassMethods(obj, copyClass, *args):
             setattr(obj, key, func)
 
 class Col_Mixins(PRMP_Mixins):
-    
+
     def __str__(self): return f'{self.className}({str(self.columns)})'
-    
+
     def __getitem__(self, num): return self.columns[num]
-    
+
     def __len__(self): return len(self.columns)
 
 class Column(Col_Mixins):
-    
+
     def __init__(self, index, column):
         self.index = '#%d'%index
         self.type = None
@@ -92,7 +92,7 @@ class Column(Col_Mixins):
             self.attr = column[1] if (l>1) and column[1] else self.propertize(self.text)
             self.value = column[2] if (l>2) and column[2] else value
             self.width = column[3] if (l>3) and column[3] else 20
-            
+
         elif isinstance(column, dict):
             self.text = column.get('text', value)
             self.attr = column.get('attr', self.propertize(self.text))
@@ -108,13 +108,13 @@ class Column(Col_Mixins):
             self.attr = self.propertize(self.text)
             self.value = value
             self.width = width
-    
+
     def __repr__(self): return f'<{self.index}>'
-    
+
     @property
     def columns(self): return [self.index, self.text, self.attr, self.value, self.width]
-    
-    def get(self, obj):
+
+    def getFromObj(self, obj):
         if obj:
             try:
                 val = ''
@@ -130,15 +130,17 @@ class Column(Col_Mixins):
                     if self.type: val = self.type(val)
                 return val or ''
 
-            except Exception as e: return ''
+            except Exception as e: print(e); return ''
 
-    def proof(self, obj): return self.get(obj) == self.value
+    def proof(self, obj): return self.getFromObj(obj) == self.value
+
+    def __getitem__(self, item): return PRMP_Mixins.__getitem__(self, item)
 
 class Columns(Col_Mixins):
     def __init__(self, columns):
         self.columns = []
         self.process(columns)
-    
+
     def process(self, columns):
         self.columns = []
         index = 0
@@ -147,8 +149,8 @@ class Columns(Col_Mixins):
             self.columns.append(colObj)
             index += 1
         return self.columns
-    
-    def get(self, obj): return [col.get(obj) for col in self]
+
+    def getFromObj(self, obj): return [col.getFromObj(obj) for col in self]
 
 
 
