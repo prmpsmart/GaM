@@ -1169,11 +1169,16 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         if w:
             if not self._foc: self.treeview.treeview.deleteAll()
             else: self.treeview.treeview.delete(self._foc)
+
         self.setListBox()
+
 
     def setListBox(self):
         self.listbox.clear()
-        for top in self.columns:
+        tops = self.treeview.treeview.getChildren()
+
+
+        for top in tops:
             text = top.text
             self.listbox.insert(text)
         self.total.set(self.listbox.last)
@@ -1193,7 +1198,8 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     def getColumns(self):
         tops = self.treeview.treeview.getChildren()
         listbox = self.listbox.curselection()
-        if not listbox: listbox = range(self.listbox.last)
+        if not listbox: listbox = range(len(tops))
+        # if not listbox: listbox = range(self.listbox.last)
 
         result = [tops[num] for num in listbox] if isinstance(tops, (tuple, list)) else [tops]
 
