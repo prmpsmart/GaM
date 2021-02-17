@@ -5,7 +5,6 @@ from .extensions import *
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
 
-
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, delay=0, **kwargs):
@@ -265,6 +264,39 @@ class Splash(PRMP_Dialog):
     def set(self): pass
 
 
+
+class ColumnViewerDialog(PRMP_Dialog):
+
+    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(300, 300), column=None, **kwargs):
+        self.column = column
+        super().__init__(master, title=title, geo=geo, **kwargs)
+
+    def _setupDialog(self):
+        self._column = ColumnViewer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), column=self.column)
+        self.addEditButton()
+
+        self.text = self._column.text
+        self.attr = self._column.attr
+        self.value = self._column.value
+        self._width = self._column._width
+
+        self.addResultsWidgets(['text', 'attr', '_width', 'value'])
+        self.set()
+
+    def processInput(self):
+        result = self.get()
+
+        print(result)
+
+class ColumnsExplorerDialog(PRMP_Dialog):
+
+    def __init__(self, master=None, title='Columns Explorer Dialog', geo=(700, 500), columns=None, **kwargs):
+        self.columns = columns
+        super().__init__(master, title=title, geo=geo, **kwargs)
+
+    def _setupDialog(self): ColumnsExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), columns=self.columns)
+
+
 def showDialog(title=None, msg=None, which=None):
     if which == 'error': messagebox.showerror(title, msg)
     elif which == 'info': messagebox.showinfo('Information', msg)
@@ -292,8 +324,11 @@ def askPath(opened=False, folder=False, many=False, save=False):
     else: return filedialog.askdirectory()
 
 def dialogFunc(ask=0, path=0, obj=None, **kwargs):
-    if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
-    elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
+    if obj:
+        if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
+        elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
+        elif isinstance(obj, Columns): ColumnsExplorerDialog(columns=obj, **kwargs)
+        elif isinstance(obj, Column): ColumnViewerDialog(column=obj, **kwargs)
     elif path: return askPath(**kwargs)
     elif ask: return confirmDialog(**kwargs)
     else: return showDialog(**kwargs)
