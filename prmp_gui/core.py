@@ -1084,10 +1084,9 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
     @property
     def selected(self):
         sels = self.curselection()
-        # print(sels, 'sels')
         if sels:
             select = []
-            for sel in sels: select.append(self.values[sel]); print(sel)
+            for sel in sels: select.append(self.values[sel])
             return select
 
 Listbox = PLb = PRMP_Listbox
@@ -1178,7 +1177,6 @@ class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
     def _mouse_over(self, event):
         widget = event.widget
         element = widget.identify(event.x, event.y)
-        # print(widget)
         if "close" in element:
             widget.state(['alternate'])
         else:
@@ -2496,7 +2494,9 @@ class PRMP_Window(PRMP_Widget):
 
     def closing(self): pass
 
-    def save(self): print('implement save method in subclasses')
+    def save(self):
+
+        pass
 
     def destroy(self):
         if self == self.topest:
@@ -2706,13 +2706,10 @@ class PRMP_MainWindow(PRMP_Mixins):
 
     def __getitem__(self, name):
         attr = self.getFromSelf(name, self._unget)
-        # print(attr)
         if attr != self._unget: return attr
         else: return getattr(self.root, name)
 
-    def __getattr__(self, name):
-        return self[name]
-        # return getattr(self.root, name)
+    def __getattr__(self, name): return self[name]
 
 MainWindow = PMW = PRMP_MainWindow
 

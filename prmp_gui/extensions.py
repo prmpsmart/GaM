@@ -909,47 +909,56 @@ class Hierachy(PRMP_TreeView):
 H = Hierachy
 
 
+class AttributesViewer(LabelFrame):
 
-class ColumnViewer(LabelFrame):
-
-    def __init__(self, master, column=None, **kwargs):
+    def __init__(self, master, attr='', obj=None, **kwargs):
         super().__init__(master, **kwargs)
-        from .two_widgets import LabelEntry
+        from .two_widgets import LabelLabel, LabelEntry, LabelText, TwoWidgets
 
-        self.text = LabelEntry(self, place=dict(relx=0, rely=0, relh=.2, relw=1), topKwargs=dict(text='text'), orient='h', longent=.3)
+        self.obj = obj
+        self.attr = attr
 
-        self.attr = LabelEntry(self, place=dict(relx=0, rely=.2, relh=.2, relw=1), topKwargs=dict(text='attr'), orient='h', longent=.3)
+        self._value = self.obj[self.attr]
+        self._type = type(self._value)
 
-        self.value = LabelEntry(self, place=dict(relx=0, rely=.4, relh=.2, relw=1), topKwargs=dict(text='value'), orient='h', longent=.3)
+        self.name = LabelEntry(self, place=dict(relx=0, rely=0, relh=.15, relw=1), topKwargs=dict(text='attr Name'), bottomKwargs=dict(state='readonly'), orient='h', longent=.3)
 
-        self._width = LabelEntry(self, place=dict(relx=0, rely=.6, relh=.2, relw=1), topKwargs=dict(text='width'), orient='h', longent=.3)
+        self.name.set(self.attr)
 
-        if column:
-            self.text.set(column.text)
-            self.attr.set(column.attr)
-            self.value.set(column.value)
-            self._width.set(column.width)
+        self.value = LabelText(self, place=dict(relx=0, rely=.15, relh=.45, relw=1), topKwargs=dict(text='attr Value'), bottomKwargs=dict(state='disabled'), orient='h', longent=.3)
+
+        self.value.set(self._value)
+
+        self.valueType = LabelEntry(self, place=dict(relx=0, rely=.6, relh=.15, relw=1), topKwargs=dict(text='value Type'), bottomKwargs=dict(state='readonly'), orient='h', longent=.23)
+
+        self.valueType.set(self._type)
+
+        self.mastertype = TwoWidgets(self, place=dict(relx=0, rely=.76, relh=.14, relw=1), topKwargs=dict(text='master Type', command=self.openMaster), bottomKwargs=dict(state='readonly'), orient='h', longent=.22, top=Button, bottom='entry')
+
+        self.mastertype.set(type(self.obj))
+
+        self.details = Button(self, text='Further Details', place=dict(relx=0, rely=.9, relh=.1, relw=1), command=self.open)
 
     def openMaster(self): openCores(master=self, obj=self.obj)
 
     def open(self):
-        if isinstance(self._value, (int, str, list, tuple, dict)): ColumnExplorer(self, values=self._value)
+        if isinstance(self._value, (int, str, list, tuple, dict)): AttributesExplorer(self, values=self._value)
         else: openCores(master=self, obj=self._value)
 
 
-class ColumnsExplorer(LabelFrame):
-    def __init__(self, master, listboxConfig={}, callback=None,  columns=None, **kwargs):
+class AttributesExplorer(LabelFrame):
+    def __init__(self, master, listboxConfig={}, callback=None, obj=None, values={}, **kwargs):
         super().__init__(master, **kwargs)
-        from .two_widgets import LabelLabel, LabelEntry
+        from .two_widgets import LabelLabel, LabelEntry, LabelText, TwoWidgets
 
         self.callback = callback
-        self.columns = columns
+        self.obj = obj
 
         frame1 = Frame(self, place=dict(relx=0, rely=0, relw=.44, relh=1))
 
         Label(frame1, text='Top Attrs', place=dict(relx=0, rely=0, relw=1, relh=.07))
 
-        self.listbox = ListBox(frame1, place=dict(relx=0, rely=.08, relh=.84, relw=1), listboxConfig=dict(config=dict(selectmode='multiple')), bindings=[('<Return>', self.clicked, '')])
+        self.listbox = ListBox(frame1, place=dict(relx=0, rely=.08, relh=.84, relw=1), listboxConfig=dict(config=dict(selectmode='multiple'), values=values), bindings=[('<Return>', self.clicked, '')])
 
         self.total = LabelLabel(frame1, place=dict(relx=0, rely=.93, relh=.07, relw=.6), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
 
@@ -959,10 +968,10 @@ class ColumnsExplorer(LabelFrame):
 
         frame2 = Frame(self, place=dict(relx=.455, rely=0, relw=.545, relh=1))
 
-        self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.8, relw=1), columns=['index', 'text', 'attr', 'width', 'value'])
-        # self.treeview.heading('#0', text='Attributes')
-        # self.ivd = self.treeview.ivd
-        # self.treeview.bind('<Delete>', self.deleteAttribute)
+        self.treeview = PRMP_Treeview(frame2, place=dict(relx=0, rely=0, relh=.8, relw=1))
+        self.treeview.heading('#0', text='Attributes')
+        self.ivd = self.treeview.ivd
+        self.treeview.bind('<Delete>', self.deleteAttribute)
 
         self.entry = LabelEntry(frame2, place=dict(relx=0, rely=.81, relw=.65, relh=.085), orient='h', longent=.25, topKwargs=dict(text='New'), bottomKwwargs=dict(placeholder=''))
         self.entry.B.bind('<Return>', self.addAtrribute)
@@ -974,11 +983,12 @@ class ColumnsExplorer(LabelFrame):
 
         self._foc = None
 
-        # if obj and not values:
-        #     keys = list(obj.__dict__.keys())
-        #     values = [key.strip('_') for key in keys if '__' not in key]
+        if obj and not values:
+            keys = list(obj.__dict__.keys())
+            values = [key.strip('_') for key in keys if '__' not in key]
 
-        if columns: self.treeview.set(columns)
+        self.values = values
+        self.set(values)
 
     def openAttribute(self):
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')
@@ -1040,7 +1050,8 @@ class ColumnsExplorer(LabelFrame):
         if not listbox: listbox = range(self.listbox.last)
         result = [tops[num] for num in listbox] if isinstance(tops, (tuple, list)) else [tops]
 
-        return result
+        if self.callback: self.callback(result)
+        else: return result
 
     def setTreeview(self, values, parent=''):
         if isinstance(values, list):
@@ -1054,6 +1065,156 @@ class ColumnsExplorer(LabelFrame):
         elif isinstance(values, (str, bytes)):
             self.treeview.insert(parent, text=values)
             pass
+
+
+
+class ColumnViewer(LabelFrame):
+
+    def __init__(self, master, column=None, **kwargs):
+        super().__init__(master, **kwargs)
+        from .two_widgets import LabelEntry
+
+        self.text = LabelEntry(self, place=dict(relx=0, rely=0, relh=.2, relw=1), topKwargs=dict(text='text'), orient='h', longent=.3)
+
+        self.attr = LabelEntry(self, place=dict(relx=0, rely=.2, relh=.2, relw=1), topKwargs=dict(text='attr'), orient='h', longent=.3)
+
+        self.value = LabelEntry(self, place=dict(relx=0, rely=.4, relh=.2, relw=1), topKwargs=dict(text='value'), orient='h', longent=.3)
+
+        self._width = LabelEntry(self, place=dict(relx=0, rely=.6, relh=.2, relw=1), topKwargs=dict(text='width'), orient='h', longent=.3)
+
+        if column:
+            self.text.set(column.text)
+            self.attr.set(column.attr)
+            self.value.set(column.value)
+            self._width.set(column.width)
+
+    def openMaster(self): openCores(master=self, obj=self.obj)
+
+    def open(self):
+        if isinstance(self._value, (int, str, list, tuple, dict)): ColumnExplorer(self, values=self._value)
+        else: openCores(master=self, obj=self._value)
+
+
+class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
+    def __init__(self, master, listboxConfig={}, callback=None,  columns=None, **kwargs):
+        LabelFrame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self)
+        from .two_widgets import LabelLabel, LabelEntry
+
+        self.callback = callback
+        self.columns = columns
+
+        _cols = ['text', 'attr', 'width', 'value']
+
+        frame1 = Frame(self, place=dict(relx=0, rely=0, relw=.3, relh=1))
+
+        Label(frame1, text='Top Attrs', place=dict(relx=0, rely=0, relw=1, relh=.07))
+
+        self.listbox = ListBox(frame1, place=dict(relx=0, rely=.08, relh=.84, relw=1), listboxConfig=dict(config=dict(selectmode='multiple')), bindings=[('<Return>', self.clicked, '')])
+
+        self.total = LabelLabel(frame1, place=dict(relx=0, rely=.93, relh=.07, relw=.6), orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.4, topKwargs=dict(text='Total'))
+
+        PRMP_Separator(self, place=dict(relx=.305, rely=0, relh=1, relw=.05), config=dict(orient='vertical'))
+
+        frame2 = Frame(self, place=dict(relx=.315, rely=0, relw=.685, relh=1))
+
+        self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.7, relw=1), columns=_cols)
+        self.treeview.treeview.bind('<Delete>', self.deleteColumn)
+
+        self.text = LabelEntry(frame2, place=dict(relx=.0, rely=.71, relw=.5, relh=.085), orient='h', longent=.23, topKwargs=dict(text='text'), bottomKwargs=dict(_type='text'))
+        self.attr = Button(frame2, place=dict(relx=.55, rely=.71, relw=.1, relh=.085), text='attr', command=self.getAttr)
+        self._width = LabelEntry(frame2, place=dict(relx=0, rely=.8, relw=.3, relh=.085), orient='h', topKwargs=dict(text='width'), bottomKwargs=dict(_type='number'))
+        self.value = LabelEntry(frame2, place=dict(relx=.35, rely=.8, relw=.3, relh=.085), orient='h', longent=.4,  topKwargs=dict(text='value'), bottomKwargs=dict(_type='text'))
+
+        Button(frame2, text='Get', place=dict(relx=.8, rely=.75, relh=.15, relw=.15), command=self.getColumns)
+
+        Button(frame2, text='Delete', place=dict(relx=.1, rely=.915, relh=.07, relw=.25), command=self.deleteColumn)
+        Button(frame2, text='Add', place=dict(relx=.45, rely=.915, relh=.07, relw=.25), command=self.addColumn)
+
+        self._foc = None
+        self._attr = ''
+
+        self.set(columns)
+        self._cols = _cols
+
+        self.addResultsWidgets(_cols)
+
+    def width(self): return self._width
+
+    def addColumn(self, e=0):
+        gets = self.get(['text', '_width', 'value'])
+        attr = self._attr
+        gets['width'] = gets['_width']
+        j = self.columns.addColumn(gets)
+        self._attr = ''
+
+        self.set(self.columns)
+        self.getColumns()
+
+    def getAttr(self):
+        from .dialogs import AttributesExplorerDialog; AttributesExplorerDialog(callback=self.setAttr)
+
+    def setAttr(self, attr):
+        if attr: self._attr = attr[0]
+
+    def deleteColumn(self, e=0):
+        self._foc = focus = self.treeview.treeview.focus()
+        from .dialogs import PRMP_MsgBox
+
+        _all = 'all Columns' if not focus else f'this Column --> {self.treeview.treeview.ivd[focus].index}'
+
+        PRMP_MsgBox(self, title='Delete Column', message=f'Are you sure to delete {_all}', ask=1, callback=self._delete)
+
+    def _delete(self, w):
+        if w:
+            if not self._foc: self.treeview.treeview.deleteAll()
+            else: self.treeview.treeview.delete(self._foc)
+        self.setListBox()
+
+    def setListBox(self):
+        self.listbox.clear()
+        for top in self.columns:
+            text = top.text
+            self.listbox.insert(text)
+        self.total.set(self.listbox.last)
+
+    def clicked(self, event=None, selected=None):
+        selected = self.listbox.selected
+        self.treeview.see
+
+    def set(self, columns):
+        if not columns: return
+        self.columns = columns
+        self.treeview.treeview.deleteAll()
+        self.treeview.viewSubs(columns)
+
+        self.setListBox()
+
+    def getColumns(self):
+        tops = self.treeview.treeview.getChildren()
+        listbox = self.listbox.curselection()
+        if not listbox: listbox = range(self.listbox.last)
+
+        result = [tops[num] for num in listbox] if isinstance(tops, (tuple, list)) else [tops]
+
+        results = [dict(text=res.text, attr=res.attr, width=res.width, value=res.value) for res in result]
+
+        self.columns.process(results)
+
+        # return results
+
+    # def setTreeview(self, values, parent=''):
+    #     if isinstance(values, list):
+    #         for value in values: self.setTreeview(value, parent)
+
+    #     elif isinstance(values, dict):
+    #         for key, value in values.items():
+    #             item = self.treeview.insert(parent, text=key)
+    #             self.setTreeview(value, item)
+
+    #     elif isinstance(values, (str, bytes)):
+    #         self.treeview.insert(parent, text=values, value=values)
+    #         pass
 
 
 

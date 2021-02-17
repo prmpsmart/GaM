@@ -290,11 +290,47 @@ class ColumnViewerDialog(PRMP_Dialog):
 
 class ColumnsExplorerDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, title='Columns Explorer Dialog', geo=(700, 500), columns=None, **kwargs):
+    def __init__(self, master=None, title='Columns Explorer Dialog', geo=(800, 500), columns=None, **kwargs):
         self.columns = columns
         super().__init__(master, title=title, geo=geo, **kwargs)
 
     def _setupDialog(self): ColumnsExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), columns=self.columns)
+
+
+
+
+class AttributesExplorerDialog(PRMP_Dialog):
+
+    def __init__(self, master=None, title='Attributes Explorer Dialog', geo=(600, 500), obj=None, **kwargs):
+        self.obj = obj
+        super().__init__(master, title=title, geo=geo, **kwargs)
+
+    def _setupDialog(self): AttributesExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), values=self.values, obj=self.obj, callback=self._callback)
+
+    def _callback(self, w):
+        if self.callback:
+            self.callback(w)
+            self.destroy()
+
+
+
+class AttributesViewerDialog(PRMP_Dialog):
+
+    def __init__(self, master=None, title='Attributes Viewer Dialog', geo=(700, 300), obj=None, attr=None, **kwargs):
+        self.attr = attr
+        self.obj = obj
+        super().__init__(master, title=title, geo=geo, **kwargs)
+
+    def _setupDialog(self): AttributesViewer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), attr=self.attr, obj=self.obj)
+
+
+
+
+
+
+
+
+
 
 
 def showDialog(title=None, msg=None, which=None):

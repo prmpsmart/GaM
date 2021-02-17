@@ -49,7 +49,6 @@ class TwoWidgets(PRMP_Frame):
             config = topKwargs.get('config')
             if config: text = config.get('text')
 
-
 # bottom part
         if isinstance(bottom, str):
             self.bottom = bottom.lower()
@@ -76,6 +75,7 @@ class TwoWidgets(PRMP_Frame):
             bottomKw = bottomKwargs.copy()
 
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
+        # if bottom == 'entry': print(bottomKw)
 
         events = self.events.get(bottom)
         if events:
@@ -168,6 +168,7 @@ class TwoWidgets(PRMP_Frame):
             self.Top.place(relx=0, rely=0, relw=1, relh=self.longent)
             self.Bottom.place(relx=0, rely=self.longent+.05, relw=1, relh=1 - self.longent - .05)
         return self
+
 TW = TwoWidgets
 
 class RadioCombo(TwoWidgets):

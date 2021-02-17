@@ -81,6 +81,7 @@ class Col_Mixins(PRMP_Mixins):
 class Column(Col_Mixins):
 
     def __init__(self, index, column):
+        self.subs = None
         self.index = '#%d'%index
         self.type = None
         value, width = '', 20
@@ -136,21 +137,25 @@ class Column(Col_Mixins):
 
     def __getitem__(self, item): return PRMP_Mixins.__getitem__(self, item)
 
+
 class Columns(Col_Mixins):
     def __init__(self, columns):
-        self.columns = []
+        self.subs = self.columns = []
         self.process(columns)
 
     def process(self, columns):
         self.columns = []
-        index = 0
-        for col in columns:
-            colObj = Column(index, col)
-            self.columns.append(colObj)
-            index += 1
+        for col in columns: self.addColumn(col)
         return self.columns
 
+    setColumns = process
+
     def getFromObj(self, obj): return [col.getFromObj(obj) for col in self]
+
+    def addColumn(self, col):
+        colObj = Column(len(self), col)
+        self.columns.append(colObj)
+        return colObj
 
 
 
