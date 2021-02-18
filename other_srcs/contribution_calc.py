@@ -96,6 +96,10 @@ class App(PRMP_Dialog):
         super().__init__(**kwargs)
 
 
+wids = [area, month, date]
+wids = [number, rate, amount]
+
+Widgets = [labelentry, labellabel(for totalmoney, contribs), hierachy]
 
 
 
