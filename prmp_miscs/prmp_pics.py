@@ -7,7 +7,7 @@ from base64 import b64encode, b64decode
 from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
 
 class PRMP_ImageType:
-    
+
     tests = []
 
     def test_jpeg(data):
@@ -99,7 +99,7 @@ class PRMP_ImageType:
             return 'exr'
 
     tests.append(test_exr)
-    
+
     @classmethod
     def get(cls, file=None, data=b'', base64=b'', image=None):
         if file:
@@ -114,7 +114,7 @@ class PRMP_ImageType:
         if data:
             _needed = data[:32]
             return cls._get(_needed)
-    
+
     @classmethod
     def _get(cls, data):
         for test in cls.tests:
@@ -125,40 +125,40 @@ class PRMP_ImageType:
 class PRMP_Pics:
     _dir = 'prmp_pics'
     subDir = ''
-    
+
     @classmethod
     def picsExt(cls):
         ext = cls.subDir[:-1]
         return ext.replace('prmp_', '')
-    
+
     @classmethod
     def picsHome(cls): return os.path.join(os.path.dirname(__file__), cls._dir)
-    
+
     @classmethod
     def picName(cls, pic): return os.path.splitext(os.path.basename(pic))[0]
-    
+
     @classmethod
     def files(cls):
         _dir = os.path.join(cls.picsHome(), cls.subDir)
         _files = []
-        
+
         for r, d, ff in os.walk(_dir):
             for f in ff:
                 if f.endswith(cls.picsExt()):
                     _files.append(os.path.join(r, f))
-        
+
         return _files
-    
+
     @classmethod
     def filesDict(cls):
         files = cls.files()
         _filesDict = {cls.picName(file): file for file in files}
         return _filesDict
-    
+
     @classmethod
     def get(cls, bitmap):
         filesL = cls.files()
-        
+
         if isinstance(bitmap, int):
             try: return filesL[bitmap]
             except: filesL[0]
@@ -170,7 +170,7 @@ class PRMP_Pics:
     @classmethod
     def get(cls, bitmap):
         filesL = cls.files()
-        
+
         if isinstance(bitmap, int):
             try: return filesL[bitmap]
             except: filesL[0]
@@ -180,18 +180,18 @@ class PRMP_Pics:
             except: filesL[0]
 
 class PRMP_Xbms(PRMP_Pics): subDir = 'prmp_xbms'
-    
+
 class PRMP_Pngs(PRMP_Pics): subDir = 'prmp_pngs'
-    
+
 class PRMP_Gifs(PRMP_Pics): subDir = 'prmp_gifs'
 
 class PRMP_Images:
-    
+
     @classmethod
     def get(cls, inbuilt, ext):
         base64 = cls.getBase64(inbuilt, ext)
         return b64decode(base64)
-    
+
     @classmethod
     def getBase64(cls,  inbuilt, ext):
         if ext == 'png': return PRMP_PNGS[inbuilt]
@@ -224,7 +224,7 @@ class PRMP_ImageFile(BytesIO):
 
         self.name = None
         self._data = data
-        
+
         if data: self.name = 'data_%d'%PRMP_ImageFile.count
 
         elif filename:
@@ -237,7 +237,7 @@ class PRMP_ImageFile(BytesIO):
             self.name = 'base64_%d'%PRMP_ImageFile.count
 
         super().__init__(self._data)
-        
+
         if image: image.save(self, inExt)
 
         PRMP_ImageFile.count += 1
@@ -250,7 +250,7 @@ class PRMP_ImageFile(BytesIO):
 
     @property
     def data(self): return self.getvalue()
-    
+
     @property
     def ext(self): return PRMP_ImageType.get(self)
 
@@ -264,10 +264,9 @@ class PRMP_ImageFile(BytesIO):
 
     @property
     def cdata(self): return self.compressedData
-    
+
     @property
     def base64Data(self): return b64encode(self.data)
-
 
     @property
     def image(self): return Image.open(self)
@@ -287,12 +286,12 @@ class PRMP_ImageFile(BytesIO):
 class PRMP_Image:
     count = 0
     def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, base64=b''):
-        
+
         pic = None
         self.imageFile = None
         self.imgClass = PhotoImage
         self.resizedImage = None
-        
+
         self._thumb = thumb
         self._resize = resize
         # print(base64)
@@ -311,25 +310,25 @@ class PRMP_Image:
             else: self.imageFile = filename or image
 
             if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError('{} or {} is not a valid value.'.format(filename, image))
-            
+
             self.name = self.imageFile.name
             self.ext = self.imageFile.ext
-            
+
             if self.ext == 'xbm': self.imgClass = BitmapImage
 
             img = self.image = Image.open(self.imageFile)
             self.info = img.info
 
             if resize and len(resize) == 2 and resize[0] > 0 and resize[1] > 0: img = self.resizedImage = self.image.resize(resize)
-                
+
             if thumb and len(thumb) == 2 and thumb[0] > 0 and thumb[1] > 0: img.thumbnail(thumb)
-            
+
             self.img = img
-            
+
             self.tkImage = self.imgClass(img, name=self.basename)
 
             PRMP_Image.count += 1
-            
+
         else: raise ValueError('imageFile is None')
 
     def __str__(self): return str(self.tkImage)
@@ -382,8 +381,8 @@ class PRMP_Image:
     def resizeTk(self, rz): return self.imgClass(self.resize(rz))
 
     def thumbnail(self, rz): self.image.thumbnail(rz)
-    
-    def thumbnailTk(self, rz): 
+
+    def thumbnailTk(self, rz):
         self.thumbnail(rz)
         return self.imgClass(self.image)
 
