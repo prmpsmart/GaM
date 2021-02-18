@@ -1,7 +1,9 @@
 import sys
 sys.path.append(r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM')
 from prmp_miscs.prmp_mixins import PRMP_Mixins
-from pickle import load
+from prmp_miscs.prmp_exts import PRMP_File, os
+
+DEST = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions'
 
 class Contribution(PRMP_Mixins):
 
@@ -43,11 +45,60 @@ class Contributions(PRMP_Mixins):
         return cont
 
     @property
+    def name(self):
+        n = f'Area_{self.area} {self.month.monthYear} {self.date.date}'
+
+        n = n.replace('/', '-')
+        return n
+
+    @property
+    def path(self):
+        p = self.name.split(' ')
+        p = '/'.join(p[:-1])
+        p = os.path.join(p, self.name).replace('/', '\\')
+        dest = os.path.join(DEST, p) + '.cont'
+        return dest
+
+    @property
     def total(self): return sum([cont.money for cont in self])
     @property
     def money(self): return self.total
 
+    def save(self):
+        path = self.path
+        dir_ = os.path.dirname(path)
+        try: os.makedirs(dir_)
+        except: pass
 
-conts = Contributions(1)
-c = conts.add(1, 400, 80)
-print(conts)
+        file = PRMP_File(filename=path)
+        file.saveObj(self)
+        file.save(path)
+
+        return file
+
+    @classmethod
+    def load(self, file):
+        file = PRMP_File(filename=file)
+        conts = file.loadObj()
+        return conts
+
+# p = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions\Area_3\July-2021\Area_3 July-2021 18-08-2021.cont'
+
+p = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions\Area_1\February-2021\Area_1 February-2021 18-02-2021.cont'
+
+o = Contributions.load(p)
+
+from prmp_gui.dialogs import PRMP_Dialog
+
+class App(PRMP_Dialog):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+
+
+
+
+App()
+
+

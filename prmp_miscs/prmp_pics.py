@@ -106,7 +106,7 @@ class PRMP_ImageFile(PRMP_File):
 
         if imageFileName and inbuilt: kwargs['data'] = PRMP_Images.get(imageFileName, inExt)
 
-        super().__init__(imageFileName, **kwargs)
+        super().__init__(filename=imageFileName, **kwargs)
 
         if image: image.save(self, inExt)
 

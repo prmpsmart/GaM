@@ -2,6 +2,7 @@ from io import BytesIO
 import os
 from base64 import b64encode, b64decode
 import zlib, pickle, os
+from .prmp_mixins import PRMP_Mixins
 
 
 class PRMP_ImageType:
@@ -120,7 +121,7 @@ class PRMP_ImageType:
             if ext: return ext
 
 
-class PRMP_File(BytesIO):
+class PRMP_File(BytesIO, PRMP_Mixins):
     count = 0
 
     def __init__(self, filename='', base64=b'', data=b''):
@@ -135,7 +136,8 @@ class PRMP_File(BytesIO):
 
         elif filename:
             self.name = os.path.basename(filename)
-            self._data = open(filename, 'rb').read()
+            try: self._data = open(filename, 'rb').read()
+            except: pass
 
         elif base64:
             self._data = b64decode(base64)
@@ -153,6 +155,23 @@ class PRMP_File(BytesIO):
 
     @property
     def data(self): return self.getvalue()
+
+    def read(self, _read=0):
+        data = self.data
+        if _read in [0]: return data
+        else: return super().read(_read)
+        return data
+
+
+    # def read(self, _read=0):
+    #     print(_read)
+    #     self._read = 0
+    #     data = self.data
+    #     if _read in [0, 1]: return data
+    #     else:
+    #         self._read =+ _read
+    #         return data[:self._read]
+    #     return data
 
     @property
     def ext(self): return PRMP_ImageType.get(self)
@@ -174,15 +193,30 @@ class PRMP_File(BytesIO):
     @property
     def image(self): return Image.open(self)
 
-    def pickle(self, file   ):
+    def pickle(self, file=''):
+        file = file or self
         try: f = open(file, 'wb')
         except: f = file
-        obj = None
+
         pickle.dump(self, f)
 
-    def save(self, file):
+    def unpickle(self, file=''):
+        file = file or self
+
         try: f = open(file, 'wb')
         except: f = file
 
+        obj = pickle.load(f)
+        return obj
+
+    def save(self, file=''):
+        file = file or self.name
+
+        try: f = open(file, 'wb')
+        except: f = file
         f.write(self.data)
+
+    def saveObj(self, obj): pickle.dump(obj, self)
+    def loadObj(self): return self.unpickle()
+
 
