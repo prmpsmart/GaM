@@ -1172,7 +1172,6 @@ class PRMP_File(BytesIO, PRMP_Mixins):
         data = self.data
         if _read == 0: return data
         else: return super().read(_read)
-        return data
 
 
     # def read(self, _read=0):
@@ -1236,6 +1235,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
 
 
 
+picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
 
 class PRMP_Pics:
     _dir = 'prmp_pics'
@@ -1433,7 +1433,7 @@ class PRMP_Image:
     @property
     def basename(self):
         if self.imageFile: return self.imageFile.name
-        return 'PRMP_Image(%d)'%dPRMP_Image.count
+        return 'PRMP_Image(%d)'%PRMP_Image.count
 
     def resize(self, rz): return self.image.resize(rz)
 
@@ -3869,7 +3869,7 @@ class PRMP_ImageWidget:
     def camera(self, e=0):
         self.delMenu()
 
-        PRMP_CameraDialog(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
+        # PRMP_CameraDialog(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
 
     def saveImage(self):
         self.delMenu()

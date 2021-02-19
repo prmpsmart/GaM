@@ -201,7 +201,7 @@ class PRMP_Image:
     @property
     def basename(self):
         if self.imageFile: return self.imageFile.name
-        return 'PRMP_Image(%d)'%dPRMP_Image.count
+        return 'PRMP_Image(%d)'%PRMP_Image.count
 
     def resize(self, rz): return self.image.resize(rz)
 
