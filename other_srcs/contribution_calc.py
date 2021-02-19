@@ -8,7 +8,7 @@ from prmp_miscs.prmp_datetime import PRMP_DateTime
 
 from prmp_gui.dialogs import *
 from prmp_gui.two_widgets import *
-PTh.setThemeIndex(38)
+PTh.setThemeIndex(30)
 
 
 
@@ -193,11 +193,6 @@ class App(PRMP_Dialog):
         self.money = LabelLabel(totals, place=dict(relx=0, rely=0, relw=.5, relh=.4), topKwargs=dict(text='Money'), orient='h')
         self.total = LabelLabel(totals, place=dict(relx=0, rely=.5, relw=.5, relh=.5), topKwargs=dict(text='Contributions'), orient='h', longent=.6)
 
-        self.bind('<Control-O>', self.load)
-        self.bind('<Control-o>', self.load)
-        self.bind('<Control-S>', self.save_)
-        self.bind('<Control-s>', self.save_)
-
     def update(self):
         self.clear()
         if self.contributions:
@@ -219,7 +214,20 @@ class App(PRMP_Dialog):
         PRMP_MsgBox(self, title='Clear?', message='Are you sure to clear this current contribution?', ask=1, callback=self.clear, _type='question')
 
 
-    def defaults(self): self.update()
+    def defaults(self):
+
+        self.bind('<Control-L>', self.load)
+        self.bind('<Control-l>', self.load)
+        self.bind('<Control-O>', self.load)
+        self.bind('<Control-o>', self.load)
+        self.bind('<Control-S>', self.save_)
+        self.bind('<Control-s>', self.save_)
+        self.bind('<Control-N>', self.create)
+        self.bind('<Control-n>', self.create)
+        self.bind('<Control-u>', self.updateCont)
+        self.bind('<Control-U>', self.updateCont)
+
+        self.update()
 
 
     def add(self, e=0):
@@ -245,7 +253,7 @@ class App(PRMP_Dialog):
         contData['area'] = int(contData['area'])
         return contData
 
-    def updateCont(self):
+    def updateCont(self, e=0):
         if not self.contributions: return
 
         contData = self.getAreaData()
