@@ -6,14 +6,6 @@ import _tkinter, threading
 from prmp_miscs.prmp_pics import PRMP_Image
 from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
-class PRMP_Result:
-    def __init__(self): self.__result = None
-
-    @property
-    def result(self): return self.__result
-    def setResult(self, result=None): self.__result = result
-PRes = PRMP_Result
-
 # superclasses
 
 'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'
@@ -1802,10 +1794,6 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
         children = self.get_children()
         for child in children: self.delete(child)
     clear = deleteAll
-
-
-
-
 
 Treeview = PTv = PRMP_Treeview
 

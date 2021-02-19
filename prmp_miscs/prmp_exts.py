@@ -1,8 +1,7 @@
 from io import BytesIO
-import os
 from base64 import b64encode, b64decode
-import zlib, pickle, os
-from .prmp_mixins import PRMP_Mixins
+import zlib, pickle
+from .prmp_mixins import PRMP_Mixins, os
 
 
 class PRMP_ImageType:

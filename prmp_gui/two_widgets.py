@@ -23,7 +23,7 @@ class TwoWidgets(PRMP_Frame):
         if dot != None: disableOnToggle = dot
         self.disableOnToggle = disableOnToggle
 
-# top part
+ # top part
 
         if isinstance(top, str):
             self.top = top.lower()
@@ -49,7 +49,7 @@ class TwoWidgets(PRMP_Frame):
             config = topKwargs.get('config')
             if config: text = config.get('text')
 
-# bottom part
+ # bottom part
         if isinstance(bottom, str):
             self.bottom = bottom.lower()
 
