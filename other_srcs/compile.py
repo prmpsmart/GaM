@@ -1,4 +1,4 @@
-from Cython.Build import cythonize
+# from Cython.Build import cythonize
 from py_libs import py27_dll, py27_include, py37_dll, py37_include, py38_dll, py38_include, py_dir
 from os import system, path, chdir, getcwd
 from shutil import copy2, move
@@ -16,8 +16,8 @@ elif py == 38:
 
 
 py='contrib_app.py'
-obj='compiled/contrib_app.o'
 out='compiled/contrib_app.c'
+obj='compiled/contrib_app.o'
 pyd='compiled/contrib_app.pyd'
 exe='compiled/Contrib_App.exe'
 
@@ -30,7 +30,7 @@ def cmd_cy():
 
 def compile_dll():
     cmd_cy()
-    return
+    # return
     cmd1 = f"gcc -Wall -g -I{py_inc} -c {out} -o {obj}"
     cmd2 = f"g++ -shared -Wl,--dll {obj} -o {pyd} {py_dll}"
     print(cmd1)
@@ -92,16 +92,15 @@ def nuitka(win=0):
     print(cmd)
     system(cmd)
 
-compile_dll()
-# compile_exe(1)
+# compile_dll()
+compile_exe(1)
 
 # pyinstaller()
 
-def launch():
-    chdir('test/TranxFer')
-    system(exe)
+k = r'C:\ProgramData\Anaconda3\PRMP_Apps\Contrib_App.exe'
+# k = 'activate'
+# system(k)
 
-# launch()
 
 
 
