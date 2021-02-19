@@ -2,6 +2,7 @@ import sys
 sys.path.append(r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM')
 from prmp_miscs.prmp_mixins import PRMP_Mixins
 from prmp_miscs.prmp_exts import PRMP_File, os
+from prmp_miscs.prmp_datetime import PRMP_DateTime
 
 DEST = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions'
 
@@ -14,6 +15,7 @@ class Contribution(PRMP_Mixins):
         rate = float(rate)
         self.number = number
         self.rate = rate
+        self.subs = None
 
         if amount > 31: money = 1
         else: money = 0
@@ -35,6 +37,10 @@ class Contributions(PRMP_Mixins):
     def __init__(self, area, month=None, date=None):
         date = self.getDate(date)
         month = self.getDate(month)
+
+        self.get = self.getFromSelf
+
+        print(self.get)
 
         self.area, self.month, self.date =  area, month, date
         self.subs = self.contributions = []
@@ -62,10 +68,10 @@ class Contributions(PRMP_Mixins):
         return dest
 
     @property
-    def total(self): return sum([cont.money for cont in self])
+    def money(self): return sum([cont.money for cont in self])
 
     @property
-    def money(self): return self.total
+    def total(self): return len(self)
 
     def save(self):
         path = self.path
@@ -89,8 +95,20 @@ class Contributions(PRMP_Mixins):
 
 p = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions\Area_1\February-2021\Area_1 February-2021 18-02-2021.cont'
 
-o = Contributions.load(p)
-# print(o[0]._subs)
+cs = Contributions.load(p)
+# cs = Contributions(1, date=PRMP_DateTime.now().addTimes(days=-1))
+import random
+for a in range(20):
+    n = a + 1
+    r = random.randrange(100, 1000, 100)
+    m = r * random.randint(1, 6)
+
+    cs.add(number=n, rate=r, amount=m)
+
+
+
+
+# exit()
 
 from prmp_gui.dialogs import *
 from prmp_gui.two_widgets import *
@@ -98,11 +116,12 @@ PTh.setThemeIndex(38)
 
 class App(PRMP_Dialog):
 
-    def __init__(self, **kwargs):
+    def __init__(self, contributions=None, **kwargs):
+        self.contributions = contributions
+
         super().__init__(tw=0, **kwargs)
 
     def _setupDialog(self):
-        self.contributions = None
         cont = self.container
 
         fr1 = Frame(cont, place=dict(relx=0, rely=0, relw=.4, relh=1), relief='groove')
@@ -127,22 +146,31 @@ class App(PRMP_Dialog):
 
         self.commission = Checkbutton(cont1, text='Commission', place=dict(relx=0, rely=.75, relw=.4, relh=.2))
 
+        settings = LabelFrame(fr1, place=dict(relx=0, rely=.86, relw=1, relh=.12), text='Settings')
+        Button(settings, text='New', place=dict(relx=0, rely=0, relw=.3, relh=.9), command=self.new)
+        Button(settings, text='Load', place=dict(relx=.35, rely=0, relw=.3, relh=.9), command=self.save)
+        Button(settings, text='Save', place=dict(relx=.7, rely=0, relw=.3, relh=.9), command=self.save)
+
         Button(cont1, text='Add', place=dict(relx=.77, rely=.77, relw=.2, relh=.17))
 
         fr2 = Frame(cont, place=dict(relx=.4, rely=0, relw=.6, relh=1), relief='groove')
 
-        self.tree = PRMP_TreeView(fr2, place=dict(relx=0, rely=0, relw=1, relh=.8), columns=columns)
+        self.tree = Hierachy(fr2, place=dict(relx=0, rely=0, relw=1, relh=.8), columns=columns)
 
         totals = LabelFrame(fr2, text='Totals', place=dict(relx=0, rely=.8, relw=1, relh=.2))
+        self.totalsDatas = ['money', 'total']
 
         self.money = LabelLabel(totals, place=dict(relx=0, rely=0, relw=.5, relh=.4), topKwargs=dict(text='Money'), orient='h')
-        self.subs = LabelLabel(totals, place=dict(relx=0, rely=.5, relw=.5, relh=.5), topKwargs=dict(text='Contributions'), orient='h', longent=.6)
+        self.total = LabelLabel(totals, place=dict(relx=0, rely=.5, relw=.5, relh=.5), topKwargs=dict(text='Contributions'), orient='h', longent=.6)
 
 
 
     def update(self):
         if self.contributions:
-            
+            self.set(self.contributions, widgets=[*self.totalsDatas, *self.areaDatas])
+
+            self.tree.viewSubs(self.contributions)
+
 
 
 
@@ -152,9 +180,13 @@ class App(PRMP_Dialog):
     def defaults(self):
         if not self.titleBar: return
 
-        Button(self.menuBar, text='Load', place=dict(relx=0, rely=0, relw=.1, relh=1), command=self.load)
-        Button(self.menuBar, text='Save', place=dict(relx=.1, rely=0, relw=.1, relh=1), command=self.save)
+        Button(self.menuBar, text='New', place=dict(relx=0, rely=0, relw=.1, relh=1), command=self.new)
+        Button(self.menuBar, text='Load', place=dict(relx=.1, rely=0, relw=.1, relh=1), command=self.save)
+        Button(self.menuBar, text='Save', place=dict(relx=.2, rely=0, relw=.1, relh=1), command=self.save)
+        self.update()
 
+    def new(self):
+        pass
     def load(self):
         pass
 
@@ -169,6 +201,6 @@ class App(PRMP_Dialog):
 
 
 geo = (700, 600)
-App(geo=geo, side='top-center')
+App(geo=geo, side='top-center', contributions=cs)
 
 

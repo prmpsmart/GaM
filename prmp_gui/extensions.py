@@ -93,7 +93,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
 
     def set(self, values={}, widgets=[]):
         if values:
-            widgets = widgets or self.resultsWidgets
+            widgets = widgets or self.__resultsWidgets
             for widgetName in widgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
@@ -110,10 +110,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
     def get(self, widgets=[]):
         result = {}
 
-        widgets = widgets or self.resultsWidgets
-
-        # widgets.sort()
-
+        widgets = widgets or self.__resultsWidgets
         for widgetName in widgets:
             if widgetName in self.__notEditables: continue
 

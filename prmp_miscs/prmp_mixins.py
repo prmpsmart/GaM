@@ -226,6 +226,7 @@ class PRMP_Mixins:
     #     var = self.getFromSelf(self.propertize(key))
     #     var = value
 
+    def __len__(self): return len(self[:])
     def __getitem__(self, item):
         if isinstance(item, self.containers):
             res = []

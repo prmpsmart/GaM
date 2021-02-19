@@ -136,8 +136,9 @@ class PRMP_File(BytesIO, PRMP_Mixins):
 
         elif filename:
             self.name = os.path.basename(filename)
-            try: self._data = open(filename, 'rb').read()
-            except: pass
+            if os.path.isfile(filename):
+                try: self._data = open(filename, 'rb').read()
+                except: pass
 
         elif base64:
             self._data = b64decode(base64)

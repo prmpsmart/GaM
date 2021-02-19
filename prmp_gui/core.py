@@ -2841,10 +2841,6 @@ class PRMP_TreeView(PRMP_Frame):
             for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
 
     def clear(self):
-        # if self.firstItem:
-        #     self.tree.delete(self.firstItem)
-        #     self.firstItem = None
-
         for key in self.ivd:
             try: self.tree.delete(key)
             except _tkinter.TclError: pass
