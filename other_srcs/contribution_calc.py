@@ -137,7 +137,7 @@ class Contributions(PRMP_Mixins):
 
 class App(PRMP_Dialog):
 
-    def __init__(self, contributions=None, geo=(700, 500), **kwargs):
+    def __init__(self, contributions=None, geo=(9       00, 600), **kwargs):
         self.contributions = contributions
 
         super().__init__(tw=0, geo=geo, **kwargs)
