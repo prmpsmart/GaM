@@ -323,6 +323,9 @@ class PRMP_DateWidget:
         if text: return PRMP_DateTime.getDMYFromDate(text)
 
     def set(self, date):
+        if date == '':
+            self['text'] = date
+            return
         if isinstance(date, str):
             try:
                 if '-' in date: d, m, y = date.split('-')
@@ -859,7 +862,8 @@ class Hierachy(PRMP_TreeView):
     def toggleOpen(self, e=0):
         if self._toggleOpen: self._toggleOpen = False
         else: self._toggleOpen = True
-        self.viewAll(*self.last)
+
+        if self.last: self.viewObjs(*self.last)
 
     def bindings(self):
         self.treeview.bind('<Control-Return>', self.viewSelected, '+')

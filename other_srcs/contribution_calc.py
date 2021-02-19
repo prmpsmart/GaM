@@ -62,9 +62,7 @@ class Contributions(PRMP_Mixins):
 
         self.get = self.getFromSelf
 
-        print(self.get)
-
-        self.area, self.month, self.date =  area, month, date
+        self.area, self.month, self.date =  int(area), month, date
         self.subs = self.contributions = []
 
     def __str__(self): return f'{self.className}(Area={self.area}, Month={self.month.monthYear}, Date={self.date.date}, Money={self.money})'
@@ -124,21 +122,21 @@ class Contributions(PRMP_Mixins):
 
 # p = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions\Area_3\July-2021\Area_3 July-2021 18-08-2021.cont'
 
-p = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions\Area_1\February-2021\Area_1 February-2021 18-02-2021.cont'
+p = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions\Area_1\February-2021\Area_1 February-2021 19-02-2021.cont'
 
 cs = Contributions.load(p)
-# cs = Contributions(1, date=PRMP_DateTime.now().addTimes(days=-1))
-import random
-for a in range(20):
-    n = a + 1
-    r = random.randrange(100, 1000, 100)
-    m = r * random.randint(1, 6)
+# cs = Contributions(1, date=PRMP_DateTime.now().addTimes(days=5))
+# import random
+# for a in range(20):
+#     n = a + 1
+#     r = random.randrange(100, 1000, 100)
+#     m = r * random.randint(1, 6)
 
-    cs.add(number=n, rate=r, amount=m)
-
-
+#     cs.add(number=n, rate=r, amount=m)
 
 
+
+# cs.save()
 # exit()
 
 from prmp_gui.dialogs import *
@@ -157,16 +155,19 @@ class App(PRMP_Dialog):
 
         fr1 = Frame(cont, place=dict(relx=0, rely=0, relw=.4, relh=1), relief='groove')
 
-        area1 = LabelFrame(fr1, place=dict(relx=0, rely=0, relw=1, relh=.3), relief='groove', text='Area Details')
+        area1 = LabelFrame(fr1, place=dict(relx=0, rely=0, relw=1, relh=.4), relief='groove', text='Area Details')
         self.areaDatas = ['area', 'month', 'date']
 
-        self.area = LabelEntry(area1, topKwargs=dict(text='Area'), place=dict(relx=0, rely=0, relw=1, relh=.3), orient='h', bottomKwargs=dict(_type='number'))
+        self.area = LabelEntry(area1, topKwargs=dict(text='Area'), place=dict(relx=0, rely=0, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
 
-        self.month = LabelMonthYearButton(area1, topKwargs=dict(text='Month'), place=dict(relx=0, rely=.31, relw=1, relh=.3), orient='h', longent=.35)
+        self.month = LabelMonthYearButton(area1, topKwargs=dict(text='Month'), place=dict(relx=0, rely=.25, relw=1, relh=.24), orient='h', longent=.35)
 
-        self.date = LabelDateButton(area1, topKwargs=dict(text='Date'), place=dict(relx=0, rely=.62, relw=1, relh=.3), orient='h', longent=.35)
+        self.date = LabelDateButton(area1, topKwargs=dict(text='Date'), place=dict(relx=0, rely=.5, relw=1, relh=.24), orient='h', longent=.35)
 
-        cont1 = LabelFrame(fr1, place=dict(relx=0, rely=.3, relw=1, relh=.4), relief='groove', text='Contribution Details')
+        Button(area1, text='Create', place=dict(relx=0, rely=0, relw=.24, relh=.9), command=self.create)
+
+
+        cont1 = LabelFrame(fr1, place=dict(relx=0, rely=.4, relw=1, relh=.4), relief='groove', text='Contribution Details')
         self.contDatas = ['number', 'rate', 'amount', 'commission']
 
         self.number = LabelEntry(cont1, topKwargs=dict(text='Number'), place=dict(relx=0, rely=0, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
@@ -180,10 +181,10 @@ class App(PRMP_Dialog):
         Button(cont1, text='Add', place=dict(relx=.77, rely=.77, relw=.2, relh=.17), command=self.add)
 
         settings = LabelFrame(fr1, place=dict(relx=0, rely=.86, relw=1, relh=.12), text='Settings')
-        Button(settings, text='New', place=dict(relx=0, rely=0, relw=.24, relh=.9), command=self.new)
-        Button(settings, text='Load', place=dict(relx=.25, rely=0, relw=.24, relh=.9), command=self.save)
+        Button(settings, text='Clear', place=dict(relx=0, rely=0, relw=.24, relh=.9), command=self.clearIt)
+        Button(settings, text='Load', place=dict(relx=.25, rely=0, relw=.24, relh=.9), command=self.load)
         Button(settings, text='Save', place=dict(relx=.5, rely=0, relw=.24, relh=.9), command=self.save)
-        Button(settings, text='Update', place=dict(relx=.75, rely=0, relw=.24, relh=.9), command=self.save)
+        Button(settings, text='Update', place=dict(relx=.75, rely=0, relw=.24, relh=.9), command=self.update)
 
         fr2 = Frame(cont, place=dict(relx=.4, rely=0, relw=.6, relh=1), relief='groove')
 
@@ -196,29 +197,39 @@ class App(PRMP_Dialog):
         self.money = LabelLabel(totals, place=dict(relx=0, rely=0, relw=.5, relh=.4), topKwargs=dict(text='Money'), orient='h')
         self.total = LabelLabel(totals, place=dict(relx=0, rely=.5, relw=.5, relh=.5), topKwargs=dict(text='Contributions'), orient='h', longent=.6)
 
-
+        self.bind('<Control-O>', self.load)
+        self.bind('<Control-o>', self.load)
+        self.bind('<Control-S>', self.save)
+        self.bind('<Control-s>', self.save)
 
     def update(self):
+        self.clear()
         if self.contributions:
-            self.tree.clear()
-
             self.set(self.contributions, widgets=[*self.totalsDatas, *self.areaDatas])
 
             self.tree.viewSubs(self.contributions)
 
-        else:
-            self.emptyWidgets([*self.areaDatas, *self.contDatas, *self.totalsDatas])
-            self.tree.clear()
+    def clear(self, w=1):
+        if not w: return
+
+        self.tree.clear()
+        self.emptyWidgets([*self.areaDatas, *self.contDatas])
+
+        for wid in [*self.areaDatas, *self.totalsDatas]: self[wid].set('')
+
+    def clearIt(self):
+        PRMP_MsgBox(self, title='Clear?', message='Are you sure to clear this current contribution?', ask=1, callback=self.clear)
+
 
     def defaults(self):
         if not self.titleBar: return
 
         Button(self.menuBar, text='New', place=dict(relx=0, rely=0, relw=.1, relh=1), command=self.new)
-        Button(self.menuBar, text='Load', place=dict(relx=.1, rely=0, relw=.1, relh=1), command=self.save)
+        Button(self.menuBar, text='Load', place=dict(relx=.1, rely=0, relw=.1, relh=1), command=self.load)
         Button(self.menuBar, text='Save', place=dict(relx=.2, rely=0, relw=.1, relh=1), command=self.save)
         self.update()
 
-    def add(self):
+    def add(self, e=0):
         if not self.contributions: return
 
         datas = self.get(self.contDatas)
@@ -235,16 +246,44 @@ class App(PRMP_Dialog):
         if not self.contributions: return
         sel = self.tree.selected()
         self.contributions.remove(sel)
-        print(self.contributions[:])
         self.update()
 
-    def new(self):
-        pass
-    def load(self):
-        pass
+    def getAreaData(self):
+        contData = self.get(self.areaDatas)
+        contData['area'] = int(contData['area'])
+        return contData
 
-    def save(self):
-        pass
+    def updateCont(self):
+        contData = self.getAreaData()
+        self.contributions.__dict__.update(contData)
+        self.update()
+
+    def create(self):
+        PRMP_MsgBox(self, title='Create a Contribution?', message='Are you sure to clear this current contribution?', ask=1, callback=self.clear)
+
+
+    def _create(self):
+        contData = self.getAreaData()
+        self.contributions = Contributions(**contData)
+
+    def load(self, e=0):
+        file = filedialog.askopenfilename(filetypes=['Contributions {.cont}'])
+        if not file: return
+
+        conts = Contributions.load(file)
+        self.contributions = conts
+        self.update()
+
+    def save(self, e=0):
+        if not self.contributions: return
+        self.updateCont()
+
+        path = self.contributions.path
+        if os.path.exists(path): PRMP_MsgBox(self, title='Already Exists', message=f'The path {path} for this contribution already exists, do you wish to overwrite?', ask=1, callback=self._save, geo=(400, 300))
+        else: self._save(1)
+
+    def _save(self, w=0):
+        if w: self.contributions.save()
 
 
 # wids = [area, month, date]
