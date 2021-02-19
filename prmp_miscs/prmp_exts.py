@@ -158,7 +158,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
 
     def read(self, _read=0):
         data = self.data
-        if _read in [0]: return data
+        if _read == 0: return data
         else: return super().read(_read)
         return data
 
