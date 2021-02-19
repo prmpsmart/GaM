@@ -8,11 +8,13 @@ DEST = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions'
 
 columns = ['number', 'rate', 'amount', 'money']
 
+
 class Contribution(PRMP_Mixins):
 
     def __init__(self, number, rate, amount):
         amount = float(amount)
         rate = float(rate)
+        number = int(number)
         self.number = number
         self.rate = rate
         self.subs = None
@@ -31,6 +33,26 @@ class Contribution(PRMP_Mixins):
     def _subs(self): return self[columns[:]]
 
     def __str__(self): return f'{self.className}(Number={self.number}, Rate={self.rate}, Amount={self.amount}, Money={self.money})'
+    def __repr__(self): return f'<{self.number}>'
+
+    def __lt__(self, other):
+        if other == None: return False
+        return self.number < other.number
+    def __le__(self, other):
+        if other == None: return False
+        return self.number <= other.number
+    def __eq__(self, other):
+        if other == None: return False
+        return self.number is other.number
+    def __ne__(self, other):
+        if other == None: return True
+        return self.number != other.number
+    def __gt__(self, other):
+        if other == None: return True
+        return self.number > other.number
+    def __ge__(self, other):
+        if other == None: return True
+        return self.number >= other.number
 
 
 class Contributions(PRMP_Mixins):
@@ -48,9 +70,18 @@ class Contributions(PRMP_Mixins):
     def __str__(self): return f'{self.className}(Area={self.area}, Month={self.month.monthYear}, Date={self.date.date}, Money={self.money})'
 
     def add(self, number, rate, amount):
+        numbers = [cont.number for cont in self]
+
+        if number in numbers: raise ValueError(f'This number {number} already exists.')
+
         cont = Contribution(number, rate, amount)
         self.contributions.append(cont)
+        self.contributions.sort()
+
         return cont
+
+    def remove(self, cont):
+        if cont in self: self.subs.remove(cont)
 
     @property
     def name(self):
@@ -146,16 +177,18 @@ class App(PRMP_Dialog):
 
         self.commission = Checkbutton(cont1, text='Commission', place=dict(relx=0, rely=.75, relw=.4, relh=.2))
 
-        settings = LabelFrame(fr1, place=dict(relx=0, rely=.86, relw=1, relh=.12), text='Settings')
-        Button(settings, text='New', place=dict(relx=0, rely=0, relw=.3, relh=.9), command=self.new)
-        Button(settings, text='Load', place=dict(relx=.35, rely=0, relw=.3, relh=.9), command=self.save)
-        Button(settings, text='Save', place=dict(relx=.7, rely=0, relw=.3, relh=.9), command=self.save)
+        Button(cont1, text='Add', place=dict(relx=.77, rely=.77, relw=.2, relh=.17), command=self.add)
 
-        Button(cont1, text='Add', place=dict(relx=.77, rely=.77, relw=.2, relh=.17))
+        settings = LabelFrame(fr1, place=dict(relx=0, rely=.86, relw=1, relh=.12), text='Settings')
+        Button(settings, text='New', place=dict(relx=0, rely=0, relw=.24, relh=.9), command=self.new)
+        Button(settings, text='Load', place=dict(relx=.25, rely=0, relw=.24, relh=.9), command=self.save)
+        Button(settings, text='Save', place=dict(relx=.5, rely=0, relw=.24, relh=.9), command=self.save)
+        Button(settings, text='Update', place=dict(relx=.75, rely=0, relw=.24, relh=.9), command=self.save)
 
         fr2 = Frame(cont, place=dict(relx=.4, rely=0, relw=.6, relh=1), relief='groove')
 
         self.tree = Hierachy(fr2, place=dict(relx=0, rely=0, relw=1, relh=.8), columns=columns)
+        self.tree.tree.bind('<Delete>', self.delete)
 
         totals = LabelFrame(fr2, text='Totals', place=dict(relx=0, rely=.8, relw=1, relh=.2))
         self.totalsDatas = ['money', 'total']
@@ -167,15 +200,15 @@ class App(PRMP_Dialog):
 
     def update(self):
         if self.contributions:
+            self.tree.clear()
+
             self.set(self.contributions, widgets=[*self.totalsDatas, *self.areaDatas])
 
             self.tree.viewSubs(self.contributions)
 
-
-
-
-
-
+        else:
+            self.emptyWidgets([*self.areaDatas, *self.contDatas, *self.totalsDatas])
+            self.tree.clear()
 
     def defaults(self):
         if not self.titleBar: return
@@ -183,6 +216,26 @@ class App(PRMP_Dialog):
         Button(self.menuBar, text='New', place=dict(relx=0, rely=0, relw=.1, relh=1), command=self.new)
         Button(self.menuBar, text='Load', place=dict(relx=.1, rely=0, relw=.1, relh=1), command=self.save)
         Button(self.menuBar, text='Save', place=dict(relx=.2, rely=0, relw=.1, relh=1), command=self.save)
+        self.update()
+
+    def add(self):
+        if not self.contributions: return
+
+        datas = self.get(self.contDatas)
+        data = {k: v for k, v in datas.items() if k != 'commission'}
+
+        try:
+            self.contributions.add(**data)
+            self.emptyWidgets(self.contDatas)
+        except Exception as e: PRMP_MsgBox(self, title=e.__class__.__name__, message=e)
+
+        self.update()
+
+    def delete(self, e=0):
+        if not self.contributions: return
+        sel = self.tree.selected()
+        self.contributions.remove(sel)
+        print(self.contributions[:])
         self.update()
 
     def new(self):
@@ -199,7 +252,7 @@ class App(PRMP_Dialog):
 
 # Widgets = [labelentry, labellabel(for totalmoney, contribs), hierachy]
 
-
+# cs = None
 geo = (700, 600)
 App(geo=geo, side='top-center', contributions=cs)
 

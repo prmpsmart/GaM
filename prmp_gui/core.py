@@ -1779,6 +1779,7 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
         newItem = ttk.Treeview.insert(self, item, position, text=text, **kwargs)
 
         self.ivd[newItem] = value or text
+        # print(self.ivd)
 
         return newItem
 
@@ -1800,6 +1801,8 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
     def deleteAll(self):
         children = self.get_children()
         for child in children: self.delete(child)
+    clear = deleteAll
+
 
 
 
@@ -2794,6 +2797,7 @@ class PRMP_TreeView(PRMP_Frame):
         self.attributes = []
 
         self.selected = self.treeview.selected
+        self.clear = self.treeview.clear
         self.ivd = self.treeview.ivd
         self.insert = self.treeview.insert
         self.heading = self.treeview.heading
@@ -2839,14 +2843,6 @@ class PRMP_TreeView(PRMP_Frame):
         _subs = obj.getFromSelf(subs) if not isinstance(obj, self.containers) else obj
         if _subs:
             for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
-
-    def clear(self):
-        for key in self.ivd:
-            try: self.tree.delete(key)
-            except _tkinter.TclError: pass
-
-        self.ivd = self.itemsValuesDict = {}
-
 
     def set(self, obj, op=1):
         self.setColumns()
