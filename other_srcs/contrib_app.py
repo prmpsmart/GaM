@@ -5472,26 +5472,26 @@ def confirmDialog(title=None, msg=None, which=None):
     if which == 4: return messagebox.askretrycancel(title, msg)
     if which == 5: return messagebox.askyesnocancel(title, msg)
 
-def askPath(opened=False, folder=False, many=False, save=False):
+def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
     if folder == False:
         if opened == False:
             if many == False:
-                if save == False: return filedialog.askopenfilename()
-                else: return filedialog.asksaveasfilename()
-            else: return filedialog.askopenfilenames()
+                if save == False: return filedialog.askopenfilename(**kwargs)
+                else: return filedialog.asksaveasfilename(**kwargs)
+            else: return filedialog.askopenfilenames(**kwargs)
         else:
             if many == False:
-                if save == False: return filedialog.askopenfile()
-                else: return filedialog.asksaveasfile()
-            else: return filedialog.askopenfiles()
-    else: return filedialog.askdirectory()
+                if save == False: return filedialog.askopenfile(**kwargs)
+                else: return filedialog.asksaveasfile(**kwargs)
+            else: return filedialog.askopenfiles(**kwargs)
+    else: return filedialog.askdirectory(**kwargs)
 
 def dialogFunc(ask=0, path=0, obj=None, **kwargs):
     if obj:
         if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
-        elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
-        elif isinstance(obj, Columns): ColumnsExplorerDialog(columns=obj, **kwargs)
-        elif isinstance(obj, Column): ColumnViewerDialog(column=obj, **kwargs)
+        # elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
+        # elif isinstance(obj, Columns): ColumnsExplorerDialog(columns=obj, **kwargs)
+        # elif isinstance(obj, Column): ColumnViewerDialog(column=obj, **kwargs)
     elif path: return askPath(**kwargs)
     elif ask: return confirmDialog(**kwargs)
     else: return showDialog(**kwargs)
@@ -5789,7 +5789,7 @@ class App(PRMP_Dialog):
 
 
     def load(self, e=0):
-        file = filedialog.askopenfilename(filetypes=['Contributions {.cont}'])
+        file = dialogFunc(path=1, filetypes=['Contributions {.cont}'])
         if not file: return
 
         conts = Contributions.load(file)
@@ -5821,4 +5821,4 @@ class App(PRMP_Dialog):
 
 # cs.save()
 PRMP_Theme.setThemeIndex(19)
-App()
+# App()

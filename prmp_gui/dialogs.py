@@ -345,19 +345,19 @@ def confirmDialog(title=None, msg=None, which=None):
     if which == 4: return messagebox.askretrycancel(title, msg)
     if which == 5: return messagebox.askyesnocancel(title, msg)
 
-def askPath(opened=False, folder=False, many=False, save=False):
+def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
     if folder == False:
         if opened == False:
             if many == False:
-                if save == False: return filedialog.askopenfilename()
-                else: return filedialog.asksaveasfilename()
-            else: return filedialog.askopenfilenames()
+                if save == False: return filedialog.askopenfilename(**kwargs)
+                else: return filedialog.asksaveasfilename(**kwargs)
+            else: return filedialog.askopenfilenames(**kwargs)
         else:
             if many == False:
-                if save == False: return filedialog.askopenfile()
-                else: return filedialog.asksaveasfile()
-            else: return filedialog.askopenfiles()
-    else: return filedialog.askdirectory()
+                if save == False: return filedialog.askopenfile(**kwargs)
+                else: return filedialog.asksaveasfile(**kwargs)
+            else: return filedialog.askopenfiles(**kwargs)
+    else: return filedialog.askdirectory(**kwargs)
 
 def dialogFunc(ask=0, path=0, obj=None, **kwargs):
     if obj:

@@ -272,7 +272,7 @@ class App(PRMP_Dialog):
 
 
     def load(self, e=0):
-        file = filedialog.askopenfilename(filetypes=['Contributions {.cont}'])
+        file = dialogFunc(path=1, filetypes=['Contributions {.cont}'])
         if not file: return
 
         conts = Contributions.load(file)

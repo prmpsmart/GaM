@@ -1,1 +1,4 @@
-import contrib_app
+from contrib_app import *
+
+
+App()
