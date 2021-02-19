@@ -1,1 +1,1 @@
-import contr_app
+import contrib_app
