@@ -91,9 +91,10 @@ class PRMP_FillWidgets(PRMP_Mixins):
     @property
     def resultsWidgets(self): return self.__resultsWidgets
 
-    def set(self, values={}):
+    def set(self, values={}, widgets=[]):
         if values:
-            for widgetName in self.resultsWidgets:
+            widgets = widgets or self.resultsWidgets
+            for widgetName in widgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
                     # try:

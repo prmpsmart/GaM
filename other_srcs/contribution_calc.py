@@ -102,11 +102,13 @@ class App(PRMP_Dialog):
         super().__init__(tw=0, **kwargs)
 
     def _setupDialog(self):
+        self.contributions = None
         cont = self.container
 
         fr1 = Frame(cont, place=dict(relx=0, rely=0, relw=.4, relh=1), relief='groove')
 
         area1 = LabelFrame(fr1, place=dict(relx=0, rely=0, relw=1, relh=.3), relief='groove', text='Area Details')
+        self.areaDatas = ['area', 'month', 'date']
 
         self.area = LabelEntry(area1, topKwargs=dict(text='Area'), place=dict(relx=0, rely=0, relw=1, relh=.3), orient='h', bottomKwargs=dict(_type='number'))
 
@@ -115,6 +117,7 @@ class App(PRMP_Dialog):
         self.date = LabelDateButton(area1, topKwargs=dict(text='Date'), place=dict(relx=0, rely=.62, relw=1, relh=.3), orient='h', longent=.35)
 
         cont1 = LabelFrame(fr1, place=dict(relx=0, rely=.3, relw=1, relh=.4), relief='groove', text='Contribution Details')
+        self.contDatas = ['number', 'rate', 'amount', 'commission']
 
         self.number = LabelEntry(cont1, topKwargs=dict(text='Number'), place=dict(relx=0, rely=0, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
 
@@ -137,7 +140,9 @@ class App(PRMP_Dialog):
 
 
 
-
+    def update(self):
+        if self.contributions:
+            
 
 
 
@@ -164,6 +169,6 @@ class App(PRMP_Dialog):
 
 
 geo = (700, 600)
-App(geo=geo)
+App(geo=geo, side='top-center')
 
 
