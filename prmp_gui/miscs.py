@@ -81,7 +81,7 @@ class Col_Mixins(PRMP_Mixins):
 class Column(Col_Mixins):
 
     def __init__(self, index, column):
-        self.subs = None
+        self.subs = []
         self.index = '#%d'%index
         self.type = None
         value, width = '', 20
@@ -96,7 +96,8 @@ class Column(Col_Mixins):
 
         elif isinstance(column, dict):
             self.text = column.get('text', value)
-            self.attr = column.get('attr', self.propertize(self.text))
+            self.attr = column.get('attr', None)
+            if not self.attr: self.attr = self.propertize(self.text)
             if isinstance(self.attr, list):
                 self._attr = self.attr
                 self.attr = self.attr[0]

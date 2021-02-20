@@ -1061,6 +1061,7 @@ class AttributesExplorer(LabelFrame):
         if self.callback: self.callback(result)
         else: return result
 
+
     def setTreeview(self, values, parent=''):
         if isinstance(values, list):
             for value in values: self.setTreeview(value, parent)
@@ -1119,7 +1120,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         frame1 = Frame(self, place=dict(relx=0, rely=0, relw=.3, relh=1))
 
-        Label(frame1, text='Top Attrs', place=dict(relx=0, rely=0, relw=1, relh=.07))
+        Label(frame1, text='Columns', place=dict(relx=0, rely=0, relw=1, relh=.07))
 
         self.listbox = ListBox(frame1, place=dict(relx=0, rely=.08, relh=.84, relw=1), listboxConfig=dict(config=dict(selectmode='multiple')), bindings=[('<Return>', self.clicked, '')])
 
@@ -1143,6 +1144,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         Button(frame2, text='Add', place=dict(relx=.45, rely=.915, relh=.07, relw=.25), command=self.addColumn)
 
         self._foc = None
+        self._focObj = None
         self._attr = ''
 
         self.set(columns)
@@ -1154,13 +1156,14 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
     def addColumn(self, e=0):
         gets = self.get(['text', '_width', 'value'])
-        attr = self._attr
+        gets['attr'] = self._attr
         gets['width'] = gets['_width']
-        j = self.columns.addColumn(gets)
+        try: j = self.columns.addColumn(gets)
+        except:
+            from .dialogs import PRMP_MsgBox; PRMP_MsgBox(self, title='Error', _type='error', message='Try to add the "attr" value.')
         self._attr = ''
 
         self.set(self.columns)
-        self.getColumns()
 
     def getAttr(self):
         from .dialogs import AttributesExplorerDialog; AttributesExplorerDialog(callback=self.setAttr)
@@ -1170,23 +1173,26 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
     def deleteColumn(self, e=0):
         self._foc = focus = self.treeview.treeview.focus()
+        self._focObj = self.treeview.treeview.ivd[focus]
         from .dialogs import PRMP_MsgBox
 
-        _all = 'all Columns' if not focus else f'this Column --> {self.treeview.treeview.ivd[focus].index}'
+        _all = 'all Columns' if not focus else f'this Column --> {self._focObj.index}'
 
         PRMP_MsgBox(self, title='Delete Column', message=f'Are you sure to delete {_all}', ask=1, callback=self._delete)
 
     def _delete(self, w):
         if w:
-            if not self._foc: self.treeview.treeview.deleteAll()
-            else: self.treeview.treeview.delete(self._foc)
+            if not self._foc: return
+            else:
+                self.treeview.treeview.delete(self._foc)
+                self.columns.remove(self._focObj)
 
         self.setListBox()
 
 
     def setListBox(self):
         self.listbox.clear()
-        tops = self.treeview.treeview.getChildren()
+        tops = self.columns
 
         if tops:
             for top in tops:
