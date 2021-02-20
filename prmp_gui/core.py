@@ -345,7 +345,7 @@ class PRMP_Theme(PRMP_Mixins):
 
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'very', 'placeholder', '_type', 'default']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default']}
 
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
@@ -792,7 +792,7 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
 
-    def __init__(self, placeholder='', _type='text', values=[], very=False, default=None, state='normal', **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', **kwargs):
         _type = _type.lower()
 
         self._read = False
@@ -808,12 +808,12 @@ class PRMP_Input:
 
         if _type == 'email':
             self.bind('<KeyRelease>', self.checkingEmail, '+')
-            self.verify = self.checkingEmail
+            self._verify = self.checkingEmail
         elif _type == 'number':
             self.set = self.setNumber
             self.get = self.getNumber
             self.bind('<KeyRelease>', self.checkingNumber, '+')
-            self.verify = self.checkingNumber
+            self._verify = self.checkingNumber
             self.returnType = float
         elif _type == 'money':
             placeholder = f'{self._moneySign} 0'
@@ -821,22 +821,22 @@ class PRMP_Input:
             self.set = self.setMoney
             self.get = self.getMoney
             self.bind('<KeyRelease>', self.checkingMoney, '+')
-            self.verify = self.checkingMoney
+            self._verify = self.checkingMoney
         elif _type == 'dir':
             self.bind('<KeyRelease>', self.checkingDir, '+')
-            self.verify = self.checkingDir
+            self._verify = self.checkingDir
         elif _type == 'file':
             self.bind('<KeyRelease>', self.checkingFile, '+')
-            self.verify = self.checkingFile
+            self._verify = self.checkingFile
         elif _type == 'path':
             self.bind('<KeyRelease>', self.checkingPath, '+')
-            self.verify = self.checkingPath
+            self._verify = self.checkingPath
         else:
             self.bind('<KeyRelease>', self.normVery, '+')
-            self.verify = self.normVery
+            self._verify = self.normVery
 
-        if self.values or (_type in types): self.very = True
-        else: self.very = very or False
+        self.required = required
+        if self.values: self.required = True
 
         self.changePlaceholder(placeholder)
 
@@ -844,9 +844,11 @@ class PRMP_Input:
         self.placeholder = placeholder
         self.set(self.placeholder)
 
+    def verify(self):
+        return self._verify()
+
 
     def normVery(self, e=0):
-        if not self.very: return True
         get = self._get()
         if self.values:
             if get in self.values: return self.green()
@@ -967,6 +969,7 @@ class PRMP_Input:
         if self._get() == '': self.set(self.placeholder)
 
     def empty(self): self.set(self.placeholder)
+
     def clear(self): self.delete('0', 'end')
 
     def _get(self): return super().get()

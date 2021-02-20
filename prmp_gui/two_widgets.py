@@ -77,6 +77,8 @@ class TwoWidgets(PRMP_Frame):
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
         # if bottom == 'entry': print(bottomKw)
 
+        self.required = getattr(self.Bottom, 'required', False)
+
         events = self.events.get(bottom)
         if events:
             for event in events:

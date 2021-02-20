@@ -263,7 +263,7 @@ class PRMP_Mixins:
                 res.append(tail)
             return res if len(res) > 1 else res[0]
 
-        return self.subs[item]
+        if self.subs: return self.subs[item]
 
 
 

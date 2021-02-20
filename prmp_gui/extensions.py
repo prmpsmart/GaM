@@ -118,7 +118,8 @@ class PRMP_FillWidgets(PRMP_Mixins):
             if wid:
                 get = wid.get()
                 verify = getattr(wid, 'verify', None)
-                if verify:
+                if (verify != None) and (wid.required == True):
+
                     if verify(): result[widgetName] = get
                     else:
                         try: wid.flash()
@@ -1131,7 +1132,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.7, relw=1), columns=_cols)
         self.treeview.treeview.bind('<Delete>', self.deleteColumn)
 
-        self.text = LabelEntry(frame2, place=dict(relx=.0, rely=.71, relw=.5, relh=.085), orient='h', longent=.23, topKwargs=dict(text='text'), bottomKwargs=dict(_type='text'))
+        self.text = LabelEntry(frame2, place=dict(relx=.0, rely=.71, relw=.5, relh=.085), orient='h', longent=.23, topKwargs=dict(text='text'), bottomKwargs=dict(_type='text', required=True))
         self.attr = Button(frame2, place=dict(relx=.55, rely=.71, relw=.1, relh=.085), text='attr', command=self.getAttr)
         self._width = LabelEntry(frame2, place=dict(relx=0, rely=.8, relw=.3, relh=.085), orient='h', topKwargs=dict(text='width'), bottomKwargs=dict(_type='number'))
         self.value = LabelEntry(frame2, place=dict(relx=.35, rely=.8, relw=.3, relh=.085), orient='h', longent=.4,  topKwargs=dict(text='value'), bottomKwargs=dict(_type='text'))
