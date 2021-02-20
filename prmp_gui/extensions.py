@@ -854,10 +854,12 @@ class Hierachy(PRMP_TreeView):
         self.last = []
         super().__init__(master=master, columns=columns, **kwargs)
 
-        from .dialogs import dialogFunc
-        self.openPRMP = dialogFunc
-
         self.bindings()
+
+    @property
+    def openDialog(self):
+        from .dialogs import dialogFunc
+        return dialogFunc
 
     def toggleOpen(self, e=0):
         if self._toggleOpen: self._toggleOpen = False
@@ -874,13 +876,14 @@ class Hierachy(PRMP_TreeView):
         self.treeview.bind('<Control-r>', self.reload)
         self.treeview.bind('<Control-R>', self.reload)
 
-    def reload(self, e=0): self.viewObjs(*self.last)
+    def reload(self, e=0):
+        if self.last: self.viewObjs(*self.last)
 
     def viewSelected(self, e=0):
         current = self.selected()
-        if current: self.openPRMP(master=self, obj=current)
+        if current: self.openDialog(master=self, obj=current)
 
-    def getSubs(self, obj):
+    def getSubs(self, obj, item=''):
         return obj.subs
 
 
@@ -893,13 +896,15 @@ class Hierachy(PRMP_TreeView):
         else:
             raw = self.columns.getFromObj(obj)
             first, *columns = raw
+            # print(raw)
 
             item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
 
-            subs = self.getSubs(obj)
+            subs = self.getSubs(obj, item)
 
         if isinstance(subs, list):
             for sub in subs:
+                # print(subs)
                 if sub: self._viewObjs(sub, item)
 
     def viewObjs(self, obj, parent=''):
@@ -1005,7 +1010,7 @@ class AttributesExplorer(LabelFrame):
                 attr = attrs[0]
                 # value = self.obj[attr]
                 # openCores(obj=value)
-                from .gam_dialogs import AttributesViewerDialog
+                from .dialogs import AttributesViewerDialog
                 AttributesViewerDialog(self, attr=attr, obj=self.obj)
 
     def addAtrribute(self, e=0):
@@ -1090,21 +1095,24 @@ class ColumnViewer(LabelFrame):
             self.value.set(column.value)
             self._width.set(column.width)
 
-    def openMaster(self): openCores(master=self, obj=self.obj)
+    def openMaster(self): from .dialogs import dialogFunc; dialogFunc(master=self, obj=self.obj)
 
     def open(self):
-        if isinstance(self._value, (int, str, list, tuple, dict)): ColumnExplorer(self, values=self._value)
-        else: openCores(master=self, obj=self._value)
+        from .dialogs import dialogFunc, ColumnsExplorerDialog
+        if isinstance(self._value, (int, str, list, tuple, dict)): ColumnsExplorerDialog(self, values=self._value)
+        else: dialogFunc(master=self, obj=self._value)
 
 
 class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
-    def __init__(self, master, listboxConfig={}, callback=None,  columns=None, **kwargs):
+    def __init__(self, master, listboxConfig={}, callback=None, columns=None, masterWid=None, **kwargs):
+
         LabelFrame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
         from .two_widgets import LabelLabel, LabelEntry
 
         self.callback = callback
         self.columns = columns
+        self.masterWid = masterWid
 
         _cols = ['text', 'attr', 'width', 'value']
 
@@ -1179,11 +1187,14 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         self.listbox.clear()
         tops = self.treeview.treeview.getChildren()
 
+        if tops:
+            for top in tops:
+                text = top.text
+                self.listbox.insert(text)
+            last = self.listbox.last
+        else: last = 0
 
-        for top in tops:
-            text = top.text
-            self.listbox.insert(text)
-        self.total.set(self.listbox.last)
+        self.total.set(last)
 
     def clicked(self, event=None, selected=None):
         selected = self.listbox.selected
@@ -1191,9 +1202,11 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
     def set(self, columns):
         if not columns: return
-        self.columns = columns
+
+        self.columns = columns if isinstance(columns, Columns) else Columns(columns)
+
         self.treeview.treeview.deleteAll()
-        self.treeview.viewSubs(columns)
+        self.treeview.viewSubs(self.columns)
 
         self.setListBox()
 
@@ -1209,7 +1222,9 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         self.columns.process(results)
 
-        # return results
+        if self.callback: self.callback(self.columns)
+
+
 
     # def setTreeview(self, values, parent=''):
     #     if isinstance(values, list):

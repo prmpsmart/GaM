@@ -6,16 +6,20 @@ def addNote(self, **kwargs):
     self.note.add(self.overview, padding=3)
     self.note.tab(0, text='Overview', compound='left', underline='-1')
 
-    self.tree = Hierachy(self.note)
-    self.note.add(self.tree, padding=3)
-    self.note.tab(1, text='Tree', compound='left', underline='-1')
+    tr = Frame(self.note)
+    self.note.add(tr, padding=3)
+    self.note.tab(1, text='Hierachy', compound='left', underline='-1')
 
-    frame = Frame(self.note)
-    self.note.add(frame, padding=3)
+    self.tree = GaM_Hierachy(tr, place=dict(relx=0, rely=0, relw=1, relh=.95))
+
+    Button(tr, text='Columns Explorer', place=dict(relx=.1, rely=.95, relw=.16, relh=.05), command=self.openColumnExplorer)
+
+    ae = Frame(self.note)
+    self.note.add(ae, padding=3)
     self.note.tab(2, text='Attributes', compound='left', underline='-1')
 
-    self._columns = ColumnsExplorer(frame, obj=self, place=dict(relx=0, rely=0, relw=1, relh=.48))
-    self.attributes = AttributesExplorer(frame, place=dict(relx=0, rely=.5, relw=1, relh=.48), **kwargs)
+
+    self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), **kwargs)
 
 
 class DC_RegionHome(TreeColumns, RegionHome):
@@ -28,15 +32,22 @@ class DC_RegionHome(TreeColumns, RegionHome):
     def _defs(self):
         self.subRegions.callback = self.selectedRegion
         self.accounts.callback = self.selectedAccount
-        addNote(self, obj=self.obj, values=self.columns(self.region))
+        addNote(self, obj=self.obj)
 
         self.details.bind('<1>', lambda e: self.defaults(1))
+
+    def openColumnExplorer(self):
+        columns = self.tree.columns
+
+        ColumnsExplorerDialog(self, columns=columns, callback=self.tree.setColumns)
+
 
     def defaults(self, i=0):
         if not i: self._defs()
         if self.region:
             self.selected(self.region)
             self.overview.updateDCDigits(self.region.lastAccount)
+
 
     def selectedRegion(self, sub):
         self.selectedAccount(sub[-1])
@@ -48,7 +59,7 @@ class DC_RegionHome(TreeColumns, RegionHome):
 
     def selected(self, sub):
         self.tree.setColumns(self.columns(sub))
-        self.tree.viewAll(sub)
+        self.tree.viewObjs(sub)
 
     def _setupApp(self):
         super()._setupApp()
@@ -86,6 +97,6 @@ class DC_AccountHome(TreeColumns, AccountHome):
         # return
         if not rm: self.overview.updateDCDigits(sub)
         self.tree.setColumns(self.columns(sub))
-        self.tree.viewAll(sub)
+        self.tree.viewObjs(sub)
 
 

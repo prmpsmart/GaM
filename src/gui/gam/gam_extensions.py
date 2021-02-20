@@ -65,8 +65,9 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
             non = 1
 
         if non == 0:
+            # print(kwargs)
             win = window(master, **kwargs)
-            if not master: win.start()
+            # if not master: win.start()
         else: dialogFunc(master=master, **kwargs)
 
 
@@ -164,14 +165,13 @@ class RegionRadioCombo(RadioCombo):
 RRC = RegionRadioCombo
 
 
-class GaM_Hierachy(PRMP_TreeView):
+class GaM_Hierachy(Hierachy):
 
 
-    def viewSelected(self, e=0):
-        current = self.selected()
-        if current: openCores(master=self, obj=current)
+    @property
+    def openDialog(self): return openCores
 
-    def getSubs(self, obj):
+    def getSubs(self, obj, item=''):
         subs = []
 
         if isinstance(obj, Region): subs = [obj.subRegions, obj.accounts, obj.persons] + [obj['dailyContributions']] or []
@@ -184,8 +184,7 @@ class GaM_Hierachy(PRMP_TreeView):
         return subs
 
 
-
-H = Hierachy = GaM_Hierachy
+GH = GaM_Hierachy
 
 
 class UniqueID(Button):

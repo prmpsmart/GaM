@@ -189,9 +189,6 @@ class PRMP_File(BytesIO, PRMP_Mixins):
     @property
     def base64Data(self): return b64encode(self.data)
 
-    @property
-    def image(self): return Image.open(self)
-
     def pickle(self, file=''):
         file = file or self
         try: f = open(file, 'wb')

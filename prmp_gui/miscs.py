@@ -131,7 +131,7 @@ class Column(Col_Mixins):
                     if self.type: val = self.type(val)
                 return val or ''
 
-            except Exception as e: print(e); return ''
+            except Exception as e: return ''
 
     def proof(self, obj): return self.getFromObj(obj) == self.value
 
@@ -153,7 +153,7 @@ class Columns(Col_Mixins):
     def getFromObj(self, obj): return [col.getFromObj(obj) for col in self]
 
     def addColumn(self, col):
-        colObj = Column(len(self), col)
+        colObj = Column(len(self), col) if not isinstance(col, Column) else col
         self.columns.append(colObj)
         return colObj
 

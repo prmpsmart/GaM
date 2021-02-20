@@ -294,7 +294,18 @@ class ColumnsExplorerDialog(PRMP_Dialog):
         self.columns = columns
         super().__init__(master, title=title, geo=geo, **kwargs)
 
-    def _setupDialog(self): ColumnsExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), columns=self.columns)
+    def _setupDialog(self):
+
+        self.cols = ColumnsExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), columns=self.columns, callback=self._callback)
+
+        self.bind('<Return>', lambda e: self.cols.getColumns())
+
+    def _callback(self, w):
+        if self.callback:
+            self.callback(w)
+            self.destroy()
+
+
 
 
 

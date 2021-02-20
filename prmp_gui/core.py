@@ -584,8 +584,8 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def status(self):
         if self._status: return self._status
-        try: return self['text']
-        except: pass
+        try: return self.kwargs.get('text', '')
+        except: return self['text']
 
     def set(self, values):
         try: self.config(text=values)
@@ -2805,7 +2805,9 @@ class PRMP_TreeView(PRMP_Frame):
     def setColumns(self, columns=[]):
         self.create()
 
-        if columns: self.columns.process(columns)
+        if isinstance(columns, Columns): self.columns = columns
+
+        else: self.columns.process(columns)
 
         if len(self.columns) > 1: self.tvc(columns=self.columns[1:])
         self.updateHeading()
@@ -2814,6 +2816,7 @@ class PRMP_TreeView(PRMP_Frame):
         for column in self.columns:
             self.heading(column.index, text=column.text, anchor='center')
             self.column(column.index, width=column.width, stretch=1,  anchor="center")#, minwidth=80)
+        self.reload()
 
     def _set(self, obj=None, parent='', subs='subs', op=1):
         name, *columns = self.columns.getFromObj(obj)
@@ -2833,6 +2836,8 @@ class PRMP_TreeView(PRMP_Frame):
             for sub in _subs: self._set(obj=sub, parent=item, subs=subs, op=op)
 
     def set(self, obj, op=1):
+        if not obj: return
+
         self.setColumns()
         self.clear()
         if obj:
@@ -2840,6 +2845,7 @@ class PRMP_TreeView(PRMP_Frame):
             self._set(obj, op=op)
 
     def reload(self): self.set(self.obj)
+
 TreeView = PTV = PRMP_TreeView
 
 class PRMP_SText(PRMP_Frame):

@@ -461,14 +461,14 @@ class ManagerHome(TreeColumns, GaM_App):
             columns = self.columns(self.obj)
             # print(columns)
             self.subs.setColumns(columns)
-            self.subs.viewAll(self.obj)
+            self.subs.viewObjs(self.obj)
 
     def openSup(self):
         pass
 
     def selected(self, sub):
         self.subs.setColumns(self.columns(sub))
-        self.subs.viewAll(obj=sub)
+        self.subs.viewObjs(obj=sub)
 
 
 class GaM_Home(GaM_App):

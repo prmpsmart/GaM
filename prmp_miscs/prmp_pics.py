@@ -99,6 +99,10 @@ class PRMP_ImageFile(PRMP_File):
             self.basename = os.path.basename(pic)
             return pic
 
+    @property
+    def image(self): return Image.open(self)
+
+
     def __init__(self, imageFileName='', inbuilt=False, inExt='png', image=None, **kwargs):
 
         passed = [bool(a) for a in [imageFileName, image]].count(True)
