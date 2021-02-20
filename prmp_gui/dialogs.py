@@ -298,12 +298,12 @@ class ColumnsExplorerDialog(PRMP_Dialog):
 
         self.cols = ColumnsExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), columns=self.columns, callback=self._callback)
 
-        self.bind('<Return>', lambda e: self.cols.getColumns())
+        self.bind('<Return>', self.cols.getColumns)
 
-    def _callback(self, w):
+    def _callback(self, w, e=0):
         if self.callback:
             self.callback(w)
-            self.destroy()
+            if not e: self.destroy()
 
 
 

@@ -183,8 +183,27 @@ class GaM_Hierachy(Hierachy):
 
         return subs
 
-
 GH = GaM_Hierachy
+
+class HierachyNColumnsExplorer(Frame):
+
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        binds = [('<Control-C>', self.openColumnExplorer, ''), ('<Control-c>', self.openColumnExplorer, '')]
+        self.tree = GaM_Hierachy(self, place=dict(relx=0, rely=0, relw=1, relh=.93), binds=binds)
+
+        self.columns = self.tree.columns
+        self.setColumns = self.tree.setColumns
+        self.viewObjs = self.tree.viewObjs
+        # self.tw = self.tree.tw
+        # self.tw = self.tree.tw
+        # self.tw = self.tree.tw
+
+        Button(self, text='Columns Explorer', place=dict(relx=.1, rely=.935, relw=.2, relh=.06), command=self.openColumnExplorer)
+
+    def openColumnExplorer(self, e=0): ColumnsExplorerDialog(self, columns=self.columns, callback=self.setColumns)
+
 
 
 class UniqueID(Button):
@@ -247,7 +266,7 @@ class SearchRecordDetails(LabelFrame):
         self.range2 = Entry(self, place=dict(relx=.73, rely=.27, relh=.25, relw=.25), _type='number')
 
         Label(self, text='Note', place=dict(relx=.02, rely=.54, relh=.25, relw=.2 ))
-        self.note = Text(self, wrap='word', place=dict(relx=.24, rely=.54, relh=.42, relw=.74), very=True)
+        self.note = Text(self, wrap='word', place=dict(relx=.24, rely=.54, relh=.42, relw=.74), required=True)
 
 
 class DateSearch(LabelFrame):
@@ -347,8 +366,6 @@ class SubsList(LabelFrame):
 
     def clicked(self, selected=None, event=None):
         selected = selected[0]
-        print('ioio')
-
         if self.dialog.get(): openCores(self, selected)
         elif self.callback: self.callback(selected)
 

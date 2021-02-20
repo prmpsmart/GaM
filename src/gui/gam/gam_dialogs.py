@@ -41,7 +41,7 @@ class PersonDialog(GaM_Dialog):
 
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
 
-        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(very=True), orient='h', place=dict(relx=.02, rely=0, relh=.15, relw=.96), longent=.25)
+        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True), orient='h', place=dict(relx=.02, rely=0, relh=.15, relw=.96), longent=.25)
 
         self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.02, rely=.14, relh=.15, relw=.96), longent=.5, orient='h')
 
@@ -49,7 +49,7 @@ class PersonDialog(GaM_Dialog):
 
         self.gender = LabelCombo(self.contact,  topKwargs=dict(config=dict(text='Gender')), bottomKwargs=dict(type_='gender'), place=dict(relx=.02, rely=.42, relh=.15, relw=.96), longent=.25, orient='h')
 
-        self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, rely=.56, relh=.44, relw=.96), bottomKwargs=dict(very=True), longent=.3, orient='h')
+        self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, rely=.56, relh=.44, relw=.96), bottomKwargs=dict(required=True), longent=.3, orient='h')
 
         self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41))
 
@@ -207,9 +207,9 @@ class OfficeDialog(GaM_Dialog):
 
         self.addEditButton()
 
-        self.name = LabelEntry(self.container, topKwargs=dict(config=dict(text='Name')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(very=1))
-        self.location = LabelEntry(self.container, topKwargs=dict(config=dict(text='Location')), place=dict(relx=.005, y=60, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(very=1))
-        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.005, y=130, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(very=1))
+        self.name = LabelEntry(self.container, topKwargs=dict(config=dict(text='Name')), place=dict(relx=.005, y=10, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(required=1))
+        self.location = LabelEntry(self.container, topKwargs=dict(config=dict(text='Location')), place=dict(relx=.005, y=60, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(required=1))
+        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Date')), place=dict(relx=.005, y=130, h=40, relw=.8), orient='h', longent=.4, bottomKwargs=dict(required=1))
 
         self.addResultsWidgets(['date', 'location', 'name'])
 

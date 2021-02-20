@@ -387,7 +387,7 @@ class ManagerHome(TreeColumns, GaM_App):
 
         self.subsList = SubsList(sups, place=dict(relx=.038, rely=.24, relh=.73, relw=.9), text='Subs', listboxConfig=dict(selectmode='single'), callback=self.selected)
 
-        self.subs = Hierachy(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
+        self.subs = HierachyNColumnsExplorer(self.container, place=dict(relx=.307, rely=.039, relh=.97, relw=.68))
 
         self.paint()
 

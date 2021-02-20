@@ -295,6 +295,11 @@ class ObjectsMixins(Mixins, CompareByDate):
         if not idReq: self._uniqueID = sha224(str(self).encode()).hexdigest()
 
     @property
+    def totalSubs(self):
+        if self.subs: return len(self.subs)
+        return 0
+
+    @property
     def uniqueID(self): return self._uniqueID
 
     @property

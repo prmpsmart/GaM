@@ -102,7 +102,7 @@ class Column(Col_Mixins):
                 self._attr = self.attr
                 self.attr = self.attr[0]
             self.value = column.get('value', value)
-            self.width = column.get('width', width)
+            self.width = column.get('width', None) or width
             self.type = column.get('type')
 
         else:
@@ -157,6 +157,12 @@ class Columns(Col_Mixins):
         colObj = Column(len(self), col) if not isinstance(col, Column) else col
         self.columns.append(colObj)
         return colObj
+
+    def remove(self, col):
+        c = dict(text=col.text, attr=col.attr, width=col.width, value=col.value)
+        for res in self:
+            d = dict(text=res.text, attr=res.attr, width=res.width, value=res.value)
+            if d == c: self.sub.remove(res)
 
 
 

@@ -18,6 +18,9 @@ class DCRecordsManager(RecordsManager):
         if self._lastRecord: return float(self.lastMoney)
         else: return super().__float__()
 
+    @property
+    def money(self): return float(self)
+
     def balance(self): return self.account.balanceAccount()
 
     def removeRecord(self, rec, called=0):

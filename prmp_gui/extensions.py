@@ -849,10 +849,11 @@ class PRMP_Camera(PRMP_Frame):
 
 class Hierachy(PRMP_TreeView):
 
-    def __init__(self, master=None, columns=[], toggleOpen=True, **kwargs):
+    def __init__(self, master=None, columns=[], toggleOpen=True, binds=[], **kwargs):
         self._toggleOpen = False
         self.toop = toggleOpen
         self.last = []
+        self.binds = binds
         super().__init__(master=master, columns=columns, **kwargs)
 
         self.bindings()
@@ -876,6 +877,8 @@ class Hierachy(PRMP_TreeView):
 
         self.treeview.bind('<Control-r>', self.reload)
         self.treeview.bind('<Control-R>', self.reload)
+
+        for event, func, sign in self.binds: self.treeview.bind(event, func, sign)
 
     def reload(self, e=0):
         if self.last: self.viewObjs(*self.last)
@@ -1157,7 +1160,8 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     def addColumn(self, e=0):
         gets = self.get(['text', '_width', 'value'])
         gets['attr'] = self._attr
-        gets['width'] = gets['_width']
+        width = gets['_width'] or 20
+        gets['width'] = int(width)
         try: j = self.columns.addColumn(gets)
         except:
             from .dialogs import PRMP_MsgBox; PRMP_MsgBox(self, title='Error', _type='error', message='Try to add the "attr" value.')
@@ -1172,9 +1176,12 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         if attr: self._attr = attr[0]
 
     def deleteColumn(self, e=0):
-        self._foc = focus = self.treeview.treeview.focus()
-        self._focObj = self.treeview.treeview.ivd[focus]
         from .dialogs import PRMP_MsgBox
+
+        self._foc = focus = self.treeview.treeview.focus()
+        if not focus: PRMP_MsgBox(self, title='No Selection.n', message='Pick a row to delete.')
+
+        self._focObj = self.treeview.treeview.ivd[focus]
 
         _all = 'all Columns' if not focus else f'this Column --> {self._focObj.index}'
 
@@ -1185,7 +1192,8 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
             if not self._foc: return
             else:
                 self.treeview.treeview.delete(self._foc)
-                self.columns.remove(self._focObj)
+                # self.columns.remove(self._focObj)
+                self.updateCol()
 
         self.setListBox()
 
@@ -1217,11 +1225,9 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         self.setListBox()
 
-    def getColumns(self):
+    def updateCol(self, listbox=[]):
         tops = self.treeview.treeview.getChildren()
-        listbox = self.listbox.curselection()
-        if not listbox: listbox = range(len(tops))
-        # if not listbox: listbox = range(self.listbox.last)
+        listbox = listbox or range(len(tops))
 
         result = [tops[num] for num in listbox] if isinstance(tops, (tuple, list)) else [tops]
 
@@ -1229,7 +1235,13 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         self.columns.process(results)
 
-        if self.callback: self.callback(self.columns)
+
+
+    def getColumns(self, e=0):
+        listbox = self.listbox.curselection()
+        self.updateCol(listbox)
+
+        if self.callback: self.callback(self.columns, e)
 
 
 

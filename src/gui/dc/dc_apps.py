@@ -6,18 +6,13 @@ def addNote(self, **kwargs):
     self.note.add(self.overview, padding=3)
     self.note.tab(0, text='Overview', compound='left', underline='-1')
 
-    tr = Frame(self.note)
-    self.note.add(tr, padding=3)
+    self.tree = HierachyNColumnsExplorer(self.note)
+    self.note.add(self.tree, padding=3)
     self.note.tab(1, text='Hierachy', compound='left', underline='-1')
-
-    self.tree = GaM_Hierachy(tr, place=dict(relx=0, rely=0, relw=1, relh=.95))
-
-    Button(tr, text='Columns Explorer', place=dict(relx=.1, rely=.95, relw=.16, relh=.05), command=self.openColumnExplorer)
 
     ae = Frame(self.note)
     self.note.add(ae, padding=3)
     self.note.tab(2, text='Attributes', compound='left', underline='-1')
-
 
     self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), **kwargs)
 
@@ -35,11 +30,6 @@ class DC_RegionHome(TreeColumns, RegionHome):
         addNote(self, obj=self.obj)
 
         self.details.bind('<1>', lambda e: self.defaults(1))
-
-    def openColumnExplorer(self):
-        columns = self.tree.columns
-
-        ColumnsExplorerDialog(self, columns=columns, callback=self.tree.setColumns)
 
 
     def defaults(self, i=0):
