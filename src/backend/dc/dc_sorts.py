@@ -27,7 +27,6 @@ class DCSort(ObjectSort):
             acc = None
 
             if season not in ['years', 'year']:
-                print(account)
                 if self.checkNumber(account):
                     if int(account) != 0:
                         account = int(account) - 1

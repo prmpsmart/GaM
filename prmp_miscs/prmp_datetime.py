@@ -408,7 +408,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     @property
     def monthYear(self): return '{}-{}'.format(self.monthName, self.year)
     @property
-    def weekMonthYear(self): return 'Week {}, {}-{}'.format(self.week, self.monthName, self.year)
+    def weekMonthYear(self): return '{}, {}-{}'.format(self.weekName, self.monthName, self.year)
     @property
     def monthYearTuple(self): return (self.year, self.month)
     @property
@@ -443,7 +443,6 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
     def isSameMonthYear(self, date): return self.monthYearTuple == date.monthYearTuple
 
     def isSameWeekMonthYear(self, date): return self.weekMonthYearTuple == date.weekMonthYearTuple
-
 
     @classmethod
     def _monthWeekDays(cls, year=None, month=None, monday=False, dateObj=None):
