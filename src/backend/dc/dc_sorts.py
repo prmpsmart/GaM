@@ -13,7 +13,7 @@ class DCSort(ObjectSort):
         sortedRecs = self.sortSubsBySeasons(date, subs=recs, seasons=['date'])
         return sortedRecs
 
-    def sort_it(self, date, season='', which='', _account=0, object_=None):
+    def sort_it(self, date, season='', which='', account=0, object_=None):
         obj = object_ or self.object
         season = season or 'month'
         which = which or 'subs'
@@ -24,20 +24,21 @@ class DCSort(ObjectSort):
         else:
 
             if 'DCRegion' in obj.mroStr:
-                obj = obj.accountsManager
+                acm = obj.accountsManager
 
                 if season not in ['years', 'year']:
-                    accounts = obj.sortSubsBySeasons(date, seasons=['month'], attr='month')
-
-                    if isinstance(accounts, list):
-                        if _account:
-                            _account = int(_account)
-                            obj = obj[_account]
+                    if self.checkNumber(account):
+                        if int(account) != 0:
+                            account = int(account) - 1
+                            accs = acm.sortSubsByMonth(date)
+                            obj = accs[account] if accs else None
 
                 if which == 'subs':
                     pass
 
             if 'DCAccount' in obj.mroStr:
+                which = which or 'days'
+                print(season, which)
 
                 if season == 'month':
                     if which == 'weeks':

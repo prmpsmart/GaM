@@ -57,8 +57,27 @@ class MonthlyAccounts(ObjectsMixins):
 class YearlyAccounts(ObjectsMixins):
     pass
 
+class MonthCompare:
+    def __lt__(self, other):
+        if other == None: return False
+        return self.month < other.month
+    def __le__(self, other):
+        if other == None: return False
+        return self.month <= other.month
+    def __eq__(self, other):
+        if other == None: return False
+        return self.month is other.month
+    def __ne__(self, other):
+        if other == None: return True
+        return self.month != other.month
+    def __gt__(self, other):
+        if other == None: return True
+        return self.month > other.month
+    def __ge__(self, other):
+        if other == None: return True
+        return self.month >= other.month
 
-class Account(Object):
+class Account(MonthCompare, Object):
     Manager = 'AccountsManager'
     subTypes = ['Records Managers']
     Error = Errors
@@ -137,7 +156,10 @@ class AccountsManager(ObjectsManager):
         if self.region != None: return f'{self.region} | {self.className}'
         return f'{self.className}'
 
-    def createAccount(self, **kwargs): return self.createSub(**kwargs)
+    def createAccount(self, **kwargs):
+        account =  self.createSub(**kwargs)
+        self.subs.sort()
+        return account
 
     @property
     def firstAccount(self): return self.first

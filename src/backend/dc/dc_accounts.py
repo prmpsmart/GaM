@@ -81,6 +81,7 @@ class DCAccount(Account):
 
 class DCAccountsManager(AccountsManager):
     ObjectType = DCAccount
+    ObjectSortClass = DCSort
 
     def __init__(self, region, **kwargs):
         super().__init__(region, **kwargs)

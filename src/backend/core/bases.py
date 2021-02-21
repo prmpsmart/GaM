@@ -59,6 +59,10 @@ class ObjectSort(Mixins):
 
     def __init__(self, object_=None): self.object = object_
 
+    def __str__(self):
+        if self.object: return f'{self.className}({self.object.name})'
+        else: return object.__str__(self)
+
     def getCompType(self, _type):
         for c in self.__comparisons:
             ind = self.__comparisons.index(c)

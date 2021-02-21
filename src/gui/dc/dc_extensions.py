@@ -460,6 +460,7 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
         self.dayName = LabelLabel(self, topKwargs=dict(text='Day Name'), place=dict(relx=.68, rely=.35, relw=.3, relh=.6))
 
         self.addResultsWidgets(['monthName', 'week', 'dayName'])
+        if date: self.date.set(date)
 
     def get(self): return PRMP_FillWidgets.get(self, ['date', 'account'])
 
@@ -467,10 +468,15 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
         self.set(date)
 
         if isinstance(self.obj, DCRegion):
-            accounts = self.obj.accountsManager.objectSort.sortSubsBySeasons(date, attr='month')
+            accounts = self.obj.accountsManager.objectSort.sortSubsBySeasons(date, attr='month', seasons=['month'])
 
             accLen = len(accounts)
-            self.account.B.configure(from_=0, to=accLen)
+            if accLen:
+                self.account.B.configure(from_=1, to=accLen)
+                self.account.B.set(1)
+            else:
+                self.account.B.configure(from_=0, to=0)
+                self.account.B.set(0)
 
 
 class DataChoose(LabelFrame):
@@ -604,20 +610,18 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
         self.obj = obj
 
-        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj)
+        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj, date=PRMP_DateTime.now())
 
         self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.45), generalAction=self.parser)
 
         self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.725, relw=.99, relh=.27))
-
-        # self.addResultsWidgets(['date', 'dataChoose'])
 
     def parser(self):
         if not self.obj: return
 
         date_acc = self.date.get()
         date = date_acc['date']
-        _account = date_acc['account']
+        account = date_acc['account']
 
       # date verification
         if not date:
@@ -639,13 +643,13 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                 else:
                     # now to the oneInAll deals
                     pass
-
+      # normal
         else:
             season, which = self.dataChoose.get()
 
          # dataChoose verification
             season = season or 'month'
-            which = which or 'subs'
+            which = which
 
             # now to the dataChoose deals
 
@@ -654,32 +658,22 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                 pass
             else:
                 if isinstance(self.obj, DCRegion):
-                    caseObj = self.obj.accountsManager
-                    acc = 0
+                    acm = self.obj.accountsManager
 
-                    if _account:
-                        _account = int(_account)
-                        caseObj = caseObj[_account]
-                        acc = 1
+                    objSort = acm.objectSort
 
-                    objSort = case.objectSort
+                    datas = objSort.sort_it(date, season=season, which=which, account=account)
 
-                    if acc:
-                        datas = caseObj.sortSubsBySeasons(date, seasons=[season])
+                    print(datas)
 
-                        if season == 'month':
-                            if which == 'weeks':
-                                weekDates = date.oneDateinWeeks
+                    # else:
+                    #     datas = []
 
+                    #     for ac in acm:
+                    #         data = ac.get_RMs_By_Seasons(date, seasons=[season])
+                    #         datas.append(data)
 
-                    else:
-                        datas = []
-
-                        for ac in caseObj:
-                            data = ac.get_RMs_By_Seasons(date, seasons=[season])
-                            datas.append(data)
-
-                    if season == 'year': pass
+                    # if season == 'year': pass
 
                     # account = if isinstance(self.obj, Client)
 
