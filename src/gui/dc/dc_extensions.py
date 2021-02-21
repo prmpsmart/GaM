@@ -664,7 +664,8 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
                     datas = objSort.sort_it(date, season=season, which=which, account=account)
 
-                    for a in datas: print(a)
+                    # for a in datas: print(a[0][{'manager': {'region': 'name'}}])
+                    # print()
 
                     # else:
                     #     datas = []
@@ -677,7 +678,11 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
                     # account = if isinstance(self.obj, Client)
 
+    def parseToRows(self, datas):
+        rows = self.getTreeColumns()
 
+    def getTreeColumns(self):
+        return []
 
 
 
