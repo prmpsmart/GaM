@@ -1,7 +1,7 @@
 from ..core.regions_managers import Region, RegionsManager, Person, PersonsManager
 from .dc_accounts import ClientAccountsManager, DCAccountsManager, AreaAccountsManager, PRMP_DateTime, CardDues, DCErrors, Rates
 from .dc_specials import DailyContributionsManager
-from .dc_sorts import DCSort
+from .dc_sorts import *
 
 class ClientDetail(Person):
     Manager = 'ClientDetailsManager'

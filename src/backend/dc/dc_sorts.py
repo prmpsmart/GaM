@@ -1,25 +1,64 @@
 from ..core.bases import ObjectSort
 
+
 class DCColumn:
-    clnt_days = ["Dates", "Days", "Brought-F", "Rate", "Thrifts", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances"]
-    clnt_weeks = ["Weeks", "Brought-F", "Rate", "Thrifts", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances"]
-    clients = ["S/N", "Clients", "Brought-F", "Rates", "Thrifts", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances"]
+    _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
+    _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
 
-    areas = ["Areas", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    days = ["Dates", "Days", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    spec_day = ["Dates", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    spec_area_yr = ["Months",  "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    spec_area_yrs = ["Years", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    weeks = ["Weeks", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    spec_week = ["Months", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    months = ["Months", "Areas", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    spec_month = ["Years", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    years = ["Years", "Months", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
+    days = ["Dates", "Days"]
+    weeks = ["Weeks"]
 
-    daily = ["S/N", "Clients", "Rate", "Old Thrifts", "Today Thrifts",  "New Savings", "Debits", "R-Upfronts", "Total Savings", "Total Debits", "Total Upfronts"]
+    accounts = ["Ledger Numbers", "Names"]
+
+
+
+    specday = ["Dates", "Clients"]
+
+    specareayr = ["Months",  "Clients"]
+
+    specareayrs = ["Years", "Clients"]
+
+    area_weeks = ["Weeks", "Clients"]
+
+    specweek = ["Months", "Clients"]
+
+    months = ["Months", "Areas", "Clients"]
+
+    specmonth = ["Years", "Clients"]
+
+    years = ["Years", "Months", "Clients"]
+
 
     @classmethod
-    def get_columns(cls, header): return cls.__dict__[header]
+    def areas(cls):
+        cl = cls._clients.copy()
+        del cl[1]
+        cl[1] = 'Commissions'
+        ar = cl + cls._areas
+        return ar
+
+    @classmethod
+    def getColumns(cls, header, recMs):
+        head = cls.__dict__[header]
+        reg = cls.__dict__[recMs]
+
+        return head + reg
+
+    @classmethod
+    def merge(cls, one, two):
+        n = cls.getColumns(one) + cls.getColumns(two)
+        return n
+
+    @classmethod
+    def getObjColumns(cls, obj, season, which):
+        if 'DCAccount' in obj.mroStr:
+            recMs = '_clientsRecMs' if obj.className == 'ClientAccount' else '_areasRecMs'
+
+            if season in ['month', 'week']:
+                normal = 0
+                if 'spec' not in which: normal = 1
+
+                if normal: return cls.getColumns(which, recMs)
 
 
 

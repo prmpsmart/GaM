@@ -227,6 +227,8 @@ class AreaAccount(DCAccount):
         self.excesses = Excesses(self)
         self.deficits = Deficits(self)
         self.ledgerNumbers = 0
+        self.ledgerNumber = self.number
+
 
         if self.className == 'AreaAccount': self.clientsAccounts = ClientsAccounts(self)
 

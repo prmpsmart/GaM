@@ -6,9 +6,6 @@ from tkinter.colorchooser import askcolor
 
 
 
-# class DC_ChartSort(ChartSort): pass
-
-
 class DC_Digits(PRMP_FillWidgets, Frame):
 
     def __init__(self, master, values={}, **kwargs):
@@ -643,6 +640,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                 else:
                     # now to the oneInAll deals
                     pass
+
       # normal
         else:
             season, which = self.dataChoose.get()
@@ -662,10 +660,10 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
                     objSort = acm.objectSort
 
-                    datas = objSort.sort_it(date, season=season, which=which, account=account)
+                    # datas = objSort.sort_it(date, season=season, which=which, account=account)
+                    datas = []
 
-                    for a in datas: print(a[0][{'manager': {'region': 'name'}}])
-                    print()
+                    coolDatas = self.parseToRows(datas, season, which)
 
                     # else:
                     #     datas = []
@@ -678,11 +676,14 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
                     # account = if isinstance(self.obj, Client)
 
-    def parseToRows(self, datas):
-        rows = self.getTreeColumns()
+    def parseToRows(self, datas, season, which):
+        rows = self.getTreeColumns(season, which)
 
-    def getTreeColumns(self):
-        return []
+    def getTreeColumns(self, season, which):
+        print(season, which)
+        return
+        columns = DCColumn.get_columns(which)
+
 
 
 
