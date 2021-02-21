@@ -664,7 +664,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
                     datas = objSort.sort_it(date, season=season, which=which, account=account)
 
-                    print(datas)
+                    for a in datas: print(a)
 
                     # else:
                     #     datas = []

@@ -16,29 +16,29 @@ class DCSort(ObjectSort):
     def sort_it(self, date, season='', which='', account=0, object_=None):
         obj = object_ or self.object
         season = season or 'month'
-        which = which or 'subs'
 
         if which == 'subs':
             'will now go to the subs accounts details'
             pass
+
         else:
+            if 'DCRegion' in obj.mroStr: acm = obj.accountsManager
+            elif 'DCAccountsManager' in obj.mroStr: acm = obj
+            acc = None
 
-            if 'DCRegion' in obj.mroStr:
-                acm = obj.accountsManager
+            if season not in ['years', 'year']:
+                print(account)
+                if self.checkNumber(account):
+                    if int(account) != 0:
+                        account = int(account) - 1
+                        accs = acm.sortSubsByMonth(date)
+                        acc = accs[account] if accs else None
 
-                if season not in ['years', 'year']:
-                    if self.checkNumber(account):
-                        if int(account) != 0:
-                            account = int(account) - 1
-                            accs = acm.sortSubsByMonth(date)
-                            obj = accs[account] if accs else None
+            if which == 'subs':
+                pass
 
-                if which == 'subs':
-                    pass
-
-            if 'DCAccount' in obj.mroStr:
+            if acc:
                 which = which or 'days'
-                print(season, which)
 
                 if season == 'month':
                     if which == 'weeks':
@@ -46,7 +46,7 @@ class DCSort(ObjectSort):
                         weekDatas = []
 
                         for week in weekDates:
-                            datas = obj.get_RMs_By_Seasons(week, seasons=['year', 'month', 'week'])
+                            datas = acc.get_RMs_By_Seasons(week, seasons=['year', 'month', 'week'])
                             if datas: weekDatas.append(datas)
                         return weekDatas
 
@@ -55,7 +55,7 @@ class DCSort(ObjectSort):
                         daysDatas = []
 
                         for day in days:
-                            datas = obj.getRecs_Of_RM_ByDate(day)
+                            datas = acc.getRecs_Of_RM_ByDate(day)
                             if datas:
                                 daysDatas.append(datas)
                         return daysDatas
@@ -65,7 +65,7 @@ class DCSort(ObjectSort):
                         specDatas = []
 
                         for spec in specdays:
-                            datas = obj.get_RMs_By_Seasons(spec, seasons=['month', 'dayName'])
+                            datas = acc.get_RMs_By_Seasons(spec, seasons=['month', 'dayName'])
                             if datas: specDatas.append(datas)
                         return specDatas
 
@@ -74,11 +74,11 @@ class DCSort(ObjectSort):
                     datas = []
 
                     for d in days:
-                        data = obj.get_RMs_By_Seasons(d, seasons=['date'])
+                        data = acc.get_RMs_By_Seasons(d, seasons=['date'])
                         if data: datas.append(data)
                     return datas
 
-            elif 'DCAccountsManager' in obj.mroStr:
+            else:
 
                 if season == 'year':
                     datas = obj.sortAccountsIntoMonths(date)
