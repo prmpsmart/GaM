@@ -676,6 +676,9 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
                     # account = if isinstance(self.obj, Client)
 
+                    
+
+
     def parseToRows(self, datas, season, which):
         rows = self.getTreeColumns(season, which)
 

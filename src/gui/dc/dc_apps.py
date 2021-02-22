@@ -14,7 +14,7 @@ def addNote(self, **kwargs):
     self.note.add(ae, padding=3)
     self.note.tab(2, text='Attributes', compound='left', underline='-1')
 
-    self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), **kwargs)
+    self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), dialog=openCores, **kwargs)
 
 
 class DC_RegionHome(TreeColumns, RegionHome):
