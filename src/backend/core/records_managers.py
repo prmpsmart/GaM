@@ -339,6 +339,15 @@ class RecordsManager(ObjectsManager):
             rec = self.ObjectType(self, money, date=date)
             return rec
 
+    def recordsAsRecordsManager(self, records, date):
+        newRecM = self.class_(self.manager)
+        if records:
+            rec = self.recordsAsRecord(records, date)
+            newRecM.addSub(rec)
+        # newRecM.createRecord(money=rec.money, date=rec.date)
+        return newRecM
+
+
     ############ Sorting
     #Date Sorting
 

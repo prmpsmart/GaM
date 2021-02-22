@@ -31,7 +31,7 @@ class Rates(DCRecordsManager):
     ObjectType = Rate
     lowest = 50
 
-    def __init__(self, accounts, rate, raw=0):
+    def __init__(self, accounts, rate=0, raw=0):
         super().__init__(accounts, True)
         self.setRate(rate, raw)
 

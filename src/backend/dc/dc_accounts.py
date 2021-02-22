@@ -64,9 +64,8 @@ class DCAccount(Account):
         for ind in range(leng):
             recM = self[ind]
             _recs = recM.objectSort.sortSubsBySeasons(date, **kwargs)
-            if _recs:
-                rec = recM.recordsAsRecord(_recs, date)
-                recs.append(rec)
+            newRecM = recM.recordsAsRecordsManager(_recs, date)
+            recs.append(newRecM)
 
         return recs
 

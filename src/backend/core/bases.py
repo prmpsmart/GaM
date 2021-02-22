@@ -282,7 +282,7 @@ class ObjectSort(Mixins):
         return subs
 
 
-class ObjectsMixins(Mixins, CompareByDate):
+class ObjectsMixins(CompareByDate, Mixins):
     subTypes = ['subs']
 
     ObjectSortClass = ObjectSort
@@ -403,7 +403,8 @@ class ObjectsMixins(Mixins, CompareByDate):
     def date(self, _date): self._date = self.getDate(_date)
 
 
-class Object(CompareByNumber, ObjectsMixins):
+# class Object(CompareByNumber, ObjectsMixins):
+class Object(ObjectsMixins):
     Manager = 'ObjectsManager'
     Managers = ()
 
@@ -487,25 +488,38 @@ class ObjectsManager(ObjectsMixins):
     def manager(self): return self._master
 
     @property
-    def subs(self): return self._subs
+    def subs(self):
+        self._subs.sort()
+        return self._subs
 
     @subs.setter
     def subs(self, subs): self._subs = subs
 
     @property
+    def subsByNumber
+
+    @property
     def first(self):
         if len(self):
-            self.subs.sort()
-            first_ = self[0]
-            assert first_.previous == None, f'{self} is not the first.'
+            first_ = None
+            for sub in self._subs:
+                if sub.number == 1:
+                    first_ = sub
+                    break
+            assert first_ and first_.previous == None, f'{self} is not the first.'
             return first_
 
     @property
     def last(self):
         if len(self):
-            self.subs.sort()
-            last_ = self[-1]
-            assert last_.next == None, f'{self} is not the last.'
+            l = len(self._subs)
+            last_ = None
+            for sub in self._subs:
+                if sub.number == l:
+                    last_ = sub
+                    break
+
+            assert last_ and last_.next == None, f'{self} is not the last.'
             return last_
 
     def addSub(self, sub): self._subs.append(sub)
@@ -549,6 +563,7 @@ class ObjectsManager(ObjectsMixins):
         if last: last.next = sub
 
         self.addSub(sub)
+        self._subs.sort()
 
         return sub
 
