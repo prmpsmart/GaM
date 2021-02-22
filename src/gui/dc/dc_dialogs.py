@@ -618,6 +618,161 @@ class PlotDialog(GaM_Dialog):
 
 
 
+class ContribApp(GaM_Dialog):
+
+    def __init__(self, contributions=None, geo=(900, 600), **kwargs):
+        self.contributions = contributions
+
+        super().__init__(tw=0, geo=geo, **kwargs)
+
+    def _setupDialog(self):
+        cont = self.container
+
+        fr1 = Frame(cont, place=dict(relx=0, rely=0, relw=.4, relh=1), relief='groove')
+
+        area1 = LabelFrame(fr1, place=dict(relx=0, rely=0, relw=1, relh=.4), relief='groove', text='Area Details')
+        self.areaDatas = ['area', 'month', 'date', 'commission']
+
+        self.area = LabelEntry(area1, topKwargs=dict(text='Area'), place=dict(relx=0, rely=0, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
+
+        self.month = LabelMonthYearButton(area1, topKwargs=dict(text='Month'), place=dict(relx=0, rely=.25, relw=1, relh=.24), orient='h', longent=.35)
+
+        self.date = LabelDateButton(area1, topKwargs=dict(text='Date'), place=dict(relx=0, rely=.5, relw=1, relh=.24), orient='h', longent=.35)
+
+        self.commission = Checkbutton(area1, text='Commission', place=dict(relx=0, rely=.79, relw=.4, relh=.15))
+
+
+        Button(area1, text='Create', place=dict(relx=.5, rely=.79, relw=.4, relh=.15), command=lambda: PRMP_MsgBox(self, title='Create a Contribution?', message='Are you sure to create contribution?', ask=1, callback=self.create, _type='question'))
+
+
+
+        cont1 = LabelFrame(fr1, place=dict(relx=0, rely=.45, relw=1, relh=.4), relief='groove', text='Contribution Details')
+        self.contDatas = ['number', 'rate', 'amount']
+
+        self.number = LabelEntry(cont1, topKwargs=dict(text='Number'), place=dict(relx=0, rely=0, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
+
+        self.rate = LabelEntry(cont1, topKwargs=dict(text='Rate'), place=dict(relx=0, rely=.25, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
+
+        self.amount = LabelEntry(cont1, topKwargs=dict(text='Amount'), place=dict(relx=0, rely=.5, relw=1, relh=.24), orient='h', bottomKwargs=dict(_type='number'))
+
+        Button(cont1, text='Add', place=dict(relx=.77, rely=.77, relw=.2, relh=.17), command=self.add)
+
+
+        settings = LabelFrame(fr1, place=dict(relx=0, rely=.86, relw=1, relh=.12), text='Settings')
+        Button(settings, text='Clear', place=dict(relx=0, rely=0, relw=.24, relh=.9), command=self.clearIt)
+        Button(settings, text='Load', place=dict(relx=.25, rely=0, relw=.24, relh=.9), command=self.load)
+        Button(settings, text='Save', place=dict(relx=.5, rely=0, relw=.24, relh=.9), command=lambda: PRMP_MsgBox(self, title='Save?', message=f'Are you sure to save to {self.contributions.path if self.contributions else ""}', callback=self.save_, geo=(400, 300)))
+
+        Button(settings, text='Update', place=dict(relx=.75, rely=0, relw=.24, relh=.9), command=self.updateCont)
+
+        fr2 = Frame(cont, place=dict(relx=.4, rely=0, relw=.6, relh=1), relief='groove')
+
+        self.tree = Hierachy(fr2, place=dict(relx=0, rely=0, relw=1, relh=.8), columns=columns)
+        self.tree.tree.bind('<Delete>', self.delete)
+
+        totals = LabelFrame(fr2, text='Totals', place=dict(relx=0, rely=.8, relw=1, relh=.2))
+        self.totalsDatas = ['money', 'total']
+
+        self.money = LabelLabel(totals, place=dict(relx=0, rely=0, relw=.5, relh=.4), topKwargs=dict(text='Money'), orient='h')
+        self.total = LabelLabel(totals, place=dict(relx=0, rely=.5, relw=.5, relh=.5), topKwargs=dict(text='Contributions'), orient='h', longent=.6)
+
+    def update(self):
+        self.clear()
+        if self.contributions:
+            self.setTitle(self.contributions.name)
+            self.set(self.contributions, widgets=[*self.totalsDatas, *self.areaDatas])
+
+            self.tree.viewSubs(self.contributions)
+
+    def clear(self, w=1):
+        if not w: return
+        self.setTitle('Contribution App')
+
+        self.tree.clear()
+        self.emptyWidgets([*self.areaDatas, *self.contDatas])
+
+        for wid in [*self.areaDatas, *self.totalsDatas]: self[wid].set('')
+
+    def clearIt(self):
+        PRMP_MsgBox(self, title='Clear?', message='Are you sure to clear this current contribution?', ask=1, callback=self.clear, _type='question')
+
+
+    def defaults(self):
+
+        self.bind('<Control-L>', self.load)
+        self.bind('<Control-l>', self.load)
+        self.bind('<Control-O>', self.load)
+        self.bind('<Control-o>', self.load)
+        self.bind('<Control-S>', self.save_)
+        self.bind('<Control-s>', self.save_)
+        self.bind('<Control-N>', self.create)
+        self.bind('<Control-n>', self.create)
+        self.bind('<Control-u>', self.updateCont)
+        self.bind('<Control-U>', self.updateCont)
+
+        self.update()
+
+
+    def add(self, e=0):
+        if not self.contributions: return
+
+        datas = self.get(self.contDatas)
+
+        try:
+            self.contributions.add(**datas)
+            self.emptyWidgets(self.contDatas)
+        except Exception as e: PRMP_MsgBox(self, title=e.__class__.__name__, message=e, _type='error')
+
+        self.update()
+
+    def delete(self, e=0):
+        if not self.contributions: return
+        sel = self.tree.selected()
+        self.contributions.remove(sel)
+        self.update()
+
+    def getAreaData(self):
+        contData = self.get(self.areaDatas)
+        contData['area'] = int(contData['area'])
+        return contData
+
+    def updateCont(self, e=0):
+        if not self.contributions: return
+
+        contData = self.getAreaData()
+        self.contributions.__dict__.update(contData)
+        self.update()
+
+    def create(self, w=0):
+        if not w: return
+        if self.contributions:
+            PRMP_MsgBox(self, title='A Contribution in progress!', message='Are you sure to clear contribution to start a new?', ask=1, callback=self.clear, _type='question')
+            return
+
+        contData = self.getAreaData()
+        self.contributions = Contributions(**contData)
+        self.update()
+
+
+    def load(self, e=0):
+        file = dialogFunc(path=1, filetypes=['Contributions {.cont}'])
+        if not file: return
+
+        conts = Contributions.load(file)
+        self.contributions = conts
+        self.update()
+
+    def save_(self, e=0):
+        if not self.contributions: return
+        self.updateCont()
+
+        path = self.contributions.path
+        if os.path.exists(path): PRMP_MsgBox(self, title='Already Exists', message=f'The path {path} for this contribution already exists, do you wish to overwrite?', ask=1, callback=self._save, geo=(400, 300), _type='error')
+        else: self._save(e)
+
+    def _save(self, w=0):
+        if w: self.contributions.save()
+
 
 
 

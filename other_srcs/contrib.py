@@ -117,11 +117,12 @@ class Contributions(PRMP_Mixins):
     @property
     def total(self): return len(self)
 
-    def save(self):
-        path = self.path
-        dir_ = os.path.dirname(path)
-        try: os.makedirs(dir_)
-        except: pass
+    def save(self, path=''):
+        if not path:
+            path = self.path
+            dir_ = os.path.dirname(path)
+            try: os.makedirs(dir_)
+            except: pass
 
         file = PRMP_File(filename=path)
         file.saveObj(self)

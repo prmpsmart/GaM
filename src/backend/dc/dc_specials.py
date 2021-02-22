@@ -16,6 +16,128 @@ class Records(Object, list):
 
 class Common: col_attr = ['number', {'month': 'monthYear'}, 'Region Name', 'Ledger Number', 'Rate', 'Contributed', 'Income', 'Transfer', 'Paidout', 'Upfront Repay', 'Saved']
 
+DEST = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions'
+
+columns = ['number', 'rate', 'amount', 'money']
+
+
+class Contribution(PRMP_Mixins):
+
+    def __init__(self, number, rate, amount):
+        amount = float(amount)
+        rate = float(rate)
+        number = int(number)
+        self.number = number
+        self.rate = rate
+        self.subs = None
+
+        if amount > 31: money = 1
+        else: money = 0
+
+        if money:
+            self.money = amount
+            self.amount = amount / rate
+        else:
+            self.amount = amount
+            self.money = rate * amount
+
+    @property
+    def _subs(self): return self[columns[:]]
+
+    def __str__(self): return f'{self.className}(Number={self.number}, Rate={self.rate}, Amount={self.amount}, Money={self.money})'
+    def __repr__(self): return f'<{self.number}>'
+
+    def __lt__(self, other):
+        if other == None: return False
+        return self.number < other.number
+    def __le__(self, other):
+        if other == None: return False
+        return self.number <= other.number
+    def __eq__(self, other):
+        if other == None: return False
+        return self.number is other.number
+    def __ne__(self, other):
+        if other == None: return True
+        return self.number != other.number
+    def __gt__(self, other):
+        if other == None: return True
+        return self.number > other.number
+    def __ge__(self, other):
+        if other == None: return True
+        return self.number >= other.number
+
+class Contributions(PRMP_Mixins):
+    def __init__(self, area, month=None, date=None,commission=False):
+        date = self.getDate(date)
+        month = self.getDate(month)
+
+        self.get = self.getFromSelf
+
+        self.area, self.month, self.date, self.commission =  int(area), month, date, commission
+        self.subs = self.contributions = []
+
+    def __str__(self): return f'{self.className}(Area={self.area}, Month={self.month.monthYear}, Date={self.date.date}, Money={self.money})'
+
+    def add(self, number, rate, amount=0):
+        numbers = [cont.number for cont in self]
+        if self.commission: amount = 1
+
+        if number in numbers: raise ValueError(f'This number {number} already exists.')
+
+        cont = Contribution(number, rate, amount)
+        self.contributions.append(cont)
+        self.contributions.sort()
+
+        return cont
+
+    def remove(self, cont):
+        if cont in self: self.subs.remove(cont)
+
+    @property
+    def _name(self):
+        n = f'Area_{self.area} {self.month.monthYear} {self.date.date}'
+
+        n = n.replace('/', '-')
+        return n
+
+    @property
+    def name(self):
+        n = f'{self._name} {"Commission" if self.commission else ""}'
+
+        return n
+
+    @property
+    def path(self):
+        p = self._name.split(' ')
+        p = '/'.join(p[:-1])
+        p = os.path.join(p, self._name).replace('/', '\\')
+        dest = os.path.join(DEST, p) + f' {"Commission" if self.commission else ""}.cont'
+        return dest
+
+    @property
+    def money(self): return sum([cont.money for cont in self])
+
+    @property
+    def total(self): return len(self)
+
+    def save(self, path=''):
+        if not path:
+            path = self.path
+            dir_ = os.path.dirname(path)
+            try: os.makedirs(dir_)
+            except: pass
+
+        file = PRMP_File(filename=path)
+        file.saveObj(self)
+        file.save(path)
+
+        return file
+
+    @classmethod
+    def load(self, file):
+        file = PRMP_File(filename=file)
+        conts = file.loadObj()
+        return conts
 
 
 class Thrift(Object, Common):
