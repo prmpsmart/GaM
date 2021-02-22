@@ -244,7 +244,7 @@ class RecordsManager(ObjectsManager):
     def records(self): return self.subs
 
     @property
-    def lastMoney(self): return float(self.lastRecord) if self.last else 0
+    def lastMoney(self): return float(self._subs[-1]) if self._subs else 0
 
     @property
     def lastRecord(self): return self.last
@@ -291,7 +291,7 @@ class RecordsManager(ObjectsManager):
 
         if new:
             record = self.createSub(money, date=date, **kwargs)
-            self.records.sort()
+            # self.records.sort()
 
         return record
 
@@ -341,10 +341,10 @@ class RecordsManager(ObjectsManager):
 
     def recordsAsRecordsManager(self, records, date):
         newRecM = self.class_(self.manager)
+        newRecM.date = date
         if records:
             rec = self.recordsAsRecord(records, date)
             newRecM.addSub(rec)
-        # newRecM.createRecord(money=rec.money, date=rec.date)
         return newRecM
 
 

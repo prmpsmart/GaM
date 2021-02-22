@@ -262,6 +262,8 @@ class ObjectSort(Mixins):
             validation = dict(value=True, attrMethod=_types[season], attr=attr, attrMethodParams=dict(date=date))
             validations.append(validation)
 
+        # print(validations)
+
         return self.sort(validations=validations, **kwargs)
 
     def search(self, _type=None, value=None, attr='', searchType='', allSubs=False, object_=None, validations=[], instance=None):
@@ -488,38 +490,42 @@ class ObjectsManager(ObjectsMixins):
     def manager(self): return self._master
 
     @property
-    def subs(self):
-        self._subs.sort()
-        return self._subs
+    def subs(self): return self._subs
+
+    @property
+    def subsByNumber(self):
+        subs = self.subs
+        s_numbers = [a.number for a in subs]
+        ordered_numbeers = sorted(s_numbers)
+        ordered = []
+        for num in ordered_numbeers:
+            index = s_numbers.index(num)
+            order = self.subs[index]
+            ordered.append(order)
+
+        return ordered
+
+
+    @property
+    def subsByDate(self): return sorted(self._subs)
 
     @subs.setter
     def subs(self, subs): self._subs = subs
 
-    @property
-    def subsByNumber
 
     @property
     def first(self):
-        if len(self):
-            first_ = None
-            for sub in self._subs:
-                if sub.number == 1:
-                    first_ = sub
-                    break
-            assert first_ and first_.previous == None, f'{self} is not the first.'
+        if len(self._subs):
+            first_ = self.subsByNumber[0]
+            assert first_.previous == None, f'{self} is not the first.'
             return first_
 
     @property
     def last(self):
-        if len(self):
+        if len(self._subs):
             l = len(self._subs)
-            last_ = None
-            for sub in self._subs:
-                if sub.number == l:
-                    last_ = sub
-                    break
-
-            assert last_ and last_.next == None, f'{self} is not the last.'
+            last_ = self.subsByNumber[-1]
+            assert last_.next == None, f'{self} is not the last.'
             return last_
 
     def addSub(self, sub): self._subs.append(sub)
@@ -563,7 +569,6 @@ class ObjectsManager(ObjectsMixins):
         if last: last.next = sub
 
         self.addSub(sub)
-        self._subs.sort()
 
         return sub
 

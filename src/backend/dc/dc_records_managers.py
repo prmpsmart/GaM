@@ -21,6 +21,18 @@ class DCRecordsManager(RecordsManager):
     @property
     def money(self): return float(self)
 
+    def recordsAsRecord(self, records, date):
+        if not self._lastRecord: return super().recordsAsRecord(records, date)
+
+        else:
+            # print(records[0].date.date, records[0].date.dayName)
+            if records:
+                numbers = [r.number for r in records]
+                mx = max(numbers)
+                index = numbers.index(mx)
+                rec = records[index]
+                return rec
+
     def balance(self): return self.account.balanceAccount()
 
     def removeRecord(self, rec, called=0):

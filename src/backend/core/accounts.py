@@ -158,7 +158,6 @@ class AccountsManager(ObjectsManager):
 
     def createAccount(self, **kwargs):
         account =  self.createSub(**kwargs)
-        self.subs.sort()
         return account
 
     @property
