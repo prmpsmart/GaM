@@ -15,7 +15,7 @@ class DCSort(ObjectSort):
         sortedRecs = self.sortSubsBySeasons(date, subs=recs, seasons=['date'])
         return sortedRecs
 
-    def getObj(self, obj, date, season='', which='', account=0, object_=None):
+    def getObj(self, date, season='', which='', account=0, object_=None):
         obj = object_ or self.object
         season, which = self._format_season_which(season, which)
 
@@ -45,7 +45,9 @@ class DCSort(ObjectSort):
 
     def sort_it(self, date, season='', which='', account=0, object_=None, **kwargs):
         season, which = self._format_season_which(season, which)
-        obj, w = self.getObj(date, season, season=season, which=which, account=account, object_=object_)
+        obj, w = self.getObj(date, season=season, which=which, account=account, object_=object_)
+
+        print(season, which, obj.name, w)
 
         results = []
 
@@ -122,7 +124,7 @@ class DCSort(ObjectSort):
 
     def _format_season_which(self, season, which):
         # season = season or 'month'
-        season = season.lower()
+        season = season.lower() or 'month'
         which = which.lower()
 
         subs = 'subs'

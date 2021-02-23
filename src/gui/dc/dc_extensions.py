@@ -485,31 +485,8 @@ class DataChoose(LabelFrame):
 
         relief = 'solid'
 
-     # years
-        self.years = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Years', variable=self.season, value='years'), bottom=Frame, place=dict(relx=.01, rely=.005, relw=.98, relh=.19), orient='h', longent=.22)
-
-        yearsFrame = self.years.Bottom
-        self.yearsVar = tk.StringVar()
-
-        years = Radiobutton(yearsFrame, text='Years', place=dict(relx=.01, rely=.005, relw=.27, relh=.98), variable=self.yearsVar, value='years', relief=relief)
-        months = Radiobutton(yearsFrame, text='Months', place=dict(relx=.29, rely=.005, relw=.32, relh=.98), variable=self.yearsVar, value='months', relief=relief)
-        subs = Radiobutton(yearsFrame, text='Subs', place=dict(relx=.615, rely=.005, relw=.24, relh=.98), variable=self.yearsVar, value='subs', relief=relief)
-
-        self.setRadioGroups([years, months, subs])
-
-     # year
-        self.year = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Year', variable=self.season, value='year'), bottom=Frame, place=dict(relx=.01, rely=.2, relw=.98, relh=.19), orient='h', longent=.22)
-
-        yearFrame = self.year.Bottom
-        self.yearVar = tk.StringVar()
-
-        months = Radiobutton(yearFrame, text='Months', place=dict(relx=.01, rely=.005, relw=.32, relh=.98), variable=self.yearVar, value='months', relief=relief)
-        subs = Radiobutton(yearFrame, text='Subs', place=dict(relx=.34, rely=.005, relw=.24, relh=.98), variable=self.yearVar, value='subs', relief=relief)
-
-        self.setRadioGroups([months, subs])
-
      # month
-        self.month = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Month', variable=self.season, value='month'), bottom=Frame, place=dict(relx=.01, rely=.40, relw=.98, relh=.19), orient='h', longent=.22)
+        self.month = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Month', variable=self.season, value='month'), bottom=Frame, place=dict(relx=.01, rely=0, relw=.98, relh=.3), orient='h', longent=.22)
 
         monthFrame = self.month.Bottom
         self.monthVar = tk.StringVar()
@@ -521,34 +498,36 @@ class DataChoose(LabelFrame):
 
         self.setRadioGroups([weeks, days, specdays, subs])
 
-
      # week
-        self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season, value='week'), bottom=Frame, place=dict(relx=.01, rely=.60, relw=.68, relh=.19), orient='h', longent=.32)
+        self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season, value='week'), bottom=Frame, place=dict(relx=.01, rely=.31, relw=.68, relh=.3), orient='h', longent=.32)
 
         weekFrame = self.week.Bottom
         self.weekVar = tk.StringVar()
 
         days = Radiobutton(weekFrame, text='Days', place=dict(relx=.01, rely=.005, relw=.52, relh=.98), variable=self.weekVar, value='days', relief=relief)
-        subs = Radiobutton(weekFrame, text='Subs', place=dict(relx=.54, rely=.005, relw=.44, relh=.98), variable=self.weekVar, value='subs', relief=relief)
 
-        self.setRadioGroups([days, subs])
+        self.setRadioGroups([days])
 
-     # day
-        self.day = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Day', variable=self.season, value='day'), bottom=Frame, place=dict(relx=.01, rely=.80, relw=.68, relh=.19), orient='h', longent=.32)
+     # subs
+        self.subs = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Subs', variable=self.season, value='subs'), bottom=Frame, place=dict(relx=.01, rely=.62, relw=.98, relh=.3), orient='h', longent=.22)
 
-        dayFrame = self.day.Bottom
-        self.dayVar = tk.StringVar()
+        subsFrame = self.subs.Bottom
+        self.subsVar = tk.StringVar()
 
-        subs = Radiobutton(dayFrame, text='Subs', place=dict(relx=.01, rely=.005, relw=.4, relh=.98), variable=self.dayVar, value='subs', relief=relief)
+        date = Radiobutton(subsFrame, text='Date', place=dict(relx=.01, rely=.005, relw=.26, relh=.98), variable=self.subsVar, value='date', relief=relief)
+        week = Radiobutton(subsFrame, text='Week', place=dict(relx=.275, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='week', relief=relief)
+        month = Radiobutton(subsFrame, text='Month', place=dict(relx=.5, rely=.005, relw=.28, relh=.98), variable=self.subsVar, value='month', relief=relief)
+        year = Radiobutton(subsFrame, text='Year', place=dict(relx=.78, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='subs', relief=relief)
 
-        self.setRadioGroups([subs])
+        self.setRadioGroups([date, week, month, year])
 
+     #
 
-        self.setRadioGroups([self.years, self.month, self.week, self.day, self.year])
+        self.setRadioGroups([self.month, self.week, self.subs])
 
-        self.day.switchGroup()
+        self.subs.switchGroup()
 
-        Button(self, text='Load', command=generalAction, place=dict(relx=.78, rely=.76, relw=.2, relh=.22))
+        Button(self, text='Load', command=generalAction, place=dict(relx=.78, rely=.32, relw=.2, relh=.22))
 
     def get(self, e=0):
         season = self.season.get()
@@ -609,9 +588,9 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
         self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj, date=PRMP_DateTime.now())
 
-        self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.45), generalAction=self.parser)
+        self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.38), generalAction=self.parser)
 
-        self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.725, relw=.99, relh=.27))
+        self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.68, relw=.99, relh=.3))
 
     def parser(self):
         if not self.obj: return
@@ -639,44 +618,15 @@ class ProperDetails(PRMP_FillWidgets, Frame):
                     return
                 else:
                     # now to the oneInAll deals
+                    print(oneInAll)
                     pass
 
       # normal
         else:
             season, which = self.dataChoose.get()
-
-         # dataChoose verification
-            season = season or 'month'
-            which = which
-
-            # now to the dataChoose deals
-
-            if which == 'subs':
-                'will now go to the subs accounts details'
-                pass
-            else:
-                if isinstance(self.obj, DCRegion):
-                    acm = self.obj.accountsManager
-
-                    objSort = acm.objectSort
-
-                    # datas = objSort.sort_it(date, season=season, which=which, account=account)
-                    datas = []
-
-                    coolDatas = self.parseToRows(datas, season, which)
-
-                    # else:
-                    #     datas = []
-
-                    #     for ac in acm:
-                    #         data = ac.get_RMs_By_Seasons(date, seasons=[season])
-                    #         datas.append(data)
-
-                    # if season == 'year': pass
-
-                    # account = if isinstance(self.obj, Client)
-
-                    
+            datas = self.obj.objectSort.sort_it(date, season=season, whch=which, account=account)
+            # print(datas)
+            # print()
 
 
     def parseToRows(self, datas, season, which):
