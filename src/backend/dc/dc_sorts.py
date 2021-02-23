@@ -1,66 +1,6 @@
 from ..core.bases import ObjectSort
 
 
-class DCColumn:
-    _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
-    _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
-
-    days = ["Dates", "Days"]
-    weeks = ["Weeks"]
-
-    accounts = ["Ledger Numbers", "Names"]
-
-
-
-    specday = ["Dates", "Clients"]
-
-    specareayr = ["Months",  "Clients"]
-
-    specareayrs = ["Years", "Clients"]
-
-    area_weeks = ["Weeks", "Clients"]
-
-    specweek = ["Months", "Clients"]
-
-    months = ["Months", "Areas", "Clients"]
-
-    specmonth = ["Years", "Clients"]
-
-    years = ["Years", "Months", "Clients"]
-
-
-    @classmethod
-    def areas(cls):
-        cl = cls._clients.copy()
-        del cl[1]
-        cl[1] = 'Commissions'
-        ar = cl + cls._areas
-        return ar
-
-    @classmethod
-    def getColumns(cls, header, recMs):
-        head = cls.__dict__[header]
-        reg = cls.__dict__[recMs]
-
-        return head + reg
-
-    @classmethod
-    def merge(cls, one, two):
-        n = cls.getColumns(one) + cls.getColumns(two)
-        return n
-
-    @classmethod
-    def getObjColumns(cls, obj, season, which):
-        if 'DCAccount' in obj.mroStr:
-            recMs = '_clientsRecMs' if obj.className == 'ClientAccount' else '_areasRecMs'
-
-            if season in ['month', 'week']:
-                normal = 0
-                if 'spec' not in which: normal = 1
-
-                if normal: return cls.getColumns(which, recMs)
-
-
 
 class DCSort(ObjectSort):
 
@@ -103,9 +43,11 @@ class DCSort(ObjectSort):
 
         return [obj, w]
 
-    def sort_it(self, date, season='', which='', account=0, object_=None):
+    def sort_it(self, date, season='', which='', account=0, object_=None, **kwargs):
         season, which = self._format_season_which(season, which)
         obj, w = self.getObj(date, season, season=season, which=which, account=account, object_=object_)
+
+        results = []
 
         if season == 'subs':
             if w == 'Aacc':
@@ -115,10 +57,9 @@ class DCSort(ObjectSort):
                 for acc in cl_accs:
                     data = acc.get_RMs_By_Seasons(date, seasons=[which])
                     if data: datas.append(data)
-                return datas
+                results =  datas
 
-            else: return obj.objectSort.sortSubsBySeasons(date, seasons=[which])
-
+            else: results =  obj.objectSort.sortSubsBySeasons(date, seasons=[which], **kwargs)
 
         else:
 
@@ -133,7 +74,7 @@ class DCSort(ObjectSort):
                         for week in weekDates:
                             datas = obj.get_RMs_By_Seasons(week, seasons=['year', 'month', 'week'])
                             if datas: weekDatas.append(datas)
-                        return weekDatas
+                        results =  weekDatas
 
                     elif which == 'days':
                         days = date.monthOnlyDates
@@ -143,7 +84,7 @@ class DCSort(ObjectSort):
                             datas = obj.get_RMs_By_Date(day)
                             if datas:
                                 daysDatas.append(datas)
-                        return daysDatas
+                        results =  daysDatas
 
                     elif which == 'specdays':
                         specdays = date.specDaysDates
@@ -152,7 +93,7 @@ class DCSort(ObjectSort):
                         for spec in specdays:
                             datas = obj.get_RMs_By_Seasons(spec, seasons=['month', 'dayName'])
                             if datas: specDatas.append(datas)
-                        return specDatas
+                        results =  specDatas
 
                     elif which == 'specday':
                         specdays = date.allSpecDaysDates[date.weekDay]
@@ -161,7 +102,7 @@ class DCSort(ObjectSort):
                         for spec in specdays:
                             datas = obj.get_RMs_By_Seasons(spec, seasons=['date'])
                             if datas: specDatas.append(datas)
-                        return specDatas
+                        results =  specDatas
 
                 elif season == 'week':
                     days = date.weekDates[date.week-1]
@@ -170,7 +111,9 @@ class DCSort(ObjectSort):
                     for d in days:
                         data = obj.get_RMs_By_Date(d)
                         if data: datas.append(data)
-                    return datas
+                    results =  datas
+
+        return results, w
 
 
     def sortSubs(self, which):
@@ -196,6 +139,54 @@ class DCSort(ObjectSort):
 
 
 
+
+
+class DCColumn:
+    _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
+    _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
+
+    weeks = ["Week"]
+    days = ["Day", "Date"]
+    specday = ['Week', 'Date']
+    specdays = ['Day']
+
+    clients = ["Ledger Number", "Name"]
+
+    subs = ['Name', 'Date', 'Active']
+    subsBig = ['Name', 'Date', 'Month', 'Active']
+
+
+
+    @classmethod
+    def areas(cls):
+        cl = cls._clients.copy()
+        del cl[1]
+        cl[1] = 'Commissions'
+        ar = cl + cls._areas
+        return ar
+
+    @classmethod
+    def getColumns(cls, header, recMs):
+        head = cls.__dict__[header]
+        reg = cls.__dict__[recMs]
+
+        return head + reg
+
+    @classmethod
+    def merge(cls, one, two):
+        n = cls.getColumns(one) + cls.getColumns(two)
+        return n
+
+    @classmethod
+    def getObjColumns(cls, obj, season, which):
+        if 'DCAccount' in obj.mroStr:
+            recMs = '_clientsRecMs' if obj.className == 'ClientAccount' else '_areasRecMs'
+
+            if season in ['month', 'week']:
+                normal = 0
+                if 'spec' not in which: normal = 1
+
+                if normal: return cls.getColumns(which, recMs)
 
 
 

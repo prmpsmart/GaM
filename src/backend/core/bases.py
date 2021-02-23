@@ -163,11 +163,13 @@ class ObjectSort(Mixins):
         return objects
 
     def sort(self, subs=[], attrs=[], _type=None, object_=None, validations=[], manAttrs=['subs']):
+
         '''
         validations = [
             {'value': PRMP_DateTime.getDMYFromDate('20/12/2020'), 'method': 'isSameMonth', 'attr': 'date', 'attrMethod': 'isSameMonth', 'methodParams': {}, 'attrMethodParams': {}, 'valueType': int, 'comp': __comparisons, 'compType': ['range', 'comp'], 'minValue': 2000, 'range': __ranges, 'className': 'ObjectsMixins', 'mroStr': 'Record'}
         ]
         '''
+
         objects = self.getObjects(object_=object_, subs=subs, attrs=attrs, manAttrs=manAttrs)
         if not objects: return
 
@@ -254,10 +256,10 @@ class ObjectSort(Mixins):
 
         return objects
 
-    def sortSubsBySeasons(self, date, seasons=['date'], attr='date', **kwargs):
+    def sortSubsBySeasons(self, date, seasons=['date'], attr='date', validations=[], **kwargs):
         _types = {'year': 'isSameYear', 'month': 'isSameMonth', 'week': 'isSameWeek', 'day': 'isSameDay', 'date': 'isSameDate', 'dayName': 'isSameDayName'}
 
-        validations = []
+        validations = validations.copy()
 
         for season in seasons:
             validation = dict(value=True, attrMethod=_types[season], attr=attr, attrMethodParams=dict(date=date))

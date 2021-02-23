@@ -26,6 +26,7 @@ class DC_COsManager(PersonsManager):
 
 
 class DCRegionsManager(RegionsManager):
+    ObjectSortClass = DCSort
     pass
 
 
