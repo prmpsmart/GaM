@@ -75,30 +75,54 @@ class DCSort(ObjectSort):
         sortedRecs = self.sortSubsBySeasons(date, subs=recs, seasons=['date'])
         return sortedRecs
 
-    def sort_it(self, date, season='', which='', account=0, object_=None):
+    def getObj(self, obj, date, season='', which='', account=0, object_=None):
         obj = object_ or self.object
-        season = season or 'month'
+        season, which = self._format_season_which(season, which)
 
-        if which == 'subs':
-            'will now go to the subs accounts details'
-            pass
+
+        w = 'obj'
+        if 'DCRegion' in obj.mroStr:
+            if season != 'subs':
+                obj = obj.accountsManager
+                w = 'acm'
+        elif 'DCAccountsManager' in obj.mroStr: w = 'acm'
+        elif 'DCAccount' in obj.mroStr:
+            if obj.className == 'AreaAccount': w = 'Aacc'
+            else: w = 'acc'
+            account = 0
+
+        # else: print(obj)
+
+        if season not in ['years', 'year']:
+            if self.checkNumber(account):
+                if int(account) != 0:
+                    account = int(account) - 1
+                    accs = obj.sortSubsByMonth(date)
+                    obj = accs[account] if accs else None
+                    w = 'acc'
+
+        return [obj, w]
+
+    def sort_it(self, date, season='', which='', account=0, object_=None):
+        season, which = self._format_season_which(season, which)
+        obj, w = self.getObj(date, season, season=season, which=which, account=account, object_=object_)
+
+        if season == 'subs':
+            if w == 'Aacc':
+                cl_accs = obj.clientsAccounts
+
+                datas = []
+                for acc in cl_accs:
+                    data = acc.get_RMs_By_Seasons(date, seasons=[which])
+                    if data: datas.append(data)
+                return datas
+
+            else: return obj.objectSort.sortSubsBySeasons(date, seasons=[which])
+
 
         else:
-            if 'DCRegion' in obj.mroStr: acm = obj.accountsManager
-            elif 'DCAccountsManager' in obj.mroStr: acm = obj
-            acc = None
 
-            if season not in ['years', 'year']:
-                if self.checkNumber(account):
-                    if int(account) != 0:
-                        account = int(account) - 1
-                        accs = acm.sortSubsByMonth(date)
-                        acc = accs[account] if accs else None
-
-            if which == 'subs':
-                pass
-
-            if acc:
+            if w == 'acc':
                 which = which or 'days'
 
                 if season == 'month':
@@ -107,7 +131,7 @@ class DCSort(ObjectSort):
                         weekDatas = []
 
                         for week in weekDates:
-                            datas = acc.get_RMs_By_Seasons(week, seasons=['year', 'month', 'week'])
+                            datas = obj.get_RMs_By_Seasons(week, seasons=['year', 'month', 'week'])
                             if datas: weekDatas.append(datas)
                         return weekDatas
 
@@ -116,7 +140,7 @@ class DCSort(ObjectSort):
                         daysDatas = []
 
                         for day in days:
-                            datas = acc.getRecs_Of_RM_ByDate(day)
+                            datas = obj.get_RMs_By_Date(day)
                             if datas:
                                 daysDatas.append(datas)
                         return daysDatas
@@ -126,7 +150,16 @@ class DCSort(ObjectSort):
                         specDatas = []
 
                         for spec in specdays:
-                            datas = acc.get_RMs_By_Seasons(spec, seasons=['month', 'dayName'])
+                            datas = obj.get_RMs_By_Seasons(spec, seasons=['month', 'dayName'])
+                            if datas: specDatas.append(datas)
+                        return specDatas
+
+                    elif which == 'specday':
+                        specdays = date.allSpecDaysDates[date.weekDay]
+                        specDatas = []
+
+                        for spec in specdays:
+                            datas = obj.get_RMs_By_Seasons(spec, seasons=['date'])
                             if datas: specDatas.append(datas)
                         return specDatas
 
@@ -135,25 +168,30 @@ class DCSort(ObjectSort):
                     datas = []
 
                     for d in days:
-                        data = acc.get_RMs_By_Seasons(d, seasons=['date'])
+                        data = obj.get_RMs_By_Date(d)
                         if data: datas.append(data)
                     return datas
 
-            else:
 
-                if season == 'year':
-                    datas = obj.sortAccountsIntoMonths(date)
-                    return datas
+    def sortSubs(self, which):
 
-                elif season == 'years':
-                    if which == 'years':
-                        # datas = obj.sortAccountsIntoYears()
-                        pass
-                    elif which == 'months':
-                        pass
+        pass
 
-                    self.notImp()
+    def _format_season_which(self, season, which):
+        # season = season or 'month'
+        season = season.lower()
+        which = which.lower()
 
+        subs = 'subs'
+        ret = [season, which]
+
+        if season in ['date', 'day', 'year']: ret[1] = subs
+        elif season == 'week':
+            if which != 'days': ret[1] = subs
+        elif season == 'month':
+            if not which: ret[1] = 'days'
+
+        return ret
 
 
 

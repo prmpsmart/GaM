@@ -423,6 +423,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         return d
     @property
     def weekDay(self): return (int(self.weekday()) + 1) % 7
+    
     @property
     def weekInYear(self): return int(self.isocalendar()[1])
 
@@ -483,10 +484,13 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         return weeks_monthYear
 
     @property
-    def weekDates(self): return self.monthWeekDays()
+    def weekDates(self):
+        'returns all the days in a month in a list of weeks'
+        return self.monthWeekDays()
 
     @property
     def oneDateInWeeks(self):
+        'returns a list of containing a day from each weeks in the month'
         weekDates = self.weekDates
         one = weekDates[0]
         last = weekDates[-1]
@@ -495,12 +499,13 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
         for week in weekDates:
             if week == one: dates.append(week[-1])
-            elif week == last: dates.append(week[0])
-            else: dates.append(week[3])
+            else: dates.append(week[0])
+            # else: dates.append(week[0])
 
         return dates
     @property
     def monthDates(self):
+        'returns all the days that makes up the 4 or 5 weeks in a list'
         days = []
         for week in self.weekDates:
             for day in week: days.append(day)
@@ -508,12 +513,14 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @property
     def monthOnlyDates(self):
+        'returns all the days in a month in a list'
         dates = self.monthDates
         days = [day for day in dates if self.isSameMonthYear(day)]
         return days
 
     @property
     def allSpecDaysDates(self):
+        'returns a list of list each containing the days of the same name'
         allDates = self.monthOnlyDates
         leng = range(len(self.daysNames))
 
@@ -528,6 +535,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @property
     def specDaysDates(self):
+        'returns a list of each day from each list returned from allSpecDaysDates'
         allDates = self.allSpecDaysDates
         leng = range(len(allDates))
 
@@ -537,6 +545,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @property
     def monthsInYear(self):
+        'returns the months in the year of this current PRMP_DateTime object'
         currentMonth = self.month
         months = range(1, 13)
         monthsDates = []
@@ -552,6 +561,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @property
     def week(self):
+        'returns the week number that this date is in its month'
         weeks = self.weekDates
         for wk in weeks:
             _wk = [w.date for w in wk]
@@ -581,18 +591,6 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         else: return day.strftime(fmt)
 
     @classmethod
-    def getMonth(cls, status="current", y_r=False):
-        if status == "current": return PRMP_DateTime.now()
-        elif status == "next": return PRMP_DateTime.now() + 1
-        elif status == "previous": return PRMP_DateTime.now() - 1
-
-    @classmethod
-    def getYear(cls, status="current"):
-        if status == "current": return "Year_" + cls.curr_year()
-        elif status == "next": return "Year_" + str(int(cls.curr_year()) + 1)
-        elif status == "previous": return "Year_" + str(int(cls.curr_year()) - 1)
-
-    @classmethod
     def verifyDateFormat(cls, date): return len(date.split('/')) == 3
 
     @classmethod
@@ -606,6 +604,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
             elif isinstance(date, cls): return date
 
     def diffInMonth(self, date):
+        'returns the different in the current month and the given month'
         self.checkDateTime(date)
         if self.monthYearTuple == date.monthYearTuple: return 0
         elif self > date: maxDate, minDate = self, date

@@ -28,6 +28,7 @@ class DCAccount(Account):
 
     def __int__(self): return int(self.balances)
     def __float__(self): return float(self.balances)
+
     @property
     def name(self): return f'{self.className}({self.region.name} | {self._month.dayMonthYear})'
     @property
@@ -70,13 +71,13 @@ class DCAccount(Account):
 
         return recs
 
-    def getRecs_Of_RM_ByDate(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['date'], **kwargs)
+    def get_RMs_By_Date(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['date'], **kwargs)
 
-    def getRecs_Of_RM_ByDay(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['day'], **kwargs)
+    def get_RMs_By_Day(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['day'], **kwargs)
 
-    def getRecs_Of_RM_ByDayName(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['dayName'], **kwargs)
+    def get_RMs_By_DayName(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['dayName'], **kwargs)
 
-    def getRecs_Of_RM_ByWeek(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['week'], **kwargs)
+    def get_RMs_By_Week(self, date=None, **kwargs): return self.get_RMs_By_Seasons(date=date, seasons=['week'], **kwargs)
 
 
 class DCAccountsManager(AccountsManager):
@@ -173,6 +174,8 @@ class ClientAccount(DCAccount):
 
 
 class ClientsAccounts(ObjectsMixins):
+    ObjectSortClass = DCSort
+
 
     def __init__(self, account):
         assert account.className == 'AreaAccount' and account.region.className == 'Area', 'This account must be an instance of AreaAccount and its region an instance of Area.'
@@ -188,7 +191,9 @@ class ClientsAccounts(ObjectsMixins):
     def __repr__(self): return f'<{self}>'
 
     def add(self, clientAccount):
-        if clientAccount not in self._subs: self._subs.append(clientAccount)
+        if clientAccount not in self._subs:
+            # print(clientAccount)
+            self._subs.append(clientAccount)
 
     @property
     def subs(self): return self._subs
@@ -196,7 +201,7 @@ class ClientsAccounts(ObjectsMixins):
     @property
     def regions(self): return [acc.region for acc in self._subs]
 
-    def getRecs_Of_RM_Of_AccByDate(self, account, date=None): return account.getRecs_Of_RM_ByDate(date)
+    def getRecs_Of_RM_Of_AccByDate(self, account, date=None): return account.get_RMs_By_Date(date)
 
     def getRecs_Of_RM_Of_AccsByDate(self, date=None):
         accs = self[:]

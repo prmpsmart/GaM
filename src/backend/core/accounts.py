@@ -99,6 +99,9 @@ class Account(MonthCompare, Object):
     def name(self): return f'{self.className}({self.date.dayMonthYear})'
 
     @property
+    def money(self): return float(self)
+    
+    @property
     def region(self): return self.manager.region
 
     @property

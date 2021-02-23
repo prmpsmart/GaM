@@ -66,7 +66,8 @@ class ObjectSort(Mixins):
     def getCompType(self, _type):
         for c in self.__comparisons:
             ind = self.__comparisons.index(c)
-            if _type in c: return c[1]
+            if _type == '=': return '=='
+            elif _type in c: return c[1]
 
     def compare(self, a, b, _type='=='):
         comp = self.getCompType(_type)

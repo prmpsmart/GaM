@@ -232,6 +232,9 @@ class RecordsManager(ObjectsManager):
     def __repr__(self): return f'<{self.name}>'
 
     @property
+    def money(self): return float(self)
+
+    @property
     def name(self): return f'{self.className}({self.moneyWithSign}, {self.date.date})'
 
     @property
