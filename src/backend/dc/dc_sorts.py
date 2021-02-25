@@ -15,8 +15,6 @@ class DCColumn:
     subs = ['Name', 'Date', 'Active']
     subsBig = ['Name', 'Date', 'Month', 'Active']
 
-
-
     @classmethod
     def areas(cls):
         cl = cls._clients.copy()
@@ -47,7 +45,7 @@ class DCColumn:
                 if 'spec' not in which: normal = 1
 
                 if normal: return cls.getColumns(which, recMs)
-                
+
             elif season == 'subs':
                 if which in ['date', 'week']: pass
                 elif which in ['month', 'year']: pass
@@ -187,13 +185,24 @@ class DCSort(ObjectSort):
         return results, w
         # return obj, results, w
 
-    def getColumns(self, season, which, w):
-        if w == 'acc':
-            pass
-        elif w == 'Aacc': return DCColumn.getColumns('clients', '_clientsRecMs')
+    def getColumns(self, season, which, w=''):
+
+        if 'acc' in w:
+            if ('A' in w):
+                recMs = '_areasRecMs'
+                if season == 'subs': which = 'clients'
+            else:
+                recMs = '_clientsRecMs'
+
+            return DCColumn.getColumns(which, recMs)
+
         elif w == 'obj' and season == 'subs':
-            if which in ['date', 'week']: pass
-            elif which in ['month', 'year']: pass
+            if which in ['date', 'week']: return DCColumn.subs
+            elif which in ['month', 'year']: return DCColumn.subsBig
+
+        elif season == 'subs':
+            if which in ['date', 'week']: return DCColumn.subs
+            elif which in ['month', 'year']: return DCColumn.subsBig
 
     def designDatas(self, datas, season, which, w):
         pass
