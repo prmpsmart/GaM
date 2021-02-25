@@ -493,10 +493,10 @@ class DataChoose(LabelFrame):
 
         weeks = Radiobutton(monthFrame, text='Weeks', place=dict(relx=.01, rely=.005, relw=.26, relh=.98), variable=self.monthVar, value='weeks', relief=relief)
         days = Radiobutton(monthFrame, text='Days', place=dict(relx=.275, rely=.005, relw=.22, relh=.98), variable=self.monthVar, value='days', relief=relief)
-        specdays = Radiobutton(monthFrame, text='7 Days', place=dict(relx=.5, rely=.005, relw=.28, relh=.98), variable=self.monthVar, value='specdays', relief=relief)
-        subs = Radiobutton(monthFrame, text='Subs', place=dict(relx=.78, rely=.005, relw=.22, relh=.98), variable=self.monthVar, value='subs', relief=relief)
+        specdays = Radiobutton(monthFrame, text='Spec Days', place=dict(relx=.5, rely=.005, relw=.26, relh=.98), variable=self.monthVar, value='specdays', relief=relief)
+        specday = Radiobutton(monthFrame, text='Spec Day', place=dict(relx=.76, rely=.005, relw=.24, relh=.98), variable=self.monthVar, value='specday', relief=relief)
 
-        self.setRadioGroups([weeks, days, specdays, subs])
+        self.setRadioGroups([weeks, days, specdays, specday])
 
      # week
         self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season, value='week'), bottom=Frame, place=dict(relx=.01, rely=.31, relw=.68, relh=.3), orient='h', longent=.32)
@@ -517,12 +517,11 @@ class DataChoose(LabelFrame):
         date = Radiobutton(subsFrame, text='Date', place=dict(relx=.01, rely=.005, relw=.26, relh=.98), variable=self.subsVar, value='date', relief=relief)
         week = Radiobutton(subsFrame, text='Week', place=dict(relx=.275, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='week', relief=relief)
         month = Radiobutton(subsFrame, text='Month', place=dict(relx=.5, rely=.005, relw=.28, relh=.98), variable=self.subsVar, value='month', relief=relief)
-        year = Radiobutton(subsFrame, text='Year', place=dict(relx=.78, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='subs', relief=relief)
+        year = Radiobutton(subsFrame, text='Year', place=dict(relx=.78, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='year', relief=relief)
 
         self.setRadioGroups([date, week, month, year])
 
      #
-
         self.setRadioGroups([self.month, self.week, self.subs])
 
         self.subs.switchGroup()
@@ -590,7 +589,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
         self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.38), generalAction=self.parser)
 
-        self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.68, relw=.99, relh=.3))
+        # self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.68, relw=.99, relh=.3))
 
     def parser(self):
         if not self.obj: return
@@ -605,27 +604,30 @@ class ProperDetails(PRMP_FillWidgets, Frame):
             return
 
       # oneInAll verification
-        if self.oneInAll.isOneinAll.get():
-            oneInAll = self.oneInAll.get()
-            spec = oneInAll[0]
-            if not spec:
-                PRMP_MsgBox(self, title='One in All Error', message='Please choose among [Months, Weeks, Days]', _type='error', delay=1500)
-                return
-            else:
-                specVal = oneInAll[1]
-                if not specVal:
-                    PRMP_MsgBox(self, title=f'{spec} Error', message=f'Please choose a valid {spec.title()} type !', _type='error', delay=1500)
-                    return
-                else:
-                    # now to the oneInAll deals
-                    print(oneInAll)
-                    pass
+        # if self.oneInAll.isOneinAll.get():
+        #     oneInAll = self.oneInAll.get()
+        #     spec = oneInAll[0]
+        #     if not spec:
+        #         PRMP_MsgBox(self, title='One in All Error', message='Please choose among [Months, Weeks, Days]', _type='error', delay=1500)
+        #         return
+        #     else:
+        #         specVal = oneInAll[1]
+        #         if not specVal:
+        #             PRMP_MsgBox(self, title=f'{spec} Error', message=f'Please choose a valid {spec.title()} type !', _type='error', delay=1500)
+        #             return
+        #         else:
+        #             # now to the oneInAll deals
+        #             print(oneInAll)
+        #             pass
 
       # normal
-        else:
+        if True:
             season, which = self.dataChoose.get()
-            datas = self.obj.objectSort.sort_it(date, season=season, whch=which, account=account)
-            # print(datas)
+            # print(season, which)
+            # return
+            datas = self.obj.objectSort.sort_it(date, season=season, which=which, account=account)
+
+            # for data in datas: print(data)
             # print()
 
 

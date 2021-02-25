@@ -1,6 +1,58 @@
 from ..core.bases import ObjectSort
 
 
+class DCColumn:
+    _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
+    _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
+
+    weeks = ["Week"]
+    days = ["Day", "Date"]
+    specday = ['Week', 'Date']
+    specdays = ['Day']
+
+    clients = ["Ledger Number", "Name"]
+
+    subs = ['Name', 'Date', 'Active']
+    subsBig = ['Name', 'Date', 'Month', 'Active']
+
+
+
+    @classmethod
+    def areas(cls):
+        cl = cls._clients.copy()
+        del cl[1]
+        cl[1] = 'Commissions'
+        ar = cl + cls._areas
+        return ar
+
+    @classmethod
+    def getColumns(cls, header, recMs):
+        head = cls.__dict__[header]
+        reg = cls.__dict__[recMs]
+
+        return head + reg
+
+    @classmethod
+    def merge(cls, one, two):
+        n = cls.getColumns(one) + cls.getColumns(two)
+        return n
+
+    @classmethod
+    def getObjColumns(cls, obj, season, which):
+        if 'DCAccount' in obj.mroStr:
+            recMs = '_clientsRecMs' if obj.className == 'ClientAccount' else '_areasRecMs'
+
+            if season in ['month', 'week']:
+                normal = 0
+                if 'spec' not in which: normal = 1
+
+                if normal: return cls.getColumns(which, recMs)
+                
+            elif season == 'subs':
+                if which in ['date', 'week']: pass
+                elif which in ['month', 'year']: pass
+
+
 
 class DCSort(ObjectSort):
 
@@ -43,11 +95,28 @@ class DCSort(ObjectSort):
 
         return [obj, w]
 
+    def _format_season_which(self, season, which):
+        # season = season or 'month'
+        season = season.lower() or 'month'
+        which = which.lower()
+
+        subs = 'subs'
+        ret = [season, which]
+
+        if season in ['date', 'day', 'year']: ret[1] = subs
+        elif season == 'week':
+            if which != 'days': ret[1] = subs
+        elif season == 'month':
+            if not which: ret[1] = 'days'
+
+        return ret
+
     def sort_it(self, date, season='', which='', account=0, object_=None, **kwargs):
         season, which = self._format_season_which(season, which)
+
         obj, w = self.getObj(date, season=season, which=which, account=account, object_=object_)
 
-        print(season, which, obj.name, w)
+        # print(season, which, obj.name, w)
 
         results = []
 
@@ -116,79 +185,21 @@ class DCSort(ObjectSort):
                     results =  datas
 
         return results, w
+        # return obj, results, w
 
+    def getColumns(self, season, which, w):
+        if w == 'acc':
+            pass
+        elif w == 'Aacc': return DCColumn.getColumns('clients', '_clientsRecMs')
+        elif w == 'obj' and season == 'subs':
+            if which in ['date', 'week']: pass
+            elif which in ['month', 'year']: pass
 
-    def sortSubs(self, which):
-
+    def designDatas(self, datas, season, which, w):
         pass
 
-    def _format_season_which(self, season, which):
-        # season = season or 'month'
-        season = season.lower() or 'month'
-        which = which.lower()
-
-        subs = 'subs'
-        ret = [season, which]
-
-        if season in ['date', 'day', 'year']: ret[1] = subs
-        elif season == 'week':
-            if which != 'days': ret[1] = subs
-        elif season == 'month':
-            if not which: ret[1] = 'days'
-
-        return ret
 
 
-
-
-
-
-class DCColumn:
-    _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
-    _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
-
-    weeks = ["Week"]
-    days = ["Day", "Date"]
-    specday = ['Week', 'Date']
-    specdays = ['Day']
-
-    clients = ["Ledger Number", "Name"]
-
-    subs = ['Name', 'Date', 'Active']
-    subsBig = ['Name', 'Date', 'Month', 'Active']
-
-
-
-    @classmethod
-    def areas(cls):
-        cl = cls._clients.copy()
-        del cl[1]
-        cl[1] = 'Commissions'
-        ar = cl + cls._areas
-        return ar
-
-    @classmethod
-    def getColumns(cls, header, recMs):
-        head = cls.__dict__[header]
-        reg = cls.__dict__[recMs]
-
-        return head + reg
-
-    @classmethod
-    def merge(cls, one, two):
-        n = cls.getColumns(one) + cls.getColumns(two)
-        return n
-
-    @classmethod
-    def getObjColumns(cls, obj, season, which):
-        if 'DCAccount' in obj.mroStr:
-            recMs = '_clientsRecMs' if obj.className == 'ClientAccount' else '_areasRecMs'
-
-            if season in ['month', 'week']:
-                normal = 0
-                if 'spec' not in which: normal = 1
-
-                if normal: return cls.getColumns(which, recMs)
 
 
 
