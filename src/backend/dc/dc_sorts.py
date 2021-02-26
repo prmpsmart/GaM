@@ -9,22 +9,28 @@ class DCColumn:
     days = ["Day", "Date"]
     specday = ['Week', 'Date']
     specdays = ['Day']
+    clients = ["Ledger Number", "Name"] # done
 
-    clients = ["Ledger Number", "Name"]
+    nums = dict(weeks=1, days=2, specday=2, specdays=1, clients=2)
+    dateAttrs = dict(Week='weekName', Day='dayName', Date='date')
+
 
     subs = ['Name', 'Date', 'Active']
     subsBig = ['Name', 'Date', 'Month', 'Active']
 
     @classmethod
-    def areas(cls):
-        cl = cls._clients.copy()
+    def areas(cls, header):
+        cl = cls._clientsRecMs.copy()
         del cl[1]
         cl[1] = 'Commissions'
-        ar = cl + cls._areas
-        return ar
+        ar = cl + cls._areasRecMs
+        head = cls.__dict__[header]
+
+        return head + ar
 
     @classmethod
     def getColumns(cls, header, recMs):
+        if recMs == '_areasRecMs': return cls.areas(header)
         head = cls.__dict__[header]
         reg = cls.__dict__[recMs]
 
@@ -51,6 +57,10 @@ class DCColumn:
                 elif which in ['month', 'year']: pass
 
 
+    @classmethod
+    def designDatas(cls, season, which, datas, w=''):
+        pass
+
 
 class DCSort(ObjectSort):
 
@@ -69,15 +79,15 @@ class DCSort(ObjectSort):
         obj = object_ or self.object
         season, which = self._format_season_which(season, which)
 
-
         w = 'obj'
         if 'DCRegion' in obj.mroStr:
             if season != 'subs':
                 obj = obj.accountsManager
                 w = 'acm'
         elif 'DCAccountsManager' in obj.mroStr: w = 'acm'
-        elif 'DCAccount' in obj.mroStr:
+        elif ('DCAccount' in obj.mroStr) or (obj.className == 'ClientsAccounts'):
             if obj.className == 'AreaAccount': w = 'Aacc'
+            elif (obj.className == 'ClientsAccounts'): w = 'AaccC'
             else: w = 'acc'
             account = 0
 
@@ -92,6 +102,8 @@ class DCSort(ObjectSort):
                     w = 'acc'
 
         return [obj, w]
+
+    def getObj_w(self, *args, **kwargs): return self.getObj(*args, **kwargs)[1]
 
     def _format_season_which(self, season, which):
         # season = season or 'month'
@@ -109,18 +121,20 @@ class DCSort(ObjectSort):
 
         return ret
 
-    def sort_it(self, date, season='', which='', account=0, object_=None, **kwargs):
+    def sort_it(self, date=None, season='', which='', account=0, object_=None, **kwargs):
         season, which = self._format_season_which(season, which)
+        date = self.getDate(date)
 
         obj, w = self.getObj(date, season=season, which=which, account=account, object_=object_)
 
-        # print(season, which, obj.name, w)
-
         results = []
 
-        if season == 'subs':
-            if w == 'Aacc':
-                cl_accs = obj.clientsAccounts
+        if (season == 'subs') or (obj.className == 'ClientsAccounts'):
+            if 'A' in w:
+                if (obj.className == 'ClientsAccounts'):
+                    cl_accs = obj
+                    which = season
+                else: cl_accs = obj.clientsAccounts
 
                 datas = []
                 for acc in cl_accs:
@@ -128,7 +142,7 @@ class DCSort(ObjectSort):
                     if data: datas.append(data)
                 results =  datas
 
-            else: results =  obj.objectSort.sortSubsBySeasons(date, seasons=[which], **kwargs)
+            else: results = obj.objectSort.sortSubsBySeasons(date, seasons=[which], **kwargs)
 
         else:
 
@@ -182,27 +196,75 @@ class DCSort(ObjectSort):
                         if data: datas.append(data)
                     results =  datas
 
+        print(results)
         return results, w
         # return obj, results, w
 
     def getColumns(self, season, which, w=''):
+        num = 0
+        columns = []
 
         if 'acc' in w:
+            recMs = '_clientsRecMs'
             if ('A' in w):
-                recMs = '_areasRecMs'
-                if season == 'subs': which = 'clients'
-            else:
-                recMs = '_clientsRecMs'
+                if season == 'subs' or 'C' in w: which = 'clients'
+                else: recMs = '_areasRecMs'
+            num = DCColumn.nums[which]
+            columns = DCColumn.getColumns(which, recMs)
 
-            return DCColumn.getColumns(which, recMs)
-
-        elif w == 'obj' and season == 'subs':
-            if which in ['date', 'week']: return DCColumn.subs
-            elif which in ['month', 'year']: return DCColumn.subsBig
+        elif w == 'obj' and season != 'subs':
+            pass
 
         elif season == 'subs':
-            if which in ['date', 'week']: return DCColumn.subs
-            elif which in ['month', 'year']: return DCColumn.subsBig
+            if which in ['date', 'week']: columns = DCColumn.subs
+            elif which in ['month', 'year']: columns = DCColumn.subsBig
+
+        return columns, num
+
+    def getDataByColumns(self, datas, columns, datacols):
+        columnsNum = []
+        if datas and columns:
+            caseData = datas[0]
+            columnsNum = [datacols.index(c) for c in columns]
+
+        refinedDatas = []
+
+        if columnsNum:
+            for data in datas:
+                _data = [data[cn] for cn in columnsNum]
+                refinedDatas.append(_data)
+
+        return refinedDatas or datas
+
+
+    def fillColumns(self, season='', which='', columns=[], **kwargs):
+        datas, w = self.sort_it(season=season, which=which, **kwargs)
+        cols, num = self.getColumns(season, which, w)
+        designcols, datacols = cols[:num], cols[num:]
+
+        refinedDatas = self.getDataByColumns(datas, columns, datacols)
+
+        designedDatas = []
+
+        if season != 'subs':
+            addons = []
+            case = [data[0] for data in refinedDatas]
+
+            if 'Ledger Number' in designcols: attrs = [dict(account=designcols[0]), dict(region=designcols[1])]
+
+            else: attrs = [dict(date=DCColumn.dateAttrs[col]) for col in designcols]
+
+            designedDatas = [d[attrs] for d in case]
+
+            for cd in designedDatas:
+                index = designedDatas.index(cd)
+                cd.extend(refinedDatas[index])
+
+        else:
+            pass
+
+
+        return designedDatas
 
     def designDatas(self, datas, season, which, w):
         pass

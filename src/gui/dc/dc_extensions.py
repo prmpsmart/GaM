@@ -625,19 +625,10 @@ class ProperDetails(PRMP_FillWidgets, Frame):
             season, which = self.dataChoose.get()
             # print(season, which)
             # return
-            datas = self.obj.objectSort.sort_it(date, season=season, which=which, account=account)
+            datas, w = self.obj.objectSort.sort_it(date, season=season, which=which, account=account)
 
-            # for data in datas: print(data)
-            # print()
+            # columns =
 
-
-    def parseToRows(self, datas, season, which):
-        rows = self.getTreeColumns(season, which)
-
-    def getTreeColumns(self, season, which):
-        print(season, which)
-        return
-        columns = DCColumn.get_columns(which)
 
 
 
