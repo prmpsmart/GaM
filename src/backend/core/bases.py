@@ -303,6 +303,8 @@ class ObjectsMixins(CompareByDate, Mixins):
 
         if not idReq: self._uniqueID = sha224(str(self).encode()).hexdigest()
 
+        self._active = self._date
+
     @property
     def totalSubs(self):
         if self.subs: return len(self.subs)
@@ -310,6 +312,14 @@ class ObjectsMixins(CompareByDate, Mixins):
 
     @property
     def uniqueID(self): return self._uniqueID
+
+    @property
+    def active(self): return self._active
+
+    @active.setter
+    def active(self, date):
+        self._active = date
+        if not self.strManager: self.manager.active = date
 
     @property
     def sort(self): return self.objectSort.sort
@@ -531,7 +541,9 @@ class ObjectsManager(ObjectsMixins):
             assert last_.next == None, f'{self} is not the last.'
             return last_
 
-    def addSub(self, sub): self._subs.append(sub)
+    def addSub(self, sub):
+        self._subs.append(sub)
+        self.active = sub.date
 
     def getSub(self, **attrs_vals):
         if len(self):

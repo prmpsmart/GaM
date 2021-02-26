@@ -18,6 +18,8 @@ class DCColumn:
     subs = ['Name', 'Date', 'Active']
     subsBig = ['Name', 'Date', 'Month', 'Active']
 
+    subsAttrs = dict(Name='Name', Date='date', Month='monthYear', Active='date')
+
     @classmethod
     def areas(cls, header):
         cl = cls._clientsRecMs.copy()
@@ -75,16 +77,18 @@ class DCSort(ObjectSort):
         sortedRecs = self.sortSubsBySeasons(date, subs=recs, seasons=['date'])
         return sortedRecs
 
-    def getObj(self, date, season='', which='', account=0, object_=None):
+    def getObj(self, date, season='', which='', account=0, object_=None, subsAttr='subRegionsManager'):
         obj = object_ or self.object
         season, which = self._format_season_which(season, which)
 
         w = 'obj'
         if 'DCRegion' in obj.mroStr:
-            if season != 'subs':
-                obj = obj.accountsManager
-                w = 'acm'
-        elif 'DCAccountsManager' in obj.mroStr: w = 'acm'
+            w = 'man'
+            # if season != 'subs': obj = obj.accountsManager
+            # else: obj = obj[subsAttr]
+            obj = obj[subsAttr]
+
+        elif 'DCAccountsManager' in obj.mroStr: w = 'man'
         elif ('DCAccount' in obj.mroStr) or (obj.className == 'ClientsAccounts'):
             if obj.className == 'AreaAccount': w = 'Aacc'
             elif (obj.className == 'ClientsAccounts'): w = 'AaccC'
@@ -121,11 +125,11 @@ class DCSort(ObjectSort):
 
         return ret
 
-    def sort_it(self, date=None, season='', which='', account=0, object_=None, **kwargs):
+    def sort_it(self, date=None, season='', which='', account=0, object_=None, subsAttr='', **kwargs):
         season, which = self._format_season_which(season, which)
         date = self.getDate(date)
 
-        obj, w = self.getObj(date, season=season, which=which, account=account, object_=object_)
+        obj, w = self.getObj(date, season=season, which=which, account=account, object_=object_, subsAttr=subsAttr)
 
         results = []
 
@@ -142,7 +146,7 @@ class DCSort(ObjectSort):
                     if data: datas.append(data)
                 results =  datas
 
-            else: results = obj.objectSort.sortSubsBySeasons(date, seasons=[which], **kwargs)
+            elif w == 'man': results = obj.objectSort.sortSubsBySeasons(date, seasons=[which], **kwargs)
 
         else:
 
@@ -196,7 +200,6 @@ class DCSort(ObjectSort):
                         if data: datas.append(data)
                     results =  datas
 
-        print(results)
         return results, w
         # return obj, results, w
 
@@ -236,7 +239,6 @@ class DCSort(ObjectSort):
 
         return refinedDatas or datas
 
-
     def fillColumns(self, season='', which='', columns=[], **kwargs):
         datas, w = self.sort_it(season=season, which=which, **kwargs)
         cols, num = self.getColumns(season, which, w)
@@ -259,9 +261,10 @@ class DCSort(ObjectSort):
             for cd in designedDatas:
                 index = designedDatas.index(cd)
                 cd.extend(refinedDatas[index])
+                print(cd)
 
         else:
-            pass
+            return datas, cols, num
 
 
         return designedDatas
