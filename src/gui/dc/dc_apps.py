@@ -6,8 +6,8 @@ def addNote(self, **kwargs):
     self.note.add(self.overview, padding=3)
     self.note.tab(0, text='Overview', compound='left', underline='-1')
 
-    self.tree = GaM_Table(self.note)
-    self.note.add(self.tree, padding=3)
+    self.table = GaM_Table(self.note)
+    self.note.add(self.table, padding=3)
     self.note.tab(1, text='Hierachy', compound='left', underline='-1')
 
     ae = Frame(self.note)
@@ -31,13 +31,11 @@ class DC_RegionHome(TreeColumns, RegionHome):
 
         self.details.bind('<1>', lambda e: self.defaults(1))
 
-
     def defaults(self, i=0):
         if not i: self._defs()
         if self.region:
             self.selected(self.region)
             self.overview.updateDCDigits(self.region.lastAccount)
-
 
     def selectedRegion(self, sub):
         self.selectedAccount(sub[-1])
@@ -48,15 +46,20 @@ class DC_RegionHome(TreeColumns, RegionHome):
         self.overview.updateDCDigits(account)
 
     def selected(self, sub):
-        self.tree.setColumns(self.columns(sub))
-        self.tree.viewObjs(sub)
+        self.table.setColumns(self.columns(sub))
+        self.table.viewObjs(sub)
 
     def _setupApp(self):
         super()._setupApp()
 
-        self.frame2 = ProperDetails(self.detailsNote)
+        self.frame2 = ProperDetails(self.detailsNote, callback=self.fillTable, obj=self.obj)
         self.detailsNote.add(self.frame2, padding=3)
         self.detailsNote.tab(1, text='Proper Details', compound='left', underline='-1')
+
+    def fillTable(self, **kwargs):
+        datas = self.obj.objectSort.fillColumns(_type=int, **kwargs)
+        title = DCColumn.getTitle(**kwargs)
+        # print(self.table)
 
 
 
@@ -86,7 +89,7 @@ class DC_AccountHome(TreeColumns, AccountHome):
     def selected(self, sub, rm=0):
         # return
         if not rm: self.overview.updateDCDigits(sub)
-        self.tree.setColumns(self.columns(sub))
-        self.tree.viewObjs(sub)
+        self.table.setColumns(self.columns(sub))
+        self.table.viewObjs(sub)
 
 

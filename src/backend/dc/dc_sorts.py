@@ -77,7 +77,7 @@ class DCSort(ObjectSort):
         sortedRecs = self.sortSubsBySeasons(date, subs=recs, seasons=['date'])
         return sortedRecs
 
-    def getObj(self, date, season='', which='', account=0, object_=None, subsAttr=''):
+    def getObj(self, date=None, season='', which='', account=0, object_=None, subsAttr=''):
         subsAttr = subsAttr or 'accountsManager'
         obj = object_ or self.object
         season, which = self._format_season_which(season, which)
@@ -200,7 +200,7 @@ class DCSort(ObjectSort):
         return results, w
         # return obj, results, w
 
-    def getColumns(self, season, which, w=''):
+    def getColumns(self, season='', which='', w=''):
         num = 0
         columns = []
 
@@ -276,8 +276,6 @@ class DCSort(ObjectSort):
 
         return designedDatas
 
-    def designDatas(self, datas, season, which, w):
-        pass
 
 
 

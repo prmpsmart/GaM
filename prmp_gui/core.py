@@ -2736,7 +2736,6 @@ class PRMP_ListBox(PRMP_Frame):
     @property
     def selected(self): return self.listbox.selected
 
-
 ListBox = PLB = PRMP_ListBox
 
 class PRMP_TreeView(PRMP_Frame):
