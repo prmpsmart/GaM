@@ -318,6 +318,7 @@ class ObjectsMixins(CompareByDate, Mixins):
 
     @active.setter
     def active(self, date):
+        if self._active > date: return
         self._active = date
         if not self.strManager: self.manager.active = date
 

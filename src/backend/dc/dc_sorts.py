@@ -18,7 +18,7 @@ class DCColumn:
     subs = ['Name', 'Date', 'Active']
     subsBig = ['Name', 'Date', 'Month', 'Active']
 
-    subsAttrs = dict(Name='Name', Date='date', Month='monthYear', Active='date')
+    subsAttrs = dict(Date='date', Month='monthYear', Active='date')
 
     @classmethod
     def areas(cls, header):
@@ -212,6 +212,7 @@ class DCSort(ObjectSort):
             if ('A' in w):
                 if season == 'subs' or 'C' in w: which = 'clients'
                 else: recMs = '_areasRecMs'
+            # only for weeks, days, specday, specdays, clients
             num = DCColumn.nums[which]
             columns = DCColumn.getColumns(which, recMs)
 
@@ -226,9 +227,7 @@ class DCSort(ObjectSort):
 
     def getDataByColumns(self, datas, columns, datacols):
         columnsNum = []
-        if datas and columns:
-            caseData = datas[0]
-            columnsNum = [datacols.index(c) for c in columns]
+        if datas and columns: columnsNum = [datacols.index(c) for c in columns]
 
         refinedDatas = []
 
@@ -239,17 +238,17 @@ class DCSort(ObjectSort):
 
         return refinedDatas or datas
 
-    def fillColumns(self, season='', which='', columns=[], **kwargs):
+    def fillColumns(self, season='', which='', columns=[], _type=None, **kwargs):
         datas, w = self.sort_it(season=season, which=which, **kwargs)
         cols, num = self.getColumns(season, which, w)
         designcols, datacols = cols[:num], cols[num:]
 
         refinedDatas = self.getDataByColumns(datas, columns, datacols)
+        # print(refinedDatas)
 
         designedDatas = []
 
-        if season != 'subs':
-            addons = []
+        if season != 'subs' or w in ['Aacc']:
             case = [data[0] for data in refinedDatas]
 
             if 'Ledger Number' in designcols: attrs = [dict(account=designcols[0]), dict(region=designcols[1])]
@@ -260,12 +259,23 @@ class DCSort(ObjectSort):
 
             for cd in designedDatas:
                 index = designedDatas.index(cd)
-                cd.extend(refinedDatas[index])
-                print(cd)
+                data = refinedDatas[index]
+                if _type: data = [_type(d) for d in data]
+                cd.extend(data)
 
         else:
-            return datas, cols, num
+            for data in refinedDatas:
+                dataColumns = []
+                for col in cols:
+                    attr = self.propertize(col)
 
+                    if attr == 'month':
+                        if getattr(data, attr, None): attr = dict(month='monthYear')
+                        else: attr = dict(date='monthYear')
+                    elif attr in ['date', 'active']: attr = {attr: 'date'}
+
+                    dataColumns.append(data[attr])
+                designedDatas.append(dataColumns)
 
         return designedDatas
 
