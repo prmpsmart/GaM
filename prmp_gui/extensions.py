@@ -118,9 +118,9 @@ class PRMP_FillWidgets(PRMP_Mixins):
             if wid:
                 get = wid.get()
                 verify = getattr(wid, 'verify', None)
-                if (verify != None) and (wid.required == True):
-
-                    if verify(): result[widgetName] = get
+                if verify and wid.required:
+                    verified = verify()
+                    if verified: result[widgetName] = get
                     else:
                         try: wid.flash()
                         except: pass

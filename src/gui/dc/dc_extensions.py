@@ -476,9 +476,10 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
                 self.account.B.set(0)
 
 
-class DataChoose(LabelFrame):
+class DataChoose(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, text='Data Choose', generalAction=None, **kwargs):
-        super().__init__(master, text=text, **kwargs)
+        LabelFrame.__init__(self, master, text=text, **kwargs)
+        PRMP_FillWidgets.__init__(self)
 
         self.season = tk.StringVar()
         self.season.set('0')
@@ -486,59 +487,28 @@ class DataChoose(LabelFrame):
         relief = 'solid'
 
      # month
-        self.month = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Month', variable=self.season, value='month'), bottom=Frame, place=dict(relx=.01, rely=0, relw=.98, relh=.3), orient='h', longent=.22)
-
-        monthFrame = self.month.Bottom
-        self.monthVar = tk.StringVar()
-
-        weeks = Radiobutton(monthFrame, text='Weeks', place=dict(relx=.01, rely=.005, relw=.26, relh=.98), variable=self.monthVar, value='weeks', relief=relief)
-        days = Radiobutton(monthFrame, text='Days', place=dict(relx=.275, rely=.005, relw=.22, relh=.98), variable=self.monthVar, value='days', relief=relief)
-        specdays = Radiobutton(monthFrame, text='Spec Days', place=dict(relx=.5, rely=.005, relw=.26, relh=.98), variable=self.monthVar, value='specdays', relief=relief)
-        specday = Radiobutton(monthFrame, text='Spec Day', place=dict(relx=.76, rely=.005, relw=.24, relh=.98), variable=self.monthVar, value='specday', relief=relief)
-
-        self.setRadioGroups([weeks, days, specdays, specday])
+        self.month = RadioCombo(self, topKwargs=dict(text='Month', variable=self.season, value='month'), bottomKwargs=dict(values=['Weeks', 'Days', 'Spec Days', 'Spec Day']), place=dict(relx=.01, rely=0, relw=.98, relh=.3), orient='h')
 
      # week
-        self.week = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Week', variable=self.season, value='week'), bottom=Frame, place=dict(relx=.01, rely=.31, relw=.68, relh=.3), orient='h', longent=.32)
-
-        weekFrame = self.week.Bottom
-        self.weekVar = tk.StringVar()
-
-        days = Radiobutton(weekFrame, text='Days', place=dict(relx=.01, rely=.005, relw=.52, relh=.98), variable=self.weekVar, value='days', relief=relief)
-
-        self.setRadioGroups([days])
+        self.week = RadioCombo(self, topKwargs=dict(text='Week', variable=self.season, value='week'), bottomKwargs=dict(values=['Days']), place=dict(relx=.01, rely=.31, relw=.68, relh=.3), orient='h')
 
      # subs
-        self.subs = TwoWidgets(self, top='radiobutton', topKwargs=dict(text='Subs', variable=self.season, value='subs'), bottom=Frame, place=dict(relx=.01, rely=.62, relw=.98, relh=.3), orient='h', longent=.22)
-
-        subsFrame = self.subs.Bottom
-        self.subsVar = tk.StringVar()
-
-        date = Radiobutton(subsFrame, text='Date', place=dict(relx=.01, rely=.005, relw=.26, relh=.98), variable=self.subsVar, value='date', relief=relief)
-        week = Radiobutton(subsFrame, text='Week', place=dict(relx=.275, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='week', relief=relief)
-        month = Radiobutton(subsFrame, text='Month', place=dict(relx=.5, rely=.005, relw=.28, relh=.98), variable=self.subsVar, value='month', relief=relief)
-        year = Radiobutton(subsFrame, text='Year', place=dict(relx=.78, rely=.005, relw=.22, relh=.98), variable=self.subsVar, value='year', relief=relief)
-
-        self.setRadioGroups([date, week, month, year])
-
+        self.subs = RadioCombo(self, topKwargs=dict(text='Subs', variable=self.season, value='subs'), bottomKwargs=dict(values=['Date', 'Week', 'Month', 'Year']), place=dict(relx=.01, rely=.62, relw=.98, relh=.3), orient='h')
      #
         self.setRadioGroups([self.month, self.week, self.subs])
-
-        self.subs.switchGroup()
 
         Button(self, text='Load', command=generalAction, place=dict(relx=.78, rely=.32, relw=.2, relh=.22))
 
     def get(self, e=0):
         season = self.season.get()
-        val = ''
+        val = {}
         if season == '0': season = ''
         if season:
-            wid = self.getFromSelf(season)
-            var = self.getFromSelf(f'{season}Var')
-            if var: val = var.get()
+            va = PRMP_FillWidgets.get(self, [season])
+            val['season'] = list(va.keys())[0]
+            val['which'] = list(va.values())[0].replace(' ', '').lower()
 
-        res = [season, val]
-        return res
+        return val
 
 
 class OneInAll(PRMP_FillWidgets, LabelFrame):
@@ -579,19 +549,21 @@ class OneInAll(PRMP_FillWidgets, LabelFrame):
 
 class ProperDetails(PRMP_FillWidgets, Frame):
 
-    def __init__(self, master, obj=None, **kwargs):
+    def __init__(self, master, obj=None, table=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
 
         self.obj = obj
+        self.table = table
 
         self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj, date=PRMP_DateTime.now())
 
-        self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.38), generalAction=self.parser)
+        self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.3), generalAction=self.parser)
 
         # self.oneInAll = OneInAll(self, text='One in All.', place=dict(relx=.005, rely=.68, relw=.99, relh=.3))
 
     def parser(self):
+        if not self.table: return
         if not self.obj: return
 
         date_acc = self.date.get()
@@ -621,12 +593,12 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         #             pass
 
       # normal
-        if True:
-            season, which = self.dataChoose.get()
-            # print(season, which)
-            # return
-            datas, w = self.obj.objectSort.sort_it(date, season=season, which=which, account=account)
+        # if True:
+        data = self.dataChoose.get()
 
+
+        pass a function to recieve the or
+        pass a tabe to recieve the designed Datas
             # columns =
 
 

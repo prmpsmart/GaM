@@ -81,7 +81,7 @@ class TreeColumns:
 
         elif isinstance(sup, (DailyContribution)): return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
 
-        return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Last Active', 'attr': {'last': {'date': 'date'}}}]
+        return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Active', 'attr': {'active': 'date'}}]
 
 
 
@@ -204,6 +204,25 @@ class HierachyNColumnsExplorer(Frame):
 
     def openColumnExplorer(self, e=0): ColumnsExplorerDialog(self, columns=self.columns, callback=self.setColumns)
 
+
+class GaM_Table(Frame):
+
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        font = PRMP_Theme.BIG_FONT.copy()
+        font['size'] = 20
+
+        self.title = Label(self, text='Title of this Table.', place=dict(relx=0, rely=0, relw=1, relh=.05), font=font)
+
+        self.hnce = HierachyNColumnsExplorer(self, place=dict(relx=0, rely=.05, relw=1, relh=.95))
+
+        self.columns = self.hnce.columns
+        self.setColumns = self.hnce.setColumns
+        self.viewObjs = self.hnce.viewObjs
+
+    def setTitle(self, title):
+        if title: self.title.set(title)
 
 
 class UniqueID(Button):

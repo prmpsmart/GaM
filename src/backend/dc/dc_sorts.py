@@ -77,15 +77,14 @@ class DCSort(ObjectSort):
         sortedRecs = self.sortSubsBySeasons(date, subs=recs, seasons=['date'])
         return sortedRecs
 
-    def getObj(self, date, season='', which='', account=0, object_=None, subsAttr='subRegionsManager'):
+    def getObj(self, date, season='', which='', account=0, object_=None, subsAttr=''):
+        subsAttr = subsAttr or 'accountsManager'
         obj = object_ or self.object
         season, which = self._format_season_which(season, which)
 
         w = 'obj'
         if 'DCRegion' in obj.mroStr:
             w = 'man'
-            # if season != 'subs': obj = obj.accountsManager
-            # else: obj = obj[subsAttr]
             obj = obj[subsAttr]
 
         elif 'DCAccountsManager' in obj.mroStr: w = 'man'
@@ -94,8 +93,6 @@ class DCSort(ObjectSort):
             elif (obj.className == 'ClientsAccounts'): w = 'AaccC'
             else: w = 'acc'
             account = 0
-
-        # else: print(obj)
 
         if season not in ['years', 'year']:
             if self.checkNumber(account):

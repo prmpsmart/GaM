@@ -844,9 +844,7 @@ class PRMP_Input:
         self.placeholder = placeholder
         self.set(self.placeholder)
 
-    def verify(self):
-        return self._verify()
-
+    def verify(self): return self._verify()
 
     def normVery(self, e=0):
         get = self._get()

@@ -6,7 +6,7 @@ def addNote(self, **kwargs):
     self.note.add(self.overview, padding=3)
     self.note.tab(0, text='Overview', compound='left', underline='-1')
 
-    self.tree = HierachyNColumnsExplorer(self.note)
+    self.tree = GaM_Table(self.note)
     self.note.add(self.tree, padding=3)
     self.note.tab(1, text='Hierachy', compound='left', underline='-1')
 
