@@ -17,7 +17,31 @@ def addNote(self, **kwargs):
     self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), dialog=openCores, **kwargs)
 
 
-class DC_RegionHome(TreeColumns, RegionHome):
+class FillTable:
+
+    def fillTable(self, columns=[], **kwargs):
+
+        datas = self.obj.objectSort.fillColumns(_type=int, columns=columns, **kwargs)
+
+        title = self.obj.objectSort.getTitle(**kwargs)
+
+        self.table.setTitle(title)
+
+        self.tree = self.table.hnce.tree
+        self.tree.setColumns(columns)
+        self.tree.clear()
+
+        self.treeview = self.tree.treeview
+
+        print('datas = ', datas)
+
+        for data in datas:
+            print(data)
+            # self.treeview.insert('', values=data)
+
+
+
+class DC_RegionHome(FillTable, TreeColumns, RegionHome):
 
     def __init__(self, master=None, title='Region Home', region=None, **kwargs):
         if region:
@@ -56,26 +80,26 @@ class DC_RegionHome(TreeColumns, RegionHome):
         self.detailsNote.add(self.frame2, padding=3)
         self.detailsNote.tab(1, text='Proper Details', compound='left', underline='-1')
 
-    def fillTable(self, **kwargs):
-        datas = self.obj.objectSort.fillColumns(_type=int, **kwargs)
-        title = DCColumn.getTitle(**kwargs)
-        # print(self.table)
 
 
-
-class DC_AccountHome(TreeColumns, AccountHome):
+class DC_AccountHome(FillTable, TreeColumns, AccountHome):
 
     def _setupApp(self):
         super()._setupApp()
+
+
+        self.frame2 = ProperDetails(self.detailsNote, callback=self.fillTable, obj=self.obj)
+        self.detailsNote.add(self.frame2, padding=3)
+        self.detailsNote.tab(1, text='Proper Details', compound='left', underline='-1')
 
         self.recordsManagers.callback = self.selectedRecordsManager
 
         addNote(self)
 
         if isinstance(self.account, AreaAccount):
-            self.recordsManagers.place(relx=.005, rely=.13, relh=.36, relw=.24)
+            self.recordsManagers.place(relx=.005, rely=.16, relh=.42, relw=.99)
 
-            self.subAccounts = SubsList(self.container, text='Clients Accounts', place=dict(relx=.005, rely=.5, relh=.36, relw=.24), callback=self.selected)
+            self.subAccounts = SubsList(self.frame1, text='Clients Accounts', place=dict(relx=.005, rely=.58, relh=.42, relw=.99), callback=self.selected)
 
             if self.account: self.subAccounts.set(self.account.getClientsAccounts(), showAttr={'region': 'name'})
 

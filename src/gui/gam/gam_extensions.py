@@ -167,7 +167,6 @@ RRC = RegionRadioCombo
 
 class GaM_Hierachy(Hierachy):
 
-
     @property
     def openDialog(self): return openCores
 

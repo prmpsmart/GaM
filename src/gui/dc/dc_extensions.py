@@ -11,50 +11,53 @@ class DC_Digits(PRMP_FillWidgets, Frame):
     def __init__(self, master, values={}, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, values)
-        font = self.DEFAULT_FONT.copy()
-        font['size'] = 2
+        font = self.PRMP_FONT.copy()
+        font['size'] = 16
+        font2 = self.PRMP_FONT.copy()
+        font2['size'] = 12
+
      # Incomes
         self._incomes = incomes = LabelFrame(self, text='Incomes')
-        Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48))
-        Label(incomes, text='Transfers', place=dict(relx=.03, rely=.51, relh=.21, relw=.48))
-        self.comm = Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48))
+        Label(incomes, text='Savings', place=dict(relx=.03, rely=.27, relh=.21, relw=.48), font=font2)
+        Label(incomes, text='Transfers', place=dict(relx=.03, rely=.51, relh=.21, relw=.48), font=font2)
+        self.comm = Label(incomes, text='Commissions', place=dict(relx=.03, rely=.74, relh=.21, relw=.48), font=font2)
 
         self.incomes = Entry_Label(incomes, text='₦ 3,000,000i', place=dict(relx=.03, rely=0, relh=.24, relw=.94), font=font)
-        self.savings = Entry_Label(incomes, text='₦ 50,000s', place=dict(relx=.53, rely=.27, relh=.21, relw=.44))
-        self.transfers = Entry_Label(incomes, text='₦ 30,000tr', place=dict(relx=.53, rely=.51, relh=.21, relw=.44))
-        self.commissions = Entry_Label(incomes, text='₦ 30,000c', place=dict(relx=.53, rely=.74, relh=.22, relw=.44))
+        self.savings = Entry_Label(incomes, text='₦ 50,000s', place=dict(relx=.53, rely=.27, relh=.21, relw=.44), font=font2)
+        self.transfers = Entry_Label(incomes, text='₦ 30,000tr', place=dict(relx=.53, rely=.51, relh=.21, relw=.44), font=font2)
+        self.commissions = Entry_Label(incomes, text='₦ 30,000c', place=dict(relx=.53, rely=.74, relh=.22, relw=.44), font=font2)
 
      # Debits
         self._paidoutits = debits = LabelFrame(self, text='Debits')
-        Label(debits, text='Withdrawals', place=dict(relx=.03, rely=.35, relh=.3, relw=.48))
-        Label(debits, text='Paidouts', place=dict(relx=.03, rely=.68, relh=.28, relw=.48))
+        Label(debits, text='Withdrawals', place=dict(relx=.03, rely=.35, relh=.3, relw=.48), font=font2)
+        Label(debits, text='Paidouts', place=dict(relx=.03, rely=.68, relh=.28, relw=.48), font=font2)
 
         self.debits = Entry_Label(debits, text='₦ 80,000d', place=dict(relx=.03, rely=0, relh=.32, relw=.94), font=font)
-        self.withdrawals = Entry_Label(debits, text='₦ 50,000w', place=dict(relx=.53, rely=.35, relh=.3, relw=.44))
-        self.paidouts = Entry_Label(debits, text='₦ 30,000p', place=dict(relx=.53, rely=.68, relh=.28, relw=.44))
+        self.withdrawals = Entry_Label(debits, text='₦ 50,000w', place=dict(relx=.53, rely=.35, relh=.3, relw=.44), font=font2)
+        self.paidouts = Entry_Label(debits, text='₦ 30,000p', place=dict(relx=.53, rely=.68, relh=.28, relw=.44), font=font2)
 
      # Upfronts
         self._upfronts = upfronts = LabelFrame(self, text='Upfronts')
-        Label(upfronts, text='Repaid', place=dict(relx=.03, rely=.35, relh=.3, relw=.48))
-        Label(upfronts, text='Overdue', place=dict(relx=.03, rely=.68, relh=.28, relw=.48))
+        Label(upfronts, text='Repaid', place=dict(relx=.03, rely=.35, relh=.3, relw=.48), font=font2)
+        Label(upfronts, text='Overdue', place=dict(relx=.03, rely=.68, relh=.28, relw=.48), font=font2)
 
         self.upfronts = Entry_Label(upfronts, text='₦ 980,000up', place=dict(relx=.03, rely=0, relh=.32, relw=.94), font=font)
-        self.repaid = Entry_Label(upfronts, text='₦ 850,000r', place=dict(relx=.53, rely=.35, relh=.3, relw=.44))
-        self.overdue = Entry_Label(upfronts, text='₦ 130,000ov', place=dict(relx=.53, rely=.68, relh=.28, relw=.44))
+        self.repaid = Entry_Label(upfronts, text='₦ 850,000r', place=dict(relx=.53, rely=.35, relh=.3, relw=.44), font=font2)
+        self.overdue = Entry_Label(upfronts, text='₦ 130,000ov', place=dict(relx=.53, rely=.68, relh=.28, relw=.44), font=font2)
 
      # Balances
         self._balances = balances = LabelFrame(self, text='Balances')
-        Label(balances, text='Brought-Fs', place=dict(relx=.03, rely=.2, relh=.18, relw=.48))
-        Label(balances, text='B-T-Os', place=dict(relx=.03, rely=.4, relh=.18, relw=.48))
-        Label(balances, text='Deficits', place=dict(relx=.03, rely=.6, relh=.18, relw=.48))
-        Label(balances, text='Excesses', place=dict(relx=.03, rely=.8, relh=.18, relw=.48))
+        Label(balances, text='Brought-Fs', place=dict(relx=.03, rely=.2, relh=.18, relw=.48), font=font2)
+        Label(balances, text='B-T-Os', place=dict(relx=.03, rely=.4, relh=.18, relw=.48), font=font2)
+        Label(balances, text='Deficits', place=dict(relx=.03, rely=.6, relh=.18, relw=.48), font=font2)
+        Label(balances, text='Excesses', place=dict(relx=.03, rely=.8, relh=.18, relw=.48), font=font2)
         fon = font.copy()
         fon['size'] = 15
         self.balances = Entry_Label(balances, text='₦ 1,080,000', place=dict(relx=.03, rely=0, relh=.18, relw=.94), font=fon)
-        self.broughts = Entry_Label(balances, text='₦ 500,000br', place=dict(relx=.53, rely=.2, relh=.18, relw=.44))
-        self.btos = Entry_Label(balances, text='₦ 30,000bto', place=dict(relx=.53, rely=.4, relh=.18, relw=.44))
-        self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44))
-        self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.18, relw=.44))
+        self.broughts = Entry_Label(balances, text='₦ 500,000br', place=dict(relx=.53, rely=.2, relh=.18, relw=.44), font=font2)
+        self.btos = Entry_Label(balances, text='₦ 30,000bto', place=dict(relx=.53, rely=.4, relh=.18, relw=.44), font=font2)
+        self.deficits = Entry_Label(balances, text='₦ 30,000def', place=dict(relx=.53, rely=.6, relh=.18, relw=.44), font=font2)
+        self.excesses = Entry_Label(balances, text='₦ 30,000exc', place=dict(relx=.53, rely=.8, relh=.18, relw=.44), font=font2)
 
         self.addResultsWidgets(['incomes', 'savings', 'debits', 'withdrawals', 'paidouts', 'upfronts', 'repaid', 'overdue', 'balances', 'broughts', 'commissions', 'btos', 'transfers', 'deficits', 'excesses', 'comm'])
 
@@ -76,29 +79,29 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         upfronts = account.upfronts
 
         fillDict = dict(
-            incomes=int(account.incomes),
-            savings=int(account.savings),
+            incomes=float(account.incomes),
+            savings=float(account.savings),
 
-            debits=int(debits),
+            debits=float(debits),
 
-            withdrawals=int(account.withdrawals),
-            paidouts=int(account.paidouts),
+            withdrawals=float(account.withdrawals),
+            paidouts=float(account.paidouts),
 
-            upfronts=int(upfronts),
-            repaid=int(upfronts.repaid),
-            overdue=int(upfronts.overdue),
+            upfronts=float(upfronts),
+            repaid=float(upfronts.repaid),
+            overdue=float(upfronts.overdue),
 
-            balances=int(account.balances),
-            broughts=int(account.broughtForwards),
-            transfers=int(account.transfers)
+            balances=float(account.balances),
+            broughts=float(account.broughtForwards),
+            transfers=float(account.transfers)
             )
 
         if not isinstance(account.region, Client):
             not_client = dict(
-                commissions=int(account.commissions),
-                btos=int(account.btos),
-                deficits=int(account.deficits),
-                excesses=int(account.excesses))
+                commissions=float(account.commissions),
+                btos=float(account.btos),
+                deficits=float(account.deficits),
+                excesses=float(account.excesses))
             fillDict.update(not_client)
         else:
             client = dict(commissions=account.rate)
@@ -112,6 +115,8 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         fillDict['comm'] = 'Commissions' if not isinstance(account.region, Client) else 'Rate'
 
         self.fill(fillDict)
+        # self.incomes.set(account.incomes.name)
+
 
 
 class DC_Overview(Frame):
@@ -191,7 +196,7 @@ class DC_Overview(Frame):
             assert isinstance(account, Account)
             self.account = account
             self.month.set(self.account.month.monthYear)
-            if isinstance(account.region, Client): self.ledgerNumber.set(account.ledgerNumber)
+            self.ledgerNumber.set(account.ledgerNumber)
             self.dcDigits.update(account)
 
     def next(self):
@@ -449,6 +454,7 @@ class DateDetails(PRMP_FillWidgets, LabelFrame):
         self.obj = obj
 
         self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.45, relh=.325), orient='h', longent=.4)
+        self.date.set(date)
 
         self.account = LabelSpin(self, topKwargs=dict(text='Accounts'), place=dict(relx=.5, rely=.02, relw=.5, relh=.325), bttk=1, orient='h', longent=.6, bottomKwargs=dict(placeholder=''))
 
@@ -482,12 +488,13 @@ class DataChoose(PRMP_FillWidgets, LabelFrame):
         PRMP_FillWidgets.__init__(self)
 
         self.season = tk.StringVar()
-        self.season.set('0')
+        self.season.set('month')
 
         relief = 'solid'
 
      # month
         self.month = RadioCombo(self, topKwargs=dict(text='Month', variable=self.season, value='month'), bottomKwargs=dict(values=['Weeks', 'Days', 'Spec Days', 'Spec Day']), place=dict(relx=.01, rely=0, relw=.98, relh=.3), orient='h', longent=.3)
+        self.month.set('Weeks')
 
      # week
         self.week = RadioCombo(self, topKwargs=dict(text='Week', variable=self.season, value='week'), bottomKwargs=dict(values=['Days']), place=dict(relx=.01, rely=.31, relw=.68, relh=.3), orient='h', longent=.4)
@@ -502,7 +509,8 @@ class DataChoose(PRMP_FillWidgets, LabelFrame):
     def get(self, e=0):
         season = self.season.get()
         val = {}
-        if season == '0': season = ''
+        if season in ['0', '']: PRMP_MsgBox(self, title='Season Error', message='Pick the valid options [Week, Month, Subs]')
+
         if season:
             va = PRMP_FillWidgets.get(self, [season])
             val['season'] = list(va.keys())[0]
@@ -560,7 +568,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         self.obj = obj
         self.callback = callback
 
-        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj)
+        self.date = DateDetails(self, place=dict(relx=.005, rely=.005, relw=.99, relh=.26), relief='groove', obj=obj, date=PRMP_DateTime.now())
 
         self.dataChoose = DataChoose(self, text='Data Choose', place=dict(relx=.005, rely=.27, relw=.99, relh=.3), generalAction=self.parser)
 
@@ -570,6 +578,8 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
         self.date_acc = {}
         self.data = {}
+        self.columns = []
+        self.heads = []
 
     def parser(self):
         if not self.obj: return
@@ -587,16 +597,21 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
         obj, w = self.obj.objectSort.getObj(**self.date_acc, **self.data)
 
-        cols, num = self.obj.objectSort.getColumns(**self.data, w=w)
+        self.columns, num = self.obj.objectSort.getColumns(**self.data, w=w)
 
-        cols = cols[num:]
+        self.heads = self.columns[:num]
 
+        cols = self.columns[num:]
         self.lists.set(cols)
 
     def load(self):
         if not self.obj: return
         cols = self.lists.selected
-        if self.callback: self.callback(columns=cols, **self.date_acc, **self.data)
+
+        if cols: columns = self.heads + cols
+        else: columns = self.columns
+
+        if self.callback: self.callback(columns=columns, **self.date_acc, **self.data)
 
 
 class ChartOptions(Frame):

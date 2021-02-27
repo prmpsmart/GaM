@@ -210,6 +210,7 @@ class DCSort(ObjectSort):
                 if season == 'subs' or 'C' in w: which = 'clients'
                 else: recMs = '_areasRecMs'
             # only for weeks, days, specday, specdays, clients
+            if not which: return
             num = DCColumn.nums[which]
             columns = DCColumn.getColumns(which, recMs)
 
@@ -237,7 +238,10 @@ class DCSort(ObjectSort):
 
     def fillColumns(self, season='', which='', columns=[], _type=None, **kwargs):
         datas, w = self.sort_it(season=season, which=which, **kwargs)
-        cols, num = self.getColumns(season, which, w)
+        cols_num = self.getColumns(season, which, w)
+
+        if cols_num: cols, num = cols_num
+        else: return
         designcols, datacols = cols[:num], cols[num:]
 
         refinedDatas = self.getDataByColumns(datas, columns, datacols)
@@ -245,7 +249,7 @@ class DCSort(ObjectSort):
 
         designedDatas = []
 
-        if season != 'subs' or w in ['Aacc']:
+        if (season != 'subs') or (w in ['Aacc']):
             case = [data[0] for data in refinedDatas]
 
             if 'Ledger Number' in designcols: attrs = [dict(account=designcols[0]), dict(region=designcols[1])]
@@ -276,7 +280,33 @@ class DCSort(ObjectSort):
 
         return designedDatas
 
+    def getTitle(self, date=None, season='', which='', **kwargs):
+        if not date: return
+        obj, _ = self.getObj(date=date, season=season, which=which, **kwargs)
 
+        if not obj: return
+        season, which = self._format_season_which(season, which)
+
+        name = obj.name
+        title = ''
+
+        dateAttr = ''
+        if season == 'week': dateAttr = 'weekMonthYear'
+
+        elif season == 'month':
+            dateAttr = 'monthYear'
+
+            title = f'{which.title()} in {date[dateAttr]} of {name}'
+
+        elif season == 'subs':
+            if which == 'date': dateAttr = 'date'
+            elif which == 'week': dateAttr = 'weekMonthYear'
+            elif which == 'month': dateAttr = 'monthYear'
+            elif which == 'year': dateAttr = 'year'
+
+            title = f'Subs in {date[dateAttr]} of {name}'
+
+        return title
 
 
 
