@@ -2734,7 +2734,7 @@ class PRMP_ListBox(PRMP_Frame):
         bound_to_mousewheel(0, self)
 
     @property
-    def selected(self): return self.listbox.selected
+    def selected(self): return self.listbox.selected or []
 
 ListBox = PLB = PRMP_ListBox
 

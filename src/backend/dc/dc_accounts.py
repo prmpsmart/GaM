@@ -246,6 +246,7 @@ class AreaAccount(DCAccount):
     @property
     def recordsManagers(self):
         recordsManagers =  super().recordsManagers + [self.broughtToOffices, self.excesses, self.deficits]
+        recordsManagers.insert(1, self.commissions)
         return recordsManagers
 
     @property

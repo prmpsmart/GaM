@@ -5,6 +5,8 @@ class DCColumn:
     _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
     _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
 
+    _shorts_ = dict(BroughtForwards='Br-Fs', Contributions='Contribs', NormalIncomes='Norm-Incs', Transfers='Trans', Withdrawals='Withdraws', BroughtToOffices='B-T-Os', Excesses='Excess', Deficits='Defs', Commissions='Comms')
+
     weeks = ["Week"]
     days = ["Day", "Date"]
     specday = ['Week', 'Date']
@@ -19,6 +21,15 @@ class DCColumn:
     subsBig = ['Name', 'Date', 'Month', 'Active']
 
     subsAttrs = dict(Date='date', Month='monthYear', Active='date')
+
+    @classmethod
+    def getShorts(cls, lists):
+        shorts = []
+        for name in lists:
+            if name in cls._shorts_: new = cls._shorts_[name]
+            else: new = name
+            shorts.append(new)
+        return shorts
 
     @classmethod
     def areas(cls, header):
@@ -147,8 +158,7 @@ class DCSort(ObjectSort):
 
         else:
 
-            if w == 'acc':
-                which = which or 'days'
+            if w in ['acc', 'Aacc']:
 
                 if season == 'month':
                     if which == 'weeks':
@@ -213,6 +223,7 @@ class DCSort(ObjectSort):
             if not which: return
             num = DCColumn.nums[which]
             columns = DCColumn.getColumns(which, recMs)
+            # print(columns)
 
         elif w == 'obj' and season != 'subs':
             pass
@@ -230,7 +241,9 @@ class DCSort(ObjectSort):
         refinedDatas = []
 
         if columnsNum:
+            # print(columnsNum, columns, datacols)
             for data in datas:
+                # print(len(data), [n.className for n in data])
                 _data = [data[cn] for cn in columnsNum]
                 refinedDatas.append(_data)
 
@@ -244,6 +257,7 @@ class DCSort(ObjectSort):
         else: return
         designcols, datacols = cols[:num], cols[num:]
 
+        # print(columns)
         refinedDatas = self.getDataByColumns(datas, columns, datacols)
         # print(refinedDatas)
 
@@ -251,6 +265,7 @@ class DCSort(ObjectSort):
 
         if (season != 'subs') or (w in ['Aacc']):
             case = [data[0] for data in refinedDatas]
+            # print(case)
 
             if 'Ledger Number' in designcols: attrs = [dict(account=designcols[0]), dict(region=designcols[1])]
 

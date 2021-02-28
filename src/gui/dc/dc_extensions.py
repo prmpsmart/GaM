@@ -597,21 +597,19 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
         obj, w = self.obj.objectSort.getObj(**self.date_acc, **self.data)
 
-        self.columns, num = self.obj.objectSort.getColumns(**self.data, w=w)
+        columns, num = self.obj.objectSort.getColumns(**self.data, w=w)
 
-        self.heads = self.columns[:num]
+        self.heads = columns[:num]
 
-        cols = self.columns[num:]
-        self.lists.set(cols)
+        self.columns = columns[num:]
+        self.lists.set(self.columns)
 
     def load(self):
         if not self.obj: return
-        cols = self.lists.selected
 
-        if cols: columns = self.heads + cols
-        else: columns = self.columns
+        cols = self.lists.selected or self.columns
 
-        if self.callback: self.callback(columns=columns, **self.date_acc, **self.data)
+        if self.callback: self.callback(columns=cols, heads=self.heads, **self.date_acc, **self.data)
 
 
 class ChartOptions(Frame):
