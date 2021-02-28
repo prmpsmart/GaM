@@ -81,6 +81,9 @@ class TreeColumns:
 
         elif isinstance(sup, (DailyContribution)): return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
 
+        # elif isinstance(sup, ClientsAccounts):
+        #     return [{'text':'L/N', 'attr': 'legderNumber'}, {'text':'Name', 'attr':{'region':'name'}}, {'text':'Brfs', 'attr':'BroughtForwards'}, 'Rates', {'text':'Contribs', 'attr':'Contributions'}, 'Incomes', {'text':'Norm-Inc', 'attr':'NormalIncomes'}, {'text':'Trans', 'attr':'Transfers'}, 'Savings', 'Debits', {'text':'Widrw', 'attr':'Withdrawals'}, 'Paidouts', {'text':'Upfs', 'attr':'Upfronts'}, {'text':'Bals', 'attr':'Balances'}]
+
         return [{'text': 'Name', 'width': 250}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Active', 'attr': {'active': 'date'}}]
 
 
@@ -209,7 +212,7 @@ class GaM_Table(Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        font = PRMP_Theme.BIG_FONT.copy()
+        font = PRMP_Theme.PRMP_FONT.copy()
         font['size'] = 20
 
         self.title = Label(self, text='Title of this Table.', place=dict(relx=0, rely=0, relw=1, relh=.05), font=font)

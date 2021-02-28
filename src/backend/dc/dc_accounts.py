@@ -1,7 +1,7 @@
 
 from .dc_records_managers import *
 from ..core.accounts import PRMP_DateTime, Account, AccountsManager
-from ..core.bases import ObjectsMixins
+from ..core.bases import ObjectsManager
 
 class DCAccount(Account):
     Manager = 'DCAccountsManager'
@@ -173,16 +173,16 @@ class ClientAccount(DCAccount):
         pass
 
 
-class ClientsAccounts(ObjectsMixins):
+class ClientsAccounts(ObjectsManager):
     ObjectSortClass = DCSort
-
+    subTypes = ['Clients Accounts']
 
     def __init__(self, account):
         assert account.className == 'AreaAccount' and account.region.className == 'Area', 'This account must be an instance of AreaAccount and its region an instance of Area.'
 
-        self.master = self.manager = self.account = account
+        self.account = account
         self._subs = []
-        super().__init__(date=account.date)
+        super().__init__(account, date=account.date)
 
     @property
     def name(self): return f'{self.className}({self.account.name})'
@@ -197,6 +197,8 @@ class ClientsAccounts(ObjectsMixins):
 
     @property
     def subs(self): return self._subs
+    @property
+    def clientsAccounts(self): return self.subs
 
     @property
     def regions(self): return [acc.region for acc in self._subs]

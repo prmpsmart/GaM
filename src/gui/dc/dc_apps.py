@@ -14,7 +14,7 @@ def addNote(self, **kwargs):
     self.note.add(ae, padding=3)
     self.note.tab(2, text='Attributes', compound='left', underline='-1')
 
-    self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), dialog=openCores, **kwargs)
+    self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), dialog=openCores, obj=self.obj, **kwargs)
 
 
 class FillTable:
@@ -67,7 +67,7 @@ class DC_RegionHome(FillTable, TreeColumns, RegionHome):
     def _defs(self):
         self.subRegions.callback = self.selectedRegion
         self.accounts.callback = self.selectedAccount
-        addNote(self, obj=self.obj)
+        addNote(self)
 
         self.details.bind('<1>', lambda e: self.defaults(1))
 

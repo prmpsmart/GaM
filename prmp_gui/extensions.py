@@ -955,11 +955,11 @@ class AttributesViewer(LabelFrame):
 
         self.details = Button(self, text='Further Details', place=dict(relx=0, rely=.9, relh=.1, relw=1), command=self.open)
 
-    def openMaster(self): self.dialog(master=self, obj=self.obj)
+    def openMaster(self): self.dialog(obj=self.obj)
 
     def open(self):
-        if isinstance(self._value, (int, str, list, tuple, dict)): AttributesExplorer(self, values=self._value, dialog=self.dialog)
-        else: self.dialog(master=self, obj=self._value)
+        if isinstance(self._value, (int, str, list, tuple, dict)): AttributesExplorer(values=self._value, dialog=self.dialog, grab=0)
+        else: self.dialog(obj=self._value, grab=0, tm=1)
 
 
 class AttributesExplorer(LabelFrame):
@@ -1003,11 +1003,14 @@ class AttributesExplorer(LabelFrame):
         if obj and not values:
             keys = list(obj.__dict__.keys())
             values = [key.strip('_') for key in keys if '__' not in key]
+            values.sort()
 
         self.values = values
         self.set(values)
 
     def openAttribute(self):
+        from .dialogs import PRMP_MsgBox, AttributesViewerDialog
+
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')
 
         attrs = self.getAttributes()
@@ -1020,8 +1023,7 @@ class AttributesExplorer(LabelFrame):
                 attr = attrs[0]
                 # value = self.obj[attr]
                 # openCores(obj=value)
-                from .dialogs import AttributesViewerDialog
-                AttributesViewerDialog(self, attr=attr, obj=self.obj, dialog=self.dialog)
+                AttributesViewerDialog(attr=attr, obj=self.obj, dialog=self.dialog, tm=0, grab=0)
 
     def addAtrribute(self, e=0):
         get = self.entry.get()

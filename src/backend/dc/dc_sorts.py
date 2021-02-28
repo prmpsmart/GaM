@@ -5,7 +5,8 @@ class DCColumn:
     _clientsRecMs = ['BroughtForwards', 'Rates', 'Contributions', 'Incomes', 'NormalIncomes', 'Transfers', 'Savings', 'Debits', 'Withdrawals', 'Paidouts', 'Upfronts', 'Balances']
     _areasRecMs = ['BroughtToOffices', 'Excesses', 'Deficits']
 
-    _shorts_ = dict(BroughtForwards='Br-Fs', Contributions='Contribs', NormalIncomes='Norm-Incs', Transfers='Trans', Withdrawals='Withdraws', BroughtToOffices='B-T-Os', Excesses='Excess', Deficits='Defs', Commissions='Comms')
+    _shorts_ = dict(BroughtForwards='Br-Fs', Contributions='Contribs', NormalIncomes='Norm-Incs', Transfers='Trans', Withdrawals='Withdraws', BroughtToOffices='B-T-Os', Excesses='Excess', Deficits='Defs', Commissions='Comms', Balances='Bals')
+    _shorts_['Ledger Number'] = 'L / N'
 
     weeks = ["Week"]
     days = ["Day", "Date"]

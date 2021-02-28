@@ -12,9 +12,9 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, values)
         font = self.PRMP_FONT.copy()
-        font['size'] = 16
+        font['size'] = 24
         font2 = self.PRMP_FONT.copy()
-        font2['size'] = 12
+        font2['size'] = 16
 
      # Incomes
         self._incomes = incomes = LabelFrame(self, text='Incomes')
@@ -449,12 +449,11 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
 class DateDetails(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, date=None, obj=None, text='Date Details', **kwargs):
         LabelFrame.__init__(self, master, text=text, **kwargs)
-        PRMP_FillWidgets.__init__(self, date)
+        PRMP_FillWidgets.__init__(self)
 
         self.obj = obj
 
         self.date = LabelDateButton(self, topKwargs=dict(text='Date'), bottomKwargs=dict(callback=self.update, anchor='center'), place=dict(relx=.02, rely=.02, relw=.45, relh=.325), orient='h', longent=.4)
-        self.date.set(date)
 
         self.account = LabelSpin(self, topKwargs=dict(text='Accounts'), place=dict(relx=.5, rely=.02, relw=.5, relh=.325), bttk=1, orient='h', longent=.6, bottomKwargs=dict(placeholder=''))
 

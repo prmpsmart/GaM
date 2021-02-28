@@ -195,7 +195,7 @@ class PRMP_Theme(PRMP_Mixins):
 
     CURRENT_THEME = 'DarkBlue3'
 
-    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 13, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 14, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     DEFAULT_MINUTE_FONT = {'family': 'Segoe Marker', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
@@ -211,9 +211,9 @@ class PRMP_Theme(PRMP_Mixins):
     DEFAULT_STATUS_FONT = DEFAULT_TITLE_FONT
 
 
-    DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 13, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_LABEL_FONT = {'family': 'Viner Hand ITC', 'size': 14, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
-    DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 15, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_LABELFRAME_FONT = {'family': 'Script MT Bold', 'size': 18, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     HEADING_FONT = {'family': 'Clarendon BT', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
