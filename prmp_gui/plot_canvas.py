@@ -114,9 +114,9 @@ class Plots(PRMP_Mixins):
 
     def legend(self):
         self.subplot.legend()
-        return
-        try: self.subplot.legend()
-        except Exception as e: print(e)
+        # return
+        # try: self.subplot.legend()
+        # except Exception as e: print(e)
 
     def set_grid(self, grid):
         if not grid: return
@@ -272,8 +272,8 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
     def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, **kwargs):
 
-        if marker: markers, markersize = (self.marker_choser(len(labels)), 10)
-        else: markers = markersize = None
+        if marker: markers = self.marker_choser(len(labels))
+        else: markers = None
 
         if lss: lss = self.ls_choser(len(labels))
 

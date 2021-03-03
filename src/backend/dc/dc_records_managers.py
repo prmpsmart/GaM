@@ -219,13 +219,13 @@ class Savings(DCRecordsManager):
 class Upfronts(RepaymentsManager):
     ObjectType = Upfront
 
-    def addUpfront(self, upfront):
+    def addUpfront(self, upfront, **kwargs):
         rate = self.account.rate
-        savings = self.account.savings
+        # savings = self.account.savings
         maxDebit = rate * 30
 
         if (float(self.account.debits) + float(self) + upfront) > maxDebit: raise DCErrors.UpfrontsError(f'Client\'s debit can\'t be more than {maxDebit}')
-        else: return self.createRecord(upfront)
+        else: return self.createRecord(upfront, **kwargs)
 
     @property
     def repaidUpfront(self): return self.repaid

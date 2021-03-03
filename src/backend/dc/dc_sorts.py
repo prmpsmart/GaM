@@ -298,6 +298,7 @@ class DCSort(ObjectSort):
 
     def getTitle(self, date=None, season='', which='', **kwargs):
         if not date: return
+        
         obj, _ = self.getObj(date=date, season=season, which=which, **kwargs)
 
         if not obj: return

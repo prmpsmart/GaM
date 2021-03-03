@@ -33,7 +33,8 @@ class Chart_Sort:
     def plot_data_sort(self, region, yaxis, month=None, area=None, week=None, day=None, spec=None, sole="", header=None):
         sub_regions = []
         columns = []
-        ## sub_Ys        clnt = []
+        ## sub_Ys
+        clnt = []
         brf = []
         com = []
         sav = []
@@ -66,18 +67,18 @@ class Chart_Sort:
                 sub_regions = Regions.same_areas_in_year(region, area)
             elif header == "areas": columns = Regions.sum_areas_in_year(region)
             else: sub_regions = region.months
-        
+
         elif region.which == "month":
             if header == "areas":
                 areas = region.areas
                 for area in areas:
                     if day: column = Days.day_column(area, day)
-                    
+
                     elif week: column = Weeks.week_column(area, week)
 
                     else: column = area.datas()
                     columns.append(column)
-                    
+
             elif header == "weeks": columns = list(Weeks.weekly_sort(region))
             elif header == "days":
                 columns = list(Days.daily_sort(region, week=week))
@@ -88,7 +89,7 @@ class Chart_Sort:
                 self.ys = column[1:]
                 self.labels = column[0]
                 self.go = 1
-                return 
+                return
             elif day:
                 column = Days.day_column(region, day)
                 self.xticks = self.class_xticks
@@ -101,7 +102,7 @@ class Chart_Sort:
             if header == "areas": sub_regions = region.areas
             elif header == "weeks": columns = Weeks.weekly_sort(region)
             elif header == "days": columns = Days.daily_sort(region, week=week)
-        
+
         ## Sorting the required records for ploting
         if sole == "1":
             num = 1
@@ -109,7 +110,7 @@ class Chart_Sort:
             if region.which in ["year", "month"]: num = 2
             datas = region.datas()
             self.ys = datas[num:]
-            
+
             self.labels = datas[0]
             self.go = 1
             return
@@ -121,70 +122,74 @@ class Chart_Sort:
                     if sub_region.which == "year": xticks.append(sub_region.name)
                     else: xticks.append(sub_region.month_name)
                 else: xticks.append(sub_region.name)
-                
+
                 if self.records[0] in yaxis: clnt.append(sub_region.total_clients)
-                    
+
                 if self.records[1] in yaxis: brf.append(sub_region.brought_forwards)
-                    
+
                 if self.records[2] in yaxis: com.append(sub_region.commissions)
-                
+
                 if self.records[3] in yaxis: sav.append(sub_region.savings)
-                
+
                 if self.records[4] in yaxis: deb.append(sub_region.debits)
-                
+
                 if self.records[5] in yaxis: not_paid.append(sub_region.not_paids)
-                
+
                 if self.records[6] in yaxis: upf.append(sub_region.upfronts)
-                
+
                 if self.records[7] in yaxis: pupf.append(sub_region.p_upfronts)
-                
+
                 if self.records[8] in yaxis: rupf.append(sub_region.r_upfronts)
-                
+
                 if self.records[9] in yaxis: bal.append(sub_region.balances)
-                
+
                 if self.records[10] in yaxis: def_.append(sub_region.deficits)
-                
+
                 if self.records[11] in yaxis: exc.append(sub_region.excesses)
-                
+
                 if self.records[12] in yaxis: bto.append(sub_region.btos)
 
         elif columns:
             for data in columns:
                 xticks.append(data[0])
                 if self.records[0] in yaxis: clnt.append(data[1])
-                
+
                 if self.records[1] in yaxis: brf.append(data[2])
-                    
+
                 if self.records[2] in yaxis: com.append(data[3])
-                    
+
                 if self.records[3] in yaxis: sav.append(data[4])
-                    
+
                 if self.records[4] in yaxis: deb.append(data[5])
-                    
+
                 if self.records[5] in yaxis: not_paid.append(data[6])
-                
+
                 if self.records[6] in yaxis: upf.append(data[7])
-                
+
                 if self.records[7] in yaxis: pupf.append(data[8])
-                
+
                 if self.records[8] in yaxis: rupf.append(data[9])
-                
+
                 if self.records[9] in yaxis: bal.append(data[10])
-                
+
                 if self.records[10] in yaxis: def_.append(data[11])
-                
+
                 if self.records[11] in yaxis: exc.append(data[12])
-                
+
                 if self.records[12] in yaxis: bto.append(data[13])
 
         if columns or sub_regions:
             for y in [clnt, brf, com, sav, deb, not_paid, upf, pupf, rupf, bal, def_, exc, bto]:
                 if y: ys.append(y)
-            
+
             self.xticks = xticks
+            print('xticks', xticks)
+            print('ys', ys)
+            print('labels', labels)
+
             if len(yaxis) == 1: self.ys = ys[0]
             else: self.ys = ys
-            
+
             self.labels = labels
             self.go = 1
 

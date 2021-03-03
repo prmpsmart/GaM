@@ -90,7 +90,6 @@ class UpfrontRepaymentsManager(RecordsManager):
         super().removeRecord(rec)
         if called == 0: self.balance()
 
-
 class Upfront(DCRepayment):
     dueSeason = 'month'
     dueTime = 1
@@ -98,6 +97,11 @@ class Upfront(DCRepayment):
     ObjectType = UpfrontRepaymentsManager
 
     def update(self, values={}, first=1): super().update(values, first)
+
+    @property
+    def subs(self): return self[:]
+
+
 
 
 

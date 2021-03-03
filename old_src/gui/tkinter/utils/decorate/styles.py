@@ -1,10 +1,11 @@
 from .colours import Colours, Fonts
-from ttkthemes import ThemedStyle
+# from ttkthemes import ThemedStyle
 from ..widgets.admin_req import make_change
-
+from tkinter.ttk import Style
+ThemedStyle = Style
 
 all_themes = ["alt", "aquativo", "arc", "black", "blue", "clam", "classic", "clearlooks", "default", "elegance","itft1", "keramik", "kroc", "plastik", "radiance", "scidblue", "scidgreen", "scidgrey", "scidmint", "scidpink", "scidpurple", "scidsand", "smog", "ubuntu", "vista", "winnative", "winxpblue", "xpnative", "equilux", "breeze"]
-    
+
 class Styles(ThemedStyle):
     geometry = "1500x780+45+40"
     short_geo = "600x700"
@@ -62,19 +63,20 @@ class Styles(ThemedStyle):
             cls.higfg                = "white"
             cls.background           = "#e7eaf0"
             cls.foreground           = "black"
-    
+
     def __init__(self, master=None, theme='', chart=''):
         if theme: self.style = theme
         if chart: self.chart = chart
-        
+
         if master:
             super().__init__(master)
+
             if theme: self.change_style(theme)
-        
+
 
     def change_style(self, theme, func=None):
         Styles.change(theme)
-        self.theme_use(theme)
+        # self.theme_use(theme)
         self.map("TCheckbutton", foreground=[("pressed", "red"), ("active", "blue")], background=[("pressed", "!disabled", "black"), ("active", "white")])
         self.changeit_theme(theme)
         if func: make_change(func)
@@ -82,17 +84,19 @@ class Styles(ThemedStyle):
     def changeit_theme(self, theme):
         if theme == "clam":
             self.configure(".", background="#3c7333")
-    
+
     @classmethod
     def get_state(cls): return cls(theme=cls.style, chart=cls.chart)
     @classmethod
     def load_state(cls, imageobj):
         if isinstance(imageobj, cls):
-            
+
             cls.change(imageobj.style)
             cls.chart = imageobj.chart
-    
-    def set_default(self): self.theme_use(self.style)
+
+    def set_default(self):
+        return
+        self.theme_use(self.style)
 
 
 

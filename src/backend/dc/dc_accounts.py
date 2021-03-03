@@ -134,6 +134,9 @@ class ClientAccount(DCAccount):
 
         self.contributions = Contributions(self)
         self.rates = Rates(self, rate, ledgerNumber)
+        self.addUpfront = self.upfronts.addUpfront
+        self.addContribution = self.contributions.addContribution
+
 
     @property
     def name(self): return f'{self.className}({self.region.name} | {self._month.monthYear} | Ledger-Number No. {self.ledgerNumber})'
@@ -158,19 +161,13 @@ class ClientAccount(DCAccount):
 
         self.balances.createRecord(bal, notAdd=True, newRecord=False, date=date)
 
-    def addContribution(self, contribution, **kwargs):
-        rec = self.contributions.addContribution(contribution, **kwargs)
-        return rec
 
-    def addDebit(self, debit, _type='w', **kwargs):
+    def addDebit(self, debit, **kwargs):
         self._balanceAccount()
         rec = self.debits.addDebit(debit, _type=_type, **kwargs)
         self.balanceAccount()
         return rec
 
-    def addUpfront(self, upfront):
-        # assert PRMP_DateTime.now().isSameMonth(month)
-        pass
 
 
 class ClientsAccounts(ObjectsManager):
