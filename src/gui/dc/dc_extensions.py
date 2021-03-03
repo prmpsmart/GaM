@@ -165,8 +165,8 @@ class DC_Overview(Frame):
         ys = [random.randint(2, 9) for a in xs]
         lbls = 'Test'
         ls = self.plotCanvas1.ls_choser()
-        self.plotCanvas1.doPloting(chart='plot', ys=ys, xticks=xs, labels=lbls, grid=dict(lw=1, ls=ls, c='red'), marker=1)
-        self.plotCanvas2.doPloting(chart='pie', ys=ys, labels=xs, explode=9, expand=0, shadow=9, title='Love', inApp=0)
+        self.plotCanvas1.doPlotting(chart='plot', ys=ys, xticks=xs, labels=lbls, grid=dict(lw=1, ls=ls, c='red'), marker=1)
+        self.plotCanvas2.doPlotting(chart='pie', ys=ys, labels=xs, explode=9, expand=0, shadow=9, title='Love', inApp=0)
 
 
     def placeVertically(self):

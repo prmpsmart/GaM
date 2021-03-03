@@ -630,6 +630,7 @@ class Thrift_Analysis(Frame):
             xticks = self.sorted_datas.xticks
             ys = self.sorted_datas.ys
             labels = self.sorted_datas.labels
+            print(labels)
 
             xlabel = self.sorted_datas.xlabel
             ylabel = self.sorted_datas.ylabel

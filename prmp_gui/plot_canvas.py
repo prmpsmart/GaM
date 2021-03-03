@@ -17,8 +17,9 @@ class Bar:
 
     def _x_axis(self):
         try:
-            assert len(self.labels) == len(self.ys)
-            assert len(self.xticks) == len(self.ys[0])
+            assert len(self.labels) == len(self.ys), f'Length of "labels-> {len(self.labels)}" must be equal to the length of "ys-> {len(self.ys)}"'
+
+            assert len(self.xticks) == len(self.ys[0]), f'Length of "xticks-> {len(self.xticks)}" must be equal to the length of "ys[0]-> {len(self.ys[0])}"'
 
             self.x_points = len(self.ys[0])
             self.d_1_point = len(self.ys)
@@ -40,7 +41,8 @@ class Bar:
         point = 0
         self.plot_points = []
         try:
-            assert len(self.xticks) == len(self.ys[0])
+            assert len(self.xticks) == len(self.ys[0]), f'Length of "xticks-> {len(self.xticks)}" must be equal to the length of "ys[0]-> {len(self.ys[0])}"'
+
             for _ in self.ys:
                 e_tick_points = [self.float_it(p + point) for p in range(self.x_points)]
                 self.plot_points.append(e_tick_points)
@@ -50,8 +52,19 @@ class Bar:
     def switch(self):
         if self.d_1_point != 1:
             self.xticks, self.labels = self.labels, self.xticks
-            self.ys = [[b[self.ys[0].index(bar)] for b in self.ys] for bar in self.ys[0]]
+
+            rly = range(len(self.ys[0]))
+            _ys = []
+
+            for yn in rly:
+                y = []
+                for _y in self.ys:
+                    x = _y[yn]
+                    y.append(x)
+                _ys.append(y)
+            self.ys = _ys
             self._x_axis()
+            
             return 1
         else: print('d_1_point=1', __file__)
 
@@ -77,7 +90,7 @@ class Plots(PRMP_Mixins):
         if set_xticks: self.subplot.set_xticks(set_xticks)
         if set_yticks: self.subplot.set_yticks(set_yticks)
 
-        if xticks: self.subplot.set_xticklabels(xticks, rotation=axisrotate[0])
+        # if xticks: self.subplot.set_xticklabels(xticks, rotation=axisrotate[0])
         if yticks: self.subplot.set_yticklabels(yticks, rotation=axisrotate[1])
 
         if title: self.subplot.set_title(title)
@@ -88,7 +101,7 @@ class Plots(PRMP_Mixins):
     def doAnnotation(self):
         if self.annotation: self.annotate(**self.genAnnot(**self.annotation))
 
-    def doPloting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
+    def doPlotting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
         self.clear()
         self.chart = chart
 
@@ -98,7 +111,7 @@ class Plots(PRMP_Mixins):
         # func(self, **kwargs)
 
         self.doAnnotation()
-        # self.legend()
+        self.legend()
         self.set_grid(grid)
 
         if autoAdjust:
@@ -134,8 +147,10 @@ class Plots(PRMP_Mixins):
         if not alpha:  alpha = 1
 
         try:
-            assert len(labels) == len(ys)
-            assert len(xticks) == len(ys[0])
+            assert len(labels) == len(ys), f'Length of "labels-> {len(labels)}" must be equal to the length of "ys-> {len(ys)}"'
+
+            assert len(xticks) == len(ys[0]), f'Length of "xticks-> {len(xticks)}" must be equal to the length of "ys[0]-> {len(ys[0])}"'
+
             indexes = range(len(labels))
             for index in indexes:
                 y = ys[index]
@@ -153,7 +168,7 @@ class Plots(PRMP_Mixins):
                 self.subplot.plot(xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
 
         except Exception as e:
-
+            print(e)
             if markers:
                 markers = markers[0]
                 markersize = 10
@@ -163,6 +178,7 @@ class Plots(PRMP_Mixins):
 
             if lss: lss = lss[0]
             else: lss = None
+        return
 
         self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
 
@@ -255,7 +271,7 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
             else: markers_give.append(mark)
         return markers_give
 
-    def doPloting(self, expand=False, inApp=1, adjust={}, **kwargs):
+    def doPlotting(self, expand=False, inApp=1, adjust={}, **kwargs):
         pie = kwargs.get('pie', False)
         draw = True
 
@@ -267,7 +283,7 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
         if adjust: dic['adjust'] = adjust
 
-        super().doPloting(**dic)
+        super().doPlotting(**dic)
         if expand: self.show()
 
     def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, **kwargs):
@@ -297,7 +313,7 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
     def set_grid(self, grid): super().set_grid(grid)
 
-    def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPloting(chart=self.chart, grid=self._grid, **self.chart_datas)
+    def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPlotting(chart=self.chart, grid=self._grid, **self.chart_datas)
 
 
 

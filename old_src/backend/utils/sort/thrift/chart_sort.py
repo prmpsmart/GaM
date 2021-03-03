@@ -183,9 +183,9 @@ class Chart_Sort:
                 if y: ys.append(y)
 
             self.xticks = xticks
-            print('xticks', xticks)
-            print('ys', ys)
-            print('labels', labels)
+            # print('xticks', xticks)
+            # print('ys', ys)
+            # print('labels', labels)
 
             if len(yaxis) == 1: self.ys = ys[0]
             else: self.ys = ys
