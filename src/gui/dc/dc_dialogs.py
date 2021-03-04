@@ -444,16 +444,62 @@ class DailyContributionDailog(GaM_Dialog):
             PRMP_MsgBox(self, title='Account creation is successful.', message=text, ask=0, delay=0)
 
 
-class PlotDialog(GaM_Dialog):
+class FillTable:
 
-    def __init__(self, master=None, title='Plot Dialog', geo=(1500, 800), **kwargs):
+    def getDatas(self, columns=[], plot=0, heads=[],season='', which='', **kwargs):
+
+        datas = self.obj.objectSort.fillColumns(_type=int, columns=columns, heads=heads, season=season, which=which, **kwargs)
+        ticks = []
+
+        if plot and datas:
+            num = len(heads)
+            _num = 0
+            if season == 'month' and  which == 'days': _num = 1
+
+            ticks = [data[_num] for data in datas]
+            datas = [data[num:] for data in datas]
+
+        title = self.obj.objectSort.getTitle(**kwargs)
+
+        return datas, title, ticks
+
+    def fillPlot(self, columns=[], heads=[], **kwargs):
+        datas, title, ticks = self.getDatas(plot=1, columns=columns, heads=heads, **kwargs)
+
+        self.plotDatas = dict(xticks=columns, ys=datas, labels=ticks, title=title)
+
+    def fillTable(self, columns=[], heads=[], **kwargs):
+        datas, title, _ = self.getDatas(columns=columns, heads=heads, **kwargs)
+
+        self.table.setTitle(title)
+
+        self.tree = self.table.hnce.tree
+
+        headies = DCColumn.getShorts(heads + columns)
+        self.tree.setColumns(headies)
+        self.tree.clear()
+
+        self.treeview = self.tree.treeview
+
+        if not datas: return
+
+        for data in datas:
+            text, *values = data
+            self.treeview.insert('', text=text, values=values)
+
+
+class PlotDialog(FillTable, GaM_Dialog):
+
+    def __init__(self, master=None, title='Plot Dialog', geo=(1500, 800), obj=None, **kwargs):
+        self.obj = obj
+        self.plotDatas = {}
         super().__init__(master, title=title, geo=geo, tm=0, **kwargs)
 
     def _setupDialog(self):
 
         note = Notebook(self.container, place=dict(relx=.005, rely=.005, relw=.28, relh=.64))
 
-        self.frame2 = ProperDetails(note)
+        self.frame2 = ProperDetails(note, obj=self.obj, callback=self.fillPlot)
         note.add(self.frame2, padding=3)
         note.tab(0, text='Proper Details', compound='left', underline='-1')
 
@@ -461,161 +507,49 @@ class PlotDialog(GaM_Dialog):
 
         fr = Frame(self.container, place=dict(relx=.285, rely=.005, relw=.711, relh=.99))
 
-        # from prmp_gui.plot_canvas import PRMP_PlotCanvas
-        # self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
-        # self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
-        # self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))
-        # self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
+        from prmp_gui.plot_canvas import PRMP_PlotCanvas
+        self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
+        self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
+        self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))
+        self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
 
-        # self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
+        self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
 
       ############ Plot and Clear
 
-        self.plot_btn = Button(self.container, command=self.chart_sort, text='Plot', place=dict(relx=.02, rely=.952, relh=.044, relw=.1))
+        self.plot_btn = Button(self.container, command=self.plotIt, text='Plot', place=dict(relx=.02, rely=.952, relh=.044, relw=.1))
+        self.bind('<Control-P>', self.plotIt)
+        self.bind('<Control-p>', self.plotIt)
 
         self.clear_btn = Button(self.container, command=self.clear_plot, text='Clear', place=dict(relx=.16, rely=.952, relh=.044, relw=.1))
-
-    def chart_sort(self):
-        return
-        str_region = self.region_cbtn.get()
-        datas = self.data_cbtn.get()
-        spec_datas = self.spec_cbtn.get() or None
-        month = area = day = week = None
-        sole = self.sole_cbtn.get()
-        go = 0
-        if str_region == 'years':
-            try:
-                region = self.plot_years
-
-                if self.plot_spec_cbtn.get() != '1':
-                    if sole == '1':
-                        title = 'ALL Years DETAILS'
-                        xlabel = 'Records'
-                        ylabel = ''
-                        go = 1
-                    elif datas == 'years':
-                        title = 'All Years'
-                        xlabel = 'Years'
-                        ylabel = 'Records'
-                        go = 1
-                    elif datas == 'months':
-                        title = 'Months in All Years'
-                        xlabel = 'Months'
-                        ylabel = 'Records'
-                        go = 1
-                    elif datas == 'areas':
-                        title = 'Areas in All Years'
-                        xlabel = 'Areas'
-                        ylabel = 'Records'
-                        go = 1
-                    else: PRMP_MsgBox(self, message='Choose Years or Months or Areas', title='Required Datas', _type='error'); go = 0
-                else:
-                    if spec_datas == 'spec_month':
-                        month = self.s_d_month.get()
-
-                        title = f'{month} in ALL Years'
-                        xlabel = 'Years'
-                        ylabel = 'Records'
-                        go = 1
-                    elif spec_datas == 'spec_area':
-                        area = self.s_d_area.get()
-
-                        title = f'{area} in ALL Years'
-                        xlabel = 'Years'
-                        ylabel = 'Records'
-                        go = 1
-            except: PRMP_MsgBox(self, title='Requires Regions', message='Not loaded', _type='error'); go = 0
-
-        elif str_region == 'year':
-            try:
-                region = self.plot_year
-                if self.plot_spec_cbtn.get() != '1':
-
-                    if sole == '1':
-                        title = f'{region} DETAILS'
-                        xlabel = 'Records'
-                        ylabel = ''
-                        go = 1
-                    elif datas == 'months':
-                        title = f'Months in Year {region}'
-                        xlabel = 'Months'
-                        ylabel = 'Records'
-                        go = 1
-                    elif datas == 'areas':
-                        title = f'Areas in Year {region}'
-                        xlabel = 'Areas'
-                        ylabel = 'Records'
-                        go = 1
-                    else: PRMP_MsgBox(self, message='Choose Months or Areas', title='Required Datas', _type='error'); go = 0
-                else:
-                    if spec_datas == 'spec_area':
-                        area = self.s_d_area.get()
-
-                        title = f'{area} in {region}'
-                        xlabel = 'Months'
-                        ylabel = 'Records'
-                        go = 1
-            except: PRMP_MsgBox(self, title='Requires Regions', message='Pick a valid Year', _type='error'); go = 0
-
-        elif str_region == 'month':
-            try:
-                region = self.plot_month
-
-                if sole == '1':
-                    title = f'{region} DETAILS'
-                    xlabel = 'Records'
-                    ylabel = ''
-                    go = 1
-                elif datas == 'areas':
-                    title = f'Areas in {region}'
-                    xlabel = 'Areas'
-                    ylabel = 'Records'
-                    go = 1
-                elif datas == 'weeks':
-                    title = f'Weeks in {region}'
-                    xlabel = 'Weeks'
-                    ylabel = 'Records'
-                    go = 1
-                else: PRMP_MsgBox(self, message='Choose Areas or Weeks', title='Required Datas', _type='error'); go = 0
-            except: PRMP_MsgBox(self, title='Requires Regions', message='Pick a valid Month', _type='error'); go = 0
-
-        elif str_region == 'area':
-            try:
-                region = self.plot_area
-                if sole == '1':
-                    title = f'{region} DETAILS'
-                    xlabel = 'Records'
-                    ylabel = ''
-                    go = 1
-                elif datas == 'weeks':
-                    title = f'Weeks in {region}'
-                    xlabel = 'Years'
-                    ylabel = 'Records'
-                    go = 1
-                else: PRMP_MsgBox(self, message='Choose Weeks', title='Required Datas', _type='error'); go = 0
-            except: PRMP_MsgBox(self, title='Requires Regions', message='Pick a valid Area', _type='error'); go = 0
+        self.bind('<Control-C>', self.clear_plot)
+        self.bind('<Control-c>', self.clear_plot)
 
 
-        else: PRMP_MsgBox(self, message='Choose All Years or Year or Month or Area_or Client', title='Required Regions', _type='error'); go = 0
+    def plotIt(self, e=0):
+        plotDetails = self.chartOptions.get()
+        figNum = plotDetails.pop('figNum')
 
-        if go:
-            self.sorted_datas = Chart_Sort(region=region, yaxis=self.get_datas(), sole=sole, month=month, area=area, header=datas)
-            self.sorted_datas.xlabel = xlabel
-            self.sorted_datas.ylabel = ylabel
-            self.sorted_datas.title = title
-            self.gather_to_plot()
+        if figNum > 4: figNum = 4
+        elif figNum < 0: figNum = 1
 
-        elif go == 0: PRMP_MsgBox(self, message='This is not implemented yet Value = Zero', title='Not Implemented', _type='info')
+        plot = self.plots_figures[figNum-1]
+        if plot and self.plotDatas:
+            plot.doPlotting(**self.plotDatas, **plotDetails)
+            plot.draw()
 
-    def clear_plot(self):
+
+    def clear_plot(self, e=0):
         num = self.chartOptions.fig.get()
         if num:
             num = int(num)
-            # fig = self.plots_figures[num - 1]
-            # fig.clear()
+
+            if num > 4: num = 4
+            elif num < 0: num = 1
+
+            fig = self.plots_figures[num - 1]
+            fig.clear()
         else: PRMP_MsgBox(self, message='Pick a chart number', title='Required Chart Number', _type='error')
-
-
 
 
 class ContribApp(GaM_Dialog):

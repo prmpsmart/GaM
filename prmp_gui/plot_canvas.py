@@ -4,18 +4,20 @@ from .core import PRMP_Frame, PRMP_Mixins
 import random
 
 
-class Bar:
-    def __init__(self, xticks, ys, labels):
+class PlotDatas:
+    def __init__(self, xticks=[], ys=[], labels=[], xlabel='', ylabel='', plot=0):
         self.xticks = xticks
         self.ys = ys
+        self.xlabel = xlabel
+        self.ylabel = ylabel
         self.labels = labels
-        self._x_axis()
+        self._x_axis(plot)
 
     def float_it(self, num):
         re = float('%.2f' % num)
         return re
 
-    def _x_axis(self):
+    def _x_axis(self, plot=0):
         try:
             assert len(self.labels) == len(self.ys), f'Length of "labels-> {len(self.labels)}" must be equal to the length of "ys-> {len(self.ys)}"'
 
@@ -26,7 +28,8 @@ class Bar:
             self.width = self.float_it(1. / (self.d_1_point + 1))
             self.space = self.float_it(1. / (self.d_1_point))
 
-        except:
+        except Exception as e:
+            print(e)
             self.x_points = len(self.ys)
             self.d_1_point = 1
             self.width = .6
@@ -52,6 +55,8 @@ class Bar:
     def switch(self):
         if self.d_1_point != 1:
             self.xticks, self.labels = self.labels, self.xticks
+            self.xlabel, self.ylabel = self.ylabel, self.xlabel
+
 
             rly = range(len(self.ys[0]))
             _ys = []
@@ -62,12 +67,14 @@ class Bar:
                     x = _y[yn]
                     y.append(x)
                 _ys.append(y)
+
             self.ys = _ys
             self._x_axis()
-            
+
             return 1
         else: print('d_1_point=1', __file__)
 
+Bar = PlotDatas
 
 class Plots(PRMP_Mixins):
     bkcol = 'white'
@@ -82,7 +89,7 @@ class Plots(PRMP_Mixins):
         self.chart = 'plot'
         self.annotation = {}
 
-    def annotate(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)):
+    def annotate(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(0, 0), lblrotate=(0, 90)):
 
         if xlabel: self.subplot.set_xlabel(xlabel, rotation=lblrotate[0])
         if ylabel: self.subplot.set_ylabel(ylabel, rotation=lblrotate[1])
@@ -90,22 +97,24 @@ class Plots(PRMP_Mixins):
         if set_xticks: self.subplot.set_xticks(set_xticks)
         if set_yticks: self.subplot.set_yticks(set_yticks)
 
-        # if xticks: self.subplot.set_xticklabels(xticks, rotation=axisrotate[0])
+        # if xticks: self.subplot.set_xticklabels(xticks)
+        if xticks: self.subplot.set_xticklabels(xticks, rotation=axisrotate[0])
+
         if yticks: self.subplot.set_yticklabels(yticks, rotation=axisrotate[1])
 
         if title: self.subplot.set_title(title)
-        # if self.chart != 'pie': self.subplot.set_title(title)
+        if self.chart != 'pie': self.subplot.set_title(title)
 
-    def genAnnot(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(50, 0), lblrotate=(0, 90)): return dict(xlabel=xlabel, ylabel=ylabel, title=title, xticks=xticks, yticks=yticks, set_xticks=set_xticks, set_yticks=set_yticks, axisrotate=axisrotate, lblrotate=lblrotate)
+    def genAnnot(self, xlabel='', ylabel='', title='', xticks=0, yticks=0, set_xticks=0, set_yticks=0, axisrotate=(0, 0), lblrotate=(0, 90)): return dict(xlabel=xlabel, ylabel=ylabel, title=title, xticks=xticks, yticks=yticks, set_xticks=set_xticks, set_yticks=set_yticks, axisrotate=axisrotate, lblrotate=lblrotate)
 
     def doAnnotation(self):
         if self.annotation: self.annotate(**self.genAnnot(**self.annotation))
 
     def doPlotting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
         self.clear()
-        self.chart = chart
+        self.chart = chart.lower()
 
-        func = self.getFromSelf(chart)
+        func = self.getFromSelf(self.chart)
         # print()
         func(**kwargs)
         # func(self, **kwargs)
@@ -142,19 +151,23 @@ class Plots(PRMP_Mixins):
         self.draw()
         self.chart_datas = {}
 
-    def plot(self, xticks=[], ys=[], labels=[], markers=[], lss=[], lw=0, alpha=0):
+    def plot(self, xticks=[], ys=[], labels=[], markers=[], lss=[], linestyle=[], lw=0, linewidth=0, alpha=0, switch=0):
+        if linestyle: lss = linestyle
+        if linewidth: lw = linewidth
         if not lw: lw = 2
         if not alpha:  alpha = 1
 
+        plotDatas = PlotDatas(xticks=xticks, ys=ys, labels=labels, xlabel=self.chart_datas.get('xlabel', ''), ylabel=self.chart_datas.get('ylabel', ''), plot=1)
+
+        if switch: plotDatas.switch()
+
+        self.annotation.update(dict(xticks=plotDatas.xticks, xlabel=plotDatas.xlabel, ylabel=plotDatas.ylabel))
+
         try:
-            assert len(labels) == len(ys), f'Length of "labels-> {len(labels)}" must be equal to the length of "ys-> {len(ys)}"'
-
-            assert len(xticks) == len(ys[0]), f'Length of "xticks-> {len(xticks)}" must be equal to the length of "ys[0]-> {len(ys[0])}"'
-
-            indexes = range(len(labels))
+            indexes = range(len(plotDatas.labels))
             for index in indexes:
-                y = ys[index]
-                label = labels[index]
+                y = plotDatas.ys[index]
+                label = plotDatas.labels[index]
 
                 if markers:
                     marker = markers[index]
@@ -165,10 +178,10 @@ class Plots(PRMP_Mixins):
                 if lss: ls = lss[index]
                 else: ls = None
 
-                self.subplot.plot(xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
+                self.subplot.plot(plotDatas.xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
 
         except Exception as e:
-            print(e)
+            # print(e, 'error first')
             if markers:
                 markers = markers[0]
                 markersize = 10
@@ -178,19 +191,19 @@ class Plots(PRMP_Mixins):
 
             if lss: lss = lss[0]
             else: lss = None
-        return
 
-        self.subplot.plot(xticks, ys, label=labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
+            try: self.subplot.plot(plotDatas.xticks, plotDatas.ys, label=plotDatas.labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
+            except Exception as e:
+                # print(e)
+                pass
 
-    def bar(self, xticks=[], ys=[], labels=[], xlabel='', title='', switch='', ylabel=''):
+    def bar(self, xticks=[], ys=[], labels=[], xlabel='', title='', switch='', ylabel='', axisrotate=(20, 0)):
 
-        barObj = Bar(xticks, ys, labels)
-        if switch:
-            barObj.switch()
-            xlabel, ylabel = ylabel, xlabel
+        barObj = PlotDatas(xticks=xticks, ys=ys, labels=labels, xlabel=xlabel, ylabel=ylabel)
+        if switch: barObj.switch()
 
 
-        self.annotation = dict(xlabel=xlabel, axisrotate=(50,0), title=title, ylabel=ylabel)
+        self.annotation = dict(xlabel=barObj.xlabel, axisrotate=axisrotate, title=title, ylabel=barObj.ylabel)
         if self.chart == 'bar':
             bar_h = self.subplot.bar
             self.annotation.update(dict(set_xticks=barObj.ranges, xticks=barObj.xticks))
@@ -238,9 +251,11 @@ class Render(Plots):
 class PRMP_PlotCanvas(Plots, PRMP_Frame):
     charts = ['plot', 'bar', 'barh', 'hist', 'pie']
     lss = ['dashed', 'dashdot', 'solid', 'dotted']
+
     def __init__(self, master=None, relief='solid', **kwargs):
         PRMP_Frame.__init__(self, master, relief=relief, **kwargs)
         Plots.__init__(self)
+
         self.expand = False
 
         self.chart_datas = {}
@@ -286,14 +301,14 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
         super().doPlotting(**dic)
         if expand: self.show()
 
-    def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, **kwargs):
+    def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, axisrotate=(20, 0), **kwargs):
 
         if marker: markers = self.marker_choser(len(labels))
         else: markers = None
 
         if lss: lss = self.ls_choser(len(labels))
 
-        self.annotation = dict(xticks=xticks, axisrotate=(50,0), xlabel=xlabel, title=title, ylabel=ylabel, **annot)
+        self.annotation = dict(xticks=xticks, axisrotate=axisrotate, xlabel=xlabel, title=title, ylabel=ylabel, **annot)
 
         self.chart_datas = dict(xticks=xticks, labels=labels, markers=markers, lss=lss, **kwargs)
 

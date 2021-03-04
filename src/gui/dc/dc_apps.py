@@ -17,45 +17,6 @@ def addNote(self, **kwargs):
     self.attributes = AttributesExplorer(ae, place=dict(relx=0, rely=0, relw=1, relh=1), dialog=openCores, obj=self.obj, **kwargs)
 
 
-class FillTable:
-
-    def getDatas(self, columns=[], plot=0, heads=[], **kwargs):
-
-        datas = self.obj.objectSort.fillColumns(_type=int, columns=columns, heads=heads, **kwargs)
-
-        if plot:
-            num = len(heads)
-            datas = [data[num:] for data in datas]
-
-        title = self.obj.objectSort.getTitle(**kwargs)
-
-        return datas, title
-
-    def fillPlot(self, **kwargs):
-        datas, title = self.getDatas(plot=1, **kwargs)
-
-
-    def fillTable(self, columns=[], heads=[], **kwargs):
-        datas, title = self.getDatas(columns=columns, heads=heads, **kwargs)
-
-        self.table.setTitle(title)
-
-        self.tree = self.table.hnce.tree
-
-        headies = DCColumn.getShorts(heads + columns)
-        self.tree.setColumns(headies)
-        self.tree.clear()
-
-        self.treeview = self.tree.treeview
-
-        if not datas: return
-
-        for data in datas:
-            text, *values = data
-            self.treeview.insert('', text=text, values=values)
-
-
-
 
 class DC_RegionHome(FillTable, TreeColumns, RegionHome):
 

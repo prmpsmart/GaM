@@ -504,6 +504,8 @@ class DataChoose(PRMP_FillWidgets, LabelFrame):
         self.setRadioGroups([self.month, self.week, self.subs])
 
         Button(self, text='Parse', command=generalAction, place=dict(relx=.78, rely=.32, relw=.2, relh=.22))
+        self.bind_all('<Control-S>', generalAction)
+        self.bind_all('<Control-s>', generalAction)
 
     def get(self, e=0):
         season = self.season.get()
@@ -574,13 +576,15 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         self.lists = ListBox(self, place=dict(relx=.005, rely=.59, relw=.99, relh=.41), listboxConfig=dict(selectmode='multiple'))
 
         Button(self, text='Load', command=self.load, place=dict(relx=.72, rely=.85, relw=.2, relh=.05))
+        self.bind_all('<Control-L>', self.load)
+        self.bind_all('<Control-l>', self.load)
 
         self.date_acc = {}
         self.data = {}
         self.columns = []
         self.heads = []
 
-    def parser(self):
+    def parser(self, e=0):
         if not self.obj: return
 
         self.date_acc = self.date.get()
@@ -603,7 +607,7 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         self.columns = columns[num:]
         self.lists.set(self.columns)
 
-    def load(self):
+    def load(self, e=0):
         if not self.obj: return
 
         cols = self.lists.selected or self.columns
@@ -637,9 +641,9 @@ class ChartOptions(Frame):
         note.add(self.plot_options, padding=1)
         note.tab(1, text='Plot Options',compound='left',underline='0')
 
-        self.bar_options = LabelFrame(self.chart_lblfrm, takefocus='')
-        note.add(self.bar_options, padding=1)
-        note.tab(2, text='Bar Options',compound='left',underline='0')
+        self.switch_options = LabelFrame(self.chart_lblfrm, takefocus='')
+        note.add(self.switch_options, padding=1)
+        note.tab(2, text='Switch Options',compound='left',underline='0')
 
         self.pie_options = LabelFrame(self.chart_lblfrm, takefocus='')
         note.add(self.pie_options, padding=1)
@@ -661,13 +665,15 @@ class ChartOptions(Frame):
         self.linestyle = Checkbutton(self.plot_options, text='Line Style', place=dict(relx=.02, rely=.338, relh=.22, relw=.3))
 
         self.linewidth = LabelSpin(self.plot_options,  topKwargs=dict(text='Line Width'), bottomKwargs=dict(to=1, from_=.1, increment=.1), orient='h', place=dict(relx=.34, rely=.04, relh=.24, relw=.64))
-
+        self.linewidth.B.set(1)
 
         self.alpha = LabelSpin(self.plot_options,  topKwargs=dict(text='Alpha'), bottomKwargs=dict(to=1, from_=.1, increment=.1), orient='h', place=dict(relx=.34, rely=.33, relh=.24, relw=.64))
+        self.alpha.B.set(1)
 
-       ## Bar Options
 
-        self.switch = Checkbutton(self.bar_options, text='Switch', place=dict(relx=.02, rely=.14, relh=.25, relw=.3))
+       ## switch Options
+
+        self.switch = Checkbutton(self.switch_options, text='Switch', place=dict(relx=.02, rely=.14, relh=.25, relw=.3))
 
        ###### Pie Options
 
@@ -714,8 +720,8 @@ class ChartOptions(Frame):
             for dis in plot_dis: dis.normal()
 
 
-        if self.chart_type not in ['bar', 'barh']: self.switch.disabled()
-        else: self.switch.normal()
+        # if self.chart_type not in ['bar', 'barh']: self.switch.disabled()
+        # else: self.switch.normal()
 
         pie_conf = [self.explode, self.shadow, self.inapp]
         if self.chart_type != 'pie':
@@ -743,29 +749,29 @@ class ChartOptions(Frame):
         if self.inapp.get(): PRMP_MsgBox(title='Under Testing', message='Using Pie in Inapp will distrupt the other chart drawing', _type='warn', delay=0)
 
     def get(self):
-        chartType = self.chart_types.get()
-        if not chartType: PRMP_MsgBox(self, title='Chart Type Error', message='Choose a valid chart type.', _type='error', delay=3000)
+        chart = self.chart_types.get()
+        if not chart: PRMP_MsgBox(self, title='Chart Type Error', message='Choose a valid chart type.', _type='error', delay=3000)
 
-        results = dict(figNum=self.fig.get(), chartType=chartType)
+        results = dict(figNum=int(self.fig.get()), chart=chart)
 
         if self.grid_style.T.get():
             grid_style = self.grid_style.get().lower()
             if not grid_style: PRMP_MsgBox(self, title='Grid Style Error', message='Choose a valid grid style.', _type='error', delay=3000)
 
-            results['grid_style'] = grid_style
-            results['grid_width'] = self.grid_width.get()
-            results['grid_color'] = self._grid_color
+            grid = dict(ls=grid_style, lw=self.grid_width.get(), c=self._grid_color)
+            results['grid'] = grid
 
-        if chartType == 'Plot':
+        if chart == 'Plot':
             results['marker'] = self.marker.get()
             results['linestyle'] = self.linestyle.get()
             results['linewidth'] = self.linewidth.get()
             results['alpha'] = self.alpha.get()
-        elif chartType in ['Bar', 'Barh']: results['switch'] = self.switch.get()
-        elif chartType == 'Pie':
+        elif chart == 'Pie':
             results['inapp'] = self.inapp.get()
             results['explode'] = self.explode.get()
             results['shadow'] = self.shadow.get()
+
+        results['switch'] = self.switch.get()
 
         return results
 
