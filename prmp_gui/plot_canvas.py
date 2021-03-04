@@ -116,6 +116,7 @@ class Plots(PRMP_Mixins):
 
         func = self.getFromSelf(self.chart)
         # print()
+        if self.chart == 'pie': kwargs = {k: v for k, v in kwargs.items() if k in ['ys', 'labels', 'explode', 'shadow', 'title']}
         func(**kwargs)
         # func(self, **kwargs)
 
@@ -201,7 +202,6 @@ class Plots(PRMP_Mixins):
 
         barObj = PlotDatas(xticks=xticks, ys=ys, labels=labels, xlabel=xlabel, ylabel=ylabel)
         if switch: barObj.switch()
-
 
         self.annotation = dict(xlabel=barObj.xlabel, axisrotate=axisrotate, title=title, ylabel=barObj.ylabel)
         if self.chart == 'bar':
