@@ -138,8 +138,9 @@ class DC_Overview(Frame):
         self._prev = Button(self, text='Previous', command=self.prev)
 
         self._next = Button(self, text='Next', command=self.next)
+        from .dc_dialogs import PlotDialog
 
-        self.plotDialog = Button(self, text='Plot Dialog')
+        self.plotDialog = Button(self, text='Plot Dialog', command=lambda: PlotDialog(self, obj=self.account))
 
         self.dcDigits = DC_Digits(self)
 
@@ -629,6 +630,7 @@ class ChartOptions(Frame):
        ###### Chart Type
         self.chart_type = None
         self.chart_types = LabelCombo(self.chart_lblfrm,  topKwargs=dict(text='Chart Types'), bottomKwargs=dict(values=['Plot', 'Bar', 'Barh', 'Hist', 'Pie']), func=self.chart_types_choser, orient='h', place=dict(relx=.37, rely=.003, relh=.18, relw=.62), longent=.42)
+        self.chart_types.set('Plot')
 
        ########## Chart Types Options
         note = Notebook(self.chart_lblfrm, place=dict(relx=.003, rely=.2, relh=.8, relw=.99))

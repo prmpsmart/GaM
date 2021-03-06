@@ -31,7 +31,7 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
 
         if create: kwargs.update(dict(manager=obj))
 
-        if isinstance(obj, DCRegion): #Office is there for the mean time.
+        if isinstance(obj, (DCRegion, DCOffice)): #Office is there for the mean time.
             window = DC_RegionHome
             if not create: kwargs.update(region=obj)
 
@@ -53,7 +53,6 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
                 kwargs.update(title=obj.name, thrift=obj)
             else: window = ThriftDialog
         elif isinstance(obj, DailyContribution):
-            # print('true')
             if not create:
                 window = DailyContributionDailog
                 kwargs.update(title=obj.name, dcContrib=obj)
@@ -65,9 +64,8 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
             non = 1
 
         if non == 0:
-            # print(kwargs)
             win = window(master, **kwargs)
-            # if not master: win.start()
+            if not master: win.start()
         else: dialogFunc(master=master, **kwargs)
 
 

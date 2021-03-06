@@ -8,8 +8,9 @@ class GaM_Dialog(PRMP_Dialog):
     # def __init__(self, master=None, delay=0, **kwargs): super().__init__(master, delay=delay, **kwargs)
 
     def defaults(self):
-        self._save = GaM_Settings.threadSave
-        self._load = GaM_Settings.threadLoad
+        self.root._save = GaM_Settings.threadSave
+        self.root._load = GaM_Settings.threadLoad
+        # print(self._save)
 
     def save(self):
         # from .auths_gui import make_change
@@ -274,7 +275,9 @@ class StartDialog(GaM_Dialog):
 
         self.uniqueID = LabelEntry(self.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.1, rely=.6, relw=.8, relh=.25), bottomKwargs=dict(state='readonly'))
 
-    def defaults(self): self.uniqueID.set(self.Top.uniqueID if self.Top else '')
+    def defaults(self):
+        super().defaults()
+        self.uniqueID.set(self.Top.uniqueID if self.Top else '')
 
 
 

@@ -195,7 +195,7 @@ class PRMP_Theme(PRMP_Mixins):
 
     CURRENT_THEME = 'DarkBlue3'
 
-    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 14, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     DEFAULT_MINUTE_FONT = {'family': 'Segoe Marker', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
     BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
@@ -2137,8 +2137,8 @@ class PRMP_Window(PRMP_Widget):
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
 
         self.placeOnScreen(side, geometry)
-        self.bind('<Control-z>', self.destroySelf)
-        self.bind('<Control-Z>', self.destroySelf)
+        self.bind('<Control-E>', self.destroySelf)
+        self.bind('<Control-e>', self.destroySelf)
 
         if grab: self.grab_set()
         self.focus()

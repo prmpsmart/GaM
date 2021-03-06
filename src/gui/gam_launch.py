@@ -26,7 +26,7 @@ def testLogin(func):
 
     if Authorisation.logged_in(): testGaM(func)
     else:
-        from src.gui.core.auths_gui import Login
+        from src.gui.gam.auths_gui import Login
         func()
         Login(geo=(600, 600), tw=1,
         title='Login', callback=testGaM)
