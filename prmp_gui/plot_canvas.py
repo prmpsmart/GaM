@@ -29,7 +29,7 @@ class PlotDatas:
             self.space = self.float_it(1. / (self.d_1_point))
 
         except Exception as e:
-            print(e)
+            # print(e)
             self.x_points = len(self.ys)
             self.d_1_point = 1
             self.width = .6
