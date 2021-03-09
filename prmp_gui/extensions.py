@@ -1,6 +1,7 @@
 from .core import *
 from .miscs import create_container, bound_to_mousewheel, Columns, Column
 from prmp_miscs.prmp_pics import *
+from prmp_miscs.prmp_pics import _PIL_
 from prmp_miscs.prmp_datetime import PRMP_DateTime
 
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
@@ -134,6 +135,7 @@ FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
     def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False, **imageKwargs):
+        if not _PIL_: print('PIL is not available for this programme')
         self.rt = None
         self.prmpImage = prmpImage
         self.thumb = thumb

@@ -1,6 +1,14 @@
 
-from PIL.ImageTk import Image, PhotoImage, BitmapImage
-from PIL import ImageSequence
+
+try:
+    from PIL.ImageTk import Image, PhotoImage, BitmapImage
+    from PIL import ImageSequence
+    _PIL_ = True
+except Exception as e:
+    _PIL_ = False
+    print('PIL <pillow> image library is not installed.')
+    print(e)
+
 from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
 from .prmp_exts import *
 
@@ -100,7 +108,8 @@ class PRMP_ImageFile(PRMP_File):
             return pic
 
     @property
-    def image(self): return Image.open(self)
+    def image(self):
+        if _PIL_: return Image.open(self)
 
 
     def __init__(self, imageFileName='', inbuilt=False, inExt='png', image=None, **kwargs):
@@ -149,8 +158,8 @@ class PRMP_Image:
 
             if self.ext == 'xbm': self.imgClass = BitmapImage
 
-            img = self.image = Image.open(self.imageFile)
-            self.info = img.info
+            img = self.image = Image.open(self.imageFile) if _PIL_ else None
+            if img: self.info = img.info
 
             if resize and len(resize) == 2 and resize[0] > 0 and resize[1] > 0: img = self.resizedImage = self.image.resize(resize)
 
