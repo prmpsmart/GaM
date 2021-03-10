@@ -992,7 +992,7 @@ PIB = PRMP_InputButtons
 
 # based on tk only
 
-class PRMP_Canvas(PRMP_, ):
+class PRMP_Canvas(PRMP_, tk.Canvas):
     TKClass = tk.Canvas
 
     def __init__(self, master=None, config={}, **kwargs):
