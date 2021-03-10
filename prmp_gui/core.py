@@ -2453,11 +2453,11 @@ class PRMP_Window(PRMP_Widget):
 
         fr = F(self)
 
-        if self.__r != 1 and _PIL_:
-            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20))
+        if self.__r != 1:
+            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ else None
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20))
+            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), tip='Maximize', font='DEFAULT_SMALL_BUTTON_FONT')
 
         self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ else None
