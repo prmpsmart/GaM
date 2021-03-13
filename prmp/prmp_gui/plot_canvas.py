@@ -1,5 +1,3 @@
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from matplotlib import pyplot
 from .core import PRMP_Frame, PRMP_Mixins
 import random
 
@@ -80,6 +78,9 @@ class Plots(PRMP_Mixins):
     bkcol = 'white'
     def __init__(self, bkcol=''):
         self.big = 1
+
+        from matplotlib import pyplot
+
         self.figure = pyplot.figure(facecolor=bkcol or self.bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
 
@@ -260,6 +261,8 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
         self.chart_datas = {}
         self._pie = self.subplot.pie
+
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
         self.canvas = FigureCanvasTkAgg(self.figure, master=self).get_tk_widget()
         self.canvas.bind('<1>', self.show)
