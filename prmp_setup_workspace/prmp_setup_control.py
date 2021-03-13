@@ -5,7 +5,7 @@ root = path.dirname(path.dirname(__file__))
 
 
 filename = 'prmp\prmp_miscs\compiled\prmp_miscs.py'
-# filename = 'prmp\prmp_photoviewer\prmp_pixs1.py'
+# filename = 'prmp\prmp_miscs\compiled\prmp_gui.py'
 
 
 file = path.join(root, filename)

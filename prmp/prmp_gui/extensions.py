@@ -1111,7 +1111,9 @@ class ColumnViewer(LabelFrame):
             self.value.set(column.value)
             self._width.set(column.width)
 
-    def openMaster(self): from .dialogs import dialogFunc; dialogFunc(master=self, obj=self.obj)
+    def openMaster(self):
+        from .dialogs import dialogFunc
+        dialogFunc(master=self, obj=self.obj)
 
     def open(self):
         from .dialogs import dialogFunc, ColumnsExplorerDialog
@@ -1175,13 +1177,15 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         gets['width'] = int(width)
         try: j = self.columns.addColumn(gets)
         except:
-            from .dialogs import PRMP_MsgBox; PRMP_MsgBox(self, title='Error', _type='error', message='Try to add the "attr" value.')
+            from .dialogs import PRMP_MsgBox
+            PRMP_MsgBox(self, title='Error', _type='error', message='Try to add the "attr" value.')
         self._attr = ''
 
         self.set(self.columns)
 
     def getAttr(self):
-        from .dialogs import AttributesExplorerDialog; AttributesExplorerDialog(callback=self.setAttr)
+        from .dialogs import AttributesExplorerDialog
+        AttributesExplorerDialog(callback=self.setAttr)
 
     def setAttr(self, attr):
         if attr: self._attr = attr[0]
