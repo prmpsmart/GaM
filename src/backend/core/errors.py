@@ -1,4 +1,4 @@
-from prmp_miscs.prmp_errors import PRMP_Errors
+from prmp.prmp_miscs.prmp_errors import PRMP_Errors
 
 class Errors(PRMP_Errors):
     class RegionsManagerError(Exception): pass

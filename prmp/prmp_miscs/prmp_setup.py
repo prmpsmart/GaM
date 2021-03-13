@@ -195,8 +195,4 @@ class PRMP_Setup:
 
 
 
-f = PRMP_Setup('inno_setup', 'test.iss', gen_script=1)
-f._inno_setup()
-
-
 

@@ -97,7 +97,7 @@ class Plots(PRMP_Mixins):
         if set_xticks: self.subplot.set_xticks(set_xticks)
         if set_yticks: self.subplot.set_yticks(set_yticks)
 
-        # if xticks: self.subplot.set_xticklabels(xticks)
+        if xticks: self.subplot.set_xticklabels(xticks)
         if xticks: self.subplot.set_xticklabels(xticks, rotation=axisrotate[0])
 
         if yticks: self.subplot.set_yticklabels(yticks, rotation=axisrotate[1])

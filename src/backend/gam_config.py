@@ -1,6 +1,6 @@
 # from .gam.gam import GaM
 import pickle, os, io, zlib, threading
-from prmp_gui.core import PRMP_Theme
+from prmp.prmp_gui.core import PRMP_Theme
 from ..utils.auths import Authorisation
 
 
@@ -15,7 +15,7 @@ class GaM_Settings:
     cwd = os.getcwd()
     dataPath = os.path.join(cwd, 'data.prmp')
     otherDataPath = os.path.join(cwd, 'specialData.prmp')
-    
+
     @classmethod
     def loadAll(cls):
         # try:
@@ -36,7 +36,7 @@ class GaM_Settings:
         file = open(destFile, 'wb')
         file.write(compData)
         file.close()
-    
+
     @classmethod
     def decompress(cls, file):
         compData = open(file, 'rb').read()
@@ -57,7 +57,7 @@ class GaM_Settings:
         if not gam:
             print('GaM_Settings.GaM = None')
             return
-        
+
         gamBytes = pickle.dumps(gam)
         cls.compress(gamBytes, cls.dataPath)
 
@@ -71,7 +71,7 @@ class GaM_Settings:
             # auths
         except Exception as e: print(e)
         cls.setLoads()
-    
+
     @classmethod
     def setLoads(cls):
         PRMP_Theme.setThemeIndex(cls.ThemeIndex)

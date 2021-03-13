@@ -1,6 +1,6 @@
 from .errors import Errors
 import re, io
-from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
+from prmp.prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
 
 
 
@@ -24,4 +24,4 @@ class Mixins(PRMP_Mixins):
 
     @classmethod
     def setMoneySign(cls, sign): Mixins._moneySign = sign
-    
+

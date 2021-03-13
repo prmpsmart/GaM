@@ -1,7 +1,7 @@
 from os import path, chdir, listdir, getcwd
 # import _set
-# from prmp_gui.two_widgets import *
-from prmp_gui import *
+# from prmp.prmp_gui.two_widgets import *
+from prmp.prmp_gui import *
 PRMP_Theme.setThemeIndex(38)
 
 def getPixs(folder):
@@ -10,7 +10,7 @@ def getPixs(folder):
     cwd = getcwd()
     chdir(folder)
     pixs = []
-    
+
     for file in listdir(folder):
         if path.isfile(file):
             if PRMP_ImageType.get(file):
@@ -45,21 +45,21 @@ class PhotoViewer(PRMP_MainWindow):
         self.current = LabelLabel(self.frame, place=dict(relx=.005, rely=.9, relw=.7, relh=.09), orient='h', topKwargs=dict(text='Current: '), longent=.24)
 
         self.listBtn = Checkbutton(self.frame, place=dict(relx=.75, rely=.9, relw=.2, relh=.07), text='List?', command=self.toggleList)
-        
+
         self.listFrame = Frame(self.container)
         self.list = ListBox(self.listFrame, place=dict(relx=.005, rely=.005, relw=.99, relh=.99), callback=self.listSelection)
 
         self.defaults()
         self.placeFrame()
         self.paint()
-    
+
     def defaults(self):
         self.bind('<Left>', self.previousPic)
         self.bind('<Right>', self.nextPic)
         if self._folder: self.chooseDir(folder=self._folder)
         else: self.updateDatas()
 
-    
+
     def byIndex(self, e=0):
         index = self.index.get()
         try:
@@ -70,13 +70,13 @@ class PhotoViewer(PRMP_MainWindow):
         except Exception as e:
             PRMP_MsgBox(self, title=e.__class__.__name__, message=e, ask=0, _type='error')
             return
-    
+
     def updateDatas(self):
         self.folder.set(self._folder)
         self.total.set(self._total)
         self.index.set(self._index+1)
         self.setCurrent()
-        
+
     def setCurrent(self):
         if not self._pixs: return
         self.index.set(self._index)
@@ -87,7 +87,7 @@ class PhotoViewer(PRMP_MainWindow):
         current = path.basename(self._current)
         self.current.set(current)
         self.imageLabel.loadImage(self._current)
-    
+
     def chooseDir(self, e=0, folder=''):
         folder = folder or dialogFunc(path=1, folder=1)
         if not folder: return
@@ -99,13 +99,13 @@ class PhotoViewer(PRMP_MainWindow):
         self._total = len(self._pixs)
         self.updateDatas()
         self.list.set(self._pixs)
-    
+
     def listSelection(self, selected, event=0):
         if selected:
             selected = selected[0]
             self._index = self._pixs.index(selected)
             self.setCurrent()
-    
+
     def previousPic(self, e=0):
         if self._pixs:
             self._index -= 1
@@ -117,7 +117,7 @@ class PhotoViewer(PRMP_MainWindow):
             self._index += 1
             if self._index >= self._total: self._index = 0
             self.setCurrent()
-    
+
     def toggleList(self):
         if self.listBtn.get():
             x, y = self.geo[:2]
@@ -128,7 +128,7 @@ class PhotoViewer(PRMP_MainWindow):
             self.changeGeometry(self.geo[:2])
             self.placeFrame()
             self.listFrame.place_forget()
-    
+
     def placeFrame(self, w=0):
         if w: relw = .5
         else: relw = .99

@@ -1,6 +1,6 @@
 
 from .errors import Errors
-from prmp_miscs.prmp_datetime import *
+from prmp.prmp_miscs.prmp_datetime import *
 from .bases import ObjectsManager, ObjectsMixins
 from .records import *
 

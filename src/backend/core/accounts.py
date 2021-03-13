@@ -1,4 +1,4 @@
-from prmp_miscs.prmp_datetime import PRMP_DateTime, CompareByDate
+from prmp.prmp_miscs.prmp_datetime import PRMP_DateTime, CompareByDate
 from .bases import ObjectsMixins, Object, ObjectsManager
 from .errors import Errors
 
@@ -100,7 +100,7 @@ class Account(MonthCompare, Object):
 
     @property
     def money(self): return float(self)
-    
+
     @property
     def region(self): return self.manager.region
 

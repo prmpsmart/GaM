@@ -1,5 +1,5 @@
-from prmp_gui.extensions import *
-from prmp_miscs.prmp_pics import *
+from prmp.prmp_gui.extensions import *
+from prmp.prmp_miscs.prmp_pics import *
 from os import path, chdir, listdir, getcwd
 
 rootDir = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GAM\GAM\prmp_miscs\prmp_pics\prmp_xbms'
@@ -28,7 +28,7 @@ for xbm in listdir(rootDir):
     lbl.grid(row=r, column=c)
     count += 1
     lbls.append(lbl)
-    
+
 # B(cont, text='tesst', tip='iepie kiuaw \niua oaiw acioe opopwefno aifu').grid(column=c, row=r+2)
 # B(cont, text='tesst', tip='iepie kiuaw \niua oaiw acioe opopwefno aifu').grid()
 

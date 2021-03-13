@@ -1,16 +1,16 @@
 from os import listdir, path, chdir, getcwd
 from base64 import b64encode, b64decode
-from prmp_miscs.prmp_pics import PRMP_ImageType
+from prmp.prmp_miscs.prmp_pics import PRMP_ImageType
 
 cwd = getcwd()
 
 
 def makeImage(cat):
     _dir_ = dir_ = '.'
-    
+
 
     file = 'gam_images.py'
-    
+
     opn = open(file, 'w')
     # return
 
@@ -25,7 +25,7 @@ def makeImage(cat):
         enc  = b64encode(data)
         strf = f"{name} = {enc} \n\n"
         opn.write(strf)
-    
+
     chdir(cwd)
 
     img = ', '.join(lnames)

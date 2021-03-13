@@ -1,7 +1,7 @@
-# from prmp_gui.core import *
-from prmp_gui.dialogs import *
-from prmp_gui.two_widgets import *
-from prmp_miscs.prmp_datetime import *
+# from prmp.prmp_gui.core import *
+from prmp.prmp_gui.dialogs import *
+from prmp.prmp_gui.two_widgets import *
+from prmp.prmp_miscs.prmp_datetime import *
 # from ..dc.dc_apps import *
 # from ..core.gam_apps import *
 
@@ -692,7 +692,7 @@ class Thrift_Analysis:
             fig = self.plots_figures[num - 1]
             fig.clear()
         else: self.details_output('Pick a chart number', title='Required Chart Number', which='error')
-    
+
     def inapp_info(self):
         self.cb_clicked()
         if self.inapp_cbtn.get() == '1': show('Under Testing', 'Using Pie in Inapp will distrupt the other chart drawing', 'warn')

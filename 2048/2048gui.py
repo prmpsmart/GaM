@@ -1,6 +1,6 @@
 from os import path, sys
 sys.path.append(path.dirname(path.dirname(__file__)))
-from prmp_gui.core import *
+from prmp.prmp_gui.core import *
 PRMP_Window.PRMPICON = PRMP_Window.TKICON = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM\src\gui\gam\imgs\gam.ico'
 
 class Game2048:
