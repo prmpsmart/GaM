@@ -1,6 +1,6 @@
 import platform
 
-from prmp.prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime
+from prmp.prmp_miscs.prmp_mixins import PRMP_Mixins
 import functools
 
 

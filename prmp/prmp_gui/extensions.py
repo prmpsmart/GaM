@@ -5,7 +5,6 @@ from prmp.prmp_miscs.prmp_pics import _PIL_
 from prmp.prmp_miscs.prmp_datetime import PRMP_DateTime
 
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
-# Extensions
 
 class AutoScroll:
     '''Configure the scrollbars for a widget.'''

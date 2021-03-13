@@ -1,7 +1,11 @@
-from os import path, chdir, listdir, getcwd
-# import _set
+from os import path, chdir, listdir, getcwd, sys
 # from prmp.prmp_gui.two_widgets import *
-from prmp.prmp_gui import *
+# sys.path.append(path.dirname(path.dirname(__file__)))
+
+# from prmp.prmp_gui.two_widgets import *
+# from prmp.prmp_gui.dialogs import *
+from prmp_gui import *
+
 PRMP_Theme.setThemeIndex(38)
 
 def getPixs(folder):
@@ -136,8 +140,6 @@ class PhotoViewer(PRMP_MainWindow):
 
     def placeList(self): self.listFrame.place(relx=.5, rely=.005, relw=.49, relh=.96)
 
-PV = PhotoViewer
-
-PV(geo=(500, 500), tm=1, folder=r'C:\Users\Administrator\Documents\GaM OFFICE\logos').mainloop()
+if __name__ == '__main__': PhotoViewer(geo=(700, 500), tm=1, folder=r'C:\Users\Administrator\Documents\GaM OFFICE\logos').mainloop()
 
 

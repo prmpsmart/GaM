@@ -2506,7 +2506,7 @@ class PRMP_Window(PRMP_Widget):
         def out(u):
             if not u: return
             self.destroy()
-            os.sys.exit()
+            os.sys.exit(self.save())
 
         if self == self.topest:
             from .dialogs import PRMP_MsgBox
