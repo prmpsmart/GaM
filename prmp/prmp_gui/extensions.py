@@ -1,8 +1,8 @@
 from .core import *
 from .miscs import create_container, bound_to_mousewheel, Columns, Column
-from prmp_miscs.prmp_pics import *
-from prmp_miscs.prmp_pics import _PIL_
-from prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp.prmp_miscs.prmp_pics import *
+from prmp.prmp_miscs.prmp_pics import _PIL_
+from prmp.prmp_miscs.prmp_datetime import PRMP_DateTime
 
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
 # Extensions

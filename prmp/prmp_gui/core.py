@@ -3,7 +3,7 @@ from tkinter.font import Font, families
 import tkinter.ttk as ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import _tkinter, threading
-from prmp_miscs.prmp_pics import PRMP_Image, _PIL_
+from prmp.prmp_miscs.prmp_pics import PRMP_Image, _PIL_
 from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
 # superclasses

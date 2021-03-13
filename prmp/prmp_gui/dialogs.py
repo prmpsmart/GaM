@@ -1,6 +1,6 @@
 
-from prmp_miscs.prmp_datetime import PRMP_DateTime
-from prmp_miscs.prmp_pics import PRMP_Xbms
+from prmp.prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp.prmp_miscs.prmp_pics import PRMP_Xbms
 from .extensions import *
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog

@@ -1,6 +1,6 @@
 import platform
 
-from prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime
+from prmp.prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime
 import functools
 
 
@@ -146,7 +146,7 @@ class Columns(Col_Mixins):
 
     def process(self, columns):
         if not columns: return
-        
+
         self.columns = []
         for col in columns: self.addColumn(col)
         return self.columns

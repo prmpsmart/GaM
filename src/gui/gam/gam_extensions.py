@@ -1,7 +1,7 @@
-from prmp_gui.extensions import *
-from prmp_gui.two_widgets import *
-from prmp_gui.dialogs import *
-from prmp_miscs.prmp_datetime import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
+from prmp.prmp_gui.extensions import *
+from prmp.prmp_gui.two_widgets import *
+from prmp.prmp_gui.dialogs import *
+from prmp.prmp_miscs.prmp_datetime import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
 from ...backend.gam.gam import GaM
 from ...backend.dc.dc_regions import *
 
