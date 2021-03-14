@@ -175,7 +175,7 @@ class PRMP_Setup:
 
         self.holder.extra_commands = extra_commands
         self.holder.clean = '--clean' if clean else ''
-        self.holder.noconfirm = '-y' if clean else ''
+        self.holder.noconfirm = '-y' if noconfirm else ''
 
         self.holder.log_level = ['--log-level', log_level]
 
