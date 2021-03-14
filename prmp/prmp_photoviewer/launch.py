@@ -1,8 +1,10 @@
-from os import system
+from prmp.prmp_miscs.prmp_setup import PRMP_Setup, system
 
-# system(r'python photoviewer.py ')
-system(r'python main.py "C:\Users\Administrator\Documents\GaM OFFICE\logos\gam text2.png" -g700-600+80.80 -scenter-top')
+binaries = {'photoviewer.cp39-win_amd64.pyd': '.', 'prmp_gui.cp39-win_amd64.pyd': '.', 'prmp_miscs.cp39-win_amd64.pyd': '.'}
 
-# system(r'python photoviewer.py "C:\Users\Administrator\Documents\GaM OFFICE\logos\gam text2.png" -g700-400+80.80 -scenter-top')
+# a = PRMP_Setup('pyinstaller', name='PRMP_Photoviewer', console=True, binaries=binaries, onefile=False, icon='', noconfirm=True, extra_commands=[])
+a = PRMP_Setup('pyinstaller', name='PRMP_Photoviewer', console=True, binaries=binaries, onefile=False, icon='', noconfirm=True, extra_commands=[], scripts='main.py')
 
+# a.build()
+system(r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM\prmp\prmp_photoviewer\dist\PRMP_Photoviewer\PRMP_Photoviewer.exe')
 

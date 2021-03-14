@@ -137,11 +137,16 @@ class PRMP_Setup:
         sys.argv.extend(['build_ext', self.holder.directory])
         setup(ext_modules=ext_modules, **self.holder.meta_datas)
 
-    def pyinstaller(self, console=True, extra_commands=[], extensions_modules=[], log_level='info', datas={}, binaries={}, name='', onefile=False, icon='', clean=False, noconfirm=False):
+    def pyinstaller(self, scripts=[], console=True, extra_commands=[], log_level='info', datas={}, binaries={}, name='', onefile=False, icon='', clean=False, noconfirm=False):
         '''
         :param console: a boolean whether to enable consoled executable or not
         :param extra_commands: commands to pass to PyInstaller
         '''
+
+        # assert scripts, 'Provide script(s) to compile!'
+
+        if isinstance(scripts, str): scripts = [scripts]
+
 
         log_level = log_level.upper()
         log_levels = ["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"]
@@ -149,21 +154,36 @@ class PRMP_Setup:
 
         self.holder = Holder()
 
-        self.holder.name = f'-n {name}'
-
-        self.holder.datas = ' '.join([f'--add-data {pathsep.join(data, datas[data])}' for data in datas]) if datas else ''
-        self.holder.binaries = ' '.join([f'--add-binary {pathsep.join(binary, binaries[binary])}' for binary in binaries]) if binaries else ''
+        self.holder.scripts = scripts
+        self.holder.name = f'-n{name}'
 
         self.holder.console = '-c' if console else '-w'
         self.holder.onefile = '-F' if onefile else '-D'
-        self.holder.icon = '-i {icon}' if icon else ''
+        self.holder.icon = '-i{icon}' if icon else ''
+
+        self.holder.datas = []
+
+        for data in datas:
+            dat = [f'--add-data', pathsep.join([data, datas[data]])]
+            self.holder.datas.extend(dat)
+
+        self.holder.binaries = []
+
+        for binary in binaries:
+            dat = [f'--add-binary', pathsep.join([binary, binaries[binary]])]
+            self.holder.binaries.extend(dat)
 
         self.holder.extra_commands = extra_commands
         self.holder.clean = '--clean' if clean else ''
-        self.holder.noconfirm = '--noconfirm' if clean else ''
-        self.holder.log_level = f'--log-level {log_level}'
+        self.holder.noconfirm = '-y' if clean else ''
 
-        self.holder.run_parameter = [self.holder.name, self.holder.datas, self.holder.binaries, self.holder.console, self.holder.onefile, self.holder.icon, *self.holder.extra_commands, self.holder.clean, self.holder.noconfirm, self.holder.log_level]
+        self.holder.log_level = ['--log-level', log_level]
+
+        self.holder.run_parameter = [self.holder.name, self.holder.console, self.holder.onefile, self.holder.icon, *self.holder.extra_commands, *self.holder.datas, *self.holder.binaries, self.holder.clean, self.holder.noconfirm, *self.holder.log_level, *self.holder.scripts]
+
+        while '' in self.holder.run_parameter: self.holder.run_parameter.remove('')
+
+        # print(self.holder.run_parameter)
 
     def _pyinstaller(self):
         import PyInstaller.__main__

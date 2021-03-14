@@ -18,3 +18,5 @@ prmp_pics/
 libs/
 compiled/
 build/
+dist/
+*.spec
