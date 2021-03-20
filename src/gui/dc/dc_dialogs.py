@@ -552,7 +552,7 @@ class PlotDialog(FillTable, GaM_Dialog):
         else: PRMP_MsgBox(self, message='Pick a chart number', title='Required Chart Number', _type='error')
 
 
-class ContribApp(GaM_Dialog):
+class ContribDialog(GaM_Dialog):
 
     def __init__(self, contributions=None, geo=(900, 600), **kwargs):
         self.contributions = contributions

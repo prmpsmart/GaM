@@ -82,8 +82,6 @@ class PRMP_Mixins:
     def mroStr(self): return [s.__name__ for s in self.mro]
 
     def getDate(self, date=None):
-        from .prmp_datetime import PRMP_DateTime
-
         if date == None: date = PRMP_DateTime.now()
         elif isinstance(date, str): date = PRMP_DateTime.getDMYFromDate(date)
         PRMP_DateTime.checkDateTime(date, 1)

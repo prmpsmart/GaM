@@ -38,8 +38,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
         self.focus()
         if delay: self.after(delay, self.destroy)
 
-        # if self.tooltype: self.withdraw()
-        if 2: pass
+        if self.tooltype: self.withdraw()
         elif wait: self.wait_window()
         elif show: self.mainloop()
 
