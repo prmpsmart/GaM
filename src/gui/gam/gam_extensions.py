@@ -191,7 +191,7 @@ class HierachyNColumnsExplorer(Frame):
         super().__init__(master, **kwargs)
 
         binds = [('<Control-C>', self.openColumnExplorer, ''), ('<Control-c>', self.openColumnExplorer, '')]
-        self.tree = GaM_Hierachy(self, place=dict(relx=0, rely=0, relw=1, relh=.93), binds=binds)
+        self.tree = GaM_Hierachy(self, place=dict(relx=0, rely=0, relw=1, relh=.93), binds=binds, treeviewKwargs=dict(style='PRMP.Treeview'))
 
         self.columns = self.tree.columns
         self.setColumns = self.tree.setColumns
@@ -362,7 +362,7 @@ class SubsList(LabelFrame):
 
         Button(self, place=dict(relx=.4, rely=0, relh=.1, relw=.25), text='Reload', command=self.reload)
 
-        self.dialog = Checkbutton(self, place=dict(relx=.68, rely=0, relh=.1, relw=.3), text='Dialog?')
+        self.dialog = Checkbutton(self, place=dict(relx=.68, rely=0, relh=.1, relw=.3), text='Dialog?', var=1)
 
         self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.135, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
@@ -385,6 +385,8 @@ class SubsList(LabelFrame):
 
     def clicked(self, selected=None, event=None):
         selected = selected[0]
+        # print(self.dialog.get())
+        # return
         if self.dialog.get(): openCores(self, selected)
         elif self.callback: self.callback(selected)
 

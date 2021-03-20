@@ -30,7 +30,7 @@ class GaM_App(PRMP_MainWindow):
     def save(self, u=0):
         if u: self.saveIt()
         else: self._save()
-        print(f'Saved { GaM_Settings.GaM}.')
+        # print(f'Saved {GaM_Settings.GaM}.')
 
     def load(self): self._load()
 

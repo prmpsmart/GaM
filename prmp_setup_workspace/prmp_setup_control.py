@@ -13,7 +13,7 @@ scripts = []
 # filename = root = ''
 filename = prmp_gui
 file = path.join(root, filename)
-file = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM\test_src\compiled\contrib_app.c'
+file = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM\prmp\prmp_miscs\prmp_images.py'
 # print(file)
 # print(path.isfile(file))
 

@@ -496,7 +496,7 @@ class PRMP_Widget(PRMP_Theme):
         :param tipKwargs: dict of [Label options, follow, delay]
         '''
 
-
+        config = config.copy()
         self.kwargs = kwargs.copy()
         kwargs.clear()
         self.kwargs['font'] = font or 'PRMP_FONT'
@@ -526,7 +526,7 @@ class PRMP_Widget(PRMP_Theme):
         if isinstance(var, tk.StringVar): pass
         elif var:
             var = tk.StringVar()
-            var.set(self.value)
+            var.set('0')
         self.var = self.variable = var
         if var: config['variable'] = var
 
@@ -817,7 +817,9 @@ class PRMP_Widget(PRMP_Theme):
         for arg in args: self.bind(arg[0], arg[1], '+')
 
     def __getitem__(self, item):
-        if self.TkClass: return self.TkClass.__getitem__(self, item)
+        try:
+            if self.TkClass: return self.TkClass.__getitem__(self, item)
+        except: pass
 PWd = PRMP_Widget
 
 class PRMP_(PRMP_Widget):
@@ -1719,7 +1721,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     'gripcount': 10
                 }
             },
-            'PRMP.Treeview': {
+            'Treeview': {
                 'configure': {
                     'rowheight': 28,
                     'fieldbackground': background,
@@ -1727,9 +1729,9 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     # 'columnfont': heading_font,
                 },
                 'map': {
-                    'background': [('selected', text_background)],#, ('hover', button_background)],
-                    'foreground': [('selected', text_foreground)]#, ('hover', button_foreground)],
-                    # 'relief': [('hover', 'ridge')]
+                    'background': [('selected', text_background), ('hover', button_background)],
+                    'foreground': [('selected', text_foreground), ('hover', button_foreground)],
+                    'relief': [('hover', 'ridge')]
                 }
             },
             # 'TreeCtrl': {
@@ -1764,7 +1766,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
             },
             'Row': {
                 'configure': {
-                    'relief': 'flat'
+                    'relief': 'groove'
                 },
                 'map': {
                     'rowbackground': [('selected', 'black')],
@@ -1773,7 +1775,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                 },
                 'layout': [('Treeitem.border', {'children': [('Treeitem.row', {'sticky': 'nswe'})]})]
             },
-            'PRMP.Item': {
+            'Item': {
                 'configure': {
                     'font': heading_font,
                     'relief': 'flat'
@@ -1897,8 +1899,8 @@ Button = PB = PRMP_Button
 class PRMP_Checkbutton(PRMP_InputButtons, PRMP_, tk.Checkbutton):
     TkClass = tk.Checkbutton
 
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        PRMP_.__init__(self, master=master, asLabel=asLabel, config=config, **kwargs)
+    def __init__(self, master=None, asLabel=False, config={}, var=1, **kwargs):
+        PRMP_.__init__(self, master=master, asLabel=asLabel, config=config, var=var, **kwargs)
 
         self.toggleSwitch()
 
@@ -2039,8 +2041,8 @@ SButton = PSB = PRMP_Style_Button
 class PRMP_Style_Checkbutton(PRMP_InputButtons, PRMP_Style_, ttk.Checkbutton):
     TkClass = ttk.Checkbutton
 
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, **kwargs)
+    def __init__(self, master=None, asLabel=False, config={}, var=1, **kwargs):
+        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, var=var, **kwargs)
 
         self.toggleSwitch()
 SCheckbutton = PSC = PRMP_Style_Checkbutton
@@ -3150,10 +3152,11 @@ class PRMP_TreeView(PRMP_Frame):
         # if ret != self._unget: return ret
         # else: return getattr(self.treeview, attr)
 
-    def __init__(self, master=None, columns=[], **kwargs):
+    def __init__(self, master=None, columns=[], treeviewKwargs={}, **kwargs):
         super().__init__(master=master, **kwargs)
 
         self.treeview = None
+        self.treeviewKwargs = treeviewKwargs
         self.xscrollbar = None
         self.yscrollbar = None
         self.obj = None
@@ -3175,7 +3178,7 @@ class PRMP_TreeView(PRMP_Frame):
             self.yscrollbar.destroy()
             del self.yscrollbar
 
-        self.t = self.tree = self.treeview = PRMP_Treeview(self)
+        self.t = self.tree = self.treeview = PRMP_Treeview(self, **self.treeviewKwargs)
         self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
         self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
         self.treeview.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
