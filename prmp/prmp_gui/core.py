@@ -3289,8 +3289,9 @@ class PRMP_DropDownWidget:
 
         self.WidgetClass.__init__(self, master, **kwargs)
 
+        if issubclass(dropdown_windowclass, (PRMP_Window, PRMP_MainWindow)): dropdown_windowkwargs.update(dict(tooltype=1, normTk=1))
         self.dropdown_window = dropdown_windowclass(self, callback=self.set, **dropdown_windowkwargs) if dropdown_windowclass else Toplevel(self, **dropdown_windowkwargs)
-        # self.dropdown_window.withdraw()
+        self.dropdown_window.withdraw()
 
         # add validation to Entry so that only desired input format are accepted
 

@@ -336,7 +336,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @classmethod
     def checkDateTime(cls, date, dontRaise=False):
-        date = cls.getDMYFromDate(date)
+        date = cls.getDMYFromString(date)
         if not isinstance(date, PRMP_DateTime):
             if dontRaise: return False
             raise cls.Errors('Date must be an instance of PRMP_DateTime')
@@ -368,7 +368,8 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         else: raise error
 
     @classmethod
-    def createDateTime(cls, year=None, month=1, day=1, auto=False, obj=None, week=None, hour=0, minute=0, second=0):
+    def createDateTime(cls, year=None, month=1, day=1, auto=False, obj=None, week=None, hour=0, minute=0, second=0, string=''):
+        if string: return cls.getDMYFromString(string)
         if isinstance(obj, (datetime.date, datetime.datetime)):
             year = obj.year
             month = obj.month
@@ -592,12 +593,12 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         else: return day.strftime(fmt)
 
     @classmethod
-    def getDMYFromDate(cls, date):
+    def getDMYFromString(cls, date):
         if date:
             if isinstance(date, str):
                 try: day, month, year = cls.getNumsInStrAsList(None, date, [2], 1)
                 except Exception as e: return
-                
+
                 day, month, year = int(day), int(month), int(year)
                 dt = cls(year, month, day)
                 return dt

@@ -310,7 +310,7 @@ class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
 IL = PRMP_ImageButton
 
 class PRMP_DateWidget:
-    attr = 'strDate'
+    attr = 'date'
     def __init__(self, min_=None, max_=None, callback=None):
         self.callback = callback
         self.date = None
@@ -329,11 +329,11 @@ class PRMP_DateWidget:
     def get(self):
         if self.date: return self.date
         text = self['text']
-        if text: return PRMP_DateTime.getDMYFromDate(text)
+        if text: return PRMP_DateTime.getDMYFromString(text)
 
     def set(self, date):
         if date == '':
-            self['text'] = date
+            self.config(text=date)
             return
         if isinstance(date, str):
             try:
@@ -576,8 +576,8 @@ class PRMP_Calendar(Frame):
         month = PRMP_DateTime.checkDateTime(month, dontRaise=1)
         if not month: month = PRMP_DateTime.now()
 
-        self.min = PRMP_DateTime.getDMYFromDate(min_)
-        self.max = PRMP_DateTime.getDMYFromDate(max_)
+        self.min = PRMP_DateTime.getDMYFromString(min_)
+        self.max = PRMP_DateTime.getDMYFromString(max_)
         self.__date = None
         self.month = month
         self.callback = callback
@@ -1233,7 +1233,15 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     #         self.treeview.insert(parent, text=values, value=values)
     #         pass
 
+class PRMP_DropDownCalendarWidget(PRMP_DropDownWidget):
+    def __init__(self, *args, **kwargs):
+        from .dialogs import PRMP_CalendarDialog
+
+        super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
 
 
+class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
+    def __init__(self, *args, **kwargs):
+        from .dialogs import PRMP_CalendarDialog
 
-
+        super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
