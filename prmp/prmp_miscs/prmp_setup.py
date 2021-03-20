@@ -121,7 +121,8 @@ class PRMP_Setup:
         )
         self.holder.meta_datas.update(meta_datas)
 
-        self.holder.scripts, self.holder.dest = (scripts, dest) or self.get_scripts(folder)
+        self.holder.scripts, self.holder.dest = (scripts, dest) if scripts else self.get_scripts(folder)
+        if not self.holder.dest: self.holder.dest = dest or 'pyd'
 
         self.holder.directory = '--inplace' if inplace else f'-b{self.holder.dest}'
 

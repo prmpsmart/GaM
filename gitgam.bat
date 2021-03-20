@@ -4,7 +4,7 @@
 @REM git clone https://github.com/prmpsmart/GaM.git
 @REM git push --set-upstream origin master
 @REM git push https://github.com/prmpsmart/GaM.git
-@REM git push origin
+git push origin
 @REM git config --global http.postBuffer 524288000
 @REM git config --global http.version HTTP/1.1
 @REM git push
