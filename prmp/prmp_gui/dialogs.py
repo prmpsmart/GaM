@@ -7,9 +7,12 @@ import tkinter.filedialog as filedialog
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, delay=0, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, delay=0, tt=False, tooltype=False, wait=False, **kwargs):
 
-        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, grab=grab, **kwargs)
+        self.tooltype = tt or tooltype
+        if self.tooltype: grab = 0
+
+        PRMP_MainWindow.__init__(self, master, ntb=ntb, nrz=nrz, tm=tm, gaw=gaw, tw=tw, grab=grab, tooltype=self.tooltype, **kwargs)
 
         PRMP_FillWidgets.__init__(self, values=values)
 
@@ -34,10 +37,11 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
         self.focus()
         if delay: self.after(delay, self.destroy)
-        self.mainloop()
 
-        # if show: self.mainloop()
-        # else: self.wait_window()
+        # if self.tooltype: self.withdraw()
+        if 2: pass
+        elif wait: self.wait_window()
+        elif show: self.mainloop()
 
 
     def _setupDialog(self):
@@ -104,17 +108,21 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
             else: wid.disabled()
 
     def destroyDialog(self):
-        if self._return: self.destroy()
+        if self.tooltype: self.withdraw()
+        elif self._return: self.destroy()
+
         if self.callback: self.callback(self.result)
+
 PD = PRMP_Dialog
 
 class PRMP_CalendarDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, month=None, dest='', title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, **kwargs):
+    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, date=None, **kwargs):
         self.min = min_
         self.max = max_
-        self.month = month
-        super().__init__(master, title=title, geo=geo, editable=False, show=0, **kwargs)
+        self.month = date or month
+
+        super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
     def _setupDialog(self): self.calendar = self.addWidget(PRMP_Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min, month=self.month), place=dict(relx=0, rely=0, relh=1, relw=1))
 
@@ -125,6 +133,14 @@ class PRMP_CalendarDialog(PRMP_Dialog):
         if self._return:
             PRMP_Calendar.choosen = None
             self.destroyDialog()
+
+    def validate_cmd(self, date): return PRMP_DateTime.getDMYFromDate(date)
+
+    def set(self, date=None):
+        date = super().getDate(date)
+        if date:
+            self.calendar.month = date
+            self.calendar.updateDays()
 
 CD = PRMP_CalendarDialog
 
@@ -203,19 +219,22 @@ PMB = PRMP_MsgBox
 
 class PRMP_CameraDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, source=0, frameUpdateRate=10, title='PRMP_Camera Dialog', **kwargs):
-        self.source = source
-        self.frameUpdateRate = frameUpdateRate
+    def __init__(self, master=None, title='PRMP_Camera Dialog', cameraKwargs={}, **kwargs):
+        self.cameraKwargs = cameraKwargs
         super().__init__(master, title=title, **kwargs)
 
     def isMaximized(self): return self.getWid_H_W(self)
 
-    def _setupDialog(self): PRMP_Camera(self.container, source=self.source, frameUpdateRate=self.frameUpdateRate, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage)
+    def _setupDialog(self):
+        self.camera = PRMP_Camera(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), **self.cameraKwargs)
+        self.set = self.camera.setImage
 
     def getImage(self, imageFile):
         self._setResult(imageFile)
         if not self.callback: return PRMP_Camera._saveImage(imageFile)
         self.destroyDialog()
+
+    # def
 
     def __del__(self): del self.camera
 CamD = PRMP_CameraDialog
@@ -224,11 +243,15 @@ class PRMP_ImageDialog(PRMP_Dialog):
 
     def __init__(self, master=None, image=None, title='Image Dialog', **kwargs):
         self.image = image
-        super().__init__(master, title=title, **kwargs)
+        # print(kwargs)
+        super().__init__(master, title=title, show=0, **kwargs)
 
-    def isMaximized(self): return self.getWid_H_W(self)
+    # def isMaximized(self): return self.getWid_H_W(self)
 
-    def _setupDialog(self): PRMP_ImageLabel(self.container, prmpImage=self.image, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage)
+    def _setupDialog(self):
+        self.imageLabel = PRMP_ImageLabel(self.container, prmpImage=self.image, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'))
+        self.set = self.imageLabel.set
+        # self.bind('<Return>', self.imageLabel.saveImage)
 
     def getImage(self, imageFile):
         self._setResult(imageFile)

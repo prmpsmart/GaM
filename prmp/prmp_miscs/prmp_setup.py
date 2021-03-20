@@ -99,7 +99,7 @@ class PRMP_Setup:
             return files, f'/{folder}'
         else: return [folder], ''
 
-    def build_ext(self, folder='', scripts=[], description='', meta_datas={}, classifiers=classifiers, platforms=platforms, keywords=[], license='', name='', inplace=False, version='1.0'):
+    def build_ext(self, folder='', scripts=[], description='', meta_datas={}, classifiers=classifiers, platforms=platforms, keywords=[], license='', name='', inplace=False, dest='', version='1.0'):
         self.holder = Holder()
         name = name or path.basename(folder[:-3]) if folder.endswith('.py') else folder
 
@@ -121,10 +121,9 @@ class PRMP_Setup:
         )
         self.holder.meta_datas.update(meta_datas)
 
-        self.holder.scripts, self.holder.dest = scripts or self.get_scripts(folder)
+        self.holder.scripts, self.holder.dest = (scripts, dest) or self.get_scripts(folder)
 
-        self.holder.directory = '--inplace' if inplace else f'-bpyd{self.holder.dest}'
-        # print(self.holder.directory)
+        self.holder.directory = '--inplace' if inplace else f'-b{self.holder.dest}'
 
     def _build_ext(self):
         from distutils.core import setup

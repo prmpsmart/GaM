@@ -45,6 +45,31 @@ class PRMP_Mixins:
     containers = list, set, tuple
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
+    def getNumsInStrAsList(self, string, length=[], dontRaise=False):
+        strs = list(string.replace(' ', ''))
+
+        numbers = []
+        count = 0
+        non_num = []
+
+        for a in strs:
+            try: int(a)
+            except: non_num.append(count)
+            count += 1
+
+        if len(non_num) not in length:
+            if not dontRaise: raise AssertionError(f'Provide {length} numbers separated by non-numerics')
+            return
+
+        count = 0
+        for n in non_num:
+            numbers.append(strs[count:n])
+            count = n+1
+        numbers.append(strs[count:])
+
+        strs = [int(''.join(d)) for d in numbers]
+        return strs
+
     @property
     def mroStr(self): return [s.__name__ for s in self.mro]
 
@@ -53,7 +78,7 @@ class PRMP_Mixins:
 
         if date == None: date = PRMP_DateTime.now()
         elif isinstance(date, str): date = PRMP_DateTime.getDMYFromDate(date)
-        PRMP_DateTime.checkDateTime(date)
+        PRMP_DateTime.checkDateTime(date, 1)
         return date
 
     def numWithCommas(self, num=None, fl=0):

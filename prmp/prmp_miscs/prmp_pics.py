@@ -111,7 +111,6 @@ class PRMP_ImageFile(PRMP_File):
     def image(self):
         if _PIL_: return Image.open(self)
 
-
     def __init__(self, imageFileName='', inbuilt=False, inExt='png', image=None, **kwargs):
 
         passed = [bool(a) for a in [imageFileName, image]].count(True)
@@ -227,6 +226,9 @@ class PRMP_Image:
     def thumbnailTk(self, rz):
         self.thumbnail(rz)
         return self.imgClass(self.image)
+
+    def copy(self):
+        if self.image: return self.image.copy()
 
 
 

@@ -128,7 +128,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
         passed = [bool(a) for a in [filename, base64]].count(True)
         assert passed <= 1, 'Only one is required in [filename, base64, image]'
 
-        self.name = None
+        self.name = filename
         self._data = data
 
         if data: self.name = 'data_%d'%PRMP_File.count

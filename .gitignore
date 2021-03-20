@@ -20,3 +20,7 @@ compiled/
 build/
 dist/
 *.spec
+Output/
+!gitgam.bat
+2048/
+prmp_setup_workspace/

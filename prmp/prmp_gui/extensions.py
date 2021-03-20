@@ -134,7 +134,7 @@ FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
     def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False, **imageKwargs):
-        if not _PIL_: print('PIL is not available for this programme')
+        if not _PIL_: print('PIL is not available for this program!')
         self.rt = None
         self.prmpImage = prmpImage
         self.thumb = thumb
@@ -151,7 +151,7 @@ class PRMP_ImageWidget:
         self._normal = normal
         self.bindMenu()
 
-        self.loadImage(self.prmpImage, **imageKwargs)
+        self.after(100, lambda:self.loadImage(self.prmpImage, **imageKwargs))
 
     def disabled(self):
         self.unBindMenu()
@@ -238,7 +238,8 @@ class PRMP_ImageWidget:
     def _removeImage(self, val):
         if val: self.loadImage()
 
-    def set(self, imageFile): self.loadImage(imageFile)
+    def set(self, imageFile=None):
+        if imageFile: self.loadImage(imageFile)
 
     def changeImage(self, e=0):
         self.delMenu()
@@ -250,7 +251,7 @@ class PRMP_ImageWidget:
         if self._normal: return
         self.bind('<1>', self.delMenu, '+')
         self.bind('<3>', self.showMenu, '+')
-        self.bind('<Double-1>', self.camera)
+        self.bind('<Double-1>', self.camera, '+')
 
     def unBindMenu(self):
         self.unbind('<1>')
@@ -295,6 +296,12 @@ class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **imageKwargs)
 IL = PRMP_ImageLabel
+
+# class PRMP_SImageLabel(PRMP_ImageWidget, PRMP_Label):
+#     def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, callback=None, **kwargs):
+#         PRMP_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
+#         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, callback=callback, **imageKwargs)
+# SIL = PRMP_ImageLabel
 
 class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
     def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
@@ -388,71 +395,6 @@ class ScrollableFrame(PRMP_Frame):
         self.canvas.configure(scrollregion=p)
 SF = ScrollableFrame
 
-class Test_PRMP_ToolTip:
-    def __init__(self, master, msg='', delay=.01, follow=True, root=None):
-
-        self.msg = msg
-        self.master = master
-
-        self.msgVar = tk.StringVar()
-        self.msgVar.set(msg)
-
-        self.delay = delay
-        self.follow = follow
-
-        self.tip = None
-        self.hidden = 0
-
-        self.master.bind('<Enter>', self.spawn, '+')
-        self.master.bind('<Leave>', self.hide, '+')
-        self.master.bind('<Motion>', self.move, '+')
-
-    def deleteTip(self):
-        if self.tip:
-            if (time.time() - self.hidden > 3):
-                self.tip.destroy()
-                self.tip = None
-            else: self.tip.after(100, self.deleteTip)
-
-    def spawn(self, event=0):
-        self.visible = 1
-        self.lastMotion = 0
-
-        if not self.tip:
-            self.tip = PRMP_Toplevel(self.master, geo=(), atb=0, asb=0, tm=1)
-            Message(self.tip, config=dict(textvariable=self.msgVar, aspect=1000), asEntry=True).grid()
-
-            self.tip.after(10, self.deleteTip)
-
-            self.placeTip(event)
-
-        self.tip.after(int(self.delay * 1000), self.show)
-
-    def update(self, msg): self.msgVar.set(msg)
-
-    def show(self):
-        if self.tip:
-            if self.visible == 1 and time.time() - self.lastMotion > self.delay: self.visible = 2
-            if self.visible == 2: self.tip.deiconify()
-
-    def placeTip(self, event=None): self.tip.geometry('+%i+%i' % (event.x_root+20, event.y_root-10))
-
-    def move(self, event):
-        if self.tip:
-            self.lastMotion = time.time()
-            if self.follow is False:
-                self.tip.withdraw()
-                self.visible = 1
-            self.placeTip(event)
-
-            self.tip.after(int(self.delay * 1000), self.show)
-        else: self.spawn(event)
-
-    def hide(self, event=None):
-        self.hidden = time.time()
-        self.visible = 0
-        if self.tip: self.tip.withdraw()
-TT = PRMP_ToolTip
 
 class PRMP_SolidScreen(PRMP_MainWindow):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
@@ -554,9 +496,9 @@ class PRMP_Calendar(Frame):
             # name='DAY'+str(PRMP_Calendar.DayLabel.count)
             # PRMP_Calendar.DayLabel.count += 1
 
-            self.bind('<Enter>', self.onButton)
-            self.bind('<Leave>', self.offButton)
-            self.bind('<ButtonPress-1>', self.choosen)
+            self.bind('<Enter>', self.onButton, '+')
+            self.bind('<Leave>', self.offButton, '+')
+            self.bind('<ButtonPress-1>', self.choosen, '+')
 
         def onButton(self, e=0):
             self.statusShow()
@@ -585,7 +527,7 @@ class PRMP_Calendar(Frame):
             if day: self.changeDay(day)
             if command:
                 self.unbind('<ButtonPress-1>')
-                self.bind('<ButtonPress-1>', command)
+                self.bind('<ButtonPress-1>', command, '+')
 
             background, foreground = kwargs.get('background'), kwargs.get('foreground')
             self.configure(**kwargs)
@@ -627,18 +569,19 @@ class PRMP_Calendar(Frame):
                 self.clicked()
                 self.returnMethod(self.day)
 
-    def __init__(self, master=None, month=None, dest='', callback=None, min_=None, max_=None, **kwargs):
+    def __init__(self, master=None, month=None, callback=None, min_=None, max_=None, **kwargs):
         super().__init__(master, **kwargs)
+        month = kwargs.pop('date', month)
 
-        if month == None: month = PRMP_DateTime.now()
-        PRMP_DateTime.checkDateTime(month)
+        month = PRMP_DateTime.checkDateTime(month, dontRaise=1)
+        if not month: month = PRMP_DateTime.now()
 
         self.min = PRMP_DateTime.getDMYFromDate(min_)
         self.max = PRMP_DateTime.getDMYFromDate(max_)
         self.__date = None
         self.month = month
         self.callback = callback
-        self.dest = dest
+
         self.daysButtons = []
 
         self._back = PRMP_Button(self, text=self._backward, command=self.previousYear, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], font=PRMP_Theme.DEFAULT_MINUTE_FONT)
@@ -679,7 +622,6 @@ class PRMP_Calendar(Frame):
             btn = self.DayLabel(self, returnMethod=self.choosenDay, text=d, relief='groove')
             btn.place(relx=x, rely=y, relw=w, relh=h)
             self.daysButtons.append(btn)
-
 
         self.reset = self.daysButtons[-4]
         self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', notPart=1, relief='ridge')
@@ -726,6 +668,7 @@ class PRMP_Calendar(Frame):
         self.updateDays()
 
     def updateDays(self):
+
         self.monthNameLbl.config(text=self.month.monthName)
         self.yearLbl.config(text=self.month.year)
         monthDates = self.month.monthDates
@@ -758,7 +701,7 @@ class PRMP_Entry_Label(Label):
     def __init__(self, master, font='DEFAULT_FONT', **kwargs): super().__init__(master, asEntry=True, font=font, **kwargs)
 Entry_Label = PRMP_Entry_Label
 
-class PRMP_Camera(PRMP_Frame):
+class PRMP_Camera(PRMP_Style_Frame):
 
     def __init__(self, master, source=0, frameUpdateRate=10, callback=None, **kwargs):
         import cv2
@@ -767,28 +710,32 @@ class PRMP_Camera(PRMP_Frame):
         self.source = source
         self.image = None
         self._image = None
+        self._set = None
         self.callback = callback
         self.pause = False
+        self.opened = False
 
         self.frameUpdateRate = frameUpdateRate
 
         super().__init__(master, **kwargs)
 
         self.screen = Label(self, place=dict(relx=.006, rely=.01, relh=.85, relw=.985))
-        self.screen.bind('<Double-1>', self.screenPause)
+        self.screen.bind('<Double-1>', self.screenPause, '+')
 
         self.save = Button(self, config=dict(text='Save', command=self.saveImage))
-
-        self.openCam()
+        self.bind('<Map>', self.checkVisibility)
+        self.bind('<Unmap>', self.checkVisibility)
+        self.bind('<Return>', self.saveImage)
 
     def y(self): return
 
     def placeSave(self): self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
 
     def screenPause(self, e=0):
-        if self.pause:
+        if self.pause or self._set:
             self.pause = False
             self.openCam()
+            self._set = None
             self.save.place_forget()
         else:
             self.pause = True
@@ -808,35 +755,54 @@ class PRMP_Camera(PRMP_Frame):
     def get(self): return self.saveImage()
 
     def openCam(self):
+        if self._set: return
         self.cam = self.cv2.VideoCapture(self.source)
         self.updateScreen()
+        self.opened = True
 
     def closeCam(self):
-        if self.cam and self.cam.isOpened(): self.cam.release()
+        if self.cam and self.cam.isOpened():
+            self.cam.release()
+            self.opened = False
 
     def snapshot(self):
         # Get a frame from the video source
         success, frame = self.getFrame()
         # if frame: self.cv2.imwrite("frame-" + time.strftime("%d-%m-%Y-%H-%M-%S") + ".jpg", self.cv2.cvtColor(frame, self.cv2.COLOR_RGB2BGR))
 
+    def _updateScreen(self, image=None):
+        self.image = PhotoImage(image=image) if image else self.image
+        self.screen.config(image=self.image)
+
     def updateScreen(self):
-        if self.image: self.screen.config(image=self.image)
+        if self.image: self._updateScreen()
         # if self.image: self.screen['image'] = self.image
         del self.image
         self.image = None
         self.setImage()
         if not self.pause: self.after(self.frameUpdateRate, self.updateScreen)
 
-    def setImage(self):
+    def checkVisibility(self, event):
+        if event.type == tk.EventType.Map:
+            if not self.pause:
+                self.after(100, self.openCam)
+                pass
+        elif event.type == tk.EventType.Unmap: self.closeCam()
+
+    def setImage(self, image=None):
+        self._set = image
         success, frame = self.getFrame()
-        if success:
+        if success or self._set:
             dif = 20
             w_h = self.width-dif, self.height-dif
             if w_h[0] < 0 and w_h[1] < 0: return
-            self._image = Image.fromarray(frame)
+
+            self._image = PRMP_Image(self._set) if self._set else Image.fromarray(frame)
+
             image = self._image.copy()
             image.thumbnail(w_h)
-            self.image = PhotoImage(image=image)
+
+            self._updateScreen(image)
 
     def getFrame(self):
         if self.cam and self.cam.isOpened():
@@ -846,7 +812,6 @@ class PRMP_Camera(PRMP_Frame):
         else: return (False, None)
 
     def __del__(self): self.closeCam()
-
 
 class Hierachy(PRMP_TreeView):
 
@@ -873,11 +838,11 @@ class Hierachy(PRMP_TreeView):
     def bindings(self):
         self.treeview.bind('<Control-Return>', self.viewSelected, '+')
         if self.toop:
-            self.treeview.bind('<Control-o>', self.toggleOpen)
-            self.treeview.bind('<Control-O>', self.toggleOpen)
+            self.treeview.bind('<Control-o>', self.toggleOpen, '+')
+            self.treeview.bind('<Control-O>', self.toggleOpen, '+')
 
-        self.treeview.bind('<Control-r>', self.reload)
-        self.treeview.bind('<Control-R>', self.reload)
+        self.treeview.bind('<Control-r>', self.reload, '+')
+        self.treeview.bind('<Control-R>', self.reload, '+')
 
         for event, func, sign in self.binds: self.treeview.bind(event, func, sign)
 
@@ -920,7 +885,6 @@ class Hierachy(PRMP_TreeView):
     def viewSubs(self, obj): self.viewObjs(obj[:])
 H = Hierachy
 
-
 class AttributesViewer(LabelFrame):
 
     def __init__(self, master, attr='', obj=None, dialog=None, **kwargs):
@@ -962,7 +926,6 @@ class AttributesViewer(LabelFrame):
         if isinstance(self._value, (int, str, list, tuple, dict)): AttributesExplorer(values=self._value, dialog=self.dialog, grab=0)
         else: self.dialog(obj=self._value, grab=0, tm=1)
 
-
 class AttributesExplorer(LabelFrame):
     def __init__(self, master, listboxConfig={}, callback=None, obj=None, values={}, dialog=None, **kwargs):
         super().__init__(master, **kwargs)
@@ -989,10 +952,10 @@ class AttributesExplorer(LabelFrame):
         self.treeview = PRMP_Treeview(frame2, place=dict(relx=0, rely=0, relh=.8, relw=1))
         self.treeview.heading('#0', text='Attributes')
         self.ivd = self.treeview.ivd
-        self.treeview.bind('<Delete>', self.deleteAttribute)
+        self.treeview.bind('<Delete>', self.deleteAttribute, '+')
 
         self.entry = LabelEntry(frame2, place=dict(relx=0, rely=.81, relw=.65, relh=.085), orient='h', longent=.25, topKwargs=dict(text='New'), bottomKwwargs=dict(placeholder=''))
-        self.entry.B.bind('<Return>', self.addAtrribute)
+        self.entry.B.bind('<Return>', self.addAtrribute, '+')
 
         self.top = Checkbutton(frame2, text='Top?', place=dict(relx=.7, rely=.815, relh=.07, relw=.25))
 
@@ -1089,8 +1052,6 @@ class AttributesExplorer(LabelFrame):
             self.treeview.insert(parent, text=values)
             pass
 
-
-
 class ColumnViewer(LabelFrame):
 
     def __init__(self, master, column=None, **kwargs):
@@ -1120,7 +1081,6 @@ class ColumnViewer(LabelFrame):
         if isinstance(self._value, (int, str, list, tuple, dict)): ColumnsExplorerDialog(self, values=self._value)
         else: dialogFunc(master=self, obj=self._value)
 
-
 class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, listboxConfig={}, callback=None, columns=None, masterWid=None, **kwargs):
 
@@ -1147,7 +1107,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         frame2 = Frame(self, place=dict(relx=.315, rely=0, relw=.685, relh=1))
 
         self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.7, relw=1), columns=_cols)
-        self.treeview.treeview.bind('<Delete>', self.deleteColumn)
+        self.treeview.treeview.bind('<Delete>', self.deleteColumn, '+')
 
         self.text = LabelEntry(frame2, place=dict(relx=.0, rely=.71, relw=.5, relh=.085), orient='h', longent=.23, topKwargs=dict(text='text'), bottomKwargs=dict(_type='text', required=True))
         self.attr = Button(frame2, place=dict(relx=.55, rely=.71, relw=.1, relh=.085), text='attr', command=self.getAttr)

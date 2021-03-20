@@ -336,10 +336,11 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
 
     @classmethod
     def checkDateTime(cls, date, dontRaise=False):
+        date = cls.getDMYFromDate(date)
         if not isinstance(date, PRMP_DateTime):
             if dontRaise: return False
             raise cls.Errors('Date must be an instance of PRMP_DateTime')
-        return True
+        return date
 
     @classmethod
     def now(cls): return cls.createDateTime(obj=super().now())
@@ -423,7 +424,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         return d
     @property
     def weekDay(self): return (int(self.weekday()) + 1) % 7
-    
+
     @property
     def weekInYear(self): return int(self.isocalendar()[1])
 
@@ -591,13 +592,12 @@ class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
         else: return day.strftime(fmt)
 
     @classmethod
-    def verifyDateFormat(cls, date): return len(date.split('/')) == 3
-
-    @classmethod
     def getDMYFromDate(cls, date):
         if date:
-            if isinstance(date, str) and cls.verifyDateFormat(date):
-                day, month, year = date.split('/')
+            if isinstance(date, str):
+                try: day, month, year = cls.getNumsInStrAsList(None, date, [2], 1)
+                except Exception as e: return
+                
                 day, month, year = int(day), int(month), int(year)
                 dt = cls(year, month, day)
                 return dt
