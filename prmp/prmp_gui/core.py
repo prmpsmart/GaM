@@ -3336,8 +3336,9 @@ class PRMP_DropDownWidget:
 
     def _on_b1_press(self, event=None):
         """Trigger self.drop_down on widget press and set widget state to ['pressed', 'active']."""
-        if ('disabled' != self['state']):
-            self.state(['pressed'])
+
+        if str(self['state']) != 'disabled':
+            self['state'] = 'pressed'
             self.drop_down()
 
     def _on_focus_out_dropdown_window(self, event):
