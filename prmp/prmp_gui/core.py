@@ -714,19 +714,17 @@ class PRMP_Widget(PRMP_Theme):
 
     def normal(self): self.state('normal')
 
-    def state(self, *args):
-        if not args:
-            st = self['state']
-            return str(st)
-
-        try: return self.configure(state=args[0])
-        except:
-            try: return self.TkClass.state(self, *args)
+    def state(self, args=''):
+        if isinstance(args, (list, tuple)): return self.TkClass.state(self, args)
+        elif isinstance(args, str):
+            try: return self.TkClass.state(self, args)
             except:
-                if self.children:
-                    for child in self.winfo_children(): child.state(*args)
-                    return 1
-
+                try: self['state'] = args
+                except:
+                    try: self.configure(state=args)
+                    except: pass
+        if self.children:
+            for child in self.winfo_children(): child.state(args)
 
     def config(self, **kwargs):
         self.kwargs.update(kwargs)
@@ -1024,8 +1022,8 @@ class PRMP_Input:
         if get == self.placeholder: get = ''
         return get
 
-    def state(self, *args):
-        go = super().state(*args)
+    def state(self, args=''):
+        go = super().state(args)
         if go and 'readonly' in args: self._read = True
         return go
 PI = PRMP_Input
@@ -3338,7 +3336,7 @@ class PRMP_DropDownWidget:
 
     def _on_b1_press(self, event=None):
         """Trigger self.drop_down on widget press and set widget state to ['pressed', 'active']."""
-        if ('disabled' not in self.state()):
+        if ('disabled' != self['state']):
             self.state(['pressed'])
             self.drop_down()
 
@@ -3479,7 +3477,7 @@ class PRMP_DropDownEntry(PRMP_DropDownWidget, SEntry):
                 self.state(['!active'])
                 ttk.Entry.configure(self, cursor=self._cursor)
 
-    def state(self, *args):
+    def state(self, args=''):
         """
         Modify or inquire widget state.
 
@@ -3488,14 +3486,10 @@ class PRMP_DropDownEntry(PRMP_DropDownWidget, SEntry):
         is returned indicating which flags were changed. statespec is
         expected to be a sequence.
         """
-        if args:
-            # change cursor depending on state to mimic Combobox behavior
-            # print(self.configure)
-            # return []
-            states = args[0]
-            if 'disabled' in states or 'readonly' in states: self.configure(cursor='arrow')
-            elif '!disabled' in states or '!readonly' in states: self.configure(cursor='xterm')
-        return super().state(*args)
+        # change cursor depending on state to mimic Combobox behavior
+        if 'disabled' in args or 'readonly' in args: self.configure(cursor='arrow')
+        elif '!disabled' in args or '!readonly' in args: self.configure(cursor='xterm')
+        return super().state(args)
 
     def configure(self, cnf={}, **kw):
         kwargs = cnf.copy()

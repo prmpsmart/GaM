@@ -56,6 +56,7 @@ class PersonDialog(GaM_Dialog):
 
         # self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
         self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
+        self.date.B.disabled()
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'date'])
 
