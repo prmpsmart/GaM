@@ -182,6 +182,9 @@ class PRMP_File(BytesIO, PRMP_Mixins):
 
     @property
     def compressedData(self): return zlib.compress(self.data)
+    
+    @property
+    def decompressedData(self): return zlib.decompress(self.data)
 
     @property
     def cdata(self): return self.compressedData

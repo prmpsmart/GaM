@@ -53,6 +53,14 @@ class PRMP_Mixins:
     containers = list, set, tuple
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
+    def tkFormatedFileTypes(self, name, exts=[]):
+        fexts = '{'
+        for ext in exts: fexts += f'.{ext} '
+        fexts = fexts[:-1]
+        fexts += '}'
+        filetypes = ['%s %s'%(name, fexts)]
+        return filetypes
+
     def getNumsInStrAsList(self, string, length=[], dontRaise=False):
         strs = list(string.replace(' ', ''))
 
@@ -429,7 +437,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
         passed = [bool(a) for a in [filename, base64]].count(True)
         assert passed <= 1, 'Only one is required in [filename, base64, image]'
 
-        self.name = None
+        self.name = filename
         self._data = data
 
         if data: self.name = 'data_%d'%PRMP_File.count
@@ -485,6 +493,9 @@ class PRMP_File(BytesIO, PRMP_Mixins):
     def compressedData(self): return zlib.compress(self.data)
 
     @property
+    def decompressedData(self): return zlib.decompress(self.data)
+
+    @property
     def cdata(self): return self.compressedData
 
     @property
@@ -515,6 +526,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
 
     def saveObj(self, obj): pickle.dump(obj, self)
     def loadObj(self): return self.unpickle()
+
 
 
 # prmp_pics.py

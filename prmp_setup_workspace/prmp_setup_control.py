@@ -11,7 +11,7 @@ scripts = []
 
 # filename = root = ''
 filename = prmp_gui
-filename = prmp_miscs
+# filename = prmp_miscs
 file = path.join(root, filename)
 # file = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM\prmp\prmp_miscs\prmp_images.py'
 # print(file)

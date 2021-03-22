@@ -347,7 +347,7 @@ class PRMP_Theme(PRMP_Mixins):
 
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very']}
 
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
@@ -1149,7 +1149,7 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
 
         if type_.lower() == 'gender': values = ['Male', 'Female']
 
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)
         self.objects = {}
         self.changeValues(values)

@@ -243,7 +243,7 @@ class PRMP_ImageDialog(PRMP_Dialog):
     def __init__(self, master=None, image=None, title='Image Dialog', **kwargs):
         self.image = image
         # print(kwargs)
-        super().__init__(master, title=title, show=0, **kwargs)
+        super().__init__(master, title=title, **kwargs)
 
     # def isMaximized(self): return self.getWid_H_W(self)
 

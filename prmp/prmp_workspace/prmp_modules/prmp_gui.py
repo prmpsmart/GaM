@@ -515,7 +515,8 @@ class PRMP_Theme(PRMP_Mixins):
 
     def _paint(self):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very']}
+
 
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
@@ -1005,13 +1006,14 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
 
-    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, **kwargs):
         _type = _type.lower()
 
         self._read = False
         if self.kwargs.get('state', None) == 'readonly': self._read = True
 
         self.values = values
+        self.very = very
 
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
@@ -1098,11 +1100,12 @@ class PRMP_Input:
         self._add_placeholder()
 
     def green(self):
-        self.configure(foreground='green')
+        foreground = self.kwargs.get('foreground', 'green')
+        if self.very: self.configure(foreground=foreground)
         return True
 
     def red(self):
-        self.configure(foreground='red')
+        if self.very: self.configure(foreground='red')
         return False
 
     def checkingPath(self, event=None):
@@ -1190,8 +1193,8 @@ class PRMP_Input:
         if get == self.placeholder: get = ''
         return get
 
-    def state(self, *args):
-        go = super().state(*args)
+    def state(self, args=''):
+        go = super().state(args)
         if go and 'readonly' in args: self._read = True
         return go
 PI = PRMP_Input
