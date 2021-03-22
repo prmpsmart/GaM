@@ -1578,7 +1578,8 @@ class PRMP_Setup:
         )
         self.holder.meta_datas.update(meta_datas)
 
-        self.holder.scripts, self.holder.dest = (scripts, dest) or self.get_scripts(folder)
+        self.holder.scripts, self.holder.dest = (scripts, dest) if scripts else self.get_scripts(folder)
+        if not self.holder.dest: self.holder.dest = dest or 'pyd'
 
         self.holder.directory = '--inplace' if inplace else f'-b{self.holder.dest}'
 
@@ -1615,7 +1616,7 @@ class PRMP_Setup:
 
         self.holder.console = '-c' if console else '-w'
         self.holder.onefile = '-F' if onefile else '-D'
-        self.holder.icon = '-i{icon}' if icon else ''
+        self.holder.icon = f'-i{icon}' if icon else ''
 
         self.holder.datas = []
 
@@ -1674,5 +1675,54 @@ class PRMP_Setup:
         if self.holder.gen_script: system(self.holder.gen_script)
         if self.holder.customize: self.customize_script(self.holder.script, old_var=self.holder.old_ver, new_var=self.holder.new_ver, author=self.holder.author)
         system(self.holder.program)
+
+    def change_ext(self, file, ext):
+        splits = file.split('.')
+        splits[-1] = f'.{ext}'
+        _outfile = ''.join(splits)
+        return _outfile
+
+    def py2c(self, file, quiet=False, embed=False, outfile='', pyver=2, dry_run=False):
+        '''
+        :param pyver: python version of the file
+        '''
+        _outfile = outfile or self.change_ext(file, 'c')
+
+        embed = '--embed=main' if embed else ''
+        outfile = f'-o {_outfile}' if _outfile else ''
+        pyver = '-3' if pyver == 3 else ''
+        cmd = f"python -m cython {pyver} -f {embed} {file} {outfile}"
+        if dry_run or not quiet: print(cmd)
+        if not dry_run: system(cmd)
+        return _outfile
+
+    def _create_dll(self, file, include_dir='', as_pyd=False, python_dll='', cython_it=False, outext='dll', quiet=False, dry_run=False, **kwargs):
+        if cython_it: file = self.py2c(file, dry_run=dry_run, **kwargs)
+        include_dir = f'-I{include_dir}' if include_dir else ''
+        objfile = self.change_ext(file, 'o')
+        outext = 'pyd' if as_pyd else outext
+
+        outfile = self.change_ext(file, outext)
+
+        # return
+        cmd1 = f"gcc -Wall -g {include_dir} -c {file} -o {objfile}"
+        if dry_run or not quiet: print(cmd1)
+        if not dry_run: system(cmd1)
+
+        cmd2 = f"g++ -shared -Wl,--dll {objfile} -o {outfile} {python_dll}"
+        if dry_run or not quiet: print(cmd2)
+        if not dry_run: system(cmd2)
+
+
+    def _create_exe(self, file, include_dir='', win=0, python_dll='', quiet=False, dry_run=False):
+        outfile = self.change_ext(file, 'exe')
+        include_dir = f'-I{include_dir}' if include_dir else ''
+
+        mode = "-mwindows" if win else "-mconsole"
+
+        cmd =  f"g++ -Wall -g {include_dir} {mode} {file} {python_dll} -municode -o {outfile}"
+
+        if dry_run or not quiet: print(cmd)
+        if not dry_run: system(cmd)
 
 # end
