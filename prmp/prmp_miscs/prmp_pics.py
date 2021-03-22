@@ -9,7 +9,11 @@ except Exception as e:
     print('PIL <pillow> image library is not installed.')
     print(e)
 
-from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
+try:
+    from .prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
+    _PRMP_IMAGES_ = 1
+except: _PRMP_IMAGES_ = 0
+
 from .prmp_exts import *
 
 
@@ -81,10 +85,11 @@ class PRMP_Images:
     @classmethod
     def get(cls, inbuilt, ext):
         base64 = cls.getBase64(inbuilt, ext)
-        return b64decode(base64)
+        if base64: return b64decode(base64)
 
     @classmethod
     def getBase64(cls,  inbuilt, ext):
+        if not _PRMP_IMAGES_: return
         if ext == 'png': return PRMP_PNGS[inbuilt]
         elif ext == 'gif': return PRMP_GIFS[inbuilt]
         elif ext == 'xbm': return PRMP_XBMS[inbuilt]

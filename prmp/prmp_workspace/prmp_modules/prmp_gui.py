@@ -3,7 +3,7 @@
 import platform
 
 from prmp_miscs import *
-from prmp_miscs import _PIL_
+from prmp_miscs import _PIL_, _PRMP_IMAGES_
 import functools
 
 
@@ -2698,14 +2698,14 @@ class PRMP_Window(PRMP_Widget):
         self._min = self._max = self._exit = None
 
         if not self.noWindowButtons and self.__r != 1:
-            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
         if not self.noWindowButtons:
-            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
             self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
             self._icon = L(fr)
@@ -4780,7 +4780,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         LabelFrame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
-        
+
 
         self.callback = callback
         self.columns = columns

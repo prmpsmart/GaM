@@ -4,7 +4,7 @@ import os, time, random, ctypes, tkinter as tk, sys, time, tkinter.ttk as ttk, _
 from tkinter.font import Font, families
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
-from prmp.prmp_miscs.prmp_pics import PRMP_Image, _PIL_
+from prmp.prmp_miscs.prmp_pics import PRMP_Image, _PIL_, _PRMP_IMAGES_
 from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
 # superclasses
@@ -837,13 +837,14 @@ PS_ = PRMP_Style_
 
 class PRMP_Input:
 
-    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, **kwargs):
         _type = _type.lower()
 
         self._read = False
         if self.kwargs.get('state', None) == 'readonly': self._read = True
 
         self.values = values
+        self.very = very
 
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
@@ -930,11 +931,12 @@ class PRMP_Input:
         self._add_placeholder()
 
     def green(self):
-        self.configure(foreground='green')
+        foreground = self.kwargs.get('foreground', 'green')
+        if self.very: self.configure(foreground=foreground)
         return True
 
     def red(self):
-        self.configure(foreground='red')
+        if self.very: self.configure(foreground='red')
         return False
 
     def checkingPath(self, event=None):
@@ -2530,14 +2532,14 @@ class PRMP_Window(PRMP_Widget):
         self._min = self._max = self._exit = None
 
         if not self.noWindowButtons and self.__r != 1:
-            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
         if not self.noWindowButtons:
-            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
             self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
             self._icon = L(fr)
