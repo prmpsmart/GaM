@@ -3,7 +3,7 @@ class Column:
     clnt_days = ["Dates", "Days", "Brought-F", "Rate", "Thrifts", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances"]
     clnt_weeks = ["Weeks", "Brought-F", "Rate", "Thrifts", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances"]
     clients = ["S/N", "Clients", "Brought-F", "Rates", "Thrifts", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances"]
-    
+
     areas = ["Areas", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
     days = ["Dates", "Days", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
     spec_day = ["Dates", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
@@ -14,26 +14,11 @@ class Column:
     months = ["Months", "Areas", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
     spec_month = ["Years", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
     years = ["Years", "Months", "Clients", "Brought-F", "Commissions", "Savings", "Debits", "Not-Paid", "Upfronts", "P-Upfronts", "R-Upfronts", "Balances", "Deficits", "Excesses", "B-T-Os"]
-    
+
     daily = ["S/N", "Clients", "Rate", "Old Thrifts", "Today Thrifts",  "New Savings", "Debits", "R-Upfronts", "Total Savings", "Total Debits", "Total Upfronts"]
-    
+
     @classmethod
-    def get_columns(cls, header):
-        return cls.__dict__[header]
-        # if header == "clients": return cls.clients
-        # elif header == "areas": return cls.areas
-        # elif header == "days": return cls.days
-        # elif header == "spec_day": return cls.spec_day
-        # elif header == "weeks": return cls.weeks
-        # elif header == "spec_week": return cls.spec_week
-        # elif header == "months": return cls.months
-        # elif header == "spec_month": return cls.spec_month
-        # elif header == "years": return cls.years
-        # elif header == "daily": return cls.daily
-        # elif header == "clnt_days": return cls.clnt_days
-        # elif header == "clnt_weeks": return cls.clnt_weeks
-        # elif header == "spec_area_yr": return cls.spec_area_yr
-        # elif header == "spec_area_yrs": return cls.spec_area_yrs
+    def get_columns(cls, header): return cls.__dict__[header]
 
 class Days:
 
@@ -498,7 +483,7 @@ class Weeks:
         date_fmt = "%d/%m/%Y"
         month_wks = ca.monthdatescalendar(year, month)
         month_wks2 = ca.monthdays2calendar(year, month)
-        
+
         weeks_tuples = []
         weeks = []
         weeks_dicts = []
@@ -519,12 +504,12 @@ class Weeks:
                 w_d_days.append(d_d_w)
                 week_dict.update({date:0})
                 week_days.append((date,day_name))
-            
+
             weeks.append(weeks_dates)
             weeks_tuples.append(w_d_days)
             weeks_dicts.append(week_dict)
             weeks_days.append(week_days)
-        
+
         if which == "weeks": return weeks
         elif which == "weeks_tuples": return weeks_tuples
         elif which == "weeks_dicts": return weeks_dicts
@@ -614,10 +599,10 @@ class Weeks:
         month = region.month
         if region.which == "client": column = [region.number, region.name, region.brought_forwards_dates, region.rate_date, region.thrifts_dates, region.savings_dates, region.debits_dates,  region.upfronts_dates, region.p_upfronts_dates, region.r_upfronts_dates, region.balances_dates]
         elif region.which in ["area", "month"]: column = [region.name, region.clients_dates, region.brought_forwards_dates, region.commissions_dates, region.savings_dates, region.debits_dates, region.not_paids_dates, region.upfronts_dates, region.p_upfronts_dates, region.r_upfronts_dates, region.balances_dates, region.deficits_dates, region.excesses_dates, region.btos_dates]
-        
+
         cls.week_sorts(month, column, week)
         return column
-    
+
     @classmethod
     def year_week_columns(cls, year, week):
         week_columns = []
@@ -647,7 +632,7 @@ class Weeks:
             for date_name in dates_names:
                 date, name = date_name
 
-                str_date_name = date + " | " + cls.name_short(name) 
+                str_date_name = date + " | " + cls.name_short(name)
                 strs_date_name.append(str_date_name)
             return strs_date_name
         except Exception as e:

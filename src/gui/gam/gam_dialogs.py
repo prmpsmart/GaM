@@ -257,9 +257,9 @@ class StartDialog(GaM_Dialog):
         self.font['size'] = 15
         self.topName = self.TOP.__name__
 
-        if GaM_Settings.GaM:
-            self.Top = GaM_Settings.GaM
-            self.Manager = self.Top.person
+        # if GaM_Settings.GaM:
+        #     self.Top = GaM_Settings.GaM
+        #     self.Manager = self.Top.person
 
         super().__init__(master, title=title, geo=geo, **kwargs)
 
@@ -281,10 +281,8 @@ class StartDialog(GaM_Dialog):
         super().defaults()
         self.uniqueID.set(self.Top.uniqueID if self.Top else '')
 
-
-
     def createTOP(self):
-        if self.Top: PRMP_MsgBox(self, message=f'A {self.topName} object already existed.', title='{self.topName} Error', ask=0, _type='error')
+        if self.Top: PRMP_MsgBox(self, message=f'A {self.topName} object already existed.', title=f'{self.topName} Error', ask=0, _type='error')
         else: PRMP_MsgBox(self, message=f'Are you sure to create a {self.topName} object?', title=f'{self.topName} creation confirmation', callback=self._createTOP, _type='question')
 
     def startDefaults(self): GaM_Settings.GaM = self.Top
@@ -305,7 +303,7 @@ class StartDialog(GaM_Dialog):
         if len(personsManager): dic = dict(person=personsManager[-1])
         else: dic = dict(manager=personsManager)
 
-        PersonDialog(self, title=f'{self.MANAGER} Details', callback=self.setMANAGER, **dic)
+        PersonDialog(self, title=f'{self.MANAGER} Details', callback=self.setMANAGER, grab=1, **dic)
 
     def setMANAGER(self, manager):
         if not self.MANAGER: self.MANAGER = manager

@@ -538,6 +538,8 @@ class PRMP_Widget(PRMP_Theme):
 
         if bool(tipKwargs) and not isinstance(tipKwargs, dict) and self.kwargs.get('text'): tipKwargs = dict(text=self.kwargs.get('text'))
 
+        self.tooltip = None
+
         self.addTip(**tipKwargs)
 
         self.bind('<Enter>', self.entered, '+')
@@ -726,9 +728,10 @@ class PRMP_Widget(PRMP_Theme):
         if self.children:
             for child in self.winfo_children(): child.state(args)
 
-    def config(self, **kwargs):
+    def config(self, tipKwargs={}, **kwargs):
+        if tipKwargs: self.set_tooltip_text(tipKwargs)
         self.kwargs.update(kwargs)
-        self.configure(**kwargs)
+        self.TkClass.configure(self, **kwargs)
 
     @property
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
@@ -739,6 +742,11 @@ class PRMP_Widget(PRMP_Theme):
 
         if not PRMP_Window.TIPSMANAGER: self.tooltip = PRMP_ToolTipsManager(self, **kwargs)
         else: PRMP_Window.TIPSMANAGER.add_tooltip(self, **kwargs)
+
+    def set_tooltip_text(self, tipKwargs):
+        tip = self.tooltip or PRMP_Window.TIPSMANAGER
+        if tip: tip.set_tooltip_text(self, **tipKwargs)
+
 
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
@@ -1032,7 +1040,7 @@ PI = PRMP_Input
 
 class PRMP_InputButtons:
 
-    def setl(self, val):
+    def set(self, val):
         if self.var:
             self.var.set(val)
             # self.val = self.value = val
@@ -2427,6 +2435,9 @@ class PRMP_Window(PRMP_Widget):
     def centerOfRightOfScreen(self):
         points = self.pointsToCenterOfScreen
         points[2] *= 2
+        points[2] -= 50
+        print(points)
+
         self.setGeometry(points)
 
     def topLeftOfScreen(self):
@@ -2438,6 +2449,7 @@ class PRMP_Window(PRMP_Widget):
         points = self.pointsToCenterOfScreen
         points[-1] = 50
         points[2] *= 2
+        points[2] -= 50
         self.setGeometry(points)
 
     def bottomLeftOfScreen(self):
@@ -2449,6 +2461,7 @@ class PRMP_Window(PRMP_Widget):
     def bottomRightOfScreen(self):
         points = self.pointsToCenterOfScreen
         points[-2] *= 2
+        points[-2] -= 50
         points[-1] *= 2
         self.setGeometry(points)
 
