@@ -189,7 +189,7 @@ class PRMP_Setup:
         import PyInstaller.__main__
         PyInstaller.__main__.run(self.holder.run_parameter)
 
-    def inno_setup(self, script, old_ver='', new_ver='', gen_script=False, gui=False, customize=False, author='PRMP Smart'):
+    def inno_setup(self, script='', old_ver='', new_ver='', gen_script=False, gui=False, customize=False, author='PRMP Smart'):
         self.holder = Holder()
         self.holder.script = script
         self.holder.new_ver = new_ver
@@ -239,23 +239,30 @@ class PRMP_Setup:
         if not dry_run: system(cmd)
         return _outfile
 
-    def _create_dll(self, file, include_dir='', as_pyd=False, python_dll='', cython_it=False, outext='dll', quiet=False, dry_run=False, **kwargs):
-        if cython_it: file = self.py2c(file, dry_run=dry_run, **kwargs)
-        include_dir = f'-I{include_dir}' if include_dir else ''
-        objfile = self.change_ext(file, 'o')
-        outext = 'pyd' if as_pyd else outext
+    def create_dll(self, file, include_dir='', as_pyd=False, python_dll='', cython_it=False, outext='dll', quiet=False, dry_run=False, **kwargs):
+        self.holder = Holder()
+        self.holder.dry_run = dry_run
+        self.holder.quiet = quiet
+        self.holder.python_dll = python_dll
+        self.holder.file = file
 
-        outfile = self.change_ext(file, outext)
+        if cython_it: self.holder.file = self.py2c(file, dry_run=dry_run, **kwargs)
+        self.holder.include_dir = f'-I{include_dir}' if include_dir else ''
+        self.holder.objfile = self.change_ext(file, 'o')
+        self.holder.outext = 'pyd' if as_pyd else outext
 
-        # return
-        cmd1 = f"gcc -Wall -g {include_dir} -c {file} -o {objfile}"
-        if dry_run or not quiet: print(cmd1)
-        if not dry_run: system(cmd1)
+        self.holder.outfile = self.change_ext(file, outext)
+        # print(self.holder.include_dir)
 
-        cmd2 = f"g++ -shared -Wl,--dll {objfile} -o {outfile} {python_dll}"
-        if dry_run or not quiet: print(cmd2)
-        if not dry_run: system(cmd2)
+    def _create_dll(self):
 
+        cmd1 = f"gcc -Wall -g {self.holder.include_dir} -c {self.holder.file} -o {self.holder.objfile}"
+        if self.holder.dry_run or not self.holder.quiet: print(cmd1)
+        if not self.holder.dry_run: system(cmd1)
+
+        cmd2 = f"g++ -shared -Wl,--dll {self.holder.objfile} -o {self.holder.outfile} {self.holder.python_dll}"
+        if self.holder.dry_run or not self.holder.quiet: print(cmd2)
+        if not self.holder.dry_run: system(cmd2)
 
     def _create_exe(self, file, include_dir='', win=0, python_dll='', quiet=False, dry_run=False):
         outfile = self.change_ext(file, 'exe')

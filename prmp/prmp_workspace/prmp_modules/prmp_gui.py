@@ -3,7 +3,7 @@
 import platform
 
 from prmp_miscs import *
-from prmp_miscs import _PIL_, _PRMP_IMAGES_
+from prmp_miscs import _PIL_
 import functools
 
 
@@ -172,7 +172,6 @@ class Columns(Col_Mixins):
 import os, time, random, ctypes, tkinter as tk, _tkinter
 from tkinter.font import Font, families
 import tkinter.ttk as ttk
-from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 
 # superclasses
@@ -517,7 +516,6 @@ class PRMP_Theme(PRMP_Mixins):
         if not self._ttk_:
             kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very']}
 
-
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
             background = kwargs.pop('background', PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
@@ -665,7 +663,7 @@ class PRMP_Widget(PRMP_Theme):
         :param tipKwargs: dict of [Label options, follow, delay]
         '''
 
-
+        config = config.copy()
         self.kwargs = kwargs.copy()
         kwargs.clear()
         self.kwargs['font'] = font or 'PRMP_FONT'
@@ -695,7 +693,7 @@ class PRMP_Widget(PRMP_Theme):
         if isinstance(var, tk.StringVar): pass
         elif var:
             var = tk.StringVar()
-            var.set(self.value)
+            var.set('0')
         self.var = self.variable = var
         if var: config['variable'] = var
 
@@ -706,6 +704,8 @@ class PRMP_Widget(PRMP_Theme):
         except: pass
 
         if bool(tipKwargs) and not isinstance(tipKwargs, dict) and self.kwargs.get('text'): tipKwargs = dict(text=self.kwargs.get('text'))
+
+        self.tooltip = None
 
         self.addTip(**tipKwargs)
 
@@ -883,23 +883,22 @@ class PRMP_Widget(PRMP_Theme):
 
     def normal(self): self.state('normal')
 
-    def state(self, *args):
-        if not args:
-            st = self['state']
-            return str(st)
-
-        try: return self.configure(state=args[0])
-        except:
-            try: return self.TkClass.state(self, *args)
+    def state(self, args=''):
+        if isinstance(args, (list, tuple)): return self.TkClass.state(self, args)
+        elif isinstance(args, str):
+            try: return self.TkClass.state(self, args)
             except:
-                if self.children:
-                    for child in self.winfo_children(): child.state(*args)
-                    return 1
+                try: self['state'] = args
+                except:
+                    try: self.configure(state=args)
+                    except: pass
+        if self.children:
+            for child in self.winfo_children(): child.state(args)
 
-
-    def config(self, **kwargs):
+    def config(self, tipKwargs={}, **kwargs):
+        if tipKwargs: self.set_tooltip_text(tipKwargs)
         self.kwargs.update(kwargs)
-        self.configure(**kwargs)
+        self.TkClass.configure(self, **kwargs)
 
     @property
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')
@@ -910,6 +909,11 @@ class PRMP_Widget(PRMP_Theme):
 
         if not PRMP_Window.TIPSMANAGER: self.tooltip = PRMP_ToolTipsManager(self, **kwargs)
         else: PRMP_Window.TIPSMANAGER.add_tooltip(self, **kwargs)
+
+    def set_tooltip_text(self, tipKwargs):
+        tip = self.tooltip or PRMP_Window.TIPSMANAGER
+        if tip: tip.set_tooltip_text(self, **tipKwargs)
+
 
     def on_mousewheel(self, event):
         if platform.system() == 'Windows': self.yview_scroll(-1*int(event.delta/120),'units')
@@ -986,7 +990,9 @@ class PRMP_Widget(PRMP_Theme):
         for arg in args: self.bind(arg[0], arg[1], '+')
 
     def __getitem__(self, item):
-        if self.TkClass: return self.TkClass.__getitem__(self, item)
+        try:
+            if self.TkClass: return self.TkClass.__getitem__(self, item)
+        except: pass
 PWd = PRMP_Widget
 
 class PRMP_(PRMP_Widget):
@@ -1201,7 +1207,7 @@ PI = PRMP_Input
 
 class PRMP_InputButtons:
 
-    def setl(self, val):
+    def set(self, val):
         if self.var:
             self.var.set(val)
             # self.val = self.value = val
@@ -1318,7 +1324,7 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
 
         if type_.lower() == 'gender': values = ['Male', 'Female']
 
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)
         self.objects = {}
         self.changeValues(values)
@@ -1890,7 +1896,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     'gripcount': 10
                 }
             },
-            'PRMP.Treeview': {
+            'Treeview': {
                 'configure': {
                     'rowheight': 28,
                     'fieldbackground': background,
@@ -1898,9 +1904,9 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     # 'columnfont': heading_font,
                 },
                 'map': {
-                    'background': [('selected', text_background)],#, ('hover', button_background)],
-                    'foreground': [('selected', text_foreground)]#, ('hover', button_foreground)],
-                    # 'relief': [('hover', 'ridge')]
+                    'background': [('selected', text_background), ('hover', button_background)],
+                    'foreground': [('selected', text_foreground), ('hover', button_foreground)],
+                    'relief': [('hover', 'ridge')]
                 }
             },
             # 'TreeCtrl': {
@@ -1935,7 +1941,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
             },
             'Row': {
                 'configure': {
-                    'relief': 'flat'
+                    'relief': 'groove'
                 },
                 'map': {
                     'rowbackground': [('selected', 'black')],
@@ -1944,7 +1950,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                 },
                 'layout': [('Treeitem.border', {'children': [('Treeitem.row', {'sticky': 'nswe'})]})]
             },
-            'PRMP.Item': {
+            'Item': {
                 'configure': {
                     'font': heading_font,
                     'relief': 'flat'
@@ -2068,8 +2074,8 @@ Button = PB = PRMP_Button
 class PRMP_Checkbutton(PRMP_InputButtons, PRMP_, tk.Checkbutton):
     TkClass = tk.Checkbutton
 
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        PRMP_.__init__(self, master=master, asLabel=asLabel, config=config, **kwargs)
+    def __init__(self, master=None, asLabel=False, config={}, var=1, **kwargs):
+        PRMP_.__init__(self, master=master, asLabel=asLabel, config=config, var=var, **kwargs)
 
         self.toggleSwitch()
 
@@ -2210,8 +2216,8 @@ SButton = PSB = PRMP_Style_Button
 class PRMP_Style_Checkbutton(PRMP_InputButtons, PRMP_Style_, ttk.Checkbutton):
     TkClass = ttk.Checkbutton
 
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, **kwargs)
+    def __init__(self, master=None, asLabel=False, config={}, var=1, **kwargs):
+        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, var=var, **kwargs)
 
         self.toggleSwitch()
 SCheckbutton = PSC = PRMP_Style_Checkbutton
@@ -2596,6 +2602,9 @@ class PRMP_Window(PRMP_Widget):
     def centerOfRightOfScreen(self):
         points = self.pointsToCenterOfScreen
         points[2] *= 2
+        points[2] -= 50
+        print(points)
+
         self.setGeometry(points)
 
     def topLeftOfScreen(self):
@@ -2607,6 +2616,7 @@ class PRMP_Window(PRMP_Widget):
         points = self.pointsToCenterOfScreen
         points[-1] = 50
         points[2] *= 2
+        points[2] -= 50
         self.setGeometry(points)
 
     def bottomLeftOfScreen(self):
@@ -2618,6 +2628,7 @@ class PRMP_Window(PRMP_Widget):
     def bottomRightOfScreen(self):
         points = self.pointsToCenterOfScreen
         points[-2] *= 2
+        points[-2] -= 50
         points[-1] *= 2
         self.setGeometry(points)
 
@@ -2701,14 +2712,14 @@ class PRMP_Window(PRMP_Widget):
         self._min = self._max = self._exit = None
 
         if not self.noWindowButtons and self.__r != 1:
-            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
+            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ else None
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
+            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
         if not self.noWindowButtons:
-            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ and _PRMP_IMAGES_ else None
+            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ else None
             self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
             self._icon = L(fr)
@@ -2765,7 +2776,7 @@ class PRMP_Window(PRMP_Widget):
             os.sys.exit(self.save())
 
         if self == self.topest:
-
+            from .dialogs import PRMP_MsgBox
             PRMP_MsgBox(self, title='Exit', message='Are you sure to exit?', callback=out)
         else: self.destroy()
 
@@ -3321,10 +3332,11 @@ class PRMP_TreeView(PRMP_Frame):
         # if ret != self._unget: return ret
         # else: return getattr(self.treeview, attr)
 
-    def __init__(self, master=None, columns=[], **kwargs):
+    def __init__(self, master=None, columns=[], treeviewKwargs={}, **kwargs):
         super().__init__(master=master, **kwargs)
 
         self.treeview = None
+        self.treeviewKwargs = treeviewKwargs
         self.xscrollbar = None
         self.yscrollbar = None
         self.obj = None
@@ -3346,7 +3358,7 @@ class PRMP_TreeView(PRMP_Frame):
             self.yscrollbar.destroy()
             del self.yscrollbar
 
-        self.t = self.tree = self.treeview = PRMP_Treeview(self)
+        self.t = self.tree = self.treeview = PRMP_Treeview(self, **self.treeviewKwargs)
         self.xscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="horizontal", command=self.treeview.xview))
         self.yscrollbar = PRMP_Style_Scrollbar(self, config=dict(orient="vertical", command=self.treeview.yview))
         self.treeview.configure(xscrollcommand=self.xscrollbar.set, yscrollcommand=self.yscrollbar.set)
@@ -3460,8 +3472,9 @@ class PRMP_DropDownWidget:
 
         self.WidgetClass.__init__(self, master, **kwargs)
 
+        if issubclass(dropdown_windowclass, (PRMP_Window, PRMP_MainWindow)): dropdown_windowkwargs.update(dict(tooltype=1, normTk=1))
         self.dropdown_window = dropdown_windowclass(self, callback=self.set, **dropdown_windowkwargs) if dropdown_windowclass else Toplevel(self, **dropdown_windowkwargs)
-        # self.dropdown_window.withdraw()
+        self.dropdown_window.withdraw()
 
         # add validation to Entry so that only desired input format are accepted
 
@@ -3505,8 +3518,9 @@ class PRMP_DropDownWidget:
 
     def _on_b1_press(self, event=None):
         """Trigger self.drop_down on widget press and set widget state to ['pressed', 'active']."""
-        if ('disabled' not in self.state()):
-            self.state(['pressed'])
+
+        if str(self['state']) != 'disabled':
+            self['state'] = 'pressed'
             self.drop_down()
 
     def _on_focus_out_dropdown_window(self, event):
@@ -3646,7 +3660,7 @@ class PRMP_DropDownEntry(PRMP_DropDownWidget, SEntry):
                 self.state(['!active'])
                 ttk.Entry.configure(self, cursor=self._cursor)
 
-    def state(self, *args):
+    def state(self, args=''):
         """
         Modify or inquire widget state.
 
@@ -3655,14 +3669,10 @@ class PRMP_DropDownEntry(PRMP_DropDownWidget, SEntry):
         is returned indicating which flags were changed. statespec is
         expected to be a sequence.
         """
-        if args:
-            # change cursor depending on state to mimic Combobox behavior
-            # print(self.configure)
-            # return []
-            states = args[0]
-            if 'disabled' in states or 'readonly' in states: self.configure(cursor='arrow')
-            elif '!disabled' in states or '!readonly' in states: self.configure(cursor='xterm')
-        return super().state(*args)
+        # change cursor depending on state to mimic Combobox behavior
+        if 'disabled' in args or 'readonly' in args: self.configure(cursor='arrow')
+        elif '!disabled' in args or '!readonly' in args: self.configure(cursor='xterm')
+        return super().state(args)
 
     def configure(self, cnf={}, **kw):
         kwargs = cnf.copy()
@@ -3701,7 +3711,6 @@ DDCb = DropDownCheckbutton = PRMP_DropDownCheckbutton
 
 # extensions.py
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
-
 
 class AutoScroll:
     '''Configure the scrollbars for a widget.'''
@@ -3822,7 +3831,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                         try: wid.flash()
                         except: pass
 
-
+                        from .dialogs import PRMP_MsgBox
                         PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()}* is required to proceed!', _type='error', okText='Understood')
                         return
                 else: result[widgetName] = get
@@ -3928,7 +3937,7 @@ class PRMP_ImageWidget:
 
     def removeImage(self):
         self.delMenu()
-
+        from .dialogs import PRMP_MsgBox
 
         PRMP_MsgBox(self, title='Profile Picture Removal', message='Are you sure you wanna remove the picture from this profile? ', callback=self._removeImage)
 
@@ -3965,7 +3974,7 @@ class PRMP_ImageWidget:
 
     def camera(self, e=0):
         self.delMenu()
-
+        from .dialogs import PRMP_CameraDialog
 
         PRMP_CameraDialog(self, title='Profile Photo', tw=1, tm=1, callback=self.set)
 
@@ -4007,11 +4016,11 @@ class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
 IL = PRMP_ImageButton
 
 class PRMP_DateWidget:
-    attr = 'strDate'
+    attr = 'date'
     def __init__(self, min_=None, max_=None, callback=None):
         self.callback = callback
         self.date = None
-
+        from .dialogs import PRMP_CalendarDialog, PRMP_DateTime
         self.CD = PRMP_CalendarDialog
         self.DT = PRMP_DateTime
         self.min = min_
@@ -4026,11 +4035,11 @@ class PRMP_DateWidget:
     def get(self):
         if self.date: return self.date
         text = self['text']
-        if text: return PRMP_DateTime.getDMYFromDate(text)
+        if text: return PRMP_DateTime.getDMYFromString(text)
 
     def set(self, date):
         if date == '':
-            self['text'] = date
+            self.config(text=date)
             return
         if isinstance(date, str):
             try:
@@ -4273,8 +4282,8 @@ class PRMP_Calendar(Frame):
         month = PRMP_DateTime.checkDateTime(month, dontRaise=1)
         if not month: month = PRMP_DateTime.now()
 
-        self.min = PRMP_DateTime.getDMYFromDate(min_)
-        self.max = PRMP_DateTime.getDMYFromDate(max_)
+        self.min = PRMP_DateTime.getDMYFromString(min_)
+        self.max = PRMP_DateTime.getDMYFromString(max_)
         self.__date = None
         self.month = month
         self.callback = callback
@@ -4523,7 +4532,7 @@ class Hierachy(PRMP_TreeView):
 
     @property
     def openDialog(self):
-
+        from .dialogs import dialogFunc
         return dialogFunc
 
     def toggleOpen(self, e=0):
@@ -4586,11 +4595,11 @@ class AttributesViewer(LabelFrame):
 
     def __init__(self, master, attr='', obj=None, dialog=None, **kwargs):
         super().__init__(master, **kwargs)
-
+        from .two_widgets import LabelLabel, LabelEntry, LabelText, TwoWidgets
 
         self.dialog = dialog
         if not self.dialog:
-
+            from .dialogs import dialogFunc
             self.dialog = dialogFunc
 
         self.obj = obj
@@ -4626,7 +4635,7 @@ class AttributesViewer(LabelFrame):
 class AttributesExplorer(LabelFrame):
     def __init__(self, master, listboxConfig={}, callback=None, obj=None, values={}, dialog=None, **kwargs):
         super().__init__(master, **kwargs)
-
+        from .two_widgets import LabelLabel, LabelEntry, LabelText, TwoWidgets
 
         self.dialog = dialog
         self.callback = callback
@@ -4670,7 +4679,7 @@ class AttributesExplorer(LabelFrame):
         self.set(values)
 
     def openAttribute(self):
-
+        from .dialogs import PRMP_MsgBox, AttributesViewerDialog
 
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')
 
@@ -4700,7 +4709,7 @@ class AttributesExplorer(LabelFrame):
 
         _all = 'all attributes' if not focus else f'this attribute --> {self.ivd[focus]}'
 
-
+        from .dialogs import PRMP_MsgBox
 
         PRMP_MsgBox(self, title='Delete Attribute', message=f'Are you sure to delete {_all}', ask=1, callback=self._delete)
 
@@ -4753,7 +4762,7 @@ class ColumnViewer(LabelFrame):
 
     def __init__(self, master, column=None, **kwargs):
         super().__init__(master, **kwargs)
-
+        from .two_widgets import LabelEntry
 
         self.text = LabelEntry(self, place=dict(relx=0, rely=0, relh=.2, relw=1), topKwargs=dict(text='text'), orient='h', longent=.3)
 
@@ -4770,11 +4779,11 @@ class ColumnViewer(LabelFrame):
             self._width.set(column.width)
 
     def openMaster(self):
-
+        from .dialogs import dialogFunc
         dialogFunc(master=self, obj=self.obj)
 
     def open(self):
-
+        from .dialogs import dialogFunc, ColumnsExplorerDialog
         if isinstance(self._value, (int, str, list, tuple, dict)): ColumnsExplorerDialog(self, values=self._value)
         else: dialogFunc(master=self, obj=self._value)
 
@@ -4783,7 +4792,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         LabelFrame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
-
+        from .two_widgets import LabelLabel, LabelEntry
 
         self.callback = callback
         self.columns = columns
@@ -4834,21 +4843,21 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         gets['width'] = int(width)
         try: j = self.columns.addColumn(gets)
         except:
-
+            from .dialogs import PRMP_MsgBox
             PRMP_MsgBox(self, title='Error', _type='error', message='Try to add the "attr" value.')
         self._attr = ''
 
         self.set(self.columns)
 
     def getAttr(self):
-
+        from .dialogs import AttributesExplorerDialog
         AttributesExplorerDialog(callback=self.setAttr)
 
     def setAttr(self, attr):
         if attr: self._attr = attr[0]
 
     def deleteColumn(self, e=0):
-
+        from .dialogs import PRMP_MsgBox
 
         self._foc = focus = self.treeview.treeview.focus()
         if not focus: PRMP_MsgBox(self, title='No Selection.n', message='Pick a row to delete.')
@@ -4930,16 +4939,27 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     #         self.treeview.insert(parent, text=values, value=values)
     #         pass
 
+class PRMP_DropDownCalendarWidget(PRMP_DropDownWidget):
+    def __init__(self, *args, **kwargs):
+        from .dialogs import PRMP_CalendarDialog
+
+        super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
+
+
+class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
+    def __init__(self, *args, **kwargs):
+        from .dialogs import PRMP_CalendarDialog
+
+        super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
+
 
 # two_widgets.py
-
-#  These widgets doesn't need or can't be used with PRMP_Widget.addWidget()
 
 class TwoWidgets(PRMP_Frame):
     top_widgets = {'label': PRMP_Label, 'checkbutton': PRMP_Checkbutton, 'radiobutton': PRMP_Radiobutton}
     stop_widgets = {'label': PRMP_Style_Label, 'checkbutton': PRMP_Style_Checkbutton, 'radiobutton': PRMP_Style_Radiobutton}
     bottom_widgets = {'label': PRMP_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': PRMP_Spinbox, 'button': PRMP_Button, 'monthbutton': PRMP_MonthButton, 'monthyearbutton': PRMP_MonthYearButton}
-    sbottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': PRMP_Style_Spinbox, 'button': PRMP_Button}
+    sbottom_widgets = {'label': PRMP_Style_Label, 'datebutton': PRMP_DateButton, 'entry': PRMP_Style_Entry, 'text': PRMP_Text, 'stext': PRMP_SText, 'combobox': PRMP_Combobox, 'spinbox': PRMP_Style_Spinbox, 'button': PRMP_Button, 'dropdownentry': PRMP_DropDownEntry}
     events = {'combobox': ['<<ComboboxSelected>>', '<Return>'], 'spinbox': ['<<Increment>>', '<<Decrement>>', '<Return>']}
     top_defaults = {'asLabel': True}
     bottom_defaults = {'borderwidth': 3, 'relief': 'sunken', 'asEntry': True}
@@ -5172,6 +5192,8 @@ LMB = LabelMonthButton
 class LabelMonthYearButton(TwoWidgets):
     def __init__(self, master, **kwargs): super().__init__(master, top='label', bottom='monthyearbutton', **kwargs)
 LMYB = LabelMonthYearButton
+
+
 
 
 
@@ -5512,10 +5534,17 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
     def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPlotting(chart=self.chart, grid=self._grid, **self.chart_datas)
 
+
+
+
+
+
 # dialogs.py
 
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
+from tkinter.simpledialog import askstring, askfloat, askinteger
+
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
@@ -5907,7 +5936,7 @@ def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
             else: return filedialog.askopenfiles(**kwargs)
     else: return filedialog.askdirectory(**kwargs)
 
-def dialogFunc(ask=0, path=0, obj=None, **kwargs):
+def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, **kwargs):
     if obj:
         if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
         elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
@@ -5915,9 +5944,157 @@ def dialogFunc(ask=0, path=0, obj=None, **kwargs):
         elif isinstance(obj, Column): ColumnViewerDialog(column=obj, **kwargs)
     elif path: return askPath(**kwargs)
     elif ask: return confirmDialog(**kwargs)
+    elif string: return askstring(*args, **kwargs)
+    elif float_: return askfloat(*args, **kwargs)
+    elif int_: return askinteger(*args, **kwargs)
     else: return showDialog(**kwargs)
 
 
+
+def getPixs(folder):
+    if not path.isdir(folder): raise f'{folder} is not a valid directory/folder.'
+
+    cwd = getcwd()
+    chdir(folder)
+    pixs = []
+
+    for file in listdir(folder):
+        if path.isfile(file):
+            if PRMP_ImageType.get(file):
+                p = path.join(folder, file)
+                pixs.append(p)
+    chdir(cwd)
+    return pixs
+
+class PhotoViewer(PRMP_MainWindow):
+
+    def __init__(self, title='PRMP Photo Viewer', folder='', file='', **kwargs):
+        super().__init__(title=title, **kwargs)
+        self._folder = folder
+        self._pixs = []
+        self._total = 0
+        self._current = ''
+        self._index = 0
+
+        self.frame = Frame(self.container)
+
+        self.folder = LabelButton(self.frame, place=dict(relx=.005, rely=.005, relw=.99, relh=.09), orient='h', topKwargs=dict(text='Folder'), longent=.13, bottomKwargs=dict(command=self.chooseDir))
+        self.bind('<Control-O>', self.chooseDir)
+        self.bind('<Control-o>', self.chooseDir)
+
+        self.imageLabel = PRMP_ImageLabel(self.frame, place=dict(relx=.005, rely=.1, relw=.99, relh=.7), prmpImage=file)
+
+        self.previous = Button(self.imageLabel, text=self._previous, place=dict(relx=.005, rely=.42, relw=.1, relh=.16), command=self.previousPic, relief='flat', tipKwargs=dict(text='Previous Picture'))
+
+        self.next = Button(self.imageLabel, text=self._next, place=dict(relx=.89, rely=.42, relw=.1, relh=.16), command=self.nextPic, relief='flat', tipKwargs=dict(text='Next Picture'))
+
+        self.total = LabelLabel(self.frame, place=dict(relx=.005, rely=.8, relw=.5, relh=.09), orient='h', topKwargs=dict(text='Total Pictures: '), longent=.55)
+        self.index = LabelEntry(self.frame, place=dict(relx=.65, rely=.8, relw=.35, relh=.09), orient='h', topKwargs=dict(text='Index'), longent=.45, bottomKwargs=dict(_type='number'))
+        self.index.B.bind('<Return>', self.byIndex)
+
+        self.current = LabelEntry(self.frame, place=dict(relx=.005, rely=.9, relw=.7, relh=.09), orient='h', topKwargs=dict(text='Current: '), longent=.24, bottomKwargs=dict(state='readonly'))
+
+        self.listBtn = Checkbutton(self.frame, place=dict(relx=.75, rely=.9, relw=.2, relh=.07), text='List?', command=self.toggleList, var=1, value=1, tipKwargs=dict(text='Toggle list of pictures in the current folder.'))
+
+        self.listFrame = Frame(self.container)
+        self.list = ListBox(self.listFrame, place=dict(relx=.005, rely=.005, relw=.99, relh=.99), callback=self.listSelection)
+
+        self.defaults()
+        self.placeFrame()
+        if file:
+            d = path.dirname(file)
+            if d: self.chooseDir(folder=d)
+            self.setCurrent(file)
+            # self.current.set(file)
+        self.paint()
+
+    def defaults(self):
+        self.bind('<Left>', self.previousPic)
+        self.bind('<Right>', self.nextPic)
+        if self._folder: self.chooseDir(folder=self._folder)
+        else: self.updateDatas()
+
+    def byIndex(self, e=0):
+        index = self.index.get()
+        try:
+            print(index)
+            index = int(index)
+            assert 0 <= index <= self._total, f'Index {index} is not in range 0 ... {self._total}.'
+            self._index = index
+            self.setCurrent()
+        except Exception as e:
+            PRMP_MsgBox(self, title=e.__class__.__name__, message=e, ask=0, _type='error')
+            return
+
+    def updateDatas(self):
+        self.folder.set(self._folder)
+        self.total.set(self._total)
+        self.index.set(self._index+1)
+        self.setCurrent()
+
+    def setCurrent(self, current_=''):
+        if not current_:
+            if not self._pixs: return
+            self.index.set(self._index)
+            self._current = self._pixs[self._index]
+            if not path.exists(self._current):
+                PRMP_MsgBox(self, title='Not Exist', message=f'{self._current} does not exist, try to reload the folder.', ask=0)
+                return
+
+        current = path.basename(self._current)
+        self.current.set(current)
+        self.imageLabel.loadImage(current_ or self._current)
+
+    def chooseDir(self, e=0, folder=''):
+        if not folder: folder = dialogFunc(path=1, folder=1, initialdir=self._folder, title='PRMP Photoviewer')
+
+        if not folder: return
+
+        self._folder = folder
+        self._pixs = getPixs(folder)
+
+        self._current = ''
+        if self._pixs: self._current = self._pixs[0]
+
+        self._total = len(self._pixs)
+        self.updateDatas()
+        self.list.set(self._pixs)
+
+    def listSelection(self, selected, event=0):
+        if selected:
+            selected = selected[0]
+            self._index = self._pixs.index(selected)
+            self.setCurrent()
+
+    def previousPic(self, e=0):
+        if self._pixs:
+            self._index -= 1
+            if self._index <= 0: self._index = self._total - 1
+            self.setCurrent()
+
+    def nextPic(self, e=0):
+        if self._pixs:
+            self._index += 1
+            if self._index >= self._total: self._index = 0
+            self.setCurrent()
+
+    def toggleList(self):
+        if self.listBtn.get():
+            x, y = self.geo[:2]
+            self.changeGeometry((x*2, y))
+            self.placeList()
+            self.placeFrame(1)
+        else:
+            self.changeGeometry(self.geo[:2])
+            self.placeFrame()
+            self.listFrame.place_forget()
+
+    def placeFrame(self, w=0):
+        if w: relw = .5
+        else: relw = .99
+        self.frame.place(relx=.005, rely=.005, relw=relw, relh=.96)
+
+    def placeList(self): self.listFrame.place(relx=.5, rely=.005, relw=.49, relh=.96)
 
 
 

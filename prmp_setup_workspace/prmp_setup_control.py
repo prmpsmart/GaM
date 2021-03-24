@@ -6,11 +6,11 @@ root = path.dirname(path.dirname(__file__))
 
 prmp_miscs = 'prmp\prmp_workspace\prmp_modules\prmp_miscs.py'
 prmp_gui = 'prmp\prmp_workspace\prmp_modules\prmp_gui.py'
-scripts = [path.join(root, a) for a in [prmp_miscs, prmp_gui]][0:1]
-scripts = []
+scripts = [path.join(root, a) for a in [prmp_miscs, prmp_gui]]
+# scripts = []
 
-# filename = root = ''
-filename = prmp_gui
+filename = root = ''
+# filename = prmp_gui
 # filename = prmp_miscs
 file = path.join(root, filename)
 # file = r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM\prmp\prmp_miscs\prmp_images.py'

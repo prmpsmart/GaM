@@ -4,6 +4,9 @@ from prmp.prmp_miscs.prmp_pics import PRMP_Xbms
 from .extensions import *
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
+from tkinter.simpledialog import askstring, askfloat, askinteger
+
+
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
 
@@ -240,15 +243,16 @@ CamD = PRMP_CameraDialog
 
 class PRMP_ImageDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, image=None, title='Image Dialog', **kwargs):
+    def __init__(self, master=None, image=None, title='Image Dialog', imageKwargs={}, **kwargs):
         self.image = image
+        self.imageKwargs = imageKwargs
         # print(kwargs)
         super().__init__(master, title=title, **kwargs)
 
     # def isMaximized(self): return self.getWid_H_W(self)
 
     def _setupDialog(self):
-        self.imageLabel = PRMP_ImageLabel(self.container, prmpImage=self.image, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'))
+        self.imageLabel = PRMP_ImageLabel(self.container, prmpImage=self.image, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), imageKwargs=self.imageKwargs)
         self.set = self.imageLabel.set
         # self.bind('<Return>', self.imageLabel.saveImage)
 
@@ -394,7 +398,7 @@ def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
             else: return filedialog.askopenfiles(**kwargs)
     else: return filedialog.askdirectory(**kwargs)
 
-def dialogFunc(ask=0, path=0, obj=None, **kwargs):
+def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, **kwargs):
     if obj:
         if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
         elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
@@ -402,5 +406,8 @@ def dialogFunc(ask=0, path=0, obj=None, **kwargs):
         elif isinstance(obj, Column): ColumnViewerDialog(column=obj, **kwargs)
     elif path: return askPath(**kwargs)
     elif ask: return confirmDialog(**kwargs)
+    elif string: return askstring(*args, **kwargs)
+    elif float_: return askfloat(*args, **kwargs)
+    elif int_: return askinteger(*args, **kwargs)
     else: return showDialog(**kwargs)
 

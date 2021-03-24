@@ -24,7 +24,6 @@ import platform, functools
 
 from PIL.ImageTk import Image, PhotoImage, BitmapImage
 from PIL import ImageSequence
-# from prmp_images import PRMP_PNGS, PRMP_GIFS, PRMP_XBMS
 
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
