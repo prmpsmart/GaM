@@ -30,7 +30,6 @@ class PersonDialog(GaM_Dialog):
         if person: title = f'{person.master.className} {title}'
         values = person or values
 
-
         super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
 
     def _setupDialog(self):
@@ -42,7 +41,7 @@ class PersonDialog(GaM_Dialog):
 
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
 
-        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True), orient='h', place=dict(relx=.02, rely=0, relh=.14, relw=.96), longent=.25)
+        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True, very=1), orient='h', place=dict(relx=.02, rely=0, relh=.14, relw=.96), longent=.25)
 
         self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.02, rely=.14, relh=.14, relw=.96), longent=.5, orient='h')
 
@@ -257,9 +256,9 @@ class StartDialog(GaM_Dialog):
         self.font['size'] = 15
         self.topName = self.TOP.__name__
 
-        # if GaM_Settings.GaM:
-        #     self.Top = GaM_Settings.GaM
-        #     self.Manager = self.Top.person
+        if GaM_Settings.GaM:
+            self.Top = GaM_Settings.GaM
+            self.Manager = self.Top.person
 
         super().__init__(master, title=title, geo=geo, **kwargs)
 
@@ -303,7 +302,7 @@ class StartDialog(GaM_Dialog):
         if len(personsManager): dic = dict(person=personsManager[-1])
         else: dic = dict(manager=personsManager)
 
-        PersonDialog(self, title=f'{self.MANAGER} Details', callback=self.setMANAGER, grab=1, **dic)
+        PersonDialog(self, title=f'{self.MANAGER} Details', callback=self.setMANAGER, show=0, **dic)
 
     def setMANAGER(self, manager):
         if not self.MANAGER: self.MANAGER = manager

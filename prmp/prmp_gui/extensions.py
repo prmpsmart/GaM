@@ -133,12 +133,13 @@ class PRMP_FillWidgets(PRMP_Mixins):
 FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False, **imageKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False, bindMenu=1, fullsize=False, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
         self.rt = None
         self.prmpImage = prmpImage
         self.thumb = thumb
         self.resize = resize
+        self.fullsize = fullsize
 
         self.frame_counter = 0
         self.frame = None
@@ -149,9 +150,11 @@ class PRMP_ImageWidget:
         self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
 
         self._normal = normal
-        self.bindMenu()
+        if bindMenu: self.bindMenu()
 
-        self.after(100, lambda:self.loadImage(self.prmpImage, **imageKwargs))
+        self.after(100, lambda: self.loadImage(self.prmpImage, **imageKwargs))
+
+        self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 
     def disabled(self):
         self.unBindMenu()
@@ -161,18 +164,15 @@ class PRMP_ImageWidget:
         self.bindMenu()
         super().normal()
 
-    def loadImage(self, prmpImage=None, **kwargs):
+    def loadImage(self, prmpImage=None, event=None, **kwargs):
         self.delMenu()
         self.isGif = False
 
-        dif = 20
-        # if not kwargs: return
-        # print(kwargs)
-
         self.frame_counter = 0
         # self.thumb = self.resize or self.thumb
+
         if not (self.resize and self.thumb):
-            self.thumb = self.width-dif, self.height-dif
+            self.thumb = self.width, self.height
             if self.thumb[0] < 0 and self.thumb[1] < 0:
                 # self.thumb = (250, 200)
                 self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
@@ -189,6 +189,7 @@ class PRMP_ImageWidget:
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
 
             self.image = self.prmpImage.image
+            if self.fullsize: self.resize = (self.width, self.height)
 
             if self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
             else: self.frame = self.prmpImage.thumbnailTk(self.thumb)
@@ -275,7 +276,8 @@ class PRMP_ImageWidget:
     def saveImage(self):
         self.delMenu()
         if self.imageFile:
-            file = asksaveasfilename(filetypes=picTypes)
+            from .dialogs import dialogFunc
+            file = dialogFunc(path=1, save=1,filetypes=picTypes)
             if file: self.imageFile.save(file)
 
     def showMenu(self, e=0):
@@ -291,11 +293,17 @@ class PRMP_ImageWidget:
 
 IW = PRMP_ImageWidget
 
-class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={},  normal=0, config={}, **kwargs):
-        PRMP_Style_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
+class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Label):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, **kwargs):
+        PRMP_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **imageKwargs)
 IL = PRMP_ImageLabel
+
+class PRMP_ImageSLabel(PRMP_ImageWidget, PRMP_Style_Label):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, **kwargs):
+        PRMP_Style_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **imageKwargs)
+SIL = PRMP_ImageSLabel
 
 # class PRMP_SImageLabel(PRMP_ImageWidget, PRMP_Label):
 #     def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, callback=None, **kwargs):
@@ -307,7 +315,13 @@ class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
     def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
         PRMP_Button.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
-IL = PRMP_ImageButton
+IB = PRMP_ImageButton
+
+class PRMP_ImageSButton(PRMP_ImageWidget, PRMP_Style_Button):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+        PRMP_Style_Button.__init__(self, master, config=dict(**config), **kwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+ISB = PRMP_ImageSButton
 
 class PRMP_DateWidget:
     attr = 'date'
@@ -748,7 +762,8 @@ class PRMP_Camera(PRMP_Style_Frame):
 
     @staticmethod
     def _saveImage(image):
-        file = asksaveasfilename(filetypes=picTypes)
+        from .dialogs import dialogFunc
+        file = dialogFunc(path=1, save=1, filetypes=picTypes)
 
         if file: image.save(file)
 

@@ -344,7 +344,7 @@ class PRMP_Theme(PRMP_Mixins):
         PRMP_Theme.setTheme(theme)
         return [theme, prev]
 
-    def _paint(self):
+    def _paint(self, nno):
         if not self._ttk_:
             kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very']}
 
@@ -448,12 +448,12 @@ class PRMP_Theme(PRMP_Mixins):
                 child.paint()
 
     def _paintAll(self, event=None):
-        self._paint()
+        self._paint(not event)
         self._paintChildren()
 
     def paint(self, event=None):
         # print(e)
-        self._paintAll()
+        self._paintAll(not event)
 
     @classmethod
     def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
@@ -1802,6 +1802,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
     def update(self, event=None):
         if not PRMP_Style.LOADED: self.createPrmp()
         self.theme_settings('prmp', self.settings)
+
 Style = PSt = PRMP_Style
 
 class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
@@ -2486,7 +2487,7 @@ class PRMP_Window(PRMP_Widget):
             if self._addStatusBar: bottom = 30
             else: bottom = 0
 
-        self.container.place(x=0, y=top, w=self.winfo_width(), h=h or self.winfo_height()-bottom)
+        if self.container: self.container.place(x=0, y=top, w=self.winfo_width(), h=h or self.winfo_height()-bottom)
 
         self.placeTitlebar()
         self.placeStatusBar()
