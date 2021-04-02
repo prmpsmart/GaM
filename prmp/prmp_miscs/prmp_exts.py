@@ -142,7 +142,10 @@ class PRMP_File(BytesIO, PRMP_Mixins):
         elif base64:
             self._data = b64decode(base64)
             self.name = 'base64_%d'%PRMP_File.count
-
+        
+        self.basename = os.path.basename(self.name)
+        self.name_n_ext = self.basename.split('.')[0]
+        
         super().__init__(self._data)
 
         PRMP_File.count += 1

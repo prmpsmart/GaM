@@ -300,11 +300,11 @@ class PRMP_Theme(PRMP_Mixins):
     @property
     def fontsNames(self): return self.tk.splitlist(self.tk.call("font", "names"))
 
-    def parseFont(self, font):
+    def parseFont(self, font, name=''):
         if isinstance(font, str):
             if font in self.fontsNames: return font
             return Font(name=font)
-        elif isinstance(font, dict): return Font(**font)
+        elif isinstance(font, dict): return Font(**font, name=name)
 
     def deriveFont(self, kwargs={}, default='DEFAULT_FONT'):
         if not kwargs: font = self.kwargs.get('font')
@@ -2475,7 +2475,7 @@ class PRMP_Window(PRMP_Widget):
         self.resizable(0, 0)
         if g: self.grab_set()
         self.focus()
-        self.wait_window()
+        self.wait_fwindow()
 
     def placeContainer(self, event=None, h=0):
         if self._addTitleBar:

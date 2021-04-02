@@ -305,11 +305,6 @@ class PRMP_ImageSLabel(PRMP_ImageWidget, PRMP_Style_Label):
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **imageKwargs)
 SIL = PRMP_ImageSLabel
 
-# class PRMP_SImageLabel(PRMP_ImageWidget, PRMP_Label):
-#     def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, callback=None, **kwargs):
-#         PRMP_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-#         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, callback=callback, **imageKwargs)
-# SIL = PRMP_ImageLabel
 
 class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
     def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
@@ -409,14 +404,14 @@ class ScrollableFrame(PRMP_Frame):
         self.canvas.configure(scrollregion=p)
 SF = ScrollableFrame
 
-
 class PRMP_SolidScreen(PRMP_MainWindow):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
         super().__init__(tm=1, gaw=gaw, geo=geo or (500, 500), side=side, **kwargs)
 
-        self.container.configure(borderwidth=12)
+        self.container.configure(borderwidth=bd)
 
         self.paint()
+        
 SS = PRMP_SolidScreen
 
 class ScrolledText(AutoScroll, tk.Text):

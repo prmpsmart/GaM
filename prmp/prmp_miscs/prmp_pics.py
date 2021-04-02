@@ -304,7 +304,7 @@ class PRMP_ImageFile(PRMP_File):
 
 class PRMP_Image:
     count = 0
-    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, base64=b''):
+    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, base64=b'', name=''):
 
         pic = None
         self.imageFile = None
@@ -344,7 +344,7 @@ class PRMP_Image:
 
             self.img = img
 
-            self.tkImage = self.imgClass(img, name=self.basename)
+            self.tkImage = self.imgClass(img, name=name or self.name_n_ext)
 
             PRMP_Image.count += 1
 
@@ -389,8 +389,12 @@ class PRMP_Image:
     def interframe_durations(self): return [anf.info.get('duration', 0) for anf in self.animatedFrames]
 
     @property
+    def name_n_ext(self):
+        if self.imageFile: return self.imageFile.name_n_ext
+        else: return self.basename
+    @property
     def basename(self):
-        if self.imageFile: return self.imageFile.name
+        if self.imageFile: return self.imageFile.basename
         return 'PRMP_Image(%d)'%PRMP_Image.count
 
     def resize(self, rz): return self.image.resize(rz)
