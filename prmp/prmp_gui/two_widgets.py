@@ -95,7 +95,7 @@ class TwoWidgets(PRMP_Frame):
         if self.value and self.variable: self.checked()
 
         self.place_widgs()
-
+# 
     def clicked(self, e=0): return self.B.get()
 
     @property

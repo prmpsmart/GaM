@@ -243,8 +243,8 @@ CamD = PRMP_CameraDialog
 
 class PRMP_ImageDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, image=None, title='Image Dialog', imageKwargs={}, **kwargs):
-        self.image = image
+    def __init__(self, master=None, prmpImage=None, title='Image Dialog', imageKwargs={}, **kwargs):
+        self.prmpImage = prmpImage
         self.imageKwargs = imageKwargs
         # print(kwargs)
         super().__init__(master, title=title, **kwargs)
@@ -252,13 +252,15 @@ class PRMP_ImageDialog(PRMP_Dialog):
     # def isMaximized(self): return self.getWid_H_W(self)
 
     def _setupDialog(self):
-        self.imageLabel = PRMP_ImageLabel(self.container, prmpImage=self.image, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), imageKwargs=self.imageKwargs)
+        self.imageLabel = PRMP_ImageLabel(self.container, prmpImage=self.prmpImage, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), imageKwargs=self.imageKwargs)
         self.set = self.imageLabel.set
         # self.bind('<Return>', self.imageLabel.saveImage)
 
     def getImage(self, imageFile):
         self._setResult(imageFile)
         self.destroyDialog()
+    
+    def setImage(self, image): self.imageLabel.loadImage(image)
 
 class Splash(PRMP_Dialog):
     def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), callback=None, title='Goodness and Mercy', imageKwargs={}, delay=2000, **kwargs):

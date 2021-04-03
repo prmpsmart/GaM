@@ -22,19 +22,27 @@ class PRMP_Theme(PRMP_Mixins):
     COLOR_SYSTEM_DEFAULT = 'SystemButtonFace'
     DEFAULT_BUTTON_COLOR = ('white', BLUES[0])
     OFFICIAL_PRMPSMART_BUTTON_COLOR = ('white', BLUES[0])
+    
     DEFAULT_ERROR_BUTTON_COLOR = ("#FFFFFF", "#FF0000")
+    
     DEFAULT_FOREGROUND_COLOR = 'black'
+    
     DEFAULT_BACKGROUND_COLOR = COLOR_SYSTEM_DEFAULT
-    DEFAULT_ELEMENT_BACKGROUND_COLOR = None
-    DEFAULT_ELEMENT_TEXT_COLOR = COLOR_SYSTEM_DEFAULT
-    DEFAULT_TEXT_ELEMENT_BACKGROUND_COLOR = None
+    
     DEFAULT_INPUT_ELEMENTS_COLOR = COLOR_SYSTEM_DEFAULT
+    
     DEFAULT_INPUT_TEXT_COLOR = COLOR_SYSTEM_DEFAULT
+    
     DEFAULT_SCROLLBAR_COLOR = None
+    
     DEFAULT_PROGRESS_BAR_COLOR = (GREENS[0], '#D0D0D0')
+    
     DEFAULT_PROGRESS_BAR_COMPUTE = ('#000000', '#000000')
+    
     DEFAULT_PROGRESS_BAR_COLOR_OFFICIAL = (GREENS[0], '#D0D0D0')
+    
     DEFAULT_HIGHLIGHT_BG = 'white'
+    
     DEFAULT_HIGHLIGHT_BG = '#004080'
 
     DEFAULT_RELIEF = 'groove'
@@ -346,7 +354,7 @@ class PRMP_Theme(PRMP_Mixins):
 
     def _paint(self, nno):
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback']}
 
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
@@ -454,6 +462,10 @@ class PRMP_Theme(PRMP_Mixins):
     def paint(self, event=None):
         # print(e)
         self._paintAll(not event)
+    
+    @classmethod
+    def updateTheme(cls):
+        if PRMP_Window.STYLE: PRMP_Window.STYLE.update()
 
     @classmethod
     def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
@@ -670,7 +682,7 @@ class PRMP_Widget(PRMP_Theme):
             else: self.unlight()
 
     def switchGroup(self, event=None):
-        if e: self.var.set(self.val)
+        if event: self.var.set(self.val)
         for w in self.toggleGroup:
             if w == self: self.light()
             else: w.unlight()
@@ -680,7 +692,7 @@ class PRMP_Widget(PRMP_Theme):
         if self.toggleGroup: self.bind('<1>', self.switchGroup, '+')
         else: self.bind('<1>', self.switchOne, '+')
 
-    def addToggleGroup(self, group=[]):
+    def addToggleGroup(self, group):
         if group:
             self.toggleGroup = group
             self.toggleSwitch()

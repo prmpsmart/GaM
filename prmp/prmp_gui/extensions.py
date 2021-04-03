@@ -318,6 +318,19 @@ class PRMP_ImageSButton(PRMP_ImageWidget, PRMP_Style_Button):
         PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
 ISB = PRMP_ImageSButton
 
+
+class PRMP_ImageCheckbutton(PRMP_ImageWidget, PRMP_Checkbutton):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+        PRMP_Checkbutton.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+IB = PRMP_ImageCheckbutton
+
+class PRMP_ImageSCheckbutton(PRMP_ImageWidget, PRMP_Style_Checkbutton):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+        PRMP_Style_Checkbutton.__init__(self, master, config=dict(**config), **kwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+ISB = PRMP_ImageSCheckbutton
+
 class PRMP_DateWidget:
     attr = 'date'
     def __init__(self, min_=None, max_=None, callback=None):
@@ -378,26 +391,27 @@ class ScrollableFrame(PRMP_Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.canvas = canvas = PRMP_Canvas(self, config=dict(bg='blue'))
-        canvas.place(x=0, rely=0, relh=.96, relw=.99)
+        self.canvas = PRMP_Canvas(self, config=dict(bg='blue'))
+        self.canvas.place(x=0, rely=0, relh=.96, relw=.99)
 
         # self.canvas.grid_rowconfigure(0, weight=1)
 
-        xscrollbar = PRMP_Scrollbar(self, config=dict(orient="horizontal", command=canvas.xview))
-        yscrollbar = PRMP_Scrollbar(self, config=dict(orient="vertical", command=canvas.yview))
-        canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
+        xscrollbar = PRMP_Scrollbar(self, config=dict(orient="horizontal", command=self.canvas.xview))
+        yscrollbar = PRMP_Scrollbar(self, config=dict(orient="vertical", command=self.canvas.yview))
+        self.canvas.configure(xscrollcommand=xscrollbar.set, yscrollcommand=yscrollbar.set)
         xscrollbar.pack(side="bottom", fill="x")
 
         yscrollbar.pack(side="right", fill="y")
 
         bound_to_mousewheel(0, self)
 
-        self.scrollable_frame = PRMP_Frame(canvas)
+        self.scrollable_frame = PRMP_Frame(self.canvas)
         self.scrollable_frame.pack(side='left', fill='both', expand=1)
 
         self.scrollable_frame.bind("<Configure>", self.changeFrameBox)
 
-        canvas.create_window((0, 0), window=self.scrollable_frame, anchor='nw')
+        self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor='nw')
+        self.changeFrameBox()
 
     def changeFrameBox(self, e=0):
         p = self.canvas.bbox("all")
@@ -411,7 +425,7 @@ class PRMP_SolidScreen(PRMP_MainWindow):
         self.container.configure(borderwidth=bd)
 
         self.paint()
-        
+
 SS = PRMP_SolidScreen
 
 class ScrolledText(AutoScroll, tk.Text):

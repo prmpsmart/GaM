@@ -336,6 +336,7 @@ class PRMP_Image:
             if self.ext == 'xbm': self.imgClass = BitmapImage
 
             img = self.image = Image.open(self.imageFile) if _PIL_ else None
+            self.frames = getattr(img, 'n_frames', 1)
             if img: self.info = img.info
 
             if resize and len(resize) == 2 and resize[0] > 0 and resize[1] > 0: img = self.resizedImage = self.image.resize(resize)
