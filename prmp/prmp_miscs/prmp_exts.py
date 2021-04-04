@@ -103,4 +103,68 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
     def saveObj(self, obj): pickle.dump(obj, self)
     def loadObj(self): return self.unpickle()
 
+class PRMP_Exts(PRMP_Mixins):
+
+    
+    @classmethod
+    def getname(cls, name):
+        name = os.path.splitext(os.path.basename(name))[0]
+        name = name.replace(' ', '_').replace('-', '_').replace('.', '_')
+        return name
+    
+    @classmethod
+    def getsplits(cls, file, name=''):
+        '''
+        :param file: str path to a file to read.
+        :param name: name of the already encoded data passed as :param file: 
+        '''
+
+        if not name:
+            data = open(file, 'rb').read()
+            enc_data = base64.b64encode(data)
+        else: enc_data = file
+        
+        total = len(enc_data)
+
+        lim = 65000
+
+        div, mod = divmod(total, lim)
+        if mod: div += 1
+
+        name = cls.getname(name or file)
+        if div == 1: return {name: enc_data}
+
+        splits = {}
+        for num in range(div):
+            nex = num + 1
+            splits[name+str(nex)] = enc_data[lim*num : lim*(nex)]
+        return splits
+    
+    @classmethod
+    def embed_files_into_py(cls, files, pyfile, vars_name):
+        '''
+        :param files: list of path to files to embed
+        :param pyfile: a str path to a python file to host the images.
+        '''
+        ope = open(pyfile, 'w')
+        exts = []
+
+        for f in files:
+            ext = os.path.splitext(f)[1]
+            ext = ext[1:]
+            name = cls.getname(f)
+            splits = cls.getsplits(f)
+            keys = splits.keys()
+            exts.append(name)
+
+            for sp, vl in splits.items(): ope.write(f"{sp} = {vl}\n\n")
+
+            ope.write(f"{name} = {' + '.join(keys)}\n\n")
+
+
+        EXTS = '%s = {'%vars_name
+        for ext in exts: EXTS += f"'{ext}': {ext}, "
+        EXTS = EXTS[:-2]
+        EXTS += '}'
+        ope.write(EXTS)
 

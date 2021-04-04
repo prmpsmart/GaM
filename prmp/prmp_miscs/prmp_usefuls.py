@@ -1,6 +1,6 @@
 import os, zipfile, subprocess
 
-def zipPath(resource, destination='', latest=False):
+def zipPath(resource, destination='', latest=False, quiet=0):
     # Create name of new zip file, based on original folder or file name
     resource = resource.rstrip('\\').rstrip('/')
     # if resource in destination: TranxFerLogger.warning('Loop: Save somewhere else!')
@@ -27,6 +27,7 @@ def zipPath(resource, destination='', latest=False):
                    filename = os.path.join(root, file)
                    arc = root.replace(resource, zipRootDir)
                    arcname = os.path.join(arc, file)
+                   if not quiet: print('adding %s'%filename)
                    zipFile.write(filename, arcname, zipfile.ZIP_DEFLATED)
         else: zipFile.write(resource, zipFileName, zipfile.ZIP_DEFLATED)
     return zipFileName
