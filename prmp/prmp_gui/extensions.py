@@ -135,6 +135,8 @@ FW = PRMP_FillWidgets
 class PRMP_ImageWidget:
     def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False, bindMenu=1, fullsize=False, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
+        imageKwargs['for_tk'] = 1
+
         self.rt = None
         self.prmpImage = prmpImage
         self.thumb = thumb
@@ -194,7 +196,9 @@ class PRMP_ImageWidget:
             if self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
             else: self.frame = self.prmpImage.thumbnailTk(self.thumb)
 
+
             if self.prmpImage.ext == 'gif':
+                print(prmpImage, kwargs)
                 # self.frames = self.prmpImage.animatedTkFrames
                 # self.durations = self.prmpImage.interframe_durations
                 self.frames = []

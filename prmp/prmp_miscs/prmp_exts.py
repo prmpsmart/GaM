@@ -1,147 +1,31 @@
-from io import BytesIO
-from base64 import b64encode, b64decode
-import zlib, pickle
+import io, base64, zlib, pickle
 from .prmp_mixins import PRMP_Mixins, os
 
 
-class PRMP_ImageType:
 
-    tests = []
-
-    def test_jpeg(data):
-        """JPEG data in JFIF or Exif format"""
-        if data[6:10] in (b'JFIF', b'Exif'):
-            return 'jpeg'
-
-    tests.append(test_jpeg)
-
-    def test_png(data):
-        if data.startswith(b'\211PNG\r\n\032\n'):
-            return 'png'
-
-    tests.append(test_png)
-
-    def test_gif(data):
-        """GIF ('87 and '89 variants)"""
-        if data[:6] in (b'GIF87a', b'GIF89a'):
-            return 'gif'
-
-    tests.append(test_gif)
-
-    def test_tiff(data):
-        """TIFF (can be in Motorola or Intel byte order)"""
-        if data[:2] in (b'MM', b'II'):
-            return 'tiff'
-
-    tests.append(test_tiff)
-
-    def test_rgb(data):
-        """SGI image library"""
-        if data.startswith(b'\001\332'):
-            return 'rgb'
-
-    tests.append(test_rgb)
-
-    def test_pbm(data):
-        """PBM (portable bitmap)"""
-        if len(data) >= 3 and \
-            data[0] == ord(b'P') and data[1] in b'14' and data[2] in b' \t\n\r':
-            return 'pbm'
-
-    tests.append(test_pbm)
-
-    def test_pgm(data):
-        """PGM (portable graymap)"""
-        if len(data) >= 3 and \
-            data[0] == ord(b'P') and data[1] in b'25' and data[2] in b' \t\n\r':
-            return 'pgm'
-
-    tests.append(test_pgm)
-
-    def test_ppm(data):
-        """PPM (portable pixmap)"""
-        if len(data) >= 3 and \
-            data[0] == ord(b'P') and data[1] in b'36' and data[2] in b' \t\n\r':
-            return 'ppm'
-
-    tests.append(test_ppm)
-
-    def test_rast(data):
-        """Sun raster file"""
-        if data.startswith(b'\x59\xA6\x6A\x95'):
-            return 'rast'
-
-    tests.append(test_rast)
-
-    def test_xbm(data):
-        """X bitmap (X10 or X11)"""
-        if data.startswith(b'#define '):
-            return 'xbm'
-
-    tests.append(test_xbm)
-
-    def test_bmp(data):
-        if data.startswith(b'BM'):
-            return 'bmp'
-
-    tests.append(test_bmp)
-
-    def test_webp(data):
-        if data.startswith(b'RIFF') and data[8:12] == b'WEBP':
-            return 'webp'
-
-    tests.append(test_webp)
-
-    def test_exr(data):
-        if data.startswith(b'\x76\x2f\x31\x01'):
-            return 'exr'
-
-    tests.append(test_exr)
-
-    @classmethod
-    def get(cls, file=None, data=b'', base64=b'', image=None):
-        if file:
-            if isinstance(file, (str, bytes)): file = open(file, 'rb')
-            data = file.read(32)
-        elif base64: data = b64decode(base64)
-        elif image:
-            file = BytesIO()
-            image.save(file)
-            data = file.getvalue()
-
-        if data:
-            _needed = data[:32]
-            return cls._get(_needed)
-
-    @classmethod
-    def _get(cls, data):
-        for test in cls.tests:
-            ext = test(data)
-            if ext: return ext
-
-
-class PRMP_File(BytesIO, PRMP_Mixins):
+class PRMP_File(io.BytesIO, PRMP_Mixins):
     count = 0
 
-    def __init__(self, filename='', base64=b'', data=b''):
+    def __init__(self, filename='', b64=b'', data=b''):
 
-        passed = [bool(a) for a in [filename, base64]].count(True)
-        assert passed <= 1, 'Only one is required in [filename, base64, image]'
+        passed = [bool(a) for a in [filename, b64, data]]
+        print(passed)
+        assert passed.count(True) <= 2, 'Only one is required in [filename, b64, data]'
 
         self.name = filename
         self._data = data
 
-        if data: self.name = 'data_%d'%PRMP_File.count
+        if data: self.name = self.name or 'data_%d'%PRMP_File.count
 
-        elif filename:
+        elif filename and not (b64 or data):
             self.name = os.path.basename(filename)
             if os.path.isfile(filename):
                 try: self._data = open(filename, 'rb').read()
                 except: pass
 
-        elif base64:
-            self._data = b64decode(base64)
-            self.name = 'base64_%d'%PRMP_File.count
+        elif b64:
+            self._data = base64.b64decode(b64)
+            self.name = self.name or 'base64_%d'%PRMP_File.count
         
         self.basename = os.path.basename(self.name)
         self.name_n_ext = self.basename.split('.')[0]
@@ -176,9 +60,6 @@ class PRMP_File(BytesIO, PRMP_Mixins):
     #     return data
 
     @property
-    def ext(self): return PRMP_ImageType.get(self)
-
-    @property
     def size(self): return len(self.data)
 
     def get(self): return self.data
@@ -193,7 +74,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
     def cdata(self): return self.compressedData
 
     @property
-    def base64Data(self): return b64encode(self.data)
+    def base64Data(self): return base64.b64encode(self.data)
 
     def pickle(self, file=''):
         file = file or self

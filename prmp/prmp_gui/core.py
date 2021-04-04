@@ -2555,16 +2555,17 @@ class PRMP_Window(PRMP_Widget):
         w, y = self.geo[:2]
         fr = F(self)
         self._min = self._max = self._exit = None
+        rv = (20, 20)
 
         if not self.noWindowButtons and self.__r != 1:
-            self.imgMin = PRMP_Image('green', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgMin = PRMP_Image('green', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
         if not self.noWindowButtons:
-            self.imgExit = PRMP_Image('red', inbuilt=1, resize=(20, 20)) if _PIL_ else None
+            self.imgExit = PRMP_Image('red', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
             self._icon = L(fr)
@@ -2630,7 +2631,7 @@ class PRMP_Window(PRMP_Widget):
 
     def setPRMPIcon(self, icon):
         if icon and _PIL_:
-            self.imgIcon = PRMP_Image(icon, resize=(20, 20))
+            self.imgIcon = PRMP_Image(icon, resize=(20, 20), for_tk=1)
             self._icon['image'] = self.imgIcon
 
     def placeTitlebar(self):
