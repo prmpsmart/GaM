@@ -1,6 +1,6 @@
 
 from prmp.prmp_miscs.prmp_datetime import PRMP_DateTime
-from prmp.prmp_miscs.prmp_pics import PRMP_Xbms
+from prmp.prmp_miscs.prmp_pics import PRMP_XBMS
 from .extensions import *
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
@@ -203,7 +203,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         elif _type in self._xbms: return f'@{self._xbms[_type]}'
 
     @property
-    def _xbms(self): return PRMP_Xbms.filesDict()
+    def _xbms(self): return PRMP_XBMS
 
     def yesCom(self):
         if self.ask: self._setResult(True)

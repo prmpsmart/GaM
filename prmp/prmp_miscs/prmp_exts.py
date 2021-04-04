@@ -9,7 +9,7 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
     def __init__(self, filename='', b64=b'', data=b''):
 
         passed = [bool(a) for a in [filename, b64, data]]
-        print(passed)
+        
         assert passed.count(True) <= 2, 'Only one is required in [filename, b64, data]'
 
         self.name = filename
@@ -34,9 +34,13 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
 
         PRMP_File.count += 1
 
+    def __repr__(self):
+        if self.name: return f'<%s(%s)>'%(self.className, self.name)
+        else: return '<%s(%d)>'%(self.className, PRMP_File.count)
+    
     def __str__(self):
-        if self.name: return f'{self.className}(%s)'%self.name
-        else: return f'{self.className}(%d)'%PRMP_File.count
+        if self.name: return self.name
+        else: return '<%s(%d)>'%(self.className, PRMP_File.count)
 
     def __len__(self): return self.size
 
@@ -85,16 +89,13 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
 
     def unpickle(self, file=''):
         file = file or self
-
         try: f = open(file, 'wb')
         except: f = file
-
         obj = pickle.load(f)
         return obj
 
     def save(self, file=''):
         file = file or self.name
-
         try: f = open(file, 'wb')
         except: f = file
         f.write(self.data)

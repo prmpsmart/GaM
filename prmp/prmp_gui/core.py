@@ -3,7 +3,7 @@ import os, time, random, ctypes, tkinter as tk, sys, time, tkinter.ttk as ttk, _
 
 from tkinter.font import Font, families
 
-from prmp.prmp_miscs.prmp_pics import PRMP_Image, _PIL_
+from prmp.prmp_miscs.prmp_pics import PRMP_Image, _PIL_, PRMP_Images
 from .miscs import PRMP_Mixins, functools, bound_to_mousewheel, Columns, platform
 
 # superclasses
@@ -352,7 +352,7 @@ class PRMP_Theme(PRMP_Mixins):
         PRMP_Theme.setTheme(theme)
         return [theme, prev]
 
-    def _paint(self, nno):
+    def _paint(self, nno=None):
         if not self._ttk_:
             kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback']}
 
@@ -2164,6 +2164,14 @@ class PRMP_Window(PRMP_Widget):
     def start(self):
         self.paint()
         self.mainloop()
+    
+    def change_color(self, p, n=10, up=1):
+        bgs = PRMP_Images.get_colors(p, n, inhex=1)
+        bg = bgs[0]
+        PRMP_Theme.DEFAULT_BACKGROUND_COLOR = bg
+        PRMP_Theme.DEFAULT_BUTTON_COLOR = ('white', bg)
+        if up: self.updateTheme()
+        return bgs
 
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', **kwargs):
 

@@ -1,4 +1,4 @@
-__all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_GIFS', 'PRMP_XBMS', 'PRMP_Images', 'PRMP_ImageFile', 'PRMP_Image', 'PRMP_File', 'io', 'os', 'base64', 'zlib', 'pickle', 'PRMP_ImageType']
+__all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_GIFS', 'PRMP_XBMS', 'PRMP_Images', 'PRMP_ImageFile', 'PRMP_Image', 'PRMP_File', 'io', 'os', 'base64', 'zlib', 'pickle', 'PRMP_ImageType', 'Image', 'PhotoImage', 'BitmapImage', 'ImageSequence']
 
 apply = b'\n    iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAACzUlEQVR4AWIgB7h0Mtu4AzonBxg9oigK17Ztuw1q27Zt23bXtm3btm3bxvyndzZ6bdZJzuDhuxbqkU2KpO+9nYIwsD7bhHrk6Me/hVHCB1xWn1NF4Hhan9cp4LY/Pb69tdlW41OsBt2MuwguMcQPj/0Cgqp3xruZe0QHVPsX6kI57RyEEjbAv1gHdw2WVW393f1ah4HbhXp6Kofd5ezzf0MkcRMMsh5DN/alYLtwUy67dtS7Y5fUZlaGlJpCLuUIfiWsQWCxAQ5LjaiivSUdhQ2k3BXZZ4rBJOclvsQthVOBGH65Hamj3Ml3JlSpL077an1K1CGWtBXyqUfhki0LWi8mY4Oa82DcDuFeodt+96gmPWTzQd+L9osPqQ6iampmXsXn+MUILNHHda0FVVt+dT/VHGwQWUrQjnjJ+RRq4Lb+0qodwj09aH0sD6a9UK3oZwKHgt/4mbgCxjnPoRn1hArR06/ZcHaI9LIT8jxRF1yhD+vCj4iosIRc0PXGnUK9ywgof0t3cVVomQnk0g5DKHk9FcIQBySG8oWY3Sxwp0gvD4mgM4LQcmMY5T2EQe49+JSoNOXokcnKao88ZRjnPsO3xKXwKJLDF8d9tVSI361VcBqFGP/VeV9NeLkFrPI/QDPnMiwL3sO3VAXW+V8gnLIBqpnn4JApyRcin+70bastetNBpXPKUys881XgUSILhcwjEEvdgl8pK/AtaSlCSo1wSW0WH+qejvTb4V0ifcu1op9yweWGkE7fg4+Jc8nrj1AJu89RJI6dmdep5G3UG5vN1aFlprAu+IzAIgPsFRvIeze5rfvNzV+3WXu79Z6ytrvwsCEjzx3fdr2fS5BpbXR8xG/Hl43faR+MBIz+AXYjdefFfq961n3XgFHdxMF1CfUVazxfkY2G/yAcL+a7kQX2aA7K/HdlvOKagTWQuK7NpIBXt2bUhQGyAhvyX8ltpGqlVcOSAAAAAElFTkSuQmCC'
 
@@ -213,7 +213,7 @@ PRMP_XBMS = {'act_fold': act_fold, 'balarrow': balarrow, 'bold': bold, 'capital'
 
 try:
     from PIL.ImageTk import Image, PhotoImage, BitmapImage
-    from PIL import ImageSequence
+    from PIL import Image, ImageDraw, ImageSequence
     _PIL_ = True
 except Exception as e:
     _PIL_ = False
@@ -339,6 +339,120 @@ class PRMP_ImageType:
             if ext: return ext
 
 class PRMP_Images:
+    @classmethod
+    def rgb2hex(cls, color):
+        ''' To get the hex value of a color in rgb format
+
+        :param color: a list containing the values of the rgb
+        :type color: list
+        '''
+        color = [int(a) for a in color]
+        f, s, t = color
+        return "#{:02x}{:02x}{:02x}".format(f, s, t)
+    
+    @classmethod
+    def get_colors_percent(cls, freq, colors):
+        ''' To get the dict containing colors and their percentages.
+
+        :param freq: a list containing the frequencies of each color in colors
+        :type image: list
+
+        :param colors: a list containing the colors
+        :type colors: list
+        '''
+        total = sum(freq)
+        percent = [int(val/total*100) for val in freq]
+        hex_pers = dict(zip(colors, percent))
+
+        return hex_pers
+
+    @classmethod
+    def get_most_common(cls, colors):
+        ''' To get the color with the max percentage.
+
+        :param colors: a dict containing the colors and their percentages of occurrence
+        :type colors: dict
+        '''
+
+        _max = max(list(colors.values()))
+        for k in colors:
+            if colors[k] == _max: return k
+
+    @classmethod
+    def get_colors(cls, image, numcolors=10, resize=150, inhex=0, most_common=0, percent=0):
+        ''' To get the colors in an image.
+
+        :param image: an image or a str or bytes to an image file
+        :type image: [str, bytes, Image]
+
+        :param numcolors: number of colors to return
+        :type numcolors: int
+
+        :param resize: an int to resize the image to speed up the process
+        :type resize: int
+        
+        :param inhex: bool whether to return the colors in hex
+        :type inhex: bool
+        
+        :param most_common: bool whether to return only the most common color
+        :type most_common: bool
+        
+        :param percent: bool whether to return colors with the frequency (percentages)
+        :type percent: bool
+        '''
+        # Resize image to speed up processing
+        img = Image.open(image) if isinstance(image, (str, bytes)) else image
+        if resize: img.thumbnail((resize, resize))
+
+        # Reduce to palette
+        paletted = img.convert('P', palette=Image.ADAPTIVE, colors=numcolors)
+
+        # Find colors
+        palette = paletted.getpalette()
+        color_counts = sorted(paletted.getcolors(), reverse=True)
+
+        frequency = [a[0] for a in color_counts]
+
+        colors = []
+        for i in range(numcolors):
+            palette_index = color_counts[i][1]
+            start = palette_index*3
+            dominant_color = palette[start:start+3]
+            colors.append(tuple(dominant_color))
+        
+        if inhex: colors = [cls.rgb2hex(c) for c in colors]
+        
+        colors_percent = cls.get_colors_percent(frequency, colors)
+
+        if most_common: colors = cls.get_most_common(colors_percent)
+        
+        if percent: colors = colors_percent
+
+        return colors
+    
+    @classmethod
+    def save_palette(colors, swatchsize=20, outfile="palette.png" ):
+        ''' To write the dict or list colors into an image.
+        :param colors: list of colors or dict of colors with the colors as the keys.
+        :type colors: list, tuple, dict
+
+        :param swatchsize: the size of each rectangle of the colors.
+        :type swatchsize: int
+
+        :param outfile: path to save the image to.
+        :type outfile: str, bytes
+        '''
+        num_colors = len(colors)
+        palette = Image.new('RGB', (swatchsize*num_colors, swatchsize))
+        draw = ImageDraw.Draw(palette)
+
+        posx = 0
+        for color in colors:
+            draw.rectangle([posx, 0, posx+swatchsize, swatchsize], fill=color) 
+            posx = posx + swatchsize
+
+        del draw
+        palette.save(outfile, "PNG")
 
     @classmethod
     def getname(cls, name):
@@ -365,7 +479,7 @@ class PRMP_Images:
         div, mod = divmod(total, lim)
         if mod: div += 1
 
-        name = getname(name or file)
+        name = cls.getname(name or file)
         if div == 1: return {name: enc_data}
 
         splits = {}
@@ -373,7 +487,6 @@ class PRMP_Images:
             nex = num + 1
             splits[name+str(nex)] = enc_data[lim*num : lim*(nex)]
         return splits
-
 
     @classmethod
     def images_into_py(cls, folder='.', pyfile='pyized_images.py', merge={}, prefix='', space=10, add_all=0):
@@ -404,7 +517,7 @@ class PRMP_Images:
                 # get image type
                 ext = PRMP_ImageType.get(pp)
                 # get usable name
-                name = getname(os.path.basename(pp))
+                name = cls.getname(os.path.basename(pp))
 
                 if ext:
                     # if it exists already
@@ -443,7 +556,7 @@ class PRMP_Images:
                 _dict = {'name': ''}
                 if (k in merge) and (name in merge[k]) and (file_data == merge[k][name]): _dict['name'] = name
 
-                splits = getsplits(file_data, **_dict)
+                splits = cls.getsplits(file_data, **_dict)
                 exts[k][name] = list(splits.keys())
 
                 for key, val in splits.items():
@@ -496,7 +609,6 @@ class PRMP_ImageFile(PRMP_File):
     @property
     def ext(self): return PRMP_ImageType.get(self)
 
-
 class PRMP_Image:
     count = 0
     def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, b64=b'', name='', for_tk=False):
@@ -508,34 +620,35 @@ class PRMP_Image:
 
         self._thumb = thumb
         self._resize = resize
-        # print(b64)
 
         self.image = None
         self.for_tk = for_tk
         self.tkImage = None
-        self.name = name
+
+        self.name = name or PRMP_Images.getname(filename)
+
         self._animatedTkFrames = []
         self._animatedFrames = []
 
         if filename or image or b64:
-            if filename:
-                self.imageFile = filename if isinstance(filename, PRMP_ImageFile) else PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
-            elif image: self.imageFile = PRMP_ImageFile(image=image)
+            if image: self.imageFile = PRMP_ImageFile(image=image)
             elif b64: self.imageFile = PRMP_ImageFile(b64=b64)
+            elif filename :self.imageFile = filename if isinstance(filename, PRMP_ImageFile) else PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             else: self.imageFile = filename or image
 
             if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError('{} or {} is not a valid value.'.format(filename, image))
 
-            self.name = self.imageFile.name
             self.ext = self.imageFile.ext
 
             if self.ext == 'xbm': self.tkImgClass = BitmapImage
 
-            img = self.image = Image.open(self.imageFile) if _PIL_ else None
+            img = self.image = image or Image.open(self.imageFile) if _PIL_ else None
+
             self.frames = getattr(img, 'n_frames', 1)
+            
             if img: self.info = img.info
 
-            if resize and len(resize) == 2 and resize[0] > 0 and resize[1] > 0: img = self.resizedImage = self.image.resize(resize)
+            if resize and len(resize) == 2 and resize[0] > 0 and resize[1] > 0: img = self.resizedImage = img.resize(resize)
 
             if thumb and len(thumb) == 2 and thumb[0] > 0 and thumb[1] > 0: img.thumbnail(thumb)
 
@@ -553,6 +666,7 @@ class PRMP_Image:
 
     def __str__(self):
         if self.for_tk: return str(self.tkImage)
+
         return self.name
 
     @property
@@ -578,14 +692,12 @@ class PRMP_Image:
         if self._animatedFrames: return self._animatedFrames
         else:
             for frame in ImageSequence.Iterator(self.img):
-                print(99)
                 if self._resize: img = frame.resize(self._resize)
                 elif self._thumb:
                     frame.thumbnail(self._thumb)
                     img = frame
                 else: img = frame
                 self._animatedFrames.append(img)
-            print(self._animatedFrames)
         return self._animatedFrames
 
     @property
