@@ -25,6 +25,6 @@ def main():
 
 # if __name__ == '__main__': main()
 
-# os.system(r'C:\Users\Administrator\Desktop\Clear_pyc C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM')
+os.system(r'C:\Users\Administrator\Desktop\Clear_pyc C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM')
 
 

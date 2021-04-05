@@ -356,7 +356,6 @@ class AccountHome(ObjectHome):
         account = self.account = self.obj
         name, self._manager = (account.manager.name, account.manager) if account else ('', None)
 
-
         self.manager = LabelButton(self.frame1, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.15, relw=.99), bottomKwargs=dict(command=self.openManager, text=name))
 
         self.recordsManagers = SubsList(self.frame1, text='Records Managers', place=dict(relx=.005, rely=.16, relh=.63, relw=.99))

@@ -278,9 +278,12 @@ class Splash(PRMP_Dialog):
             cont = self
             self.container.place_forget()
 
-        self.image = PRMP_ImageLabel(cont, prmpImage=self.prmpImage, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=self.geo, imageKwargs=self.imageKwargs, normal=1)
+        self.imageKwargs['bindMenu'] = 0
+        self.imageKwargs['imgDelay'] = 0
 
-        self.load = PRMP_ImageLabel(cont, prmpImage='line_boxes', place=dict(relx=0, rely=.9, relw=1, relh=.1), imageKwargs=dict(inbuilt=1, inExt='gif'), resize=(280, 50), normal=1)
+        self.image = PRMP_ImageLabel(cont, prmpImage=self.prmpImage, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=self.geo, imageKwargs=self.imageKwargs)
+
+        self.load = PRMP_ImageLabel(cont, prmpImage='line_boxes', place=dict(relx=0, rely=.9, relw=1, relh=.1), imageKwargs=dict(inbuilt=1, inExt='gif'), resize=(280, 50))
 
         # self.after(self.delay, self.destroy)
         self.after(self.delay, self.processCallback)

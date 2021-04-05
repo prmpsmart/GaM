@@ -3,7 +3,7 @@ from ...utils.auths import Authorisation
 # GUI counterpart
 
 from .gam_dialogs import *
-from .gam_images import GAM_PNGS
+from .gam_images import GaM_PNGS
 
 
 
@@ -588,11 +588,12 @@ class Security(GaM_Dialog):
 
     def _setupDialog(self): Security_Settings(self.container, place=dict(relx=.005, rely=.005, relh=.99, relw=.99))
 
+
 class Login(GaM_Dialog):
     def __init__(self, master=None, title='GaM Login.', **kwargs): super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):
-        self.header = PRMP_ImageLabel(self.container, imageKwargs=dict(base64=GAM_PNGS['gam']), background="yellow", normal=1, config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
+        PRMP_ImageSLabel(self.container, imageKwargs=dict(b64=GaM_PNGS['gam']), background="yellow", config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
 
         self.pass_login = User_Login(self.container, callback=self._callback, place=dict(relx=.05, rely=.35, relh=.63, relw=.9))
 

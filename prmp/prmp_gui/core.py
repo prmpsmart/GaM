@@ -439,10 +439,10 @@ class PRMP_Theme(PRMP_Mixins):
                 try: self.configure(background=background)
                 except: pass
                 return self
-            # print(self)
+            
             self.configure(**_dict)
 
-        if self.var and self.var.get() == self.val: self.checked(1)
+        if self.checkVar and self.var.get() == self.val: self.checked(1)
 
         return self
 
@@ -511,7 +511,6 @@ class PRMP_Widget(PRMP_Theme):
         self.kwargs = kwargs.copy()
         kwargs.clear()
         self.kwargs['font'] = font or 'PRMP_FONT'
-        self.kwargs.update(config)
 
         self.master = master
 
@@ -529,20 +528,26 @@ class PRMP_Widget(PRMP_Theme):
 
         self.toggleGroup = []
 
-        self.val = self.kwargs.pop('val', '1')
-        self.value = self.kwargs.pop('value', self.val)
-
         var = self.kwargs.pop('var', None) or self.kwargs.get('variable', None)
 
         if isinstance(var, tk.StringVar): pass
         elif var:
             var = tk.StringVar()
             var.set('0')
-        self.var = self.variable = var
-        if var: config['variable'] = var
+
+        if var:
+            self.var = self.variable = var
+            config['variable'] = var
+            isChk = self.PRMP_WIDGET == 'Checkbutton'
+            val = self.kwargs.pop('val', '1' if isChk else '')
+            self.val = self.value = self.kwargs.get('value', val)
+            
+            if not isChk: config['value'] = self.val
 
         self._ttk_ = _ttk_
         self.TkClass.__init__(self, self.master, **config)
+        
+        self.kwargs.update(config)
 
         try: self.useFont(font)
         except: pass
@@ -675,9 +680,12 @@ class PRMP_Widget(PRMP_Theme):
         else:
             self.unlight()
             self.onFg = False
+    
+    @property
+    def checkVar(self): return self.kwargs.get('variable', False)
 
     def checked(self, event=None):
-        if self.variable:
+        if self.checkVar:
             if self.variable.get() == self.value: self.light()
             else: self.unlight()
 
@@ -2173,7 +2181,7 @@ class PRMP_Window(PRMP_Widget):
         if up: self.updateTheme()
         return bgs
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, **kwargs):
 
         if themeIndex: PRMP_Theme.setThemeIndex(themeIndex)
         elif theme: PRMP_Theme.setTheme(theme)
@@ -2189,6 +2197,7 @@ class PRMP_Window(PRMP_Widget):
             if tipping: PRMP_Window.TIPSMANAGER = PRMP_ToolTipsManager(self)
 
         self.container = None
+        self.canvas_as_container = canvas_as_container
         self.zoomed = False
         self.iconed = False
         self.titleBar = None
@@ -2202,10 +2211,14 @@ class PRMP_Window(PRMP_Widget):
         self.title(title)
         self.co = 0
 
+        if cac != None: canvas_as_container = cac
+
 
         if container:
-            self.container = PRMP_Style_Frame(self)
-            self.container.configure(relief='groove')
+            if canvas_as_container: self.container = Canvas(self, relief='groove')
+            else:
+                self.container = PRMP_Style_Frame(self)
+                self.container.configure(relief='groove')
 
         if normTk: atb, asb, geo = 0, 0, ()
 

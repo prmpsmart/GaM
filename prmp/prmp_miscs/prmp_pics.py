@@ -714,7 +714,9 @@ class PRMP_Image:
         self.for_tk = for_tk
         self.tkImage = None
 
-        self.name = name or PRMP_Images.getname(filename)
+        filename = filename or ''
+
+        self.name = name or PRMP_Exts.getname(filename)
 
         self._animatedTkFrames = []
         self._animatedFrames = []

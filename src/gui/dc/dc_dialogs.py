@@ -505,15 +505,6 @@ class PlotDialog(FillTable, GaM_Dialog):
 
         self.chartOptions = ChartOptions(self.container, place=dict(relx=.005, rely=.65, relw=.28, relh=.3))
 
-        fr = Frame(self.container, place=dict(relx=.285, rely=.005, relw=.711, relh=.99))
-
-        from prmp.prmp_gui.plot_canvas import PRMP_PlotCanvas
-        self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
-        self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
-        self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))
-        self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
-
-        self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
 
       ############ Plot and Clear
 
@@ -524,7 +515,27 @@ class PlotDialog(FillTable, GaM_Dialog):
         self.clear_btn = Button(self.container, command=self.clear_plot, text='Clear', place=dict(relx=.16, rely=.952, relh=.044, relw=.1))
         self.bind('<Control-C>', self.clear_plot)
         self.bind('<Control-c>', self.clear_plot)
+        
+        self.bind('<Control-L>', self.frame2.load)
+        self.bind('<Control-l>', self.frame2.load)
+        
+        self.bind('<Control-O>', self.frame2.parser)
+        self.bind('<Control-o>', self.frame2.parser)
 
+        self.after(400, self.loadFigs)
+    
+    def loadFigs(self):
+        fr = Frame(self.container, place=dict(relx=.285, rely=.005, relw=.711, relh=.99))
+
+        from prmp.prmp_gui.plot_canvas import PRMP_PlotCanvas
+        self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
+        self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
+        self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))
+        self.fig4 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.502, relw=.496, relh=.496))
+
+        self.plots_figures = [self.fig1, self.fig2, self.fig3, self.fig4]
+
+        fr.paint()
 
     def plotIt(self, e=0):
         plotDetails = self.chartOptions.get()
@@ -534,10 +545,11 @@ class PlotDialog(FillTable, GaM_Dialog):
         elif figNum < 0: figNum = 1
 
         plot = self.plots_figures[figNum-1]
-        if plot and self.plotDatas:
-            plot.doPlotting(**self.plotDatas, **plotDetails)
-            plot.draw()
-
+        try:
+            if plot and self.plotDatas:
+                plot.doPlotting(**self.plotDatas, **plotDetails)
+                plot.draw()
+        except Exception as e: PRMP_MsgBox(self, title=e.__name__, msg=e, _type='error')
 
     def clear_plot(self, e=0):
         num = self.chartOptions.fig.get()

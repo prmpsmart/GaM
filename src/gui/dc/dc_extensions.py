@@ -162,6 +162,7 @@ class DC_Overview(Frame):
 
     def testDraw(self):
         # xs = list(range(1, 10))
+        return
         xs = [chr(64+a) for a in range(1, 10)]
         ys = [random.randint(2, 9) for a in xs]
         lbls = 'Test'
@@ -203,7 +204,7 @@ class DC_Overview(Frame):
     def next(self):
         if not self.account: return
         _next = self.account.next
-        # print(_next)
+        
         if _next: self.updateDCDigits(_next)
 
     def prev(self):
@@ -487,7 +488,7 @@ class DataChoose(PRMP_FillWidgets, LabelFrame):
         LabelFrame.__init__(self, master, text=text, **kwargs)
         PRMP_FillWidgets.__init__(self)
 
-        self.season = tk.StringVar()
+        self.season = tk.StringVar(self, name='season')
         self.season.set('month')
 
         relief = 'solid'
@@ -505,6 +506,7 @@ class DataChoose(PRMP_FillWidgets, LabelFrame):
         self.setRadioGroups([self.month, self.week, self.subs])
 
         Button(self, text='Parse', command=generalAction, place=dict(relx=.78, rely=.32, relw=.2, relh=.22))
+
         self.bind_all('<Control-S>', generalAction)
         self.bind_all('<Control-s>', generalAction)
 
@@ -577,8 +579,6 @@ class ProperDetails(PRMP_FillWidgets, Frame):
         self.lists = ListBox(self, place=dict(relx=.005, rely=.59, relw=.99, relh=.41), listboxConfig=dict(selectmode='multiple'))
 
         Button(self, text='Load', command=self.load, place=dict(relx=.72, rely=.85, relw=.2, relh=.05))
-        self.bind_all('<Control-L>', self.load)
-        self.bind_all('<Control-l>', self.load)
 
         self.date_acc = {}
         self.data = {}
@@ -598,21 +598,15 @@ class ProperDetails(PRMP_FillWidgets, Frame):
 
       # normal
         self.data = self.dataChoose.get()
-
         obj, w = self.obj.objectSort.getObj(**self.date_acc, **self.data)
-
         columns, num = self.obj.objectSort.getColumns(**self.data, w=w)
-
         self.heads = columns[:num]
-
         self.columns = columns[num:]
         self.lists.set(self.columns)
 
     def load(self, e=0):
         if not self.obj: return
-
         cols = self.lists.selected or self.columns
-
         if self.callback: self.callback(columns=cols, heads=self.heads, **self.date_acc, **self.data)
 
 

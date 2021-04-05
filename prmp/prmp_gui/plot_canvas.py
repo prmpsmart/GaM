@@ -80,6 +80,7 @@ class Plots(PRMP_Mixins):
         self.big = 1
 
         from matplotlib import pyplot
+        self.pyplot = pyplot
 
         self.figure = pyplot.figure(facecolor=bkcol or self.bkcol)
         self.subplot = self.figure.add_subplot(self.big,1,1)
@@ -116,11 +117,11 @@ class Plots(PRMP_Mixins):
         self.chart = chart.lower()
 
         func = self.getFromSelf(self.chart)
-        # print()
+        
         if self.chart == 'pie': kwargs = {k: v for k, v in kwargs.items() if k in ['ys', 'labels', 'explode', 'shadow', 'title']}
         func(**kwargs)
-        # func(self, **kwargs)
 
+        # if kwargs:
         self.doAnnotation()
         self.legend()
         self.set_grid(grid)
@@ -226,10 +227,12 @@ class Plots(PRMP_Mixins):
 
     def hist(self, *args): pass
 
-    def pie(self,  ys=[], labels=[], explode=[], shadow=None, title=''):
+    def pie(self, ys=[], labels=[], explode=[], shadow=None, title=''):
         self.annotation = dict(title=title)
 
         if not self.pie: return
+        try: ys = [y[0] for y in ys]
+        except: pass
 
         self._pie(ys, labels=labels, explode=explode, autopct='%1.1f%%', shadow=shadow, labeldistance=1.1)
         self.adjust(left=0, bottom=.4, right=1, top=.88, wspace=.2, hspace=0)
@@ -239,7 +242,7 @@ class Render(Plots):
     def __init__(self, bkcol='white', annotation={}):
         super().__init__(bkcol)
         self.figure.canvas.set_window_title('Goodness and Mercy')
-        self._pie = pyplot.pie
+        self._pie = self.pyplot.pie
         self.annotation = annotation
 
     def draw(self): self.figure.show()

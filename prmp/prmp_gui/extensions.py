@@ -133,7 +133,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
 FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, normal=False, bindMenu=1, fullsize=False, loadDefault=0, **imageKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
         imageKwargs['for_tk'] = 1
 
@@ -153,10 +153,10 @@ class PRMP_ImageWidget:
 
         self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
 
-        self._normal = normal
         if bindMenu: self.bindMenu()
 
-        self.after(100, lambda: self.loadImage(self.prmpImage, **imageKwargs))
+        # self.after(imgDelay, lambda: self.loadImage(self.prmpImage, **imageKwargs))
+        self.loadImage(self.prmpImage, **imageKwargs)
 
         self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 
@@ -174,8 +174,8 @@ class PRMP_ImageWidget:
 
         self.frame_counter = 0
         # self.thumb = self.resize or self.thumb
-
-        if not (self.resize and self.thumb):
+#
+        if self.winfo_ismapped() and  not (self.resize and self.thumb):
             self.thumb = self.width, self.height
             if self.thumb[0] < 0 and self.thumb[1] < 0:
                 # self.thumb = (250, 200)
@@ -215,7 +215,7 @@ class PRMP_ImageWidget:
             self.configure(image=self.frame)
 
         except Exception as e:
-            # print(e, __file__, 'Line ', 222)
+            print(e, __file__, 'Line ', 222)
             self['image'] = ''
             if self.loadDefault: self.loadImage(self.default_dp)
 
@@ -252,8 +252,6 @@ class PRMP_ImageWidget:
         if file: self.loadImage(file)
 
     def bindMenu(self):
-        # print(self._normal)
-        if self._normal: return
         self.bind('<1>', self.delMenu, '+')
         self.bind('<3>', self.showMenu, '+')
         self.bind('<Double-1>', self.camera, '+')
@@ -298,41 +296,41 @@ class PRMP_ImageWidget:
 IW = PRMP_ImageWidget
 
 class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, config={}, **kwargs):
         PRMP_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **imageKwargs)
 IL = PRMP_ImageLabel
 
 class PRMP_ImageSLabel(PRMP_ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, normal=0, config={}, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, config={}, **kwargs):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, normal=normal, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **imageKwargs)
 SIL = PRMP_ImageSLabel
 
 
 class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
         PRMP_Button.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
 IB = PRMP_ImageButton
 
 class PRMP_ImageSButton(PRMP_ImageWidget, PRMP_Style_Button):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
         PRMP_Style_Button.__init__(self, master, config=dict(**config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
 ISB = PRMP_ImageSButton
 
 
 class PRMP_ImageCheckbutton(PRMP_ImageWidget, PRMP_Checkbutton):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
         PRMP_Checkbutton.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
 IB = PRMP_ImageCheckbutton
 
 class PRMP_ImageSCheckbutton(PRMP_ImageWidget, PRMP_Style_Checkbutton):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={},  normal=0, **kwargs):
+    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
         PRMP_Style_Checkbutton.__init__(self, master, config=dict(**config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  normal=normal, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
 ISB = PRMP_ImageSCheckbutton
 
 class PRMP_DateWidget:
@@ -1273,3 +1271,30 @@ class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
         from .dialogs import PRMP_CalendarDialog
 
         super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
+
+
+class PasswordEntry(SFrame):
+    def __init__(self, master, **kwargs):
+        '''
+        a password widget that features a show button and action button.
+        '''
+        super().__init__(master, **kwargs)
+        
+        ffont = self.PRMP_FONT.copy()
+        ffont['size'] = 20
+        self.entry = Entry(self, show='*', place=dict(relx=0, rely=0, relw=.8, relh=1), relief='flat', font=ffont)
+        self.entry.focus()
+        
+        res = 20
+
+        view = PRMP_ImageSButton(self, place=dict(relx=.8, rely=0, relw=.1, relh=1), prmpImage='highlight', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), resize=(res, res), tipKwargs=dict(text='Show'))
+        view.bind('<ButtonPress-1>', self.view)
+        view.bind('<ButtonRelease-1>', self.hide)
+
+        PRMP_ImageSButton(self, place=dict(relx=.9, rely=0, relw=.1, relh=1), prmpImage='next', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), command=self.action, resize=(res, res), tipKwargs=dict(text='Submit'))
+    
+    def hide(self, event=None): self.entry.configure(show='*')
+    def view(self, event=None): self.entry.configure(show='')
+    
+    def action(self):
+        pass

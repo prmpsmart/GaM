@@ -6,9 +6,9 @@ from .prmp_mixins import PRMP_Mixins, os
 class PRMP_File(io.BytesIO, PRMP_Mixins):
     count = 0
 
-    def __init__(self, filename='', b64=b'', data=b''):
+    def __init__(self, filename='', b64=b'', data=b'', obj=None):
 
-        passed = [bool(a) for a in [filename, b64, data]]
+        passed = [bool(a) for a in [filename, b64, data, obj]]
         
         assert passed.count(True) <= 2, 'Only one is required in [filename, b64, data]'
 
@@ -31,6 +31,8 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
         self.name_n_ext = self.basename.split('.')[0]
         
         super().__init__(self._data)
+
+        if obj: self.saveObj(obj)
 
         PRMP_File.count += 1
 

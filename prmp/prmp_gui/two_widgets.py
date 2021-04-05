@@ -88,24 +88,15 @@ class TwoWidgets(PRMP_Frame):
         self.B = self.Bottom
         self.T = self.Top
 
-        self.val, self.var = self.value, self.variable = self.T.val, self.T.var
+        if self.T.checkVar:
+            self.val, self.var = self.value, self.variable = self.T.val, self.T.var
+            if self.value and self.variable: self.checked()
 
         self.rt = None
-
-        if self.value and self.variable: self.checked()
 
         self.place_widgs()
 # 
     def clicked(self, e=0): return self.B.get()
-
-    @property
-    def value(self): return self.Top.value
-    @property
-    def variable(self): return self.Top.variable
-    @value.setter
-    def value(self, v): return
-    @variable.setter
-    def variable(self, v): return
 
     def light(self):
         # print(self)
