@@ -113,13 +113,13 @@ class PRMP_Exts(PRMP_Mixins):
         return name
     
     @classmethod
-    def getsplits(cls, file, name=''):
+    def getsplits(cls, file, name='', data=0):
         '''
         :param file: str path to a file to read.
         :param name: name of the already encoded data passed as :param file: 
         '''
 
-        if not name:
+        if not data:
             data = open(file, 'rb').read()
             enc_data = base64.b64encode(data)
         else: enc_data = file
@@ -141,29 +141,32 @@ class PRMP_Exts(PRMP_Mixins):
         return splits
     
     @classmethod
-    def embed_files_into_py(cls, files, pyfile, vars_name):
+    def embed_files_into_py(cls, files, pyfile, vars_name, var_pre='', var_suf=''):
         '''
         :param files: list of path to files to embed
         :param pyfile: a str path to a python file to host the images.
         '''
         ope = open(pyfile, 'w')
-        exts = []
+        names = {}
 
         for f in files:
             ext = os.path.splitext(f)[1]
             ext = ext[1:]
             name = cls.getname(f)
-            splits = cls.getsplits(f)
+            var_name = var_pre + name + var_suf
+            splits = cls.getsplits(f, name=var_name)
             keys = splits.keys()
-            exts.append(name)
+            names[name] = var_name
 
-            for sp, vl in splits.items(): ope.write(f"{sp} = {vl}\n\n")
+            for sp, vl in splits.items():
+                strf = "{} = {}\n\n".format(sp, vl)
+                ope.write(strf)
 
-            ope.write(f"{name} = {' + '.join(keys)}\n\n")
-
+            ss = "{'name': '%s', 'ext': '%s', 'data': %s}"%(name, ext, ' + '.join(keys))
+            ope.write("{} = {}\n\n".format(var_name, ss))
 
         EXTS = '%s = {'%vars_name
-        for ext in exts: EXTS += f"'{ext}': {ext}, "
+        for name, var_name in names.items(): EXTS += "'{}': {}, ".format(name, var_name)
         EXTS = EXTS[:-2]
         EXTS += '}'
         ope.write(EXTS)

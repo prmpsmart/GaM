@@ -634,7 +634,9 @@ class PRMP_Images:
 
             for name, file_data in v.items():
                 _dict = {'name': ''}
-                if (k in merge) and (name in merge[k]) and (file_data == merge[k][name]): _dict['name'] = name
+                if (k in merge) and (name in merge[k]) and (file_data == merge[k][name]):
+                    _dict['name'] = name
+                    _dict['data'] = 1
 
                 splits = PRMP_Exts.getsplits(file_data, **_dict)
 
