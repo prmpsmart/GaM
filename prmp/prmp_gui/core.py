@@ -2213,7 +2213,6 @@ class PRMP_Window(PRMP_Widget):
 
         if cac != None: canvas_as_container = cac
 
-
         if container:
             if canvas_as_container: self.container = Canvas(self, relief='groove')
             else:

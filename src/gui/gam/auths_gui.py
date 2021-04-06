@@ -28,14 +28,16 @@ def make_change(ordfunc=None, *args, silent=0, **kwargs):
 
 
 
-class Base_Password(PRMP_FillWidgets, Frame):
+class Base_Password(PRMP_FillWidgets):
 
-    def __init__(self, master, req=1, **kwargs):
+    def __init__(self, master, req=1, container=None, offset=0, **kwargs):
 
-        Frame.__init__(self, master, **kwargs)
+        self.frame = master if container else Frame(master, **kwargs)
+        # Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
 
         self.req = req
+        self.offset = offset
         self.new_is_password = False
         self.old_is_password = False
 
@@ -51,44 +53,44 @@ class Base_Password(PRMP_FillWidgets, Frame):
         self.ent_old = ''
         self.hint_text=''
 
-        self.name = Entry(self, placeholder=self.ent_name, required=1)
-        self.clr_name = Button(self, text="Clear", command=self.name.empty, relief="solid")
+        self.name = Entry(self.frame, placeholder=self.ent_name, required=1)
+        self.clr_name = Button(self.frame, text="Clear", command=self.name.empty, relief="solid")
 
-        self.username = Entry(self, placeholder=self.ent_usr, required=1)
-        self.clr_usr = Button(self, text="Clear", command=self.username.empty, relief="solid")
+        self.username = Entry(self.frame, placeholder=self.ent_usr, required=1)
+        self.clr_usr = Button(self.frame, text="Clear", command=self.username.empty, relief="solid")
 
-        self.admin = Checkbutton(self, relief="solid", text="Admin?", command=self.admin_add)
+        self.admin = Checkbutton(self.frame, relief="solid", text="Admin?", command=self.admin_add)
 
-        self.password = Entry(self, placeholder=self.ent_pwd, required=1)
+        self.password = Entry(self.frame, placeholder=self.ent_pwd, required=1)
         self.first = 0
         self.password.bind('<KeyPress>', self.show_star)
 
-        self.old = Entry(self, required=1)
-        self.clr_old = Button(self, text="Clear", command=self.old.empty, relief="solid")
+        self.old = Entry(self.frame, required=1)
+        self.clr_old = Button(self.frame, text="Clear", command=self.old.empty, relief="solid")
 
-        self.password_confirm = Label(self)
+        self.password_confirm = Label(self.frame)
 
-        self.password_length = Label(self, relief="sunken", bd=2, font='PRMP_FONT')
+        self.password_length = Label(self.frame, relief="sunken", bd=2, font='PRMP_FONT')
 
-        self.clr_pwd = Button(self, text="Clear", command=self.password.empty, relief="solid")
+        self.clr_pwd = Button(self.frame, text="Clear", command=self.password.empty, relief="solid")
 
-        self.new = Entry(self, required=1)
-        self.clr_new = Button(self, text="Clear", command=self.new.empty, relief="solid")
+        self.new = Entry(self.frame, required=1)
+        self.clr_new = Button(self.frame, text="Clear", command=self.new.empty, relief="solid")
 
-        self.show_pass = Checkbutton(self, command=self.show_password, relief="solid", text="Show")
+        self.show_pass = Checkbutton(self.frame, command=self.show_password, relief="solid", text="Show")
 
-        self.show_old = Checkbutton(self, command=self.show_old_, relief="solid", text="Show")
+        self.show_old = Checkbutton(self.frame, command=self.show_old_, relief="solid", text="Show")
 
-        self.hint = Entry(self, required=0)
+        self.hint = Entry(self.frame, required=0)
 
-        self.clr_hint = Button(self, text="Clear", command=self.hint.empty, relief="solid")
+        self.clr_hint = Button(self.frame, text="Clear", command=self.hint.empty, relief="solid")
 
         self.hx, self.hy, self.hh, self.hw, = .1, .57, .04, .5
-        self.forgot_chk = Checkbutton(self, command=self.forgot_check, relief="solid", text="Forgot Password?")
+        self.forgot_chk = Checkbutton(self.frame, command=self.forgot_check, relief="solid", text="Forgot Password?")
 
-        self.hint_lbl = Label(self, relief="flat")
+        self.hint_lbl = Label(self.frame, relief="flat")
 
-        self.action = Button(self, text='Action', relief="solid", command=self.make_change)
+        self.action = Button(self.frame, text='Action', relief="solid", command=self.make_change)
 
     def binds(self):
         # self.bind_all('<Return>', self.make_change)
@@ -230,6 +232,12 @@ class Base_Password(PRMP_FillWidgets, Frame):
 
     def act(self): pass
 
+    @property
+    def new_h(self): return 1-self.offset
+
+    def relh(self, rh): return self.new_h * rh
+    
+    def rely(self, ry): return self.offset + ry
 
 class Change_Username(Base_Password):
 
@@ -320,16 +328,15 @@ class Delete_User(Base_Password):
             Authorisation.delete_user(*self.get_inputs())
             PRMP_MsgBox(self, title="User Deleted Successful", msg=f"User:\nName: {user.name}\nUsername: {user.username}  is successful", _type="info")
 
-
     def place_widgs(self):
-        self.username.place(relx=.1, rely=.1, relh=.15, relw=.6)
-        self.clr_usr.place(relx=.72, rely=.1, relh=.14, relw=.09)
+        self.username.place(relx=.1, rely=self.rely(.1), relh=self.relh(.15), relw=.6)
+        self.clr_usr.place(relx=.72, rely=self.rely(.1), relh=self.relh(.14), relw=.09)
 
-        self.password.place(relx=.1, rely=.35, relh=.15, relw=.6)
-        self.clr_pwd.place(relx=.72, rely=.35, relh=.14, relw=.09)
-        self.show_pass.place(relx=.84, rely=.35, relh=.14, relw=.11)
+        self.password.place(relx=.1, rely=self.rely(.35), relh=self.relh(.15), relw=.6)
+        self.clr_pwd.place(relx=.72, rely=self.rely(.35), relh=self.relh(.14), relw=.09)
+        self.show_pass.place(relx=.84, rely=self.rely(.35), relh=self.relh(.14), relw=.11)
 
-        self.action.place(relx=.1, rely=.8, relh=.14, relw=.8)
+        self.action.place(relx=.1, rely=self.rely(.8), relh=self.relh(.14), relw=.8)
 
 class Change_Password(Base_Password):
 
@@ -404,7 +411,6 @@ class Change_Password(Base_Password):
 
         self.action.place(relx=.1, rely=.87, relh=.12, relw=.8)
 
-
 class Add_User(Change_Password):
 
     def __init__(self, master=None, **kwargs):
@@ -466,7 +472,7 @@ class User_Login(Delete_User):
 
         self.callback = callback
 
-        self.hx, self.hy, self.hh, self.hw, = .1, .6, .12, .6
+        self.hx, self.hy, self.hh, self.hw, = .1, self.rely(.6), self.relh(.12), .6
         self.hint_text = "Love You"
 
         self.action.config(text="Login")
@@ -515,7 +521,7 @@ class User_Login(Delete_User):
 
     def place_widgs(self):
         super().place_widgs()
-        self.forgot_chk.place(relx=.72, rely=.6, relh=.12, relw=.27)
+        self.forgot_chk.place(relx=.72, rely=self.rely(.6), relh=self.relh(.12), relw=.27)
 
 
 class Login_Status(LabelFrame):
@@ -590,12 +596,36 @@ class Security(GaM_Dialog):
 
 
 class Login(GaM_Dialog):
-    def __init__(self, master=None, title='GaM Login.', **kwargs): super().__init__(master, title=title, **kwargs)
+    def __init__(self, master=None, title='GaM Login.', **kwargs): super().__init__(master, title=title, cac=1, **kwargs)
 
     def _setupDialog(self):
-        PRMP_ImageSLabel(self.container, imageKwargs=dict(b64=GaM_PNGS['gam']), background="yellow", config=dict(relief='solid'), resize=(500, 110), place=dict(relx=.005, rely=.005, relh=.26, relw=.99))
 
-        self.pass_login = User_Login(self.container, callback=self._callback, place=dict(relx=.05, rely=.35, relh=.63, relw=.9))
+        self.pass_login = User_Login(self.container, container=1, callback=self._callback, place=dict(relx=.05, rely=.35, relh=.63, relw=.9), offset=0)
+        
+        self.username_font = self.PRMP_FONT.copy()
+        self.username_font['size'] = 30
+        self.username_font = self.parseFont(self.username_font)
+
+        self.container.bind('<Configure>',  self.afterload)
+
+    def afterload(self, event=None):
+        '''
+        updates the container objects
+        '''
+        x, y = geo = self.width, self.height
+        
+        self.img = PRMP_Image('purple_beau', resize=geo, for_tk=1, inbuilt=1, inExt='jpeg')
+
+        self.container.create_image(0, 0, image=self.img, anchor='nw')
+        
+        self.gam_img = PRMP_Image(b64=GaM_PNGS['gam'], resize=(x, 180), for_tk=1)
+        self.container.create_image(0, 5, image=self.gam_img, anchor='nw')
+        self.change_color(self.img.image)
+
+        user = 'Rocky Miracy Peter'
+        # self.container.create_text(x/2, 360, text=user, fill='white', font=self.username_font)
+
+        # PRMP_Window.STYLE.update()
 
     def _callback(self):
         if self.callback: self.callback(self.destroy)
