@@ -45,6 +45,13 @@ class PRMP_Mixins:
     containers = list, set, tuple
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
+    def isArray(self, array):
+        try:
+            array.any()
+            return True
+        except: return False
+
+
     def tkFormatedFileTypes(self, name, exts=[]):
         fexts = '{'
         for ext in exts: fexts += f'.{ext} '

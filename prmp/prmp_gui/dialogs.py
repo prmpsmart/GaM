@@ -252,7 +252,8 @@ class PRMP_ImageDialog(PRMP_Dialog):
     # def isMaximized(self): return self.getWid_H_W(self)
 
     def _setupDialog(self):
-        self.imageLabel = PRMP_ImageLabel(self.container, prmpImage=self.prmpImage, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), imageKwargs=self.imageKwargs)
+        self.imageKwargs['bindMenu'] = 1
+        self.imageLabel = PRMP_ImageSLabel(self.container, prmpImage=self.prmpImage, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), imageKwargs=self.imageKwargs)
         self.set = self.imageLabel.set
         # self.bind('<Return>', self.imageLabel.saveImage)
 
@@ -261,6 +262,8 @@ class PRMP_ImageDialog(PRMP_Dialog):
         self.destroyDialog()
     
     def setImage(self, image): self.imageLabel.loadImage(image)
+
+ImgD = PRMP_ImageDialog
 
 class Splash(PRMP_Dialog):
     def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), callback=None, title='Goodness and Mercy', imageKwargs={}, delay=2000, **kwargs):

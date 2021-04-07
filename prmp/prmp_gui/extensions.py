@@ -133,7 +133,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
 FW = PRMP_FillWidgets
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, **imageKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, face=False, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
         imageKwargs['for_tk'] = 1
 
@@ -142,6 +142,7 @@ class PRMP_ImageWidget:
         self.thumb = thumb
         self.resize = resize
         self.fullsize = fullsize
+        self.face = face
 
         self.frame_counter = 0
         self.frame = None
@@ -158,7 +159,7 @@ class PRMP_ImageWidget:
         # self.after(imgDelay, lambda: self.loadImage(self.prmpImage, **imageKwargs))
         self.loadImage(self.prmpImage, **imageKwargs)
 
-        self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
+        # self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 
     def disabled(self):
         self.unBindMenu()
@@ -174,9 +175,9 @@ class PRMP_ImageWidget:
 
         self.frame_counter = 0
         # self.thumb = self.resize or self.thumb
-#
+        if not self.thumb: self.thumb = self.width, self.height
+
         if self.winfo_ismapped() and  not (self.resize and self.thumb):
-            self.thumb = self.width, self.height
             if self.thumb[0] < 0 and self.thumb[1] < 0:
                 # self.thumb = (250, 200)
                 self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
@@ -211,11 +212,17 @@ class PRMP_ImageWidget:
 
                 self.isGif = True
                 self.__renderGif()
+            
+            else:
+                if self.face: self.frame = self.prmpImage._find_faces(prmp_image=1, for_tk=1)
 
-            self.configure(image=self.frame)
+            self.config(image=self.frame)
+            self.paint()
 
         except Exception as e:
-            print(e, __file__, 'Line ', 222)
+            raise e
+
+
             self['image'] = ''
             if self.loadDefault: self.loadImage(self.default_dp)
 
@@ -728,7 +735,7 @@ Entry_Label = PRMP_Entry_Label
 
 class PRMP_Camera(PRMP_Style_Frame):
 
-    def __init__(self, master, source=0, frameUpdateRate=10, callback=None, **kwargs):
+    def __init__(self, master, source=0, frameUpdateRate=10, callback=None, face=False, **kwargs):
         import cv2
         self.cv2 = cv2
         self.cam = None
@@ -737,6 +744,7 @@ class PRMP_Camera(PRMP_Style_Frame):
         self._image = None
         self._set = None
         self.callback = callback
+        self.face = face
         self.pause = False
         self.opened = False
 
@@ -744,8 +752,9 @@ class PRMP_Camera(PRMP_Style_Frame):
 
         super().__init__(master, **kwargs)
 
-        self.screen = Label(self, place=dict(relx=.006, rely=.01, relh=.85, relw=.985))
+        self.screen = PRMP_Style_Label(self, place=dict(relx=0, rely=0, relh=1, relw=1), anchor='center')
         self.screen.bind('<Double-1>', self.screenPause, '+')
+        self.screen.bind('<Configure>', self.onConfig, '+')
 
         self.save = Button(self, config=dict(text='Save', command=self.saveImage))
         self.bind('<Map>', self.checkVisibility)
@@ -754,13 +763,16 @@ class PRMP_Camera(PRMP_Style_Frame):
 
     def y(self): return
 
-    def placeSave(self): self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
+    def placeSave(self):
+        self.screen.place(relx=.006, rely=.01, relh=.85, relw=.985)
+        self.save.place(relx=.375, rely=.87, relh=.1, relw=.25)
 
     def screenPause(self, e=0):
         if self.pause or self._set:
             self.pause = False
             self.openCam()
             self._set = None
+            self.screen.place(relx=0, rely=0, relh=1, relw=1)
             self.save.place_forget()
         else:
             self.pause = True
@@ -780,8 +792,18 @@ class PRMP_Camera(PRMP_Style_Frame):
 
     def get(self): return self.saveImage()
 
+    def onConfig(self, event=None):
+        if not self._image: return
+        w_h = self.screen.width, self.screen.height
+        
+        image = self._image
+        # image.thumbnail(w_h)
+        image = image.resize(w_h)
+        self._updateScreen(image)
+        
     def openCam(self):
         if self._set: return
+
         self.cam = self.cv2.VideoCapture(self.source)
         self.updateScreen()
         self.opened = True
@@ -819,14 +841,14 @@ class PRMP_Camera(PRMP_Style_Frame):
         self._set = image
         success, frame = self.getFrame()
         if success or self._set:
-            dif = 20
-            w_h = self.width-dif, self.height-dif
-            if w_h[0] < 0 and w_h[1] < 0: return
+            if self.width <= 0 and self.height <= 0: return
 
-            self._image = PRMP_Image(self._set) if self._set else Image.fromarray(frame)
+            if self.face: frame = PRMP_Image.find_faces(array=frame)
 
-            image = self._image.copy()
-            image.thumbnail(w_h)
+            # self._image = PRMP_Image(self._set) if self._set else PRMP_Image(array=frame, for_tk=1)
+            self._image = Image.fromarray(frame)
+
+            self.onConfig()
 
             self._updateScreen(image)
 
@@ -951,6 +973,7 @@ class AttributesViewer(LabelFrame):
     def open(self):
         if isinstance(self._value, (int, str, list, tuple, dict)): AttributesExplorer(values=self._value, dialog=self.dialog, grab=0)
         else: self.dialog(obj=self._value, grab=0, tm=1)
+
 
 class AttributesExplorer(LabelFrame):
     def __init__(self, master, listboxConfig={}, callback=None, obj=None, values={}, dialog=None, **kwargs):
@@ -1078,6 +1101,7 @@ class AttributesExplorer(LabelFrame):
             self.treeview.insert(parent, text=values)
             pass
 
+
 class ColumnViewer(LabelFrame):
 
     def __init__(self, master, column=None, **kwargs):
@@ -1106,6 +1130,7 @@ class ColumnViewer(LabelFrame):
         from .dialogs import dialogFunc, ColumnsExplorerDialog
         if isinstance(self._value, (int, str, list, tuple, dict)): ColumnsExplorerDialog(self, values=self._value)
         else: dialogFunc(master=self, obj=self._value)
+
 
 class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     def __init__(self, master, listboxConfig={}, callback=None, columns=None, masterWid=None, **kwargs):
@@ -1258,6 +1283,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
     #     elif isinstance(values, (str, bytes)):
     #         self.treeview.insert(parent, text=values, value=values)
     #         pass
+
 
 class PRMP_DropDownCalendarWidget(PRMP_DropDownWidget):
     def __init__(self, *args, **kwargs):

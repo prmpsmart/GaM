@@ -330,6 +330,22 @@ except Exception as e:
     print('PIL <pillow> image library is not installed.')
     print(e)
 
+try:
+    import cv2
+    _CV2_ = True
+except Exception as e:
+    _CV2_ = False
+    print('cv2 <opencv-python> computer vision library is not installed.')
+    print(e)
+
+try:
+    import cv2
+    _CV2_ = True
+except Exception as e:
+    _CV2_ = False
+    print('cv2 <opencv-python> computer vision library is not installed.')
+    print(e)
+
 from .prmp_exts import *
 
 
@@ -450,9 +466,13 @@ class PRMP_ImageType:
 
 class PRMP_Images:
     @classmethod
-    def grabscreen(cls, bbox=None): return ImageGrab.grab(bbox)
+    def grabscreen(cls, bbox=None):
+        if not _PIL_: return
+        return ImageGrab.grab(bbox)
     @classmethod
-    def grabclipboard(cls): return ImageGrab.grabclipboard()
+    def grabclipboard(cls):
+        if not _PIL_: return
+        return ImageGrab.grabclipboard()
     @classmethod
     def rgb2hex(cls, color):
         ''' To get the hex value of a color in rgb format
@@ -514,6 +534,7 @@ class PRMP_Images:
         :param percent: bool whether to return colors with the frequency (percentages)
         :type percent: bool
         '''
+        if not _PIL_: return
         # Resize image to speed up processing
         img = Image.open(image) if isinstance(image, (str, bytes)) else image
         if resize: img.thumbnail((resize, resize))
@@ -556,6 +577,7 @@ class PRMP_Images:
         :param outfile: path to save the image to.
         :type outfile: str, bytes
         '''
+        if not _PIL_: return
         num_colors = len(colors)
         palette = Image.new('RGB', (swatchsize*num_colors, swatchsize))
         draw = ImageDraw.Draw(palette)
@@ -680,17 +702,19 @@ class PRMP_ImageFile(PRMP_File):
 
     @property
     def image(self):
-        if _PIL_: return Image.open(self)
+        if not _PIL_: return
+        return Image.open(self)
 
-    def __init__(self, imageFileName='', inbuilt=False, inExt='png', image=None, **kwargs):
-
-        passed = [bool(a) for a in [imageFileName, image]].count(True)
+    def __init__(self, imageFileName='', inbuilt=False, inExt='png', image=None, array=None, **kwargs):
+        isArray = self.isArray(array)
+        passed = [bool(a) for a in [imageFileName, image, isArray]].count(True)
         assert passed <= 1, 'Only one is required in [imageFileName, image]'
 
         if imageFileName and inbuilt: kwargs['b64'] = PRMP_Images.get(imageFileName, inExt)
 
         super().__init__(filename=imageFileName, **kwargs)
 
+        if isArray and _PIL_: image = Image.fromarray(array)
         if image: image.save(self, inExt)
 
         PRMP_ImageFile.count += 1
@@ -700,30 +724,33 @@ class PRMP_ImageFile(PRMP_File):
 
 class PRMP_Image:
     count = 0
-    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, b64=b'', name='', for_tk=False):
+    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, b64=b'', name='', for_tk=False, array=None):
 
         pic = None
         self.imageFile = None
-        self.tkImgClass = PhotoImage
+
         self.resizedImage = None
 
         self._thumb = thumb
         self._resize = resize
 
-        self.image = None
+        self.image = image
         self.for_tk = for_tk
         self.tkImage = None
 
         filename = filename or ''
 
-        self.name = name or PRMP_Exts.getname(filename)
+        isArray = PRMP_Mixins.isArray(None, array)
+        
+        self.name = name or PRMP_Exts.getname(str(filename))
 
         self._animatedTkFrames = []
         self._animatedFrames = []
 
-        if filename or image or b64:
+        if filename or image or b64 or isArray:
             if image: self.imageFile = PRMP_ImageFile(image=image)
             elif b64: self.imageFile = PRMP_ImageFile(b64=b64)
+            elif isArray: self.imageFile = PRMP_ImageFile(array=array)
             elif filename :self.imageFile = filename if isinstance(filename, PRMP_ImageFile) else PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
             else: self.imageFile = filename or image
 
@@ -731,9 +758,16 @@ class PRMP_Image:
 
             self.ext = self.imageFile.ext
 
-            if self.ext == 'xbm': self.tkImgClass = BitmapImage
+    
+            if _PIL_:
+                if self.ext == 'xbm': self.tkImgClass = BitmapImage
+                else: self.tkImgClass = PhotoImage
+            else:
+                import tkinter as tk
+                self.tkImgClass = tk.PhotoImage
+                if self.ext == 'xbm': self.tkImgClass = tk.BitmapImage
 
-            img = self.image = image or Image.open(self.imageFile) if _PIL_ else None
+            img = self.image = self.image or Image.open(self.imageFile) if _PIL_ else None
 
             self.frames = getattr(img, 'n_frames', 1)
             
@@ -762,6 +796,8 @@ class PRMP_Image:
 
     @property
     def animatedTkFrames(self):
+        if not _PIL_: return
+
         if self._animatedTkFrames: return self._animatedTkFrames
         else:
             for frame in ImageSequence.Iterator(self.img):
@@ -780,6 +816,7 @@ class PRMP_Image:
 
     @property
     def animatedFrames(self):
+        if not _PIL_: return
         if self._animatedFrames: return self._animatedFrames
         else:
             for frame in ImageSequence.Iterator(self.img):
@@ -818,6 +855,50 @@ class PRMP_Image:
 
     def copy(self):
         if self.image: return self.image.copy()
+    
+    def fromarray(self, array, bgr2rgb=False):
+        if _CV2_ and bgr2rgb: array = cv2.cvtColor(array, cv2.COLOR_BGR2RGB)
+        self.image = Image.fromarray(array)
+
+
+    def toarray(self, rgb2bgr=False):
+        if not self.image: return
+
+        import numpy
+        array = numpy.asarray(self.image)
+        if _CV2_ and rgb2bgr: array = cv2.cvtColor(array, cv2.COLOR_RGB2BGR)
+        return array
+
+    def _find_faces(self, **kwargs): return self.find_faces(image=self.image, **kwargs)
+    
+    @classmethod
+    def find_faces(cls, cascPath='', image=None, array=None, as_image=False, prmp_image=False, **kwargs):
+        if not _CV2_: return
+
+        cascPath = cascPath or r"C:\Users\Administrator\Documents\My\Archives\libraries\python\cv2\data\haarcascade_frontalface_default.xml"
+
+        faceCascade = cv2.CascadeClassifier(cascPath)
+
+        if image: array = cls(image=image).toarray()
+        
+        gray = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
+
+        faces = faceCascade.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(30, 30),
+            #flags = cv2.CV_HAAR_SCALE_IMAGE
+        )
+        # print("Found {0} faces!".format(len(faces)))
+
+        for (x, y, w, h) in faces: cv2.rectangle(array, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+        if as_image or prmp_image:
+            cl = PRMP_Image if prmp_image else PRMP_ImageFile
+            return cl(array=array, **kwargs)
+        else: return array
+
 
 
 
