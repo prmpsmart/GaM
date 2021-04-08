@@ -2,7 +2,7 @@ __author__ = 'PRMPSmart@gmail.com'
 
 import datetime
 from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
-from .prmp_mixins import PRMP_Mixins, PRMP_Errors
+from .prmp_mixins import PRMP_ClassMixins, PRMP_Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
 WEEKS = ['Week %d'%a for a in range(1, 6)]
@@ -225,7 +225,8 @@ class CompareByYear:
         if other == None: return True
         return self.date.year >= other.date.year
 
-class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
+
+class PRMP_DateTime(datetime.datetime, PRMP_ClassMixins):
     date_fmt = "%d/%m/%Y" # default date format, subclass PRMP_DateTime and set date_fmt to your own format
     
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]

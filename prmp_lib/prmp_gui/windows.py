@@ -1,7 +1,8 @@
-from .core import tk, PRMP_Theme, PRMP_Widget, PRMP_Mixins, _PIL_, PRMP_Image
+from .core import tk, PRMP_Theme, PRMP_Widget, _PIL_, PRMP_Image
 from .core_tk import *
 from .core_ttk import *
 import ctypes, subprocess, functools, os
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
 
 __all__ = ['PRMP_Window', 'PRMP_Tk', 'PRMP_Toplevel', 'PRMP_MainWindow', 'PRMP_ToolTip', 'PRMP_ToolTipsManager', 'Tk', 'Toplevel']
 
@@ -106,7 +107,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
     change_color = change2Imgcolor
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, **kwargs):
         '''
         PRMP_Window a base class for all window class for common behaviours.
 
@@ -284,9 +285,11 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         else: self.setAttributes()
 
         self.setTkIcon(tkIcon or PRMP_Window.TKICON)
-        self.topmost()
+        
+        if self.topMost: self.topmost()
     
-    def setAttributes(self): self.attributes('-toolwindow', self.toolWindow, '-alpha', self.alpha, '-topmost', self.topMost)
+    def setAttributes(self): self.attributes('-toolwindow', self.toolWindow, '-alpha', self.alpha)
+    # def setAttributes(self): self.attributes('-toolwindow', self.toolWindow, '-alpha', self.alpha)
 
     def topmost(self): self.attributes('-topmost', True)
 
@@ -295,15 +298,19 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         A hack for adding this window to OS managed windows
         called if and only if (noTitleBar is True and tooltype is False)
         '''
+
         self.withdraw()
         winfo_id = self.winfo_id()
         parent = ctypes.windll.user32.GetParent(winfo_id)
         res = ctypes.windll.user32.SetWindowLongW(parent, -20, 0)
         self.deiconify()
+        
         if not res:
             # continue until OS windows manager assign an ID for this window.
             self.after(10, self.addWindowToTaskBar)
-        if res: self.setAttributes()
+        # print('-toolwindow', self.toolWindow, '-alpha', self.alpha, '-topmost', self.topMost)
+
+        if res: self.attributes('-alpha', self.alpha)
 
     # positioning of window
 
@@ -764,7 +771,7 @@ class PRMP_Toplevel(PRMP_Window, tk.Toplevel):
 Toplevel = PTl = PRMP_Toplevel
 
 
-class PRMP_MainWindow(PRMP_Mixins):
+class PRMP_MainWindow(PRMP_ClassMixins):
 
     def __init__(self, master=None, _ttk_=False, **kwargs):
 

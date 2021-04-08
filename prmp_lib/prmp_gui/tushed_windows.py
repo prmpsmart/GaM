@@ -12,7 +12,7 @@ SS = PRMP_SolidScreen
 
 class ColumnViewerDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(300, 300), column=None, **kwargs):
+    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(500, 500), column=None, **kwargs):
         self.column = column
         super().__init__(master, title=title, geo=geo, **kwargs)
 

@@ -1,5 +1,6 @@
-from .core import PRMP_Frame, PRMP_Mixins
+from . import PRMP_Frame
 import random
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
 
 
 class PlotDatas:
@@ -74,7 +75,7 @@ class PlotDatas:
 
 Bar = PlotDatas
 
-class Plots(PRMP_Mixins):
+class Plots(PRMP_ClassMixins):
     bkcol = 'white'
     def __init__(self, bkcol=''):
         self.big = 1

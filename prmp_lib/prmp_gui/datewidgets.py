@@ -1,4 +1,5 @@
 from . import *
+from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
 # print(dir())
 
 
@@ -124,7 +125,7 @@ class PRMP_Calendar(Frame):
         count = 0
 
         def __init__(self, master=None, returnMethod=None, **kw):
-            super().__init__(master=master, background=self.days_bg, foreground=self.days_fg, font=PRMP_Theme.DEFAULT_FONT, **kw)
+            super().__init__(master=master, background=self.days_bg, foreground=self.days_fg, font=PRMP_Theme.DEFAULT_FONT, highlightable=0, **kw)
             self.day = None
             self.returnMethod = returnMethod
 
@@ -132,12 +133,14 @@ class PRMP_Calendar(Frame):
             # PRMP_Calendar.DayLabel.count += 1
 
             self.bind('<Enter>', self.onButton, '+')
-            self.bind('<Leave>', self.offButton, '+')
+            self.bind('<Leave>', self.offButton)
+
             self.bind('<ButtonPress-1>', self.choosen, '+')
 
         def onButton(self, e=0):
             self.statusShow()
             if self.notPart: return
+
             if self.day:
                 if self.now: self.config(background=self.class_.now_highlight_bg, foreground=self.class_.now_highlight_fg)
                 else: self.config(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
@@ -147,6 +150,7 @@ class PRMP_Calendar(Frame):
             if self.day: return self.day.date
 
         def offButton(self, e=0):
+
             if self.notPart: return
 
             if self == PRMP_Calendar.choosen: self.config(background=self.class_.choosen_bg, foreground=self.class_.choosen_fg)
@@ -157,8 +161,7 @@ class PRMP_Calendar(Frame):
 
         paint = offButton
 
-        def config(self, day=None, command=None, notPart=False, **kwargs):
-            self.notPart = notPart
+        def config(self, day=None, command=None, **kwargs):
             if day: self.changeDay(day)
             if command:
                 self.unbind('<ButtonPress-1>')
@@ -166,7 +169,6 @@ class PRMP_Calendar(Frame):
 
             background, foreground = kwargs.get('background'), kwargs.get('foreground')
             self.configure(**kwargs)
-            # print(kwargs)
 
             if foreground: self['foreground'] = foreground
             if background: self['background'] = background
@@ -188,6 +190,8 @@ class PRMP_Calendar(Frame):
 
         def empty(self):
             self.day = None
+            self.notPart = True
+
             self.config(text='', state='disabled', relief='flat', background=PRMP_Theme.DEFAULT_BUTTON_COLOR[0])
 
         def clicked(self, e=0):
@@ -259,7 +263,8 @@ class PRMP_Calendar(Frame):
             self.daysButtons.append(btn)
 
         self.reset = self.daysButtons[-4]
-        self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', notPart=1, relief='ridge')
+        self.reset.empty()
+        self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', relief='ridge')
 
         self.updateDays()
 

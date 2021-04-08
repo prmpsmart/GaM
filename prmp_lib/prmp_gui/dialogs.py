@@ -1,12 +1,14 @@
 
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
-from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
-from prmp_lib.prmp_miscs.prmp_pics import PRMP_XBMS
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins, PRMP_AdvMixins
+from prmp_lib.prmp_miscs.prmp_images import PRMP_XBMS
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
 from tkinter.simpledialog import askstring, askfloat, askinteger
 from . import *
 from .core import PRMP_FillWidgets
+from .datewidgets import PRMP_Calendar
+
 
 
 
@@ -121,14 +123,15 @@ PD = PRMP_Dialog
 
 class PRMP_CalendarDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, date=None, **kwargs):
+    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(500, 500), min_=None, max_=None, date=None, **kwargs):
         self.min = min_
         self.max = max_
         self.month = date or month
 
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
-    def _setupDialog(self): self.calendar = self.addWidget(PRMP_Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min, month=self.month), place=dict(relx=0, rely=0, relh=1, relw=1))
+    def _setupDialog(self):
+        self.calendar = self.addWidget(PRMP_Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min, month=self.month), place=dict(relx=0, rely=0, relh=1, relw=1))
 
     def afterPaint(self): self.calendar.afterPaint()
 
@@ -141,7 +144,7 @@ class PRMP_CalendarDialog(PRMP_Dialog):
     def validate_cmd(self, date): return PRMP_DateTime.getDMYFromDate(date)
 
     def set(self, date=None):
-        date = super().getDate(date)
+        date = PRMP_AdvMixins.getDate(None, date)
         if date:
             self.calendar.month = date
             self.calendar.updateDays()
@@ -231,12 +234,13 @@ class PRMP_CameraDialog(PRMP_Dialog):
 
     def _setupDialog(self):
         from .imagewidgets import PRMP_Camera
+        self.PC = PRMP_Camera
         self.camera = PRMP_Camera(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), **self.cameraKwargs)
         self.set = self.camera.setImage
 
     def getImage(self, imageFile):
         self._setResult(imageFile)
-        if not self.callback: return PRMP_Camera._saveImage(imageFile)
+        if not self.callback: return self.PC._saveImage(imageFile)
         self.destroyDialog()
 
     # def

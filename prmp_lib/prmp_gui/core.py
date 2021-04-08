@@ -3,15 +3,15 @@ import os, time, random, tkinter as tk, sys, tkinter.ttk as ttk
 
 from tkinter.font import Font, families
 
-from prmp_lib.prmp_miscs.prmp_pics import PRMP_Image, _PIL_, PRMP_Images, _CV2_
-from .miscs import PRMP_Mixins, functools, platform
-from prmp_lib.prmp_miscs.prmp_mixins import PRMP_GuiMixins
+from prmp_lib.prmp_miscs.prmp_images import PRMP_Image, _PIL_, PRMP_Images, _CV2_
+from .miscs import functools, platform
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_GuiMixins, PRMP_Mixins
 
 # superclasses
 
 'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'
 
-__all__ = ['PRMP_Theme', 'PRMP_Widget', 'PRMP_Input', 'PRMP_InputButtons', 'PRMP_FillWidgets', 'PRMP_Mixins', '_PIL_', 'PRMP_Images', 'PRMP_Image', 'tk', 'ttk']
+__all__ = ['PRMP_Theme', 'PRMP_Widget', 'PRMP_Input', 'PRMP_InputButtons', 'PRMP_FillWidgets', 'PRMP_Mixins', '_PIL_', 'PRMP_Images', 'PRMP_Image', 'tk', 'ttk', 'PRMP_GuiMixins']
 
 
 class PRMP_Theme(PRMP_GuiMixins):

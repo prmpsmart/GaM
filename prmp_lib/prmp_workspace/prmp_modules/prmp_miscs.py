@@ -707,7 +707,7 @@ class PRMP_File(BytesIO, PRMP_Mixins):
 
 
 
-# prmp_pics.py
+# prmp_images.py
 
 try:
     from PIL.ImageTk import Image, PhotoImage, BitmapImage
@@ -719,7 +719,7 @@ except Exception as e:
     print(e)
 
 class PRMP_Pics:
-    _dir = 'prmp_pics'
+    _dir = 'prmp_images'
     subDir = ''
 
     @classmethod

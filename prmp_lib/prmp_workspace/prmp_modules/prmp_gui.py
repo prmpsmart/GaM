@@ -2320,7 +2320,7 @@ class PRMP_Window(PRMP_Widget):
         self.paint()
         self.mainloop()
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', **kwargs):
 
         if themeIndex: PRMP_Theme.setThemeIndex(themeIndex)
         elif theme: PRMP_Theme.setTheme(theme)
@@ -5658,7 +5658,7 @@ PD = PRMP_Dialog
 
 class PRMP_CalendarDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, date=None, **kwargs):
+    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(500, 500), min_=None, max_=None, date=None, **kwargs):
         self.min = min_
         self.max = max_
         self.month = date or month
@@ -5831,7 +5831,7 @@ class Splash(PRMP_Dialog):
 
 class ColumnViewerDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(300, 300), column=None, **kwargs):
+    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(500, 500), column=None, **kwargs):
         self.column = column
         super().__init__(master, title=title, geo=geo, **kwargs)
 

@@ -4124,7 +4124,7 @@ class PRMP_Window(PRMP_Widget):
         self.paint()
         self.mainloop()
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, **kwargs):
+    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, **kwargs):
 
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
@@ -5162,7 +5162,7 @@ PD = PRMP_Dialog
 
 class PRMP_CalendarDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, month=None, dest='', title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, **kwargs):
+    def __init__(self, master=None, month=None, dest='', title='PRMP_Calendar Dialog', geo=(500, 500), min_=None, max_=None, **kwargs):
         self.min = min_
         self.max = max_
         self.month = month
@@ -5808,7 +5808,7 @@ class App(PRMP_Dialog):
 
 
 
-# rates = [200, 200, 1000, 200, 200, 50, 200, 200, 300, 500, 200, 1000, 200, 100, 1000, 500, 1000, 100, 400, 1000, 500, 200, 200, 200, 400, 50, 200, 500, 300, 500, 500, 200, 200, 200, 200, 200, 200, 500, 100, 300, 1000, 500, 200, 200, 100, 300, 200, 400, 200, 200, 200, 200, 100, 200, 200, 300, 100, 100, 200, 300, 50, 200, 200, 500, 200, 100, 200, 200, 200, 100, 200, 500, 1000, 200, 300, 100, 600, 200, 100, 200, 300, 300, 500, 500, 200, 200, 50, 100, 300, 200, 200, 300, 200, 100, 200, 250, 2000, 300, 200, 100]
+# rates = [200, 200, 1000, 200, 200, 50, 200, 200, 300, 500, 200, 1000, 200, 100, 1000, 500, 1000, 100, 400, 1000, 500, 200, 200, 200, 400, 50, 200, 500, 300, 500, 500, 200, 200, 200, 200, 200, 200, 500, 100, 300, 1000, 500, 200, 200, 100, 300, 200, 400, 200, 200, 200, 200, 100, 200, 200, 300, 100, 100, 200, 300, 50, 200, 200, 500, 200, 100, 200, 200, 200, 100, 200, 500, 1000, 200, 300, 100, 600, 200, 100, 200, 500, 500, 500, 500, 200, 200, 50, 100, 300, 200, 200, 300, 200, 100, 200, 250, 2000, 300, 200, 100]
 
 # cs = Contributions(2, )
 # rts = len(rates)

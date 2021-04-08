@@ -153,7 +153,7 @@ class DC_Overview(Frame):
 
         if self.account: self.updateDCDigits(self.account)
 
-        self.topest.addAfters(self.afterload)
+        # self.topest.addAfters(self.afterload)
 
     def afterload(self):
         self.plotCanvas1.draw()

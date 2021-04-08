@@ -1,10 +1,11 @@
 from .errors import Errors
 import re, io
-from prmp_lib.prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
+from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime, CompareByDate
+from prmp_lib.prmp_miscs.prmp_mixins import *
 
 
 
-class Mixins(PRMP_Mixins):
+class Mixins(PRMP_AdvMixins, PRMP_StrMixins):
 
     def moneyWithSign_ListInList(self, listInList):
         try: listInList[0][0]

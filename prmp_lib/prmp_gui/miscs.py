@@ -1,6 +1,6 @@
 import platform
 
-from prmp_lib.prmp_miscs.prmp_mixins import PRMP_Mixins
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_StrMixins
 import functools
 
 
@@ -70,7 +70,7 @@ def copyClassMethods(obj, copyClass, *args):
 
             setattr(obj, key, func)
 
-class Col_Mixins(PRMP_Mixins):
+class Col_Mixins(PRMP_StrMixins):
 
     def __str__(self): return f'{self.className}({str(self.columns)})'
 

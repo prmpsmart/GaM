@@ -1,5 +1,5 @@
 from . import *
-from prmp_lib.prmp_miscs.prmp_pics import *
+from prmp_lib.prmp_miscs.prmp_images import *
 
 
 class PRMP_ImageWidget:
@@ -269,6 +269,7 @@ class PRMP_Camera(PRMP_Style_Frame):
     @staticmethod
     def _saveImage(image):
         from .dialogs import dialogFunc
+        from .core_tk import picTypes
         file = dialogFunc(path=1, save=1, filetypes=picTypes)
 
         if file: image.save(file)

@@ -1,3 +1,6 @@
+from . import *
+from .scrollables import *
+
 
 class PRMP_FramedCanvas(Frame):
     def __init__(self, master, canvasConfig={}, **kwargs):

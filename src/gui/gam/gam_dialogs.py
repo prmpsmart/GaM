@@ -140,7 +140,7 @@ RecD = RecordDialog
 
 class AccountDialog(GaM_Dialog):
 
-    def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(300, 300), values={}, **kwargs):
+    def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(500, 500), values={}, **kwargs):
 
         self.manager = manager
         self.account = account
@@ -194,7 +194,7 @@ AccD = AccountDialog
 
 class OfficeDialog(GaM_Dialog):
 
-    def __init__(self, master=None, title='Office Dialog', office=None, manager=None, geo=(300, 300), values={}, first=False, **kwargs):
+    def __init__(self, master=None, title='Office Dialog', office=None, manager=None, geo=(500, 500), values={}, first=False, **kwargs):
 
         self.first = first
         self.manager = manager
