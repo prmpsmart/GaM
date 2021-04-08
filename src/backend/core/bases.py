@@ -119,6 +119,9 @@ class ObjectSort(Mixins):
             elif r1 == self.__ge[1] and r2 == self.__ge[1]: return a >= b >= c
 
     def getAllObjects(self, object_=None):
+        '''
+        returns every GaM object in this object_ or self.object
+        '''
         object_ = object_ or self.object
 
         subs = []
@@ -270,6 +273,9 @@ class ObjectSort(Mixins):
         return self.sort(validations=validations, **kwargs)
 
     def search(self, _type=None, value=None, attr='', searchType='', allSubs=False, object_=None, validations=[], instance=None):
+        '''
+        search through the object to return GaM objects that is valid based on the validations.
+        '''
         results = []
         subs = []
 

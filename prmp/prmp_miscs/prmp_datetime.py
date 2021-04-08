@@ -226,7 +226,8 @@ class CompareByYear:
         return self.date.year >= other.date.year
 
 class PRMP_DateTime(datetime.datetime, PRMP_Mixins):
-    date_fmt = "%d/%m/%Y"
+    date_fmt = "%d/%m/%Y" # default date format, subclass PRMP_DateTime and set date_fmt to your own format
+    
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
     Errors = PRMP_Errors.PRMP_DateTimeError
 

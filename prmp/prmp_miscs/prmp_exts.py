@@ -7,7 +7,12 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
     count = 0
 
     def __init__(self, filename='', b64=b'', data=b'', obj=None):
-
+        '''
+        filename: str use oas the name of the object, if filename exist on storage, automatically reads the data on storage into object
+        b64: base64.b64encode bytes
+        data: raw data in bytes
+        obj: any python object to be serialized into PRMP_File
+        '''
         passed = [bool(a) for a in [filename, b64, data, obj]]
         
         assert passed.count(True) <= 2, 'Only one is required in [filename, b64, data]'
@@ -28,7 +33,7 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
             self.name = self.name or 'base64_%d'%PRMP_File.count
         
         self.basename = os.path.basename(self.name)
-        self.name_n_ext = self.basename.split('.')[0]
+        self.name_n_ext = self.basename.split('.')[0] # basename without the ext 
         
         super().__init__(self._data)
 
@@ -105,8 +110,8 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
     def saveObj(self, obj): pickle.dump(obj, self)
     def loadObj(self): return self.unpickle()
 
-class PRMP_Exts(PRMP_Mixins):
 
+class PRMP_Exts(PRMP_Mixins):
     
     @classmethod
     def getname(cls, name):

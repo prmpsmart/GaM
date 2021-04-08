@@ -22,6 +22,13 @@ class WeeklyAccounts(ObjectsMixins):
 
     def __init__(self, week, days_accounts, oneWeek=False):
         super().__init__()
+        '''
+        sort accounts into days in week.
+
+        week: name of the week
+        days_accounts: a list of accounts to be containing the accounts per day in the passed week.
+        oneWeek: bool to parse the 
+        '''
         self.week = week
         self.monday = [day for day in days_accounts if day.date.dayName == 'Monday']
         self.tuesday = [day for day in days_accounts if day.date.dayName == 'Tueday']
@@ -32,17 +39,26 @@ class WeeklyAccounts(ObjectsMixins):
         self.sunday = [day for day in days_accounts if day.date.dayName == 'Sunday']
 
         for day in self.__dict__:
-            if '_' in day: continue
-            if not self.__dict__[day]: continue
+            if ('_' in day) or (not self.__dict__[day]):
+                # if _ starts the key in self.__dict__ or key's value == [] or None
+                continue
+
             if self.__dict__[day]:
-                if oneWeek: self.__dict__[day] = self.__dict__[day][0]
+                if oneWeek: # sums up the value of the day
+                    self.__dict__[day] = self.__dict__[day][0]
                 else: self.__dict__[day] = sum(self.__dict__[day])
 
 
 class MonthlyAccounts(ObjectsMixins):
     def __init__(self, monthName, accounts, day=False):
         super().__init__()
+        '''
+        monthName: name of the month
+        accounts: list of accounts to parse
+        day: bool, whether to parse the accounts as [days in month, weeks in month]
+        '''
         self.monthName = monthName
+        self.day = day
         if day == False:
             self.week1 = [record for record in accounts if record.date.week == 1]
             self.week2 = [record for record in accounts if record.date.week == 2]
@@ -58,6 +74,8 @@ class YearlyAccounts(ObjectsMixins):
     pass
 
 class MonthCompare:
+    'compares the instances via their date.month'
+
     def __lt__(self, other):
         if other == None: return False
         return self.month < other.month
@@ -83,6 +101,10 @@ class Account(MonthCompare, Object):
     Error = Errors
 
     def __init__(self, manager, **kwargs):
+        '''
+        manager: an object to act as the manager
+        kwargs: options to pass to the constructor of class Object
+        '''
         assert manager != None, 'No manager passed.'
         Object.__init__(self, manager, **kwargs)
 
@@ -143,7 +165,7 @@ class AccountsManager(ObjectsManager):
     subTypes = ['Accounts']
 
     def __init__(self, region, autoAccount=True, **kwargs):
-
+        'region: same as [manager, master]'
         ObjectsManager.__init__(self, region)
 
         self.addAccount = self.addSub
@@ -184,7 +206,7 @@ class AccountsManager(ObjectsManager):
         # total accounts in this manager
         lengthOfAccounts = len(self)
         if lengthOfAccounts:
-            # total records manager in an account
+            # total recordsManager in an account
             lengthOfRecordManagers = len(self[0])
             containerDict = {}
             for account in self:

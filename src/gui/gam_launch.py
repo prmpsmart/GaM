@@ -4,7 +4,7 @@ from src.gui.gam.gam_images import GaM_PNGS
 
 from src.utils.auths import Authorisation
 
-GaM_Settings.loadOtherDatas()
+# GaM_Settings.loadOtherDatas()
 # Authorisation.login_cmd('prmpsmart', 'princerm')
 
 def startGaM(func):

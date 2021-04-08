@@ -3,12 +3,134 @@
 
 from .prmp_errors import PRMP_Errors
 import re, os, io
-py = os.sys.version_info[0]
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
     _unget = '_prmp_'
+    
+    Errors = PRMP_Errors
+    containers = list, set, tuple
 
+    def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
+
+    @classmethod
+    def notImp(cls): raise NotImplementedError('A subclass of {} should call this method.'.format(cls))
+
+    def testPrint(self, *args):
+        print()
+        for a in args: print(a, '=')
+        print()
+
+    def __bool__(self): return True
+
+
+
+class PRMP_ClassMixins(PRMP_Mixins):
+    
+    @property
+    def mroStr(self): return [s.__name__ for s in self.mro]
+
+    @property
+    def mro(self): return self.class_.__mro__
+
+    @property
+    def class_(self): return self.__class__
+
+    def attrError(self, attr): raise AttributeError('"{}" does not exist in {}'.format(attr, self))
+
+    @property
+    def className(self): return self.__class__.__name__
+
+    def getFromSelf(self, name, unget=None):
+        ret = self.__dict__.get(name, unget)
+        if ret != unget: return ret
+        else:
+            for cl in self.mro:
+                ret = cl.__dict__.get(name, unget)
+                if ret != unget: return ret.__get__(self)
+        return unget
+
+    # get = getFromSelf
+    
+    # def __getattr__(self, attr, dontRaise=False):
+    #     ret = self.getFromSelf(attr, self._unget)
+    #     if ret != self._unget: return ret
+    #     elif not dontRaise: self.attrError(attr)
+
+    # def __setattr__(self, attr, value): return None
+
+    # def __setitem__(self, key, value):
+    #     var = self.getFromSelf(self.propertize(key))
+    #     var = value
+
+    def __len__(self): return len(self[:])
+    
+    def __getitem__(self, item):
+        if isinstance(item, self.containers):
+            res = []
+            for it in item: res.append(self[it])
+            return res
+
+        elif isinstance(item, str): return self.getFromSelf(self.propertize(item))
+
+        elif isinstance(item, dict):
+            res = []
+            for k, v in item.items():
+                head = self[k]
+                if isinstance(v, dict):
+                    tail = []
+                    tail_props = [(g, h) for g, h in v.items()]
+                    last = tail_props[-1]
+                    count = 0
+                    length_of_tail_props = len(tail_props)
+                    while count < length_of_tail_props:
+                        tail_prop = tail_props[count]
+                        try: tail_1 = head[tail_prop[0]]
+                        except: tail_1  = getattr(head, tail_prop[0])
+
+                        try: tail_2 = tail_1[tail_prop[1]]
+                        except: tail_2  = getattr(tail_1, tail_prop[1])
+
+                        tail.append(tail_2)
+                        count += 1
+                else:
+                    if head:
+                        try: tail = head[v]
+                        except: tail = getattr(head, v)
+                    else: self.attrError(k)
+                res.append(tail)
+            return res if len(res) > 1 else res[0]
+
+        # if self.subs: return self.subs[item]
+        # else: return None
+        return self.subs[item]
+
+
+class PRMP_AdvMixins:
+    
+    def isArray(self, array):
+        try:
+            array.any()
+            return True
+        except: return False
+
+    def getDate(self, date=None):
+        from .prmp_datetime import PRMP_DateTime
+
+        if date == None: date = PRMP_DateTime.now()
+        elif isinstance(date, str): date = PRMP_DateTime.getDMYFromDate(date)
+        PRMP_DateTime.checkDateTime(date, 1)
+        return date
+
+    def getImageData(self, image):
+        temp = io.BytesIO()
+        image.save(temp, 'png')
+        data = temp.getvalue()
+        return data
+
+
+class PRMP_StrMixins(PRMP_ClassMixins):
+    
     _top = 'top'
     _left = 'left'
     _right = 'right'
@@ -28,7 +150,7 @@ class PRMP_Mixins:
     yen = chr(165)
     _moneySign = dollar + chr(32)
 
-    if py == 3:
+    if os.sys.version_info[0] == 3:
         upArrow = chr(11014)
         downArrow = chr(11015)
         x_btn1 = chr(10060)
@@ -40,25 +162,7 @@ class PRMP_Mixins:
         naira = chr(8358)
         _moneySign = naira + chr(32)
 
-
-    Errors = PRMP_Errors
-    containers = list, set, tuple
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
-
-    def isArray(self, array):
-        try:
-            array.any()
-            return True
-        except: return False
-
-
-    def tkFormatedFileTypes(self, name, exts=[]):
-        fexts = '{'
-        for ext in exts: fexts += f'.{ext} '
-        fexts = fexts[:-1]
-        fexts += '}'
-        filetypes = ['%s %s'%(name, fexts)]
-        return filetypes
 
     def getNumsInStrAsList(self, string, length=[], dontRaise=False):
         strs = list(string.replace(' ', ''))
@@ -84,17 +188,6 @@ class PRMP_Mixins:
 
         strs = [int(''.join(d)) for d in numbers]
         return strs
-
-    @property
-    def mroStr(self): return [s.__name__ for s in self.mro]
-
-    def getDate(self, date=None):
-        from .prmp_datetime import PRMP_DateTime
-
-        if date == None: date = PRMP_DateTime.now()
-        elif isinstance(date, str): date = PRMP_DateTime.getDMYFromDate(date)
-        PRMP_DateTime.checkDateTime(date, 1)
-        return date
 
     def numWithCommas(self, num=None, fl=0):
         if num == None: num = self
@@ -149,27 +242,6 @@ class PRMP_Mixins:
 
     moneyToNumber = stripSignFromMoney = stripSignFromNum
 
-    @property
-    def mro(self): return self.class_.__mro__
-
-    @property
-    def class_(self): return self.__class__
-
-    def attrError(self, attr): raise AttributeError('"{}" does not exist in {}'.format(attr, self))
-
-    def getFromSelf(self, name, unget=None):
-        ret = self.__dict__.get(name, unget)
-        if ret != unget: return ret
-        else:
-            for cl in self.mro:
-                ret = cl.__dict__.get(name, unget)
-                if ret != unget: return ret.__get__(self)
-        return unget
-
-    # get = getFromSelf
-
-    def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
-
     def checkEmail(self, email): return True if re.search(self.email_regex, email) else False
 
     def checkFile(self, file): return os.path.isfile(file)
@@ -192,41 +264,6 @@ class PRMP_Mixins:
                 return True
             return False
         except: return False
-
-    @classmethod
-    def notImp(cls): raise NotImplementedError('A subclass of {} should call this method.'.format(cls))
-
-    @property
-    def className(self): return self.__class__.__name__
-
-    @property
-    def AlphabetsSwitch(self):
-        d = {}
-        for n in range(65, 91):
-            d[chr(n)] = chr(n+32)
-            d[chr(n+32)] = chr(n)
-        return d
-
-    def propertize(self, name):
-        if name.startswith('_'): return name
-        if name:
-            name = str(name)
-            nm = name.replace(' ', '')
-            fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
-            return fin
-
-    def testPrint(self, *args):
-        print()
-        for a in args: print(a, '=')
-        print()
-
-    def __bool__(self): return True
-
-    def getImageData(self, image):
-        temp = io.BytesIO()
-        image.save(temp, 'png')
-        data = temp.getvalue()
-        return data
 
     def decimalPlace(self, num, place=1):
         num = float(num)
@@ -254,64 +291,40 @@ class PRMP_Mixins:
         listNum = list(strNum)
         return strNum.strip('0')
 
+    @property
+    def AlphabetsSwitch(self):
+        d = {}
+        for n in range(65, 91):
+            d[chr(n)] = chr(n+32)
+            d[chr(n+32)] = chr(n)
+        return d
 
-    # def __getattr__(self, attr, dontRaise=False):
-    #     ret = self.getFromSelf(attr, self._unget)
-    #     if ret != self._unget: return ret
-    #     elif not dontRaise: self.attrError(attr)
-
-    # def __setattr__(self, attr, value): return None
-
-    # def __setitem__(self, key, value):
-    #     var = self.getFromSelf(self.propertize(key))
-    #     var = value
-
-    def __len__(self): return len(self[:])
-    def __getitem__(self, item):
-        if isinstance(item, self.containers):
-            res = []
-            for it in item: res.append(self[it])
-            return res
-
-        elif isinstance(item, str): return self.getFromSelf(self.propertize(item))
-
-        elif isinstance(item, dict):
-            res = []
-            for k, v in item.items():
-                head = self[k]
-                if isinstance(v, dict):
-                    tail = []
-                    tail_props = [(g, h) for g, h in v.items()]
-                    last = tail_props[-1]
-                    count = 0
-                    length_of_tail_props = len(tail_props)
-                    while count < length_of_tail_props:
-                        tail_prop = tail_props[count]
-                        try: tail_1 = head[tail_prop[0]]
-                        except: tail_1  = getattr(head, tail_prop[0])
-
-                        try: tail_2 = tail_1[tail_prop[1]]
-                        except: tail_2  = getattr(tail_1, tail_prop[1])
-
-                        tail.append(tail_2)
-                        count += 1
-                else:
-                    if head:
-                        try: tail = head[v]
-                        except: tail = getattr(head, v)
-                    else: self.attrError(k)
-                res.append(tail)
-            return res if len(res) > 1 else res[0]
-
-        # if self.subs: return self.subs[item]
-        # else: return None
-        return self.subs[item]
+    def propertize(self, name):
+        if name.startswith('_'): return name
+        if name:
+            name = str(name)
+            nm = name.replace(' ', '')
+            fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
+            return fin
 
 
+class PRMP_GuiMixins(PRMP_Mixins):
+    pass
 
 
+class PRMP_TkMixins(PRMP_GuiMixins):
+
+    def tkFormatedFileTypes(self, name, exts=[]):
+        fexts = '{'
+        for ext in exts: fexts += f'.{ext} '
+        fexts = fexts[:-1]
+        fexts += '}'
+        filetypes = ['%s %s'%(name, fexts)]
+        return filetypes
 
 
+# class PRMP_PathMixins:
+    
 
 
 
