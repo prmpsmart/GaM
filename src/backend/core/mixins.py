@@ -1,6 +1,6 @@
 from .errors import Errors
 import re, io
-from prmp.prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
+from prmp_lib.prmp_miscs.prmp_datetime import PRMP_Mixins, PRMP_DateTime, CompareByDate
 
 
 

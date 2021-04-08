@@ -1,4 +1,4 @@
-from prmp.prmp_miscs.prmp_pics import PRMP_Images
+from prmp_lib.prmp_miscs.prmp_pics import PRMP_Images
 import os
 
 d = os.path.dirname(__file__)

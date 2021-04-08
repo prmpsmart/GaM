@@ -1,6 +1,6 @@
 # from .gam.gam import GaM
 import pickle, os, io, zlib, threading
-from prmp.prmp_gui.core import PRMP_Theme
+from prmp_lib.prmp_gui.core import PRMP_Theme
 from ..utils.auths import Authorisation
 
 

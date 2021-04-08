@@ -1,5 +1,5 @@
 import hashlib, zlib, base64
-from prmp.prmp_miscs.prmp_mixins import PRMP_Mixins
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_Mixins
 
 class Auths_Vars:
 

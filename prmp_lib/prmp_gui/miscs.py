@@ -1,6 +1,6 @@
 import platform
 
-from prmp.prmp_miscs.prmp_mixins import PRMP_Mixins
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_Mixins
 import functools
 
 

@@ -1,9 +1,9 @@
 from os import path, chdir, listdir, getcwd, sys
 try:
     # this means that its the prmp_gui package that is being used
-    from prmp.prmp_gui.core import *
-    from prmp.prmp_gui.two_widgets import *
-    from prmp.prmp_gui.dialogs import *
+    from prmp_lib.prmp_gui.core import *
+    from prmp_lib.prmp_gui.two_widgets import *
+    from prmp_lib.prmp_gui.dialogs import *
 except:
     # this means that its the prmp_gui extension module that is being used
     from prmp_gui import *

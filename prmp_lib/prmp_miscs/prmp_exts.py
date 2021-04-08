@@ -1,5 +1,5 @@
 import io, base64, zlib, pickle, zipfile
-from .prmp_mixins import PRMP_Mixins, os
+from .prmp_mixins import PRMP_AdvMixins, os
 
 
 def zipPath(resource, destination='', latest=False, quiet=0):
@@ -35,7 +35,7 @@ def zipPath(resource, destination='', latest=False, quiet=0):
     return zipFileName
 
 
-class PRMP_File(io.BytesIO, PRMP_Mixins):
+class PRMP_File(io.BytesIO, PRMP_AdvMixins):
     count = 0
 
     def __init__(self, filename='', b64=b'', data=b'', obj=None):
@@ -143,7 +143,7 @@ class PRMP_File(io.BytesIO, PRMP_Mixins):
     def loadObj(self): return self.unpickle()
 
 
-class PRMP_Exts(PRMP_Mixins):
+class PRMP_Exts(PRMP_AdvMixins):
     
     @classmethod
     def getname(cls, name):

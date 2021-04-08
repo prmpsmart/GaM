@@ -1,4 +1,9 @@
-from .core import PRMP_Theme, PRMP_Widget, PRMP_Input, PRMP_InputButtons
+from .core import *
+
+__all__ = ['PRMP_Button', 'PRMP_Checkbutton', 'PRMP_Entry', 'PRMP_Frame', 'PRMP_Label', 'PRMP_LabelFrame', 'PRMP_Menu', 'PRMP_OptionMenu', 'PRMP_PanedWindow', 'PRMP_Radiobutton', 'PRMP_Scale', 'PRMP_Scrollbar', 'PRMP_Spinbox', 'PRMP_Canvas', 'PRMP_Message', 'PRMP_Text', 'PRMP_Listbox', 'Button', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Menu', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'Canvas', 'Message', 'Text', 'Listbox']
+
+
+picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
 
 
 class PRMP_(PRMP_Widget):
@@ -91,13 +96,6 @@ class PRMP_Menu(PRMP_, tk.Menu):
         PRMP_.__init__(self, master=master, config=config, **kwargs)
 Menu = PM = PRMP_Menu
 
-class PRMP_Menubutton(PRMP_Style_, ttk.Menubutton):
-    TkClass = ttk.Menubutton
-
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
-Menubutton = PM = PRMP_Menubutton
-
 class PRMP_OptionMenu(PRMP_, tk.OptionMenu):
     TkClass = tk.OptionMenu
 
@@ -140,7 +138,7 @@ class PRMP_Scrollbar(PRMP_, tk.Scrollbar):
 
         PRMP_.__init__(self, master=master, config=config, **kwargs)
 
-    def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
+    def set(self, first, last): return tk.Scrollbar.set(self, first, last)
 Scrollbar = PSc = PRMP_Scrollbar
 
 class PRMP_Spinbox(PRMP_Input, PRMP_, tk.Spinbox):

@@ -1,5 +1,6 @@
-from .core import PRMP_Theme, PRMP_Widget, PRMP_Input, PRMP_InputButtons
+from .core import *
 
+__all__ = ['PRMP_Style', 'PRMP_Style_Button', 'PRMP_Style_Checkbutton', 'PRMP_Style_Entry', 'PRMP_Style_Frame', 'PRMP_Style_Label', 'PRMP_Style_LabelFrame', 'PRMP_Menubutton', 'PRMP_Style_OptionMenu', 'PRMP_Style_PanedWindow', 'PRMP_Style_Radiobutton', 'PRMP_Style_Scale', 'PRMP_Style_Scrollbar', 'PRMP_Style_Spinbox', 'PRMP_Combobox', 'PRMP_LabeledScale', 'PRMP_Notebook', 'PRMP_Progressbar', 'PRMP_Separator', 'PRMP_Sizegrip', 'PRMP_Treeview', 'SButton', 'SCheckbutton', 'SEntry', 'SFrame', 'SLabel', 'SLabelFrame', 'SOptionMenu', 'SPanedWindow', 'SRadiobutton', 'SScale', 'SScrollbar', 'SSpinbox', 'Combobox', 'LabeledScale', 'Notebook', 'Progressbar', 'Separator', 'Sizegrip', 'Treeview']
 
 class PRMP_Style_(PRMP_Widget):
 
@@ -14,6 +15,8 @@ PS_ = PRMP_Style_
 
 class PRMP_Style(ttk.Style, PRMP_Mixins):
     LOADED = False
+    PRMP_Window = None
+
     ttkthemes = ("black", "blue", 'prmp')
     ttkstyles = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
@@ -544,7 +547,12 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                 # 'layout': [('border', {'children': [('Treeitem.padding', {'sticky': 'nswe', 'children': [('Treeitem.indicator', {'side': 'left', 'sticky': 'nw'}), ('Treeitem.image', {'side': 'left', 'sticky': ''}), ('Treeitem.focus', {'side': 'left', 'sticky': '', 'children': [('Treeitem.text', {'side': 'right', 'sticky': ''})]})]})]})]
             },
         }
-        PRMP_Window.TOPEST.event_generate('<<PRMP_STYLE_CHANGED>>')
+        
+        if not PRMP_Style.PRMP_Window:
+            from .windows import PRMP_Window
+            PRMP_Style.PRMP_Window = PRMP_Window
+
+        if PRMP_Style.PRMP_Window: PRMP_Style.PRMP_Window.TOPEST.event_generate('<<PRMP_STYLE_CHANGED>>')
         return _settings
 
     def update(self, event=None):
@@ -597,12 +605,12 @@ class PRMP_Style_LabelFrame(PRMP_Style_, ttk.LabelFrame):
         PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
 SLabelFrame = PSLF = PRMP_Style_LabelFrame
 
-class PRMP_Style_Menubutton(PRMP_Style_, ttk.Scrollbar):
-    TkClass = ttk.Scrollbar
+class PRMP_Menubutton(PRMP_Style_, ttk.Menubutton):
+    TkClass = ttk.Menubutton
 
     def __init__(self, master=None, config={}, **kwargs):
         PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
-SScrollbar = PSM = PRMP_Style_Menubutton
+Menubutton = PM = PRMP_Menubutton
 
 class PRMP_Style_OptionMenu(PRMP_Style_, ttk.OptionMenu):
     TkClass = ttk.OptionMenu

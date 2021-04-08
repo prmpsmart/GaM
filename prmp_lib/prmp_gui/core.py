@@ -1,16 +1,20 @@
 
-import os, time, random, ctypes, subprocess, tkinter as tk, sys, time, tkinter.ttk as ttk, _tkinter, threading
+import os, time, random, tkinter as tk, sys, tkinter.ttk as ttk
 
 from tkinter.font import Font, families
 
-from prmp.prmp_miscs.prmp_pics import PRMP_Image, _PIL_, PRMP_Images
+from prmp_lib.prmp_miscs.prmp_pics import PRMP_Image, _PIL_, PRMP_Images, _CV2_
 from .miscs import PRMP_Mixins, functools, platform
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_GuiMixins
 
 # superclasses
 
 'PRMP_GUI by PRMPSmart prmpsmart@gmail.com'
 
-class PRMP_Theme(PRMP_Mixins):
+__all__ = ['PRMP_Theme', 'PRMP_Widget', 'PRMP_Input', 'PRMP_InputButtons', 'PRMP_FillWidgets', 'PRMP_Mixins', '_PIL_', 'PRMP_Images', 'PRMP_Image', 'tk', 'ttk']
+
+
+class PRMP_Theme(PRMP_GuiMixins):
     # exerpt from PySimpleGUI theming engine
 
     BLUES = ("#082567", "#0A37A3", "#00345B")
@@ -471,10 +475,11 @@ class PRMP_Theme(PRMP_Mixins):
     def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
-PTh = PRMP_Theme
+
 
 class PRMP_Widget(PRMP_Theme):
     TkClass = None
+    PRMP_Window = None
 
     def after(self, time, func):
         # print(func)
@@ -486,7 +491,7 @@ class PRMP_Widget(PRMP_Theme):
         if h: super().after(time, func)
 
     @property
-    def topest(self): return PRMP_Window.TOPEST
+    def topest(self): return self.PRMP_Window.TOPEST
 
     @property
     def _children(self): return self.winfo_children()
@@ -566,7 +571,11 @@ class PRMP_Widget(PRMP_Theme):
         self.bind('<Enter>', self.entered, '+')
         self.bind('<Leave>', self.left, '+')
 
-        if not isinstance(self, PRMP_Window): self.positionWidget(place=place, pack=pack, grid=grid)
+        if not PRMP_Widget.PRMP_Window:
+            from .windows import PRMP_Window
+            PRMP_Widget.PRMP_Window = PRMP_Window
+
+        if not isinstance(self, PRMP_Widget.PRMP_Window): self.positionWidget(place=place, pack=pack, grid=grid)
 
     def entered(self, event=None):
         if not self.nonText: self.statusShow()
@@ -1061,5 +1070,81 @@ class PRMP_InputButtons:
         elif not self.var: return self['text']
         else: return False
 PIB = PRMP_InputButtons
+
+class PRMP_FillWidgets(PRMP_Mixins):
+
+    def __init__(self, values={}):
+        self.__resultsWidgets = []
+        self.__notEditables = []
+        self.values = values
+        self.fill = self.set
+        self.empty = self.get
+
+    def addResultsWidgets(self, child):
+        if child not in self.__resultsWidgets:
+            if isinstance(child, self.containers):
+                for ch in child: self.addResultsWidgets(ch)
+            else: self.__resultsWidgets.append(child)
+
+    def addNotEditables(self, child):
+        if child not in self.__notEditables:
+            if isinstance(child, self.containers):
+                for ch in child: self.addNotEditables(ch)
+            else: self.__notEditables.append(child)
+
+    def emptyWidgets(self, widgets=[]):
+        widgets = widgets or self.resultsWidgets
+        for widgetName in widgets:
+            widget = self.getFromSelf(widgetName)
+            if widget:
+                B = widget.getFromSelf('Bottom', None)
+                if B: B.set(B.getFromSelf('placeholder'))
+                else: widget.set(widget.getFromSelf('placeholder', widget['text']))
+
+    @property
+    def notEditables(self): return self.__notEditables
+    @property
+    def resultsWidgets(self): return self.__resultsWidgets
+
+    def set(self, values={}, widgets=[]):
+        if values:
+            widgets = widgets or self.__resultsWidgets
+            for widgetName in widgets:
+                widget = self.getFromSelf(widgetName)
+                if widget:
+                    # try:
+                        val = values.get(widgetName, '')
+                        widget.set(val)
+                    # except Exception as er: print(f'ERROR {er}.')
+                else: print(f'Error [{widgetName}, {widget}]')
+            if isinstance(values, dict): self.values.update(values)
+            return True
+        else:
+            if self.values: return self.set(self.values)
+
+    def get(self, widgets=[]):
+        result = {}
+
+        widgets = widgets or self.__resultsWidgets
+        for widgetName in widgets:
+            if widgetName in self.__notEditables: continue
+
+            wid = self.__dict__.get(widgetName)
+            if wid:
+                get = wid.get()
+                verify = getattr(wid, 'verify', None)
+                if verify and wid.required:
+                    verified = verify()
+                    if verified: result[widgetName] = get
+                    else:
+                        try: wid.flash()
+                        except: pass
+
+                        from .dialogs import PRMP_MsgBox
+                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()}* is required to proceed!', _type='error', okText='Understood')
+                        return
+                else: result[widgetName] = get
+        return result
+FW = PRMP_FillWidgets
 
 

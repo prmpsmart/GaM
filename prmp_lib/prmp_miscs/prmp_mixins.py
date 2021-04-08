@@ -106,7 +106,7 @@ class PRMP_ClassMixins(PRMP_Mixins):
         return self.subs[item]
 
 
-class PRMP_AdvMixins:
+class PRMP_AdvMixins(PRMP_Mixins):
     
     def isArray(self, array):
         try:
@@ -308,7 +308,7 @@ class PRMP_StrMixins(PRMP_ClassMixins):
             return fin
 
 
-class PRMP_GuiMixins(PRMP_Mixins):
+class PRMP_GuiMixins(PRMP_StrMixins):
     pass
 
 
@@ -324,7 +324,7 @@ class PRMP_TkMixins(PRMP_GuiMixins):
 
 
 # class PRMP_PathMixins:
-    
+
 
 
 

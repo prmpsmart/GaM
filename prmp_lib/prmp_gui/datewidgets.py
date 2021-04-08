@@ -1,3 +1,6 @@
+from . import *
+# print(dir())
+
 
 class PRMP_DateWidget:
     attr = 'date'
@@ -40,7 +43,7 @@ class PRMP_DateWidget:
         if self.callback: self.callback(self.date)
 
 class PRMP_DateButton(PRMP_DateWidget, PRMP_Button):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, callback=None, anchor='w', **kwargs):
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, callback=None, anchor='w', **kwargs):
 
         PRMP_Button.__init__(self, master=master, config=dict(command=self.action, anchor=anchor), font=font, asEntry=asEntry,  **kwargs)
 

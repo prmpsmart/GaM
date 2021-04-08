@@ -1,4 +1,15 @@
+from .core import tk
+from . import *
+from .miscs import create_container
 
+__all__ = [
+'PRMP_ListBox', 
+'PRMP_TreeView', 
+'PRMP_ScrollText', 
+'ScrollableFrame', 
+'ScrolledText', 
+'ScrolledEntry', 'ListBox', 'TreeView', 'ScrollText'
+]
 
 class AutoScroll:
     '''Configure the scrollbars for a widget.'''
@@ -193,7 +204,7 @@ class PRMP_TreeView(PRMP_Frame):
 
 TreeView = PTV = PRMP_TreeView
 
-class PRMP_SText(PRMP_Frame):
+class PRMP_ScrollText(PRMP_Frame):
 
     def __init__(self, master=None, columns=[], **kwargs):
         super().__init__(master=master, **kwargs)
@@ -208,8 +219,9 @@ class PRMP_SText(PRMP_Frame):
         self.yscrollbar.pack(side="right", fill="y")
         bound_to_mousewheel(0, self)
 
-SText = PSTx = PRMP_SText
+ScrollText = PSTx = PRMP_ScrollText
 
+# under testing
 class ScrollableFrame(PRMP_Frame):
 
     def __init__(self, master, **kwargs):

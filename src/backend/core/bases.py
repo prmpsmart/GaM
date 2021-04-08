@@ -1,6 +1,6 @@
 from .errors import Errors
 from .mixins import Mixins
-from prmp.prmp_miscs.prmp_datetime import *
+from prmp_lib.prmp_miscs.prmp_datetime import *
 from hashlib import sha224
 import time
 

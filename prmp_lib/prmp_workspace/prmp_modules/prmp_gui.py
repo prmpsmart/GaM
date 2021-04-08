@@ -627,7 +627,7 @@ class PRMP_Theme(PRMP_Mixins):
     def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
-PTh = PRMP_Theme
+PRMP_Theme = PRMP_Theme
 
 class PRMP_Widget(PRMP_Theme):
 
@@ -3989,10 +3989,10 @@ class PRMP_ImageWidget:
         x, y = e.x, e.y
         x, y = e.x_root, e.y_root
         self.rt = rt = PRMP_Toplevel(self, geo=(50, 75, x, y), tm=1, asb=0, atb=0)
-        PRMP_Button(rt, text='Camera', command=self.camera, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.25, relw=1))
-        PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.25, relh=.25, relw=1))
-        PRMP_Button(rt, config=dict(text='Save', command=self.saveImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.5, relh=.25, relw=1))
-        PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PTh.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.75, relh=.25, relw=1))
+        PRMP_Button(rt, text='Camera', command=self.camera, overrelief='sunken', font=PRMP_Theme.DEFAULT_MENU_FONT, place=dict(relx=0, rely=0, relh=.25, relw=1))
+        PRMP_Button(rt, text='Change', command=self.changeImage, overrelief='sunken', font=PRMP_Theme.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.25, relh=.25, relw=1))
+        PRMP_Button(rt, config=dict(text='Save', command=self.saveImage, overrelief='sunken'), font=PRMP_Theme.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.5, relh=.25, relw=1))
+        PRMP_Button(rt, config=dict(text='Remove', command=self.removeImage, overrelief='sunken'), font=PRMP_Theme.DEFAULT_MENU_FONT, place=dict(relx=0, rely=.75, relh=.25, relw=1))
         rt.paint()
 
 IW = PRMP_ImageWidget
@@ -4056,7 +4056,7 @@ class PRMP_DateWidget:
         if self.callback: self.callback(self.date)
 
 class PRMP_DateButton(PRMP_DateWidget, PRMP_Button):
-    def __init__(self, master=None, font=PTh.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, callback=None, anchor='w', **kwargs):
+    def __init__(self, master=None, font=PRMP_Theme.DEFAULT_FONT, asEntry=True, placeholder='', min_=None, max_=None, callback=None, anchor='w', **kwargs):
 
         PRMP_Button.__init__(self, master=master, config=dict(command=self.action, anchor=anchor), font=font, asEntry=asEntry,  **kwargs)
 

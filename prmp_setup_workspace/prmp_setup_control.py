@@ -1,4 +1,4 @@
-from prmp.prmp_miscs.prmp_setup import PRMP_Setup, path, chdir, system
+from prmp_lib.prmp_miscs.prmp_setup import PRMP_Setup, path, chdir, system
 chdir(path.dirname(__file__))
 
 root = path.dirname(path.dirname(__file__))

@@ -1,3 +1,4 @@
+from . import *
 
 
 
@@ -257,3 +258,17 @@ class PRMP_DropDownCheckbutton(PRMP_DropDownWidget, Checkbutton):
         self.configure(text=val)
         return val
 DDCb = DropDownCheckbutton = PRMP_DropDownCheckbutton
+
+
+class PRMP_DropDownCalendarWidget(PRMP_DropDownWidget):
+    def __init__(self, *args, **kwargs):
+        from .dialogs import PRMP_CalendarDialog
+
+        super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
+
+
+class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
+    def __init__(self, *args, **kwargs):
+        from .dialogs import PRMP_CalendarDialog
+
+        super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)

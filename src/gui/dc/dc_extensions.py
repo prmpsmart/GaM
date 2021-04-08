@@ -1,7 +1,7 @@
 from ..gam.gam_apps import *
 from ...backend.dc.dc_regions import *
 from ...backend.dc.dc_specials import *
-from prmp.prmp_gui.plot_canvas import PRMP_PlotCanvas, random#, ChartSort
+from prmp_lib.prmp_gui.plot_canvas import PRMP_PlotCanvas, random#, ChartSort
 from tkinter.colorchooser import askcolor
 
 

@@ -1,3 +1,10 @@
+from .core import tk, PRMP_Theme, PRMP_Widget, PRMP_Mixins, _PIL_, PRMP_Image
+from .core_tk import *
+from .core_ttk import *
+import ctypes, subprocess, functools, os
+
+__all__ = ['PRMP_Window', 'PRMP_Tk', 'PRMP_Toplevel', 'PRMP_MainWindow', 'PRMP_ToolTip', 'PRMP_ToolTipsManager', 'Tk', 'Toplevel']
+
 
 class PRMP_TkReloader:
     '''reload ability of a tk app.
@@ -167,7 +174,9 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.titleBar = None
         self.menuBar = None
         self.statusBar = None
-        self.osManaged = osManaged
+        
+        self.side = side
+        self.titleText = title
 
         self.co = 0
 
@@ -218,9 +227,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
 
         # window's postion and title
-        self.titleText = title
         self.setTitle(title)
-        self.side = side
 
         self.placeOnScreen(side, geometry)
         self.bind('<Control-E>', self.destroySelf)
@@ -779,7 +786,9 @@ class PRMP_MainWindow(PRMP_Mixins):
         if attr != self._unget: return attr
         else: return getattr(self.root, name)
 
-    def __getattr__(self, name): return self[name]
+    def __getattr__(self, name):
+        # print(name)
+        return self[name]
 
 MainWindow = PMW = PRMP_MainWindow
 

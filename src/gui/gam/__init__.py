@@ -1,4 +1,6 @@
-from prmp.prmp_gui.core import PRMP_Window, os
+from prmp_lib.prmp_gui import PRMP_Window
+import os
+
 join = os.path.join
 _dir = os.path.dirname(__file__)
 imgs = join(_dir, 'imgs')

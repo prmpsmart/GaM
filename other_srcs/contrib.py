@@ -2,11 +2,11 @@ import sys
 sys.path.append(r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM')
 
 
-from prmp.prmp_miscs.prmp_mixins import PRMP_Mixins
-from prmp.prmp_miscs.prmp_exts import PRMP_File, os
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_Mixins
+from prmp_lib.prmp_miscs.prmp_exts import PRMP_File, os
 from prmp_miscs.prmp_datetime import PRMP_DateTime
 
-from prmp.prmp_gui.dialogs import *
+from prmp_lib.prmp_gui.dialogs import *
 from prmp_gui.two_widgets import *
 PTh.setThemeIndex(30)
 

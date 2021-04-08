@@ -1,4 +1,4 @@
-from prmp.prmp_miscs.prmp_setup import PRMP_Setup, system
+from prmp_lib.prmp_miscs.prmp_setup import PRMP_Setup, system
 
 binaries = {'photoviewer.cp39-win_amd64.pyd': '.', 'prmp_gui.cp39-win_amd64.pyd': '.', 'prmp_miscs.cp39-win_amd64.pyd': '.'}
 

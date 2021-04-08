@@ -527,7 +527,7 @@ class PlotDialog(FillTable, GaM_Dialog):
     def loadFigs(self):
         fr = Frame(self.container, place=dict(relx=.285, rely=.005, relw=.711, relh=.99))
 
-        from prmp.prmp_gui.plot_canvas import PRMP_PlotCanvas
+        from prmp_lib.prmp_gui.plot_canvas import PRMP_PlotCanvas
         self.fig1 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.002, relw=.496, relh=.496))
         self.fig2 = PRMP_PlotCanvas(fr, place=dict(relx=.502, rely=.002, relw=.496, relh=.496))
         self.fig3 = PRMP_PlotCanvas(fr, place=dict(relx=.002, rely=.502, relw=.496, relh=.496))

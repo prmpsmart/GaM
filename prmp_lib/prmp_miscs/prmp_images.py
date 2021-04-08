@@ -347,6 +347,7 @@ except Exception as e:
     print(e)
 
 from .prmp_exts import *
+from .prmp_mixins import PRMP_AdvMixins
 
 
 class PRMP_ImageType:
@@ -740,7 +741,7 @@ class PRMP_Image:
 
         filename = filename or ''
 
-        isArray = PRMP_Mixins.isArray(None, array)
+        isArray = PRMP_AdvMixins.isArray(None, array)
         
         self.name = name or PRMP_Exts.getname(str(filename))
 

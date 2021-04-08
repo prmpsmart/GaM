@@ -1,14 +1,16 @@
 
-from prmp.prmp_miscs.prmp_datetime import PRMP_DateTime
-from prmp.prmp_miscs.prmp_pics import PRMP_XBMS
-from .extensions import *
+from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
+from prmp_lib.prmp_miscs.prmp_pics import PRMP_XBMS
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
 from tkinter.simpledialog import askstring, askfloat, askinteger
+from . import *
+from .core import PRMP_FillWidgets
 
 
 
-class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets):
+class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
 
     def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, delay=0, tt=False, tooltype=False, wait=False, **kwargs):
 
@@ -146,7 +148,7 @@ class PRMP_CalendarDialog(PRMP_Dialog):
 
 CD = PRMP_CalendarDialog
 
-class PRMP_MsgBox(PRMP_Dialog):
+class PRMP_MessageDialog(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
     def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, okText='', msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, **kwargs):
 
@@ -217,7 +219,7 @@ class PRMP_MsgBox(PRMP_Dialog):
         self._setResult(False)
         self.destroyDialog()
 
-PMB = PRMP_MsgBox
+PMB = PRMP_MsgBox = PRMP_MessageDialog
 
 class PRMP_CameraDialog(PRMP_Dialog):
 
@@ -228,6 +230,7 @@ class PRMP_CameraDialog(PRMP_Dialog):
     def isMaximized(self): return self.getWid_H_W(self)
 
     def _setupDialog(self):
+        from .imagewidgets import PRMP_Camera
         self.camera = PRMP_Camera(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), **self.cameraKwargs)
         self.set = self.camera.setImage
 
@@ -296,48 +299,6 @@ class Splash(PRMP_Dialog):
         else: self.after(10, self.processCallback)
 
     def set(self): pass
-
-
-
-class ColumnViewerDialog(PRMP_Dialog):
-
-    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(300, 300), column=None, **kwargs):
-        self.column = column
-        super().__init__(master, title=title, geo=geo, **kwargs)
-
-    def _setupDialog(self):
-        self._column = ColumnViewer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), column=self.column)
-        self.addEditButton()
-
-        self.text = self._column.text
-        self.attr = self._column.attr
-        self.value = self._column.value
-        self._width = self._column._width
-
-        self.addResultsWidgets(['text', 'attr', '_width', 'value'])
-        self.set()
-
-    def processInput(self):
-        result = self.get()
-
-        print(result)
-
-class ColumnsExplorerDialog(PRMP_Dialog):
-
-    def __init__(self, master=None, title='Columns Explorer Dialog', geo=(800, 500), columns=None, **kwargs):
-        self.columns = columns
-        super().__init__(master, title=title, geo=geo, **kwargs)
-
-    def _setupDialog(self):
-
-        self.cols = ColumnsExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), columns=self.columns, callback=self._callback)
-
-        self.bind('<Return>', self.cols.getColumns)
-
-    def _callback(self, w, e=0):
-        if self.callback:
-            self.callback(w)
-            if not e: self.destroy()
 
 
 
