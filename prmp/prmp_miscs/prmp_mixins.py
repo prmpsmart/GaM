@@ -2,7 +2,7 @@
 #  -*- coding: utf-8 -*-
 
 from .prmp_errors import PRMP_Errors
-import re, os, io
+import re, os, io, zipfile, subprocess
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'

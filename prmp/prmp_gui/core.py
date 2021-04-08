@@ -1,5 +1,5 @@
 
-import os, time, random, ctypes, tkinter as tk, sys, time, tkinter.ttk as ttk, _tkinter, threading
+import os, time, random, ctypes, subprocess, tkinter as tk, sys, time, tkinter.ttk as ttk, _tkinter, threading
 
 from tkinter.font import Font, families
 
@@ -2158,6 +2158,48 @@ SSpinbox = PSSp = PRMP_Style_Spinbox
 
 #  windows
 
+class PRMP_TkReloader:
+    '''reload ability of a tk app.
+    subclass this class and bind PRMP_TkReloader.reload() to an event, or manually call it.
+    '''
+
+    def runner(self):
+        '''
+        the brain.
+        exits the first process, call another process with the environments variables of the current one.
+        and sets the PRMP_TK environ variable
+        '''
+        args, env = [os.sys.executable] + os.sys.argv,  os.environ
+        env["PRMP_TK"] = "RUNNING"
+        while True:
+            exit_code = subprocess.call(args, env=env, close_fds=False)
+            if exit_code != 63: return exit_code
+
+    def reloader(self, e=None):
+        '''
+        e: event
+        '''
+        try: os.system("cls")
+        except:
+            try: os.system("clear")
+            except: pass
+
+        print("Reloading")
+        os.sys.exit(63)
+        
+    def reload(self, func):
+        '''
+        This is the entry point
+        func: function to execute if reloaded
+
+        if PRMP_TK environment variable is not set, it call PRMP_TKReloader.runner
+        '''
+        try:
+            if os.environ.get("PRMP_TK") == "RUNNING": func()
+            else: os.sys.exit(self.runner())
+        except Exception as E: pass
+
+
 class PRMP_Window(PRMP_Widget):
     TOPEST = None
     STYLE = None
@@ -2170,18 +2212,70 @@ class PRMP_Window(PRMP_Widget):
     TkClass = None
 
     def start(self):
+        '''
+        paints this window and starts it
+        '''
         self.paint()
         self.mainloop()
     
-    def change_color(self, p, n=10, up=1):
-        bgs = PRMP_Images.get_colors(p, n, inhex=1)
+    def change2Imgcolor(self, image, num_colors=10, update=1, button_fg='white'):
+        '''
+        changes the PRMP_Theme defaults colors to the colors in image
+
+        image: path to image or an PIL.Image instance
+        num_colors: number of colors to extract from the image
+        update: bool, whether to trigger the painting of the widgets
+        button_fg: color to set as the foreground of button widgets.
+        '''
+
+        bgs = PRMP_Images.get_colors(image, num_colors, inhex=1)
         bg = bgs[0]
         PRMP_Theme.DEFAULT_BACKGROUND_COLOR = bg
-        PRMP_Theme.DEFAULT_BUTTON_COLOR = ('white', bg)
-        if up: self.updateTheme()
+        PRMP_Theme.DEFAULT_BUTTON_COLOR = (button_fg, bg)
+
+        if update: self.updateTheme()
         return bgs
 
+    change_color = change2Imgcolor
+
     def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(300, 300), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, **kwargs):
+        '''
+        PRMP_Window a base class for all window class for common behaviours.
+
+        container: 
+        containerConfig: 
+        alpha: 
+        side: 
+        title: 
+
+        resize: 
+        normTk: 
+        normStyle: 
+        tipping: 
+        themeIndex: 
+        theme: 
+
+        tkIcon: 
+        prmpIcon: 
+        grab: 
+        
+        b4t, bind4Theme: 
+        tbm, toggleMenuBar: 
+        tw, toolWindow: 
+        geo, geometry: 
+        ntb, noTitleBar: 
+        tm, topMost: 
+        gaw, grabAnyWhere: 
+        be, bindExit: 
+        nrz, notResizable: 
+        atb, addTitleBar: 
+        asb, addStatusBar: 
+        tt, tooltype: 
+        nwb, noWindowButtons: 
+        cac, canvas_as_container: 
+
+        kwargs: other TKClass options to pass to the PRMP_Widget.__init__
+        '''
 
         if themeIndex: PRMP_Theme.setThemeIndex(themeIndex)
         elif theme: PRMP_Theme.setTheme(theme)
@@ -2191,24 +2285,32 @@ class PRMP_Window(PRMP_Widget):
 
         if PRMP_Window.TOPEST == None:
             self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
+
             PRMP_Window.TOPEST = self
             self.createDefaultFonts()
+
             if not normStyle: PRMP_Window.STYLE = PRMP_Style(self)
+            
             if tipping: PRMP_Window.TIPSMANAGER = PRMP_ToolTipsManager(self)
 
         self.container = None
         self.canvas_as_container = canvas_as_container
         self.zoomed = False
         self.iconed = False
+
+        # window's additional widgets
         self.titleBar = None
         self.menuBar = None
         self.statusBar = None
+
+        # window's postion and title
         self.side = side
         self.titleText = title
+        self.title(title)
 
+        # functions to execute after mapping of this window
         self.__afters = []
 
-        self.title(title)
         self.co = 0
 
         if cac != None: canvas_as_container = cac
@@ -2219,8 +2321,8 @@ class PRMP_Window(PRMP_Widget):
                 self.container = PRMP_Style_Frame(self)
                 self.container.configure(relief='groove')
 
+        # normalizing of the parameters, from the abbr to their full meaning.
         if normTk: atb, asb, geo = 0, 0, ()
-
         if geo != None: geometry = geo
         if gaw != None: grabAnyWhere = gaw
         if ntb != None: noTitleBar = ntb
@@ -2234,6 +2336,7 @@ class PRMP_Window(PRMP_Widget):
         if tbm != None: toggleMenuBar = tbm
         if tt != None: tooltype = tt
         if nwb != None: noWindowButtons = nwb
+
         self.noWindowButtons = noWindowButtons
 
         self.toggleMenuBar = toggleMenuBar
@@ -2245,11 +2348,14 @@ class PRMP_Window(PRMP_Widget):
             self.bind('<Control-Up>', self.prevTheme)
             self.bind('<Control-Down>', self.nextTheme)
 
+        # set the window attributes
         self.windowAttributes(topMost=topMost, toolWindow=toolWindow, alpha=alpha, noTitleBar=noTitleBar, addTitleBar=addTitleBar, addStatusBar=addStatusBar, prmpIcon=prmpIcon, tkIcon=tkIcon, resize=resize, tooltype=tooltype)
 
+        # ability to move the whole window using Holding Right Click
         if grabAnyWhere: self._grab_anywhere_on()
         else: self._grab_anywhere_off()
 
+        # binding the 
         self.bindToWidget(('<Configure>', self.placeContainer), ('<FocusIn>', self.placeContainer), ('<Map>', self.deiconed), ('<Control-M>', self.minimize), ('<Control-m>', self.minimize))
 
         self.placeOnScreen(side, geometry)
@@ -2371,41 +2477,45 @@ class PRMP_Window(PRMP_Widget):
     def containerGeo(self): return (self.x_w[1], self.y_h[1])
 
     @property
+    def x_w(self): return (2, self.geo[0]-4)
+
+    @property
     def y_h(self): return (30, self.geo[1]-60)
 
-    @property
-    def rel_y_h(self):
-        x, y = self.geo[:2]
-        _y, h = self.y_h
-        return (_y, h/y)
+    # @property
+    # def rel_x_w(self):
+    #     x, y = self.geo[:2]
+    #     _x, w = self.x_w
+    #     return (_x, w/x)
 
-    def YH(self, geo=()):
-        if not geo: return self.y_h
-        x, y = geo[:2]
-        return (30, y-60)
+    # @property
+    # def rel_y_h(self):
+    #     x, y = self.geo[:2]
+    #     _y, h = self.y_h
+    #     return (_y, h/y)
 
-    def XW(self, geo=()):
-        if not geo: return self.x_w
-        x, y = geo[:2]
-        return (2, x-4)
+    # def YH(self, geo=()):
+    #     if not geo: return self.y_h
+    #     x, y = geo[:2]
+    #     return (30, y-60)
 
-    def relYH(self, geo=()):
-        if not geo: return self.rel_y_h
-        _y, h = self.y_h
-        x, y = geo[:2]
-        return (_y, h/y)
+    # def XW(self, geo=()):
+    #     if not geo: return self.x_w
+    #     x, y = geo[:2]
+    #     return (2, x-4)
 
-    def relXW(self, geo=()):
-        if not geo: return self.rel_x_w
-        _x, w = self.x_w
-        x, y = geo[:2]
-        return (_x, w/x)
+    # def relYH(self, geo=()):
+    #     if not geo: return self.rel_y_h
+    #     _y, h = self.y_h
+    #     x, y = geo[:2]
+    #     return (_y, h/y)
 
-    @property
-    def rel_x_w(self):
-        x, y = self.geo[:2]
-        _x, w = self.x_w
-        return (_x, w/x)
+    # def relXW(self, geo=()):
+    #     if not geo: return self.rel_x_w
+    #     _x, w = self.x_w
+    #     x, y = geo[:2]
+    #     return (_x, w/x)
+
 
     def getWhichSide(self): return random.randint(1, 15) % 3
 
@@ -2523,9 +2633,6 @@ class PRMP_Window(PRMP_Widget):
 
         self.placeTitlebar()
         self.placeStatusBar()
-
-    @property
-    def x_w(self): return (2, self.geo[0]-4)
 
     def minimize(self, event=None):
         self.withdraw()
