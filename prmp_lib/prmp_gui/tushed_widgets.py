@@ -17,14 +17,13 @@ Entry_Label = PRMP_Entry_Label
 
 class LoginEntry(Frame):
     imageLoaded = False
-
     res = (20, 20)
-    dic = dict(inbuilt=1, resize=res, for_tk=1)
+    dic = dict(inbuilt=1, resize=res, for_tk=1, bindMenu=0)
 
-    def __init__(self, master, font={}, action=None, show='*', entryKwargs={}, reliefs='', positions=(.7, .1, .1, .1), **kwargs):
+    def __init__(self, master, font={}, action=None, show='*', entryKwargs={}, reliefs='', positions=(1, 0, 0, 0, 0), _pass=None, **kwargs):
         '''
         a Login widget that features a show button and action button.
-        positions: tuple of three floats relating the width of the (entry, show, clear, action) summing up to one.
+        positions: tuple of three floats relating the width of the (entry, pass, show, clear, action) summing up to one.
         '''
         super().__init__(master, **kwargs)
         
@@ -40,6 +39,7 @@ class LoginEntry(Frame):
 
         self.set = self.entry.set
         self.get = self.entry.get
+        self._pass = _pass
         
         self.positions = positions
         self.reliefs = reliefs
@@ -48,46 +48,67 @@ class LoginEntry(Frame):
 
         self.loaded = False
         # self.bind('<Map>', self.load)
-        self.bind('<Configure>', lambda e: self.load(positions=self.positions))
+        self.bind('<Configure>', lambda e: self.load(self.positions))
     
-    def load(self, again=False, positions=()):
+    def load(self, positions=(), again=False):
 
         if self.loaded==True and again==False: return
 
         positions = positions or self.positions
-        assert len(positions) == 4 and math.ceil(sum(positions)) == 1, 'sum of positions values must be 1.0, and length should be 4.'
+        assert len(positions) == 5 , 'Length of positions must be 5.'
+        assert math.fsum(positions) == 1, 'Sum of positions must be 1.0,'
+
         self.positions = positions
 
-        self.view = self.clear = self.action = None
+        self.view = self.clear = self.action = self.pass_ = None
 
         tip = self.toplevel.tipping
-        e, s, c, a = self.positions
+        e, p, s, c, a = self.positions
         
         self.entry.place(relx=0, rely=0, relw=e, relh=1)
 
-        
-        clear = PRMP_Image('clear', **self.dic).tkImage
-        show: LoginEntry._show = PRMP_Image('highlight', **self.dic)
-        action: LoginEntry._action = PRMP_Image('next', **self.dic)
+        if p:
+            self._passes = PRMP_Image(filename='red', name='red_pass', inbuilt=1, resize=self.res, for_tk=1), PRMP_Image(filename='yellow', name='yellow_pass', inbuilt=1, resize=self.res, for_tk=1), PRMP_Image(filename='green', name='green_pass', inbuilt=1, resize=self.res, for_tk=1)
+
+            self.pass_ = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=p, relh=1), prmpImage=self._passes[0], resize=self.res)
+
+            self.entry.bind('<KeyRelease>', self.validating)
 
         if s:
-            self.img = show
-            self.show = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=s, relh=1), imageKwargs=dict(bindMenu=0, **self.dic), prmpImage='highlight')
+            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=self.dic, prmpImage='highlight')
 
             self.show.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
             self.show.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
-
+        else: self.entry.config(show='')
+        
         if c:
-            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s, rely=0, relw=c, relh=1))
+            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1),imageKwargs=self.dic, prmpImage='clear')
 
-            self.clear.bind('<ButtonPress-1>', lambda e: self.entry.empty())
-            self.clear.bind('<ButtonRelease-1>', lambda e: self.entry.empty())
+            self.clear.bind('<1>', self.clearIt)
 
-        if a:            
-            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+c, rely=0, relw=a, relh=1))
+        if a:
+            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=self.dic, prmpImage='next')
+            self.entry.bind('<Return>', self.invokeAction)
 
         self.loaded = True
         LoginEntry.imageLoaded = True
+    
+    def clearIt(self, event):
+        self.entry.empty()
+        self.validating(event)
+    
+    def validating(self, event=None):
+        if self._pass:
+            num = self._pass(self.entry.get())
+            if  num == 1: fg = "yellow"
+            elif num == 2: fg = "green"
+            else: fg = "red"
+
+            self.pass_['image'] = fg+'_pass'
+    
+    def invokeAction(self, event=None):
+        try: self.action.invoke()
+        except: pass
 
     def __getattr__(self, name):
         try:
@@ -98,7 +119,9 @@ class LoginEntry(Frame):
             res = self.entry.getFromSelf(name, None)
             return res
 
-    def setAction(self, action): self.action.config(command=action)
+    def setAction(self, action=None, _pass=None):
+        if action: self.action.config(command=action)
+        if _pass: self._pass = _pass
 
     def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
 

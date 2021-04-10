@@ -4,7 +4,7 @@ from prmp_lib.prmp_miscs.prmp_images import _PIL_
 
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, face=False, **imageKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=150, face=False, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
 
         self.rt = None
@@ -26,11 +26,11 @@ class PRMP_ImageWidget:
 
         if bindMenu: self.bindMenu()
 
-        # self.after(imgDelay, lambda: self.loadImage(self.prmpImage, **imageKwargs))
 
-        if prmpImage and imageKwargs:
+        if prmpImage or imageKwargs:
             imageKwargs['for_tk'] = 1
-            self.loadImage(self.prmpImage, **imageKwargs)
+            self.after(imgDelay, lambda: self.loadImage(self.prmpImage, **imageKwargs))
+            # self.loadImage(self.prmpImage, **imageKwargs)
 
         # self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 
@@ -47,30 +47,25 @@ class PRMP_ImageWidget:
         self.isGif = False
 
         self.frame_counter = 0
-        # self.thumb = self.resize or self.thumb
-        if not self.thumb: self.thumb = self.width, self.height
 
-        if self.winfo_ismapped() and  not (self.resize and self.thumb):
-            if self.thumb[0] < 0 and self.thumb[1] < 0:
-                # self.thumb = (250, 200)
-                self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
-                return
+        if not self.winfo_ismapped():
+            self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
+            return
 
         try:
-            if not isinstance(prmpImage, PRMP_Image): prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
+            if not isinstance(prmpImage, PRMP_Image):
+                if not kwargs.get('resize'): kwargs['resize'] = self.resize
+                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image): self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
 
-            self.prmpImage =  prmpImage
+            self.frame = self.prmpImage = prmpImage
 
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
 
             self.image = self.prmpImage.image
             if self.fullsize: self.resize = (self.width, self.height)
-
-            if self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
-            else: self.frame = self.prmpImage.thumbnailTk(self.thumb)
 
             if self.prmpImage.ext == 'gif':
                 self.frames = []
@@ -86,6 +81,10 @@ class PRMP_ImageWidget:
                 self.isGif = True
                 self.__renderGif()
             
+            elif self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
+
+            elif self.thumb: self.frame = self.prmpImage.thumbnailTk(self.thumb)
+
             else:
                 if self.face: self.frame = self.prmpImage._find_faces(prmp_image=1, for_tk=1)
 
