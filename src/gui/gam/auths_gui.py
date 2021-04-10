@@ -56,39 +56,24 @@ class Base_Password(PRMP_FillWidgets, PRMP_ClassMixins):
         self.ent_old = ''
         self.hint_text=''
 
-        self.name = Entry(self.frame, placeholder=self.ent_name, required=1)
-        self.clr_name = Button(self.frame, text="Clear", command=self.name.empty, relief="solid")
+        self.name = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_name), required=1, show='', positions=(.9, 0, .1, 0), font=15)
 
-        # self.username = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_usr), required=1, show='', positions=(1, 0, 0), font=15)
-        self.username = Entry(self.frame, placeholder=self.ent_usr, required=1)
-        self.clr_usr = Button(self.frame, text="Clear", command=self.username.empty, relief="solid")
+        self.username = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_usr), required=1, show='', positions=(.9, 0, .1, 0), font=15)
 
         self.admin = Checkbutton(self.frame, relief="solid", text="Admin?", command=self.admin_add)
 
-        self.password = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_pwd, required=1), font=15)
-        # self.password = Entry(self.frame, placeholder=self.ent_pwd, required=1)
+        self.password = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_pwd, required=1), font=15, positions=(.7, .1, .1, .1))
         self.first = 0
-        # self.password.bind('<KeyPress>', self.show_star)
 
-        self.old = Entry(self.frame, required=1)
-        self.clr_old = Button(self.frame, text="Clear", command=self.old.empty, relief="solid")
+        self.old = LoginEntry(self.frame, entryKwargs=dict(required=1), font=15, positions=(.9, 0, .1, 0))
 
         self.password_confirm = Label(self.frame)
 
         self.password_length = Label(self.frame, relief="sunken", bd=2, font='PRMP_FONT')
 
-        self.clr_pwd = Button(self.frame, text="Clear", command=self.password.empty, relief="solid")
-
-        self.new = Entry(self.frame, required=1)
-        self.clr_new = Button(self.frame, text="Clear", command=self.new.empty, relief="solid")
-
-        self.show_pass = Checkbutton(self.frame, command=self.show_password, relief="solid", text="Show")
-
-        self.show_old = Checkbutton(self.frame, command=self.show_old_, relief="solid", text="Show")
+        self.new = LoginEntry(self.frame, entryKwargs=dict(required=1), font=15, positions=(.9, 0, .1, 0))
 
         self.hint = Entry(self.frame, required=0)
-
-        self.clr_hint = Button(self.frame, text="Clear", command=self.hint.empty, relief="solid")
 
         self.hx, self.hy, self.hh, self.hw, = .1, .57, .04, .5
         self.forgot_chk = Checkbutton(self.frame, command=self.forgot_check, relief="solid", text="Forgot Password?")
@@ -278,16 +263,8 @@ class Change_Username(Base_Password):
 
     def place_widgs(self):
         self.username.place(relx=.1, rely=.1, relh=.15, relw=.6)
-        self.clr_usr.place(relx=.72, rely=.1, relh=.14, relw=.09)
-
         self.new.place(relx=.1, rely=.3, relh=.15, relw=.6)
-        self.clr_new.place(relx=.72, rely=.3, relh=.14, relw=.09)
-
         self.password.place(relx=.1, rely=.5, relh=.15, relw=.6)
-        self.clr_pwd.place(relx=.72, rely=.5, relh=.14, relw=.09)
-
-        self.show_pass.place(relx=.84, rely=.5, relh=.14, relw=.11)
-
         self.action.place(relx=.1, rely=.8, relh=.14, relw=.8)
 
 class Delete_User(Base_Password):
@@ -327,14 +304,8 @@ class Delete_User(Base_Password):
             PRMP_MsgBox(self, title="User Deleted Successful", msg=f"User:\nName: {user.name}\nUsername: {user.username}  is successful", _type="info")
 
     def place_widgs(self):
-        return
         self.username.place(relx=.1, rely=.1, relh=.15, relw=.6)
-        self.clr_usr.place(relx=.72, rely=.1, relh=.14, relw=.09)
-
         self.password.place(relx=.1, rely=.35, relh=.15, relw=.6)
-        self.clr_pwd.place(relx=.72, rely=.35, relh=.14, relw=.09)
-        self.show_pass.place(relx=.84, rely=.35, relh=.14, relw=.11)
-
         self.action.place(relx=.1, rely=.8, relh=.14, relw=.8)
 
 class Change_Password(Base_Password):
@@ -342,6 +313,7 @@ class Change_Password(Base_Password):
     def __init__(self, master=None, inh=False, **kwargs):
         super().__init__(master=master, **kwargs)
         self.new_is_password = True
+
         self.new.changePlaceholder(self.ent_cpwd)
         self.password.bind('<KeyRelease>', self.check_pass_length, '+')
 
@@ -389,25 +361,14 @@ class Change_Password(Base_Password):
     def place_widgs(self):
         if not self.inh:
             self.username.place(relx=.1, rely=.05, relh=.12, relw=.6)
-            self.clr_usr.place(relx=.72, rely=.05, relh=.11, relw=.09)
-
             self.old.place(relx=.1, rely=.2, relh=.12, relw=.6)
-            self.clr_old.place(relx=.72, rely=.2, relh=.11, relw=.09)
-            self.show_old.place(relx=.84, rely=.2, relh=.11, relw=.11)
 
         self.password.place(relx=.1, rely=.35, relh=.12, relw=.6)
-        self.clr_pwd.place(relx=.72, rely=.35, relh=.11, relw=.09)
-        self.show_pass.place(relx=.84, rely=.35, relh=.11, relw=.11)
-
         self.password_length.place(relx=.1, rely=.485, relh=.1, relw=.6)
 
         self.new.place(relx=.1, rely=.63, relh=.11, relw=.6)
-
         self.password_confirm.place(relx=.72, rely=.632, relh=.1, relw=.23)
-
         self.hint.place(relx=.1, rely=.76, relh=.09, relw=.6)
-        self.clr_hint.place(relx=.72, rely=.76, relh=.09, relw=.09)
-
         self.action.place(relx=.1, rely=.87, relh=.12, relw=.8)
 
 class Add_User(Change_Password):
@@ -459,10 +420,7 @@ class Add_User(Change_Password):
         super().place_widgs()
 
         self.name.place(relx=.1, rely=.05, relh=.12, relw=.6)
-        self.clr_name.place(relx=.72, rely=.05, relh=.11, relw=.09)
-
         self.username.place(relx=.1, rely=.2, relh=.12, relw=.6)
-        self.clr_usr.place(relx=.72, rely=.2, relh=.11, relw=.09)
         self.admin.place(relx=.84, rely=.2, relh=.11, relw=.14)
 
 class User_Login(Delete_User):
@@ -470,6 +428,7 @@ class User_Login(Delete_User):
         super().__init__(master=master, inh=True, req=0, **kwargs)
 
         self.callback = callback
+        # self.password.load(again=1)
 
         self.hx, self.hy, self.hh, self.hw, = .1, .6, .12, .6
         self.hint_text = "Love You"
@@ -519,9 +478,9 @@ class User_Login(Delete_User):
 
     def place_widgs(self):
         super().place_widgs()
-        # self.password.action.config(command=self.act)
-        
-        # self.forgot_chk.place(relx=.72, rely=.6, relh=.12, relw=.27)
+        # self.password.setAction(self.act)
+        self.action.place_forget()
+        self.forgot_chk.place(relx=.72, rely=.6, relh=.12, relw=.27)
 
 class Login_Status(LabelFrame):
     def __init__(self, master=None, **kwargs):

@@ -1,6 +1,7 @@
 from . import *
 from .scrollables import *
 from .imagewidgets import PRMP_ImageSButton
+import math
 
 
 class PRMP_FramedCanvas(Frame):
@@ -15,12 +16,19 @@ Entry_Label = PRMP_Entry_Label
 
 
 class LoginEntry(Frame):
-    def __init__(self, master, positions=(.7, .1, .1, .1), font={}, action=None, show='*', entryKwargs={}, reliefs='', **kwargs):
+    imageLoaded = False
+    _clear = None
+    _show = None
+    _action = None
+
+    res = (20, 20)
+    dic = dict(inbuilt=1, resize=res, for_tk=1)
+
+    def __init__(self, master, font={}, action=None, show='*', entryKwargs={}, reliefs='', positions=(.7, .1, .1, .1), **kwargs):
         '''
         a Login widget that features a show button and action button.
         positions: tuple of three floats relating the width of the (entry, show, clear, action) summing up to one.
         '''
-        assert len(positions) == 4 and sum(positions) == 1., 'sum of positions values must be 1.0, and length should be 4.'
         super().__init__(master, **kwargs)
         
         _f = font
@@ -30,8 +38,12 @@ class LoginEntry(Frame):
 
         if reliefs: entryKwargs['relief'] = reliefs
 
+        if not LoginEntry._clear: LoginEntry._clear = PRMP_Image('clear', **self.dic)
+        if not LoginEntry._show: LoginEntry._show = PRMP_Image('highlight', **self.dic)
+        if not LoginEntry._action: LoginEntry._action = PRMP_Image('next', **self.dic)
+
         self.entry = Entry(self, show=show, font=font, **entryKwargs)
-        self.entry.focus()
+        # self.entry.focus()
 
         self.set = self.entry.set
         self.get = self.entry.get
@@ -42,42 +54,54 @@ class LoginEntry(Frame):
         self._action = action
 
         self.loaded = False
-        # self.bind('<Map>', self.afterload)
-        self.bind('<Configure>', self.afterload)
-
+        # self.bind('<Map>', self.load)
+        self.bind('<Configure>', lambda e: self.load(positions=self.positions))
     
-    def afterload(self, event=None, again=False):
-        if self.loaded and not again: return
+    def load(self, again=False, positions=()):
+
+        if self.loaded==True and again==False: return
+
+        positions = positions or self.positions
+        assert len(positions) == 4 and math.ceil(sum(positions)) == 1, 'sum of positions values must be 1.0, and length should be 4.'
+        self.positions = positions
+
+        self.view = self.clear = self.action = None
 
         tip = self.toplevel.tipping
+        e, s, c, a = self.positions
+        
+        self.entry.place(relx=0, rely=0, relw=e, relh=1)
 
-        res = 20
-        if self.positions[1]:
-            self.view = PRMP_ImageSButton(self, prmpImage='highlight', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), resize=(res, res), tipKwargs=dict(text='Show') if tip else {}, relief=self.reliefs)
+        if s:
+            self.view = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=s, relh=1))
 
             self.view.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
             self.view.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
 
-        if self.positions[2]: self.clear = PRMP_ImageSButton(self, prmpImage='next', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), command=self._action, resize=(res, res), tipKwargs=dict(text='Submit') if tip else {}, relief=self.reliefs)
+        if c:
+            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s, rely=0, relw=c, relh=1))
 
-        if self.positions[3]: self.action = PRMP_ImageSButton(self, prmpImage='next', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), command=self._action, resize=(res, res), tipKwargs=dict(text='Submit') if tip else {}, relief=self.reliefs)
+            self.clear.bind('<ButtonPress-1>', lambda e: self.entry.empty())
+            self.clear.bind('<ButtonRelease-1>', lambda e: self.entry.empty())
 
-        self.position(self.positions)
+        if a:            
+            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+c, rely=0, relw=a, relh=1))
+
         self.loaded = True
+        LoginEntry.imageLoaded = True
 
     def __getattr__(self, name):
-        try: return self[name]
+        try:
+            res = self.getFromSelf(name, None)
+            if not res: raise AttributeError
+            return res
         except Exception as e:
-            print(e)
-            return self.entry[name]
-    
-    def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
+            res = self.entry.getFromSelf(name, None)
+            return res
 
-    def position(self, pos):
-        e, s, a = pos
-        self.entry.place(relx=0, rely=0, relw=e, relh=1)
-        if s or self.hide: self.view.place(relx=e, rely=0, relw=s, relh=1)
-        if a or self.hide: self.action.place(relx=e+s, rely=0, relw=a, relh=1)
+    def setAction(self, action): self.action.config(command=action)
+
+    def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
 
 
 class Hierachy(PRMP_TreeView):

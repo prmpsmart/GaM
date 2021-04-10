@@ -4,9 +4,8 @@ from prmp_lib.prmp_miscs.prmp_images import _PIL_
 
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, face=False, **imageKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, face=False, tked=0, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
-        imageKwargs['for_tk'] = 1
 
         self.rt = None
         self.prmpImage = prmpImage
@@ -28,7 +27,13 @@ class PRMP_ImageWidget:
         if bindMenu: self.bindMenu()
 
         # self.after(imgDelay, lambda: self.loadImage(self.prmpImage, **imageKwargs))
-        self.loadImage(self.prmpImage, **imageKwargs)
+
+        if not tked:
+            if prmpImage and imageKwargs:
+                imageKwargs['for_tk'] = 1
+                self.loadImage(self.prmpImage, **imageKwargs)
+        
+        else: self.configure(image=self.prmpImage)
 
         # self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 

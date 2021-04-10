@@ -433,17 +433,20 @@ class PRMP_Image:
         self._animatedFrames = []
 
         if filename or image or b64 or isArray:
-            if image: self.imageFile = PRMP_ImageFile(image=image)
-            elif b64: self.imageFile = PRMP_ImageFile(b64=b64)
-            elif isArray: self.imageFile = PRMP_ImageFile(array=array)
-            elif filename :self.imageFile = filename if isinstance(filename, PRMP_ImageFile) else PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
-            else: self.imageFile = filename or image
+            if image: self.imageFile = PRMP_ImageFile(filename, image=image)
+            
+            elif b64: self.imageFile = PRMP_ImageFile(filename, b64=b64)
+            
+            elif isArray: self.imageFile = PRMP_ImageFile(filename, array=array)
+            
+            else: self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
+            
+            # else: self.imageFile = PRMP_ImageFile(filename)
 
-            if not isinstance(self.imageFile, PRMP_ImageFile): raise ValueError('{} or {} is not a valid value.'.format(filename, image))
+            if not isinstance(self.imageFile, (PRMP_ImageFile, str)): raise ValueError('{} or {} is not a valid value.'.format(filename, image))
 
             self.ext = self.imageFile.ext
 
-    
             if _PIL_:
                 if self.ext == 'xbm': self.tkImgClass = BitmapImage
                 else: self.tkImgClass = PhotoImage
