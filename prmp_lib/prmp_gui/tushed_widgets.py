@@ -17,9 +17,6 @@ Entry_Label = PRMP_Entry_Label
 
 class LoginEntry(Frame):
     imageLoaded = False
-    _clear = None
-    _show = None
-    _action = None
 
     res = (20, 20)
     dic = dict(inbuilt=1, resize=res, for_tk=1)
@@ -37,10 +34,6 @@ class LoginEntry(Frame):
         if isinstance(_f, (float, int)): font['size'] = _f or 20
 
         if reliefs: entryKwargs['relief'] = reliefs
-
-        if not LoginEntry._clear: LoginEntry._clear = PRMP_Image('clear', **self.dic)
-        if not LoginEntry._show: LoginEntry._show = PRMP_Image('highlight', **self.dic)
-        if not LoginEntry._action: LoginEntry._action = PRMP_Image('next', **self.dic)
 
         self.entry = Entry(self, show=show, font=font, **entryKwargs)
         # self.entry.focus()
@@ -72,11 +65,17 @@ class LoginEntry(Frame):
         
         self.entry.place(relx=0, rely=0, relw=e, relh=1)
 
-        if s:
-            self.view = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=s, relh=1))
+        
+        clear = PRMP_Image('clear', **self.dic).tkImage
+        show: LoginEntry._show = PRMP_Image('highlight', **self.dic)
+        action: LoginEntry._action = PRMP_Image('next', **self.dic)
 
-            self.view.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
-            self.view.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
+        if s:
+            self.img = show
+            self.show = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=s, relh=1), imageKwargs=dict(bindMenu=0, **self.dic), prmpImage='highlight')
+
+            self.show.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
+            self.show.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
 
         if c:
             self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s, rely=0, relw=c, relh=1))

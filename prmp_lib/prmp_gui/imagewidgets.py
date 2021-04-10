@@ -4,7 +4,7 @@ from prmp_lib.prmp_miscs.prmp_images import _PIL_
 
 
 class PRMP_ImageWidget:
-    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, face=False, tked=0, **imageKwargs):
+    def __init__(self, prmpImage=None, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=100, face=False, **imageKwargs):
         if not _PIL_: print('PIL is not available for this program!')
 
         self.rt = None
@@ -28,12 +28,9 @@ class PRMP_ImageWidget:
 
         # self.after(imgDelay, lambda: self.loadImage(self.prmpImage, **imageKwargs))
 
-        if not tked:
-            if prmpImage and imageKwargs:
-                imageKwargs['for_tk'] = 1
-                self.loadImage(self.prmpImage, **imageKwargs)
-        
-        else: self.configure(image=self.prmpImage)
+        if prmpImage and imageKwargs:
+            imageKwargs['for_tk'] = 1
+            self.loadImage(self.prmpImage, **imageKwargs)
 
         # self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 
@@ -179,45 +176,45 @@ class PRMP_ImageWidget:
 IW = PRMP_ImageWidget
 
 class PRMP_ImageLabel(PRMP_ImageWidget, PRMP_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, config={}, **kwargs):
+    def __init__(self, master, prmpImage=None, imageKwargs={}, config={}, **kwargs):
         PRMP_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, **imageKwargs)
 
 IL = PRMP_ImageLabel
 
 class PRMP_ImageSLabel(PRMP_ImageWidget, PRMP_Style_Label):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), imageKwargs={}, config={}, **kwargs):
+    def __init__(self, master, prmpImage=None, imageKwargs={}, config={}, **kwargs):
         PRMP_Style_Label.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize, **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, *imageKwargs)
 
 SIL = PRMP_ImageSLabel
 
 class PRMP_ImageButton(PRMP_ImageWidget, PRMP_Button):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
+    def __init__(self, master, prmpImage=None, config={}, imageKwargs={}, **kwargs):
         PRMP_Button.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, **imageKwargs)
 
 IB = PRMP_ImageButton
 
 class PRMP_ImageSButton(PRMP_ImageWidget, PRMP_Style_Button):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
+    def __init__(self, master, prmpImage=None, config={}, imageKwargs={}, **kwargs):
         PRMP_Style_Button.__init__(self, master, config=dict(**config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, **imageKwargs)
 
 ISB = PRMP_ImageSButton
 
 
 class PRMP_ImageCheckbutton(PRMP_ImageWidget, PRMP_Checkbutton):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
+    def __init__(self, master, prmpImage=None, config={}, imageKwargs={}, **kwargs):
         PRMP_Checkbutton.__init__(self, master, config=dict(anchor='center', **config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, **imageKwargs)
 
 IB = PRMP_ImageCheckbutton
 
 class PRMP_ImageSCheckbutton(PRMP_ImageWidget, PRMP_Style_Checkbutton):
-    def __init__(self, master, prmpImage=None, resize=(), thumb=(), config={}, imageKwargs={}, **kwargs):
+    def __init__(self, master, prmpImage=None, config={}, imageKwargs={}, **kwargs):
         PRMP_Style_Checkbutton.__init__(self, master, config=dict(**config), **kwargs)
-        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, thumb=thumb, resize=resize,  **imageKwargs)
+        PRMP_ImageWidget.__init__(self, prmpImage=prmpImage, **imageKwargs)
 
 ISB = PRMP_ImageSCheckbutton
 
