@@ -1,6 +1,6 @@
 from .core import *
 
-__all__ = ['PRMP_Button', 'PRMP_Checkbutton', 'PRMP_Entry', 'PRMP_Frame', 'PRMP_Label', 'PRMP_LabelFrame', 'PRMP_Menu', 'PRMP_OptionMenu', 'PRMP_PanedWindow', 'PRMP_Radiobutton', 'PRMP_Scale', 'PRMP_Scrollbar', 'PRMP_Spinbox', 'PRMP_Canvas', 'PRMP_Message', 'PRMP_Text', 'PRMP_Listbox', 'Button', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Menu', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'Canvas', 'Message', 'Text', 'Listbox']
+__all__ = ['PRMP_Button', 'PRMP_Checkbutton', 'PRMP_Entry', 'PRMP_Frame', 'PRMP_Label', 'PRMP_LabelFrame', 'PRMP_Menu', 'PRMP_OptionMenu', 'PRMP_PanedWindow', 'PRMP_Radiobutton', 'PRMP_Scale', 'PRMP_Scrollbar', 'PRMP_Spinbox', 'PRMP_Canvas', 'PRMP_Message', 'PRMP_Text', 'PRMP_Listbox', 'Button', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Menu', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'Canvas', 'Message', 'Text', 'Listbox', 'ttk']
 
 
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']

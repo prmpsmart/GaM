@@ -1,5 +1,6 @@
 from . import *
 from prmp_lib.prmp_miscs.prmp_images import *
+from prmp_lib.prmp_miscs.prmp_images import _PIL_
 
 
 class PRMP_ImageWidget:

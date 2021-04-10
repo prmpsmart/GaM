@@ -469,7 +469,7 @@ class PRMP_Theme(PRMP_GuiMixins):
     
     @classmethod
     def updateTheme(cls):
-        if PRMP_Window.STYLE: PRMP_Window.STYLE.update()
+        if cls.PRMP_Window.STYLE: cls.PRMP_Window.STYLE.update()
 
     @classmethod
     def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
@@ -479,6 +479,7 @@ class PRMP_Theme(PRMP_GuiMixins):
 
 class PRMP_Widget(PRMP_Theme):
     TkClass = None
+    TipsClass = None
     PRMP_Window = None
 
     def after(self, time, func):
@@ -507,6 +508,7 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def toplevel(self):
         master = self.master
+        from .windows import PRMP_Tk, PRMP_Toplevel
         while True:
             master = master.master
             if isinstance(master, (PRMP_Tk, PRMP_Toplevel)): return master
@@ -572,8 +574,9 @@ class PRMP_Widget(PRMP_Theme):
         self.bind('<Leave>', self.left, '+')
 
         if not PRMP_Widget.PRMP_Window:
-            from .windows import PRMP_Window
+            from .windows import PRMP_Window, PRMP_ToolTipsManager
             PRMP_Widget.PRMP_Window = PRMP_Window
+            PRMP_Widget.TipsClass = PRMP_ToolTipsManager
 
         if not isinstance(self, PRMP_Widget.PRMP_Window): self.positionWidget(place=place, pack=pack, grid=grid)
 
@@ -773,11 +776,11 @@ class PRMP_Widget(PRMP_Theme):
         self.tipKwargs = kwargs
         if not kwargs: return
 
-        if not PRMP_Window.TIPSMANAGER: self.tooltip = PRMP_ToolTipsManager(self, **kwargs)
-        else: PRMP_Window.TIPSMANAGER.add_tooltip(self, **kwargs)
+        if not PRMP_Widget.PRMP_Window.TIPSMANAGER: self.tooltip = PRMP_Widget.TipsClass(self, **kwargs)
+        else: PRMP_Widget.PRMP_Window.TIPSMANAGER.add_tooltip(self, **kwargs)
 
     def set_tooltip_text(self, tipKwargs):
-        tip = self.tooltip or PRMP_Window.TIPSMANAGER
+        tip = self.tooltip or PRMP_Widget.PRMP_Window.TIPSMANAGER
         if tip: tip.set_tooltip_text(self, **tipKwargs)
 
 
@@ -1098,8 +1101,8 @@ class PRMP_FillWidgets(PRMP_Mixins):
             widget = self.getFromSelf(widgetName)
             if widget:
                 B = widget.getFromSelf('Bottom', None)
-                if B: B.set(B.getFromSelf('placeholder'))
-                else: widget.set(widget.getFromSelf('placeholder', widget['text']))
+                if B: B.set(B.getFromSelf('placeholder', ''))
+                else: widget.set(widget.getFromSelf('placeholder', widget.getFromSelf('text', '')))
 
     @property
     def notEditables(self): return self.__notEditables

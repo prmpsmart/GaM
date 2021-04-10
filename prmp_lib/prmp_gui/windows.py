@@ -3,6 +3,7 @@ from .core_tk import *
 from .core_ttk import *
 import ctypes, subprocess, functools, os
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
+from prmp_lib.prmp_miscs.prmp_images import PRMP_Images
 
 __all__ = ['PRMP_Window', 'PRMP_Tk', 'PRMP_Toplevel', 'PRMP_MainWindow', 'PRMP_ToolTip', 'PRMP_ToolTipsManager', 'Tk', 'Toplevel']
 
@@ -99,7 +100,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
         bgs = PRMP_Images.get_colors(image, num_colors, inhex=1)
         bg = bgs[0]
-        PRMP_Theme.DEFAULT_BACKGROUND_COLOR = bg
+        PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR = PRMP_Theme.DEFAULT_BACKGROUND_COLOR = bg
         PRMP_Theme.DEFAULT_BUTTON_COLOR = (button_fg, bg)
 
         if update: self.updateTheme()
@@ -177,6 +178,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.statusBar = None
         
         self.side = side
+        self.tipping = tipping
         self.titleText = title
 
         self.co = 0
@@ -833,7 +835,7 @@ class PRMP_ToolTip(Toplevel):
         self.update_idletasks()
         self.attributes('-alpha', alpha or 0.8, '-topmost', 1)
 
-        if 'linux' in sys.platform: self.attributes('-type', 'tooltip')
+        if 'linux' in os.sys.platform: self.attributes('-type', 'tooltip')
 
         style_dict = {}
 

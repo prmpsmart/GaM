@@ -1,5 +1,6 @@
 from . import *
 from .scrollables import *
+from .imagewidgets import PRMP_ImageSButton
 
 
 class PRMP_FramedCanvas(Frame):
@@ -13,31 +14,70 @@ class PRMP_Entry_Label(Label):
 Entry_Label = PRMP_Entry_Label
 
 
-class PasswordEntry(SFrame):
-    def __init__(self, master, **kwargs):
+class LoginEntry(Frame):
+    def __init__(self, master, positions=(.7, .1, .1, .1), font={}, action=None, show='*', entryKwargs={}, reliefs='', **kwargs):
         '''
-        a password widget that features a show button and action button.
+        a Login widget that features a show button and action button.
+        positions: tuple of three floats relating the width of the (entry, show, clear, action) summing up to one.
         '''
+        assert len(positions) == 4 and sum(positions) == 1., 'sum of positions values must be 1.0, and length should be 4.'
         super().__init__(master, **kwargs)
         
-        ffont = self.PRMP_FONT.copy()
-        ffont['size'] = 20
-        self.entry = Entry(self, show='*', place=dict(relx=0, rely=0, relw=.8, relh=1), relief='flat', font=ffont)
-        self.entry.focus()
+        _f = font
+        font = font if isinstance(font, (dict, str, tuple)) else self.PRMP_FONT.copy()
         
+        if isinstance(_f, (float, int)): font['size'] = _f or 20
+
+        if reliefs: entryKwargs['relief'] = reliefs
+
+        self.entry = Entry(self, show=show, font=font, **entryKwargs)
+        self.entry.focus()
+
+        self.set = self.entry.set
+        self.get = self.entry.get
+        
+        self.positions = positions
+        self.reliefs = reliefs
+        self.show = show
+        self._action = action
+
+        self.loaded = False
+        # self.bind('<Map>', self.afterload)
+        self.bind('<Configure>', self.afterload)
+
+    
+    def afterload(self, event=None, again=False):
+        if self.loaded and not again: return
+
+        tip = self.toplevel.tipping
+
         res = 20
+        if self.positions[1]:
+            self.view = PRMP_ImageSButton(self, prmpImage='highlight', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), resize=(res, res), tipKwargs=dict(text='Show') if tip else {}, relief=self.reliefs)
 
-        view = PRMP_ImageSButton(self, place=dict(relx=.8, rely=0, relw=.1, relh=1), prmpImage='highlight', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), resize=(res, res), tipKwargs=dict(text='Show'))
-        view.bind('<ButtonPress-1>', self.view)
-        view.bind('<ButtonRelease-1>', self.hide)
+            self.view.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
+            self.view.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
 
-        PRMP_ImageSButton(self, place=dict(relx=.9, rely=0, relw=.1, relh=1), prmpImage='next', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), command=self.action, resize=(res, res), tipKwargs=dict(text='Submit'))
+        if self.positions[2]: self.clear = PRMP_ImageSButton(self, prmpImage='next', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), command=self._action, resize=(res, res), tipKwargs=dict(text='Submit') if tip else {}, relief=self.reliefs)
+
+        if self.positions[3]: self.action = PRMP_ImageSButton(self, prmpImage='next', imageKwargs=dict(bindMenu=0, inbuilt=1, inExt='png'), command=self._action, resize=(res, res), tipKwargs=dict(text='Submit') if tip else {}, relief=self.reliefs)
+
+        self.position(self.positions)
+        self.loaded = True
+
+    def __getattr__(self, name):
+        try: return self[name]
+        except Exception as e:
+            print(e)
+            return self.entry[name]
     
-    def hide(self, event=None): self.entry.configure(show='*')
-    def view(self, event=None): self.entry.configure(show='')
-    
-    def action(self):
-        pass
+    def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
+
+    def position(self, pos):
+        e, s, a = pos
+        self.entry.place(relx=0, rely=0, relw=e, relh=1)
+        if s or self.hide: self.view.place(relx=e, rely=0, relw=s, relh=1)
+        if a or self.hide: self.action.place(relx=e+s, rely=0, relw=a, relh=1)
 
 
 class Hierachy(PRMP_TreeView):

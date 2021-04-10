@@ -218,6 +218,8 @@ class Authorisation(Auths_Vars):
 
     @classmethod
     def check_username(cls, usr):
+        if not usr: return
+        
         users = cls.get_usernames_lower()
         bol  = usr.lower() in users
         return bol

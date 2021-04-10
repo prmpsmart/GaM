@@ -1,6 +1,6 @@
 from .core import *
 
-__all__ = ['PRMP_Style', 'PRMP_Style_Button', 'PRMP_Style_Checkbutton', 'PRMP_Style_Entry', 'PRMP_Style_Frame', 'PRMP_Style_Label', 'PRMP_Style_LabelFrame', 'PRMP_Menubutton', 'PRMP_Style_OptionMenu', 'PRMP_Style_PanedWindow', 'PRMP_Style_Radiobutton', 'PRMP_Style_Scale', 'PRMP_Style_Scrollbar', 'PRMP_Style_Spinbox', 'PRMP_Combobox', 'PRMP_LabeledScale', 'PRMP_Notebook', 'PRMP_Progressbar', 'PRMP_Separator', 'PRMP_Sizegrip', 'PRMP_Treeview', 'SButton', 'SCheckbutton', 'SEntry', 'SFrame', 'SLabel', 'SLabelFrame', 'SOptionMenu', 'SPanedWindow', 'SRadiobutton', 'SScale', 'SScrollbar', 'SSpinbox', 'Combobox', 'LabeledScale', 'Notebook', 'Progressbar', 'Separator', 'Sizegrip', 'Treeview', 'Menubutton']
+__all__ = ['PRMP_Style', 'PRMP_Style_Button', 'PRMP_Style_Checkbutton', 'PRMP_Style_Entry', 'PRMP_Style_Frame', 'PRMP_Style_Label', 'PRMP_Style_LabelFrame', 'PRMP_Menubutton', 'PRMP_Style_OptionMenu', 'PRMP_Style_PanedWindow', 'PRMP_Style_Radiobutton', 'PRMP_Style_Scale', 'PRMP_Style_Scrollbar', 'PRMP_Style_Spinbox', 'PRMP_Combobox', 'PRMP_LabeledScale', 'PRMP_Notebook', 'PRMP_Progressbar', 'PRMP_Separator', 'PRMP_Sizegrip', 'PRMP_Treeview', 'SButton', 'SCheckbutton', 'SEntry', 'SFrame', 'SLabel', 'SLabelFrame', 'SOptionMenu', 'SPanedWindow', 'SRadiobutton', 'SScale', 'SScrollbar', 'SSpinbox', 'Combobox', 'LabeledScale', 'Notebook', 'Progressbar', 'Separator', 'Sizegrip', 'Treeview', 'Menubutton', 'ttk']
 
 class PRMP_Style_(PRMP_Widget):
 

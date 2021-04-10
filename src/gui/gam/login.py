@@ -1,6 +1,8 @@
 import os
 os.sys.path.append(r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp')
-from prmp_gui.extensions import *
+from prmp_lib.prmp_gui.windows import *
+from prmp_lib.prmp_gui.tushed_widgets import *
+from prmp_lib.prmp_gui.imagewidgets import *
 
 d = r'C:\Users\Administrator\Pictures\PRMPSmart Wallpapers'
 pics = [os.path.join(d, a) for a in os.listdir(d)]
@@ -10,7 +12,7 @@ sp = pics[0]
 user = 'Rocky Miracy Peter'
 
 
-class Login(MainWindow):
+class Login(PRMP_MainWindow):
 
     def __init__(self, geo, atb=0, asb=0, title='', ntb=1, pf=0, bn=0, **kwargs):
         '''
@@ -22,7 +24,6 @@ class Login(MainWindow):
         
         self.canvas = self.container
         
-        self.canvas.bind('<Configure>', lambda e: self.afterload(0))
         
         self.profile_frame = pf
 
@@ -31,7 +32,7 @@ class Login(MainWindow):
 
         if pf: self.pix = PRMP_ImageLabel(self.canvas, width=200, height=200, prmpImage=self.head_pix, resize=(200, 200), highlightable=1, imageKwargs=dict(bindMenu=0, name='llovee', inbuilt=1, inExt='png'))
 
-        self.password = PasswordEntry(self.canvas, config=dict(relief='flat'),  place=dict(relx=.25, rely=.6, relh=.05, relw=.5))
+        self.password = LoginEntry(self.canvas, config=dict(relief='flat'),  place=dict(relx=.25, rely=.6, relh=.05, relw=.5))
 
         self.username_font = self.PRMP_FONT.copy()
         self.username_font['size'] = 30
@@ -43,6 +44,7 @@ class Login(MainWindow):
         
         self.anime = PRMP_ImageSLabel(self.canvas, 'line_bubbles', imageKwargs=dict(bindMenu=0, name='llovee', inExt='gif', inbuilt=1), place=dict(relx=(1-.3)/2, rely=.9, relw=.3, relh=.05), config=dict(relief='flat'))
 
+        self.canvas.bind('<Configure>', lambda e: self.afterload(0))
     
     def afterload(self, s):
         '''
