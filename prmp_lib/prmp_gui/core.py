@@ -24,7 +24,9 @@ class PRMP_Theme(PRMP_GuiMixins):
     TANS = ("#FFF9D5", "#F4EFCF", "#DDD8BA")
     NICE_BUTTON_COLORS = ((GREENS[3], TANS[0]), ('#000000', '#FFFFFF'), ('#FFFFFF', '#000000'), (YELLOWS[0], PURPLES[1]), (YELLOWS[0], GREENS[3]), (YELLOWS[0], BLUES[2]))
     COLOR_SYSTEM_DEFAULT = 'SystemButtonFace'
+    
     DEFAULT_BUTTON_COLOR = ('white', BLUES[0])
+    
     OFFICIAL_PRMPSMART_BUTTON_COLOR = ('white', BLUES[0])
     
     DEFAULT_ERROR_BUTTON_COLOR = ("#FFFFFF", "#FF0000")
@@ -514,7 +516,7 @@ class PRMP_Widget(PRMP_Theme):
             if isinstance(master, (PRMP_Tk, PRMP_Toplevel)): return master
             master = master
 
-    def __init__(self, master=None, _ttk_=False, tipKwargs={}, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', config={}, **kwargs):
+    def __init__(self, master=None, _ttk_=False, tipKwargs={}, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', config={}, hl=None, **kwargs):
         '''
         :param tipKwargs: dict of [Label options, follow, delay]
         '''
@@ -525,6 +527,8 @@ class PRMP_Widget(PRMP_Theme):
         self.kwargs['font'] = font or 'PRMP_FONT'
 
         self.master = master
+
+        if hl != None: highlightable = hl
 
         if asEntry:
             relief = 'sunken'
@@ -1100,9 +1104,10 @@ class PRMP_FillWidgets(PRMP_Mixins):
         for widgetName in widgets:
             widget = self.getFromSelf(widgetName)
             if widget:
-                B = widget.getFromSelf('Bottom', None)
-                if B: B.set(B.getFromSelf('placeholder', ''))
-                else: widget.set(widget.getFromSelf('placeholder', widget.getFromSelf('text', '')))
+                # B = widget.getFromSelf('Bottom', None)
+                # if B: B.set(B.getFromSelf('placeholder', ''))
+                # else: widget.set(widget.getFromSelf('placeholder', widget.getFromSelf('text', '')))
+                widget.empty()
 
     @property
     def notEditables(self): return self.__notEditables

@@ -18,7 +18,7 @@ Entry_Label = PRMP_Entry_Label
 class LoginEntry(Frame):
     imageLoaded = False
     res = (20, 20)
-    dic = dict(inbuilt=1, resize=res, for_tk=1, bindMenu=0)
+    dic = dict(inbuilt=1, resize=res, for_tk=1)
 
     def __init__(self, master, font={}, action=None, show='*', entryKwargs={}, reliefs='', positions=(1, 0, 0, 0, 0), _pass=None, **kwargs):
         '''
@@ -68,43 +68,45 @@ class LoginEntry(Frame):
         self.entry.place(relx=0, rely=0, relw=e, relh=1)
 
         if p:
-            self._passes = PRMP_Image(filename='red', name='red_pass', inbuilt=1, resize=self.res, for_tk=1), PRMP_Image(filename='yellow', name='yellow_pass', inbuilt=1, resize=self.res, for_tk=1), PRMP_Image(filename='green', name='green_pass', inbuilt=1, resize=self.res, for_tk=1)
+            self._passes = PRMP_Image(filename='red', name='red_pass', **self.dic), PRMP_Image(filename='yellow', name='yellow_pass', **self.dic), PRMP_Image(filename='green', name='green_pass', **self.dic)
 
-            self.pass_ = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=p, relh=1), prmpImage=self._passes[0], resize=self.res)
-
+            self.pass_ = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=p, relh=1), config=dict(style='buttons.TButton'))
+            self.after(100, self.validating)
             self.entry.bind('<KeyRelease>', self.validating)
 
         if s:
-            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=self.dic, prmpImage='highlight')
+            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=dict(**self.dic, prmpImage='highlight'), bindMenu=0, config=dict(style='buttons.TButton'))
 
             self.show.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
             self.show.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
         else: self.entry.config(show='')
         
         if c:
-            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1),imageKwargs=self.dic, prmpImage='clear')
+            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1), imageKwargs=dict(**self.dic, prmpImage='clear'), bindMenu=0, config=dict(style='buttons.TButton'))
 
-            self.clear.bind('<1>', self.clearIt)
+            self.clear.bind('<1>', self.empty)
 
         if a:
-            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=self.dic, prmpImage='next')
+            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=dict(**self.dic, prmpImage='next'), bindMenu=0, config=dict(style='buttons.TButton'))
             self.entry.bind('<Return>', self.invokeAction)
 
         self.loaded = True
         LoginEntry.imageLoaded = True
     
-    def clearIt(self, event):
+    def empty(self, event=None):
         self.entry.empty()
         self.validating(event)
     
     def validating(self, event=None):
-        if self._pass:
+        if self._pass and self.pass_:
             num = self._pass(self.entry.get())
             if  num == 1: fg = "yellow"
             elif num == 2: fg = "green"
             else: fg = "red"
 
             self.pass_['image'] = fg+'_pass'
+            # self.pass_.config(image=fg+'_pass', bg=self.DEFAULT_BACKGROUND_COLOR, relief='groove')
+            # self.pass_.paint()
     
     def invokeAction(self, event=None):
         try: self.action.invoke()

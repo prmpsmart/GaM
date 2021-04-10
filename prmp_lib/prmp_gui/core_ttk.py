@@ -210,6 +210,12 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     'anchor': [('hover', 'center')]
                 }
             },
+            'buttons.TButton': {
+                'map': {
+                    'relief': [('hover', 'solid')],
+                    'anchor': [('hover', 'center')]
+                }
+            },
             'TCheckbutton': {
                 'configure': {
                     'indicatorcolor': background,

@@ -88,7 +88,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.paint()
         self.mainloop()
     
-    def change2Imgcolor(self, image, num_colors=10, update=1, button_fg='white'):
+    def change2Imgcolor(self, image, num_colors=10, update=1, button_fg='white', fg='white'):
         '''
         changes the PRMP_Theme defaults colors to the colors in image
 
@@ -101,6 +101,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         bgs = PRMP_Images.get_colors(image, num_colors, inhex=1)
         bg = bgs[0]
         PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR = PRMP_Theme.DEFAULT_BACKGROUND_COLOR = bg
+        PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR = PRMP_Theme.DEFAULT_FOREGROUND_COLOR = fg
         PRMP_Theme.DEFAULT_BUTTON_COLOR = (button_fg, bg)
 
         if update: self.updateTheme()
