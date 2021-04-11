@@ -64,6 +64,7 @@ class PRMP_ImageWidget:
             if prmpImage and not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
                 prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
+                
             else: return
 
             if isinstance(prmpImage, PRMP_Image): self.imageFile = prmpImage.imageFile
@@ -97,7 +98,6 @@ class PRMP_ImageWidget:
             else:
                 if self.face: self.frame = self.prmpImage._find_faces(prmp_image=1, for_tk=1)
 
-            print(self.frame)
             self.config(image=self.frame)
             self.paint()
 

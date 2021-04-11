@@ -1,7 +1,10 @@
 from . import *
 from .scrollables import *
-from .imagewidgets import PRMP_ImageSButton
-import math
+from prmp_lib.prmp_gui.two_widgets import *
+from prmp_lib.prmp_gui.dialogs import *
+
+from .image_widgets import PRMP_ImageSButton
+import math, os
 
 
 class PRMP_FramedCanvas(Frame):
@@ -75,19 +78,19 @@ class Tushed_Entry(Frame):
             self.entry.bind('<KeyRelease>', self.validating)
 
         if s:
-            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=dict(**self.dic, prmpImage='highlight'), bindMenu=0, config=dict(style='buttons.TButton'))
+            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=dict(**self.dic, prmpImage='highlight'), config=dict(style='buttons.TButton'))
 
             self.show.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
             self.show.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
         else: self.entry.config(show='')
         
         if c:
-            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1), imageKwargs=dict(**self.dic, prmpImage='clear'), bindMenu=0, config=dict(style='buttons.TButton'))
+            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1), imageKwargs=dict(**self.dic, prmpImage='clear'), config=dict(style='buttons.TButton'))
 
             self.clear.bind('<1>', self.empty)
 
         if a:
-            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=dict(**self.dic, prmpImage='next'), bindMenu=0, config=dict(style='buttons.TButton'))
+            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=dict(**self.dic, prmpImage='next'), config=dict(style='buttons.TButton'))
             self.entry.bind('<Return>', self.invokeAction)
 
         self.loaded = True
@@ -128,11 +131,12 @@ class Tushed_Entry(Frame):
     def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
 
 
-class ChoosePath(LabelText):
+class ChooseDir(LabelText):
     def __init__(self, master, text='', callback=None, **kwargs):
         FONT = self.PRMP_FONT
         FONT['size'] = 20
-        super().__init__(master, longent=.3, topKwargs=dict(text=text, font=FONT, image=PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1), compound='left'), tipKwargs=dict(text='Double-click to choose folder!'), **kwargs)
+        tip = self.topest.tipping
+        super().__init__(master, longent=.3, topKwargs=dict(text=text, font=FONT, image=PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1), compound='left'), tipKwargs=dict(text='Double-click to choose folder!') if tip else {}, **kwargs)
         self.T.bind('<Double-1>', self.load_dir)
         self.T.bind('<1>', self.read_dir)
         self.B.bind('<Double-1>', self.load_dir)
@@ -152,6 +156,7 @@ class ChoosePath(LabelText):
             self.folder = folder
             self.B.set(folder)
             if self.callback: self.callback(folder)
+ChooseFolder = ChooseDir
 
 
 class Hierachy(PRMP_TreeView):

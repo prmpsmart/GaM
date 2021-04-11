@@ -1,7 +1,7 @@
 from . import *
-from .datewidgets import *
+from .date_widgets import *
 from .scrollables import *
-from .dropdowns import *
+from .drop_downs import *
 
 
 
@@ -26,7 +26,7 @@ class TwoWidgets(PRMP_Frame):
         if dot != None: disableOnToggle = dot
         self.disableOnToggle = disableOnToggle
 
- # top part
+     # top part
 
         if isinstance(top, str):
             self.top = top.lower()
@@ -52,7 +52,7 @@ class TwoWidgets(PRMP_Frame):
             config = topKwargs.get('config')
             if config: text = config.get('text')
 
- # bottom part
+     # bottom part
         if isinstance(bottom, str):
             self.bottom = bottom.lower()
 
@@ -83,6 +83,7 @@ class TwoWidgets(PRMP_Frame):
         self.required = getattr(self.Bottom, 'required', False)
 
         events = self.events.get(bottom)
+        # print(events)
         if events:
             for event in events:
                 self.Bottom.bind(event, self.clicked, '+')
@@ -147,7 +148,7 @@ class TwoWidgets(PRMP_Frame):
             self.Bottom.normal()
 
 
-    def set(self, values): self.Bottom.set(values)
+    def set(self, *values): self.Bottom.set(*values)
 
     def get(self): return self.Bottom.get()
 
@@ -179,8 +180,6 @@ class LabelSpin(TwoWidgets):
     def __init__(self, master, **kwargs):
 
         super().__init__(master, top='label', bottom='spinbox', **kwargs)
-
-    def set(self, from_=.1, to=1, increment=.1): self.Bottom.config(from_=from_, to=to, increment=increment)
 LS = LabelSpin
 
 class LabelEntry(TwoWidgets):

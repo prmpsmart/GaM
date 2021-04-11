@@ -661,6 +661,8 @@ class PRMP_Style_Spinbox(PRMP_Input, PRMP_Style_, ttk.Spinbox):
     def __init__(self, master=None, config={}, **kwargs):
         PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
         PRMP_Input.__init__(self, **kwargs)
+
+
 SSpinbox = PSSp = PRMP_Style_Spinbox
 
 # based on ttk only

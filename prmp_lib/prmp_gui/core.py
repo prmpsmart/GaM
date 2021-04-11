@@ -1041,6 +1041,8 @@ class PRMP_Input:
     def set(self, values):
         self._set(values)
         self.verify()
+    
+    def setRange(self, from_=0, to=1, increment=.1): self.configure(from_=from_, to=to, increment=increment)
 
     def _clear_placeholder(self, event=None):
         if self._get() == self.placeholder: self.clear()

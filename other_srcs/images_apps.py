@@ -5,9 +5,8 @@ os.sys.path.append(os.path.dirname(__file__))
 import itertools, threading, shutil
 
 from prmp_lib.prmp_gui import *
-from prmp_lib.prmp_gui.dialogs import *
-from prmp_lib.prmp_gui.two_widgets import *
-from prmp_lib.prmp_gui.imagewidgets import *
+from prmp_lib.prmp_gui.image_widgets import *
+from prmp_lib.prmp_gui.tushed_widgets import *
 
 
 class MPVImage(PRMP_ImageCheckbutton):
@@ -42,7 +41,7 @@ class MPVImage(PRMP_ImageCheckbutton):
         self.paint()
 
 
-class MassivePhotoViewer(PRMP_MainWindow):
+class Massive_Photo_Viewer(PRMP_MainWindow):
     
     def __init__(self, master=None, geo=(1300, 840), themeIndex=37, **kwargs):
         super().__init__(master, geo=geo, themeIndex=themeIndex, asb=0, b4t=0, tipping=1, title='Massive Photo Viewer', resize=(0, 0), **kwargs)
@@ -59,7 +58,7 @@ class MassivePhotoViewer(PRMP_MainWindow):
         PRMP_Separator(self.canvas, orient='vertical', place=dict(relx=.765, rely=0, relw=.005, relh=1))
         PRMP_Separator(self.canvas, orient='vertical', place=dict(relx=.775, rely=0, relw=.005, relh=1))
 
-        self.source_dir = ChoosePath(self.canvas, place=dict(relx=.79, rely=0, relw=.2, relh=.15), text='Source Folder', callback=self.load_dir)
+        self.source_dir = ChooseDir(self.canvas, place=dict(relx=.79, rely=0, relw=.2, relh=.15), text='Source Folder', callback=self.load_dir)
 
         self.total = LabelLabel(self.canvas, topKwargs=dict(text='Total Pictures'), place=dict(relx=.79, rely=.17, relw=.2, relh=.04), longent=.65, orient='h', font='PRMP_FONT')
         
@@ -82,7 +81,7 @@ class MassivePhotoViewer(PRMP_MainWindow):
 
         self.setRadioGroups([self._copy, self._delete, self._move])
 
-        self.dest_dir = ChoosePath(self.canvas, place=dict(relx=.79, rely=yy+.07, relw=.2, relh=.15), text='Destination Folder')
+        self.dest_dir = ChooseDir(self.canvas, place=dict(relx=.79, rely=yy+.07, relw=.2, relh=.15), text='Destination Folder')
 
         Button(self.canvas, text='Proceed', place=dict(relx=.85, rely=yy+.26, relw=.09, relh=.04), image=PRMP_Image('play', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.proceed)
 
@@ -249,7 +248,139 @@ class MassivePhotoViewer(PRMP_MainWindow):
         self.load_images(self.current-1)
 
 
+class Image_Renamer(Tk):
 
-MassivePhotoViewer(tm=1)
+    def __init__(self, folder='', **kwargs):
+        super().__init__(containerClass=PRMP_ImageSLabel, containerConfig=dict(anchor='center'), geo=(800, 500), tipping=0, **kwargs)
+        self.count = 0
+
+        self.image_paths = []
+        self.folder = folder
+        self.current = 0
+        self.current_file = ''
+        self.total_images = 0
+
+        self.image = PRMP_ImageSLabel(self.cont, place=dict(relx=.02, rely=.02, relh=.96, relw=.56))
+        self.path = ChooseFolder(self.cont, text='Choose Folder', place=dict(relx=.65, rely=0, relh=.25, relw=.3), callback=self.loadFolder)
+
+        self.total = LabelEntry(self.cont, topKwargs=dict(text='Total'), place=dict(relx=.65, rely=.28, relh=.08, relw=.3), orient='h', bottomKwargs=dict(state='readonly', foreground='black'))
+        self.index = LabelSpin(self.cont, topKwargs=dict(text='Index'), place=dict(relx=.65, rely=.37, relh=.08, relw=.3), orient='h', bottomKwargs=dict(_type='number', very=1, background='white'), func=self.loadIndex, bttk=0)
+
+        self.index.B.bind('<FocusIn>', lambda e: self.focus())
+
+        Button(self.cont, place=dict(relx=.7, rely=.55, relh=.08, relw=.2), command=self.refresh, text='Refresh')
+
+        self.name = LabelEntry(self.cont, topKwargs=dict(text='Name'), place=dict(relx=.6, rely=.7, relh=.08, relw=.4), orient='h', longent=.2, bottomKwargs=dict(state='readonly', foreground='black'))
+
+        self.rename = LabelEntry(self.cont, topKwargs=dict(text='Rename'), place=dict(relx=.6, rely=.79, relh=.08, relw=.4), orient='h', longent=.26)
+        self.rename.B.bind('<Return>', self.renameFile, '+')
+
+        self.bind('<Up>', self.rootLoadIndex, '+')
+        self.bind('<Down>', self.rootLoadIndex, '+')
+        self.refresh()
+        self.first = 0 # hack for Down event
+        self.load()
+        self.start()
+
+    def loadFolder(self, path):
+        if not path: return
+        self.folder = path
+        self.image_paths = []
+        
+        for a in os.listdir(self.folder):
+            f = os.path.join(path, a)
+            if PRMP_ImageType.get(f): self.image_paths.append(f)
+        self.current = 0
+        self.total_images = len(self.image_paths)
+        
+        self.total.set(self.total_images)
+        self.index.B.setRange(1, self.total_images, 1)
+        self.index.set(1)
+
+        self.loadIndex()
+    
+    def getIndex(self, event):
+        index = self.index.get()
+        try: index = int(index)
+        except: return 0
+
+        if event:
+            if event.keysym == 'Up': index += 1
+            elif event.keysym == 'Down':
+                if self.first: index -= 1
+                else: index = 1
+            elif event.keysym == 'Return':
+                pass
+            self.first = 1
+        return index
+
+    def rootLoadIndex(self, event=None):
+        index = self.getIndex(event)
+        self.index.set(index)
+        self.loadIndex()
+        
+    def loadIndex(self, event=None):
+        index = self.getIndex(event)
+        
+        if not index: return
+
+        if (self.current == index) and not event==0: return
+
+        if 0<index<=self.total_images:
+            self.current = index
+            self.current_file = self.image_paths[self.current-1]
+            self.name.set(os.path.basename(self.current_file))
+            
+            if event == 0: return
+            
+            self.loadImage()
+            self.count += 1
+
+        if self.count == 40: self.count = 0
+    
+    def loadImage(self):
+        if not self.current_file: return
+        name = os.path.splitext(os.path.basename(self.current_file))[0]
+        size = self.image.width, self.image.height
+
+        self.image.loadImage(self.current_file, name=f'{name}_{self.count+1}', resize=size)
+
+    def load(self):
+        size = self.cont.width, self.cont.height
+        self.cont.loadImage(r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\images_db\images\prmp_jpgs\orange_lux.jpg', resize=size)
+        img = self.cont.image
+        self.change2Imgcolor(img)
+
+    def refresh(self):
+        self.loadFolder(self.folder)
+        self.path.set(self.folder)
+
+    def renameFile(self, event=None):
+        rename = self.rename.get()
+        if not rename: return
+
+        ext = os.path.splitext(self.current_file)[1]
+        if not os.path.splitext(rename)[1]: rename += ext
+
+        rename = os.path.join(self.folder, rename)
+
+        os.rename(self.current_file, rename)
+
+        self.image_paths[self.current-1] = rename
+
+        self.rename.set('')
+        self.loadIndex(0)
+
+
+
+
+# folder = r'C:\Users\Administrator\Pictures\PRMPSmart Wallpapers'
+# folder = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\images_db\images\prmp_jpgs'
+
+
+# Image_Renamer(title='Image Renamer', folder=folder, tm=1)
+
+
+
 
 
