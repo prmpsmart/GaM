@@ -12,6 +12,10 @@ creator.py
 *.zip
 *.pyd
 *.c
+*.jpg
+*.png
+*.gif
+*.ico
 
 build/
 c/

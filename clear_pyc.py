@@ -1,5 +1,5 @@
 
-import argparse, os
+import argparse, os, zipfile
 def clear_pyc(path=''):
     path = os.path.abspath(path)
     print(f'Deleting ".pyc" files in --> "{path}"')
