@@ -1,4 +1,4 @@
-__all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_XBMS', 'PRMP_GIFS']
+__all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_XBMS', 'PRMP_GIFS', 'PRMP_IMAGES']
 
 
 apply = b'\n    iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAACzUlEQVR4AWIgB7h0Mtu4AzonBxg9oigK17Ztuw1q27Zt23bXtm3btm3bxvyndzZ6bdZJzuDhuxbqkU2KpO+9nYIwsD7bhHrk6Me/hVHCB1xWn1NF4Hhan9cp4LY/Pb69tdlW41OsBt2MuwguMcQPj/0Cgqp3xruZe0QHVPsX6kI57RyEEjbAv1gHdw2WVW393f1ah4HbhXp6Kofd5ezzf0MkcRMMsh5DN/alYLtwUy67dtS7Y5fUZlaGlJpCLuUIfiWsQWCxAQ5LjaiivSUdhQ2k3BXZZ4rBJOclvsQthVOBGH65Hamj3Ml3JlSpL077an1K1CGWtBXyqUfhki0LWi8mY4Oa82DcDuFeodt+96gmPWTzQd+L9osPqQ6iampmXsXn+MUILNHHda0FVVt+dT/VHGwQWUrQjnjJ+RRq4Lb+0qodwj09aH0sD6a9UK3oZwKHgt/4mbgCxjnPoRn1hArR06/ZcHaI9LIT8jxRF1yhD+vCj4iosIRc0PXGnUK9ywgof0t3cVVomQnk0g5DKHk9FcIQBySG8oWY3Sxwp0gvD4mgM4LQcmMY5T2EQe49+JSoNOXokcnKao88ZRjnPsO3xKXwKJLDF8d9tVSI361VcBqFGP/VeV9NeLkFrPI/QDPnMiwL3sO3VAXW+V8gnLIBqpnn4JApyRcin+70bastetNBpXPKUys881XgUSILhcwjEEvdgl8pK/AtaSlCSo1wSW0WH+qejvTb4V0ifcu1op9yweWGkE7fg4+Jc8nrj1AJu89RJI6dmdep5G3UG5vN1aFlprAu+IzAIgPsFRvIeze5rfvNzV+3WXu79Z6ytrvwsCEjzx3fdr2fS5BpbXR8xG/Hl43faR+MBIz+AXYjdefFfq961n3XgFHdxMF1CfUVazxfkY2G/yAcL+a7kQX2aA7K/HdlvOKagTWQuK7NpIBXt2bUhQGyAhvyX8ltpGqlVcOSAAAAAElFTkSuQmCC'
@@ -320,3 +320,4 @@ PRMP_XBMS = {'act_fold': act_fold, 'balarrow': balarrow, 'bold': bold, 'capital'
 PRMP_GIFS = {'bar_striped': bar_striped, 'blue_blocks': blue_blocks, 'blue_circle': blue_circle, 'blue_dots': blue_dots, 'dots_pulse': dots_pulse, 'dots_wave': dots_wave, 'gray_circle': gray_circle, 'gray_dots': gray_dots, 'gray_spokes': gray_spokes, 'light_blue_circle': light_blue_circle, 'line_boxes': line_boxes, 'line_bubbles': line_bubbles, 'red_circle': red_circle, 'red_dots_ring': red_dots_ring, 'ring_black_dots': ring_black_dots, 'ring_blue': ring_blue, 'ring_gray_segments': ring_gray_segments, 'ring_lines': ring_lines, 'squish': squish}
 
 
+PRMP_IMAGES = [PRMP_PNGS, PRMP_GIFS, PRMP_JPEGS, PRMP_XBMS]
