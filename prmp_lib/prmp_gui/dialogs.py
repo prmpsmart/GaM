@@ -8,6 +8,7 @@ from tkinter.simpledialog import askstring, askfloat, askinteger
 from . import *
 from .core import PRMP_FillWidgets
 from .datewidgets import PRMP_Calendar
+from .imagewidgets import PRMP_ImageSLabel
 
 
 

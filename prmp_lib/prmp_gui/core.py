@@ -447,8 +447,10 @@ class PRMP_Theme(PRMP_GuiMixins):
                 return self
             
             self.configure(**_dict)
-
-        if self.checkVar and self.var.get() == self.val: self.checked(1)
+        
+        if self.checkVar:
+            print(self.variable, self)
+            if self.variable.get() == self.value: self.checked(1)
 
         return self
 
@@ -525,6 +527,7 @@ class PRMP_Widget(PRMP_Theme):
         self.kwargs = kwargs.copy()
         kwargs.clear()
         self.kwargs['font'] = font or 'PRMP_FONT'
+        self.kwargs.update(config)
 
         self.master = master
 
@@ -544,21 +547,20 @@ class PRMP_Widget(PRMP_Theme):
 
         self.toggleGroup = []
 
-        var = self.kwargs.pop('var', None) or self.kwargs.get('variable', None)
+        if self.PRMP_WIDGET in ['Checkbutton', 'Radiobutton']: self.value = self.variable = None
+        variable = self.checkVar
 
-        if isinstance(var, tk.StringVar): pass
-        elif var:
-            var = tk.StringVar()
-            var.set('0')
+        if variable and not isinstance(variable, tk.StringVar):
+            variable = tk.StringVar()
+            variable.set('0')
 
-        if var:
-            self.var = self.variable = var
-            config['variable'] = var
+        if variable:
+            self.variable = variable
+            config['variable'] = variable
             isChk = self.PRMP_WIDGET == 'Checkbutton'
-            val = self.kwargs.pop('val', '1' if isChk else '')
-            self.val = self.value = self.kwargs.get('value', val)
+            self.value = self.kwargs.get('value', '1' if isChk else '')
             
-            if not isChk: config['value'] = self.val
+            if not isChk: config['value'] = self.value
 
         self._ttk_ = _ttk_
         self.TkClass.__init__(self, self.master, **config)
@@ -691,19 +693,23 @@ class PRMP_Widget(PRMP_Theme):
             elif kw: widget.pack()
 
     def switchOne(self, event=None):
-        val = self.var.get() if self.var else None
+        value = self.variable.get() if self.variable else None
         if self.onFg == False:
             self.light()
-            if self.var: self.var.set('0')
+            if self.variable: self.variable.set('0')
             self.onFg = True
-        elif self.PRMP_WIDGET == 'Radiobutton' and val == self.value: self.light()
-        elif val != self.value: self.unlight()
+        elif self.PRMP_WIDGET == 'Radiobutton' and value == self.value: self.light()
+        elif value != self.value: self.unlight()
         else:
             self.unlight()
             self.onFg = False
     
     @property
-    def checkVar(self): return self.kwargs.get('variable', False)
+    def checkVar(self):
+        var = self.kwargs.get('variable', None)
+        if var:
+            print(var)
+            return var
 
     def checked(self, event=None):
         if self.checkVar:
@@ -711,7 +717,7 @@ class PRMP_Widget(PRMP_Theme):
             else: self.unlight()
 
     def switchGroup(self, event=None):
-        if event: self.var.set(self.val)
+        if event: self.variable.set(self.value)
         for w in self.toggleGroup:
             if w == self: self.light()
             else: w.unlight()
@@ -1065,16 +1071,16 @@ PI = PRMP_Input
 
 class PRMP_InputButtons:
 
-    def set(self, val):
-        if self.var:
-            self.var.set(val)
-            # self.val = self.value = val
-        else: self.configure(text=val)
+    def set(self, value):
+        if self.variable:
+            self.variable.set(value)
+            # self.value = self.value = value
+        else: self.configure(text=value)
 
     def get(self):
-        val = self.var.get() if self.var else None
-        if val == self.val: return True
-        elif not self.var: return self['text']
+        value = self.variable.get() if self.variable else None
+        if value == self.value: return True
+        elif not self.variable: return self['text']
         else: return False
 PIB = PRMP_InputButtons
 
@@ -1121,8 +1127,8 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 widget = self.getFromSelf(widgetName)
                 if widget:
                     # try:
-                        val = values.get(widgetName, '')
-                        widget.set(val)
+                        value = values.get(widgetName, '')
+                        widget.set(value)
                     # except Exception as er: print(f'ERROR {er}.')
                 else: print(f'Error [{widgetName}, {widget}]')
             if isinstance(values, dict): self.values.update(values)

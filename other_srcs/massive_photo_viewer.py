@@ -4,8 +4,10 @@ os.sys.path.append(os.path.dirname(__file__))
 
 import itertools, threading, shutil
 
-from prmp_gui.dialogs import *
-from prmp_gui.two_widgets import *
+from prmp_lib.prmp_gui import *
+from prmp_lib.prmp_gui.dialogs import *
+from prmp_lib.prmp_gui.two_widgets import *
+from prmp_lib.prmp_gui.imagewidgets import *
 
 
 class MPVImage(PRMP_ImageCheckbutton):
@@ -57,7 +59,7 @@ class ChoosePath(LabelText):
             if self.callback: self.callback(folder)
 
 
-class MassivePhotoViewer(MainWindow):
+class MassivePhotoViewer(PRMP_MainWindow):
     
     def __init__(self, master=None, geo=(1300, 840), themeIndex=37, **kwargs):
         super().__init__(master, geo=geo, themeIndex=themeIndex, asb=0, b4t=0, tipping=1, title='Massive Photo Viewer', resize=(0, 0), **kwargs)
@@ -114,7 +116,7 @@ class MassivePhotoViewer(MainWindow):
         # pp.update(PRMP_JPEGS)
         # pp.update(PRMP_XBMS)
         pp.update(PRMP_GIFS)
-        print(len(pp))
+        # print(len(pp))
         self.after(3000, lambda: threading.Thread(target=self._load_dict, args=[pp]).start())
         
         self.preview = PRMP_ImageDialog(self, geo=geo, imageKwargs=dict(bindMenu=0, fullsize=1), asb=0, tooltype=1, atb=0)
@@ -148,7 +150,7 @@ class MassivePhotoViewer(MainWindow):
             x = r * (hh+30)
             y = c * (hh+10)
 
-            one = MPVImage(self.canvas, width=hh, height=hh, imageKwargs=dict(bindMenu=0, fullsize=0, inbuilt=1, inExt='png'), resize=(80, 80), prmpImage='blue_admin', mm=self)
+            one = MPVImage(self.canvas, width=hh, height=hh, imageKwargs=dict(prmpImage='blue_admin',inbuilt=1, inExt='png', resize=(80, 80)),bindMenu=0, fullsize=0,  mm=self)
             self.canvas.create_window(x, y, window=one, anchor='nw')
 
             self.image_labels.append(one)
@@ -188,7 +190,7 @@ class MassivePhotoViewer(MainWindow):
                 # print(len(b64))
                 file = PRMP_Image(name, b64=b64)
                 wid.set(file)
-                wid.var.set('0')
+                if wid.checkVar: wid.variable.set('0')
             co += 1
 
     @property

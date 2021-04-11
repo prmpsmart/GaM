@@ -92,7 +92,7 @@ class TwoWidgets(PRMP_Frame):
         self.T = self.Top
 
         if self.T.checkVar:
-            self.val, self.var = self.value, self.variable = self.T.val, self.T.var
+            self.value, self.variable = self.T.value, self.T.variable
             if self.value and self.variable: self.checked()
 
         self.rt = None

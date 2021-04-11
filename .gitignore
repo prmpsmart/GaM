@@ -17,6 +17,7 @@ creator.py
 *.gif
 *.ico
 *.xbm
+*.dll
 
 build/
 c/
