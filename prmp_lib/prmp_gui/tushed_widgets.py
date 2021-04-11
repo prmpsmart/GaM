@@ -15,7 +15,7 @@ class PRMP_Entry_Label(Label):
 Entry_Label = PRMP_Entry_Label
 
 
-class LoginEntry(Frame):
+class Tushed_Entry(Frame):
     imageLoaded = False
     res = (20, 20)
     dic = dict(inbuilt=1, resize=res, for_tk=1)
@@ -126,6 +126,32 @@ class LoginEntry(Frame):
         if _pass: self._pass = _pass
 
     def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
+
+
+class ChoosePath(LabelText):
+    def __init__(self, master, text='', callback=None, **kwargs):
+        FONT = self.PRMP_FONT
+        FONT['size'] = 20
+        super().__init__(master, longent=.3, topKwargs=dict(text=text, font=FONT, image=PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1), compound='left'), tipKwargs=dict(text='Double-click to choose folder!'), **kwargs)
+        self.T.bind('<Double-1>', self.load_dir)
+        self.T.bind('<1>', self.read_dir)
+        self.B.bind('<Double-1>', self.load_dir)
+        self.folder = ''
+        self.callback = callback
+
+    def read_dir(self, event):
+        folder = self.B.get()
+        if os.path.isdir(folder):
+            self.folder = folder
+            self.B.set(folder)
+            if self.callback: self.callback(folder)
+
+    def load_dir(self, event):
+        folder = dialogFunc(path=1, folder=1)
+        if folder:
+            self.folder = folder
+            self.B.set(folder)
+            if self.callback: self.callback(folder)
 
 
 class Hierachy(PRMP_TreeView):

@@ -448,9 +448,7 @@ class PRMP_Theme(PRMP_GuiMixins):
             
             self.configure(**_dict)
         
-        if self.checkVar:
-            print(self.variable, self)
-            if self.variable.get() == self.value: self.checked(1)
+        if self.checkVar and self.variable.get() == self.value: self.checked(1)
 
         return self
 
@@ -707,9 +705,7 @@ class PRMP_Widget(PRMP_Theme):
     @property
     def checkVar(self):
         var = self.kwargs.get('variable', None)
-        if var:
-            print(var)
-            return var
+        if var: return var
 
     def checked(self, event=None):
         if self.checkVar:

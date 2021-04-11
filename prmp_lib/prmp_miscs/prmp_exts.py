@@ -91,7 +91,6 @@ class PRMP_File(io.BytesIO, PRMP_AdvMixins, PRMP_ClassMixins):
         if _read == 0: return data
         else: return super().read(_read)
 
-
     # def read(self, _read=0):
     #     print(_read)
     #     self._read = 0
@@ -140,7 +139,11 @@ class PRMP_File(io.BytesIO, PRMP_AdvMixins, PRMP_ClassMixins):
         f.write(self.data)
 
     def saveObj(self, obj): pickle.dump(obj, self)
+
     def loadObj(self): return self.unpickle()
+
+    @property
+    def ext(self): return os.path.splitext(self.name)[-1].replace('.', '')
 
 
 class PRMP_Exts(PRMP_AdvMixins):

@@ -388,14 +388,17 @@ class PRMP_ImageFile(PRMP_File):
     @property
     def image(self):
         if not _PIL_: return
-        return Image.open(self)
+        d = self.class_(data=self.data)
+        
+        return Image.open(d)
 
     def __init__(self, imageFileName='', inbuilt=False, inExt='png', image=None, array=None, **kwargs):
         isArray = self.isArray(array)
         passed = [bool(a) for a in [imageFileName, image, isArray]].count(True)
-        assert passed <= 1, 'Only one is required in [imageFileName, image]'
+        assert passed <= 2, 'Only one is required in [array, image]'
 
         if imageFileName and inbuilt: kwargs['b64'] = PRMP_Images.get(imageFileName, inExt)
+        self._ext = ''
 
         super().__init__(filename=imageFileName, **kwargs)
 
@@ -405,7 +408,9 @@ class PRMP_ImageFile(PRMP_File):
         PRMP_ImageFile.count += 1
     
     @property
-    def ext(self): return PRMP_ImageType.get(self)
+    def ext(self):
+        if not self._ext: self._ext = PRMP_ImageType.get(self)
+        return self._ext
 
 class PRMP_Image:
     count = 0
@@ -433,27 +438,17 @@ class PRMP_Image:
         self._animatedFrames = []
 
         if filename or image or b64 or isArray:
-            if image: self.imageFile = PRMP_ImageFile(filename, image=image)
-            
-            elif b64: self.imageFile = PRMP_ImageFile(filename, b64=b64)
-            
-            elif isArray: self.imageFile = PRMP_ImageFile(filename, array=array)
-            
-            else: self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
-            
-            # else: self.imageFile = PRMP_ImageFile(filename)
-
-            if not isinstance(self.imageFile, (PRMP_ImageFile, str)): raise ValueError('{} or {} is not a valid value.'.format(filename, image))
-
+            if not isinstance(filename, (PRMP_ImageFile)):
+                if image: self.imageFile = PRMP_ImageFile(filename, image=image)
+                
+                elif b64: self.imageFile = PRMP_ImageFile(filename, b64=b64)
+                
+                elif isArray: self.imageFile = PRMP_ImageFile(filename, array=array)
+                
+                else: self.imageFile = PRMP_ImageFile(filename, inbuilt=inbuilt, inExt=inExt)
+            else: self.imageFile = filename
+                
             self.ext = self.imageFile.ext
-
-            if _PIL_:
-                if self.ext == 'xbm': self.tkImgClass = BitmapImage
-                else: self.tkImgClass = PhotoImage
-            else:
-                import tkinter as tk
-                self.tkImgClass = tk.PhotoImage
-                if self.ext == 'xbm': self.tkImgClass = tk.BitmapImage
 
             img = self.image = self.image or Image.open(self.imageFile) if _PIL_ else None
 
@@ -473,7 +468,18 @@ class PRMP_Image:
 
         else: raise ValueError('imageFile is None')
     
+    def setTkImgClass(self):
+        if _PIL_:
+            if self.ext == 'xbm': self.tkImgClass = BitmapImage
+            else: self.tkImgClass = PhotoImage
+        else:
+            import tkinter as tk
+            self.tkImgClass = tk.PhotoImage
+            if self.ext == 'xbm': self.tkImgClass = tk.BitmapImage
+
+    
     def createTkImage(self, name=''):
+        self.setTkImgClass()
         self.tkImage = self.tkImgClass(self.img, name=name or self.name or self.name_n_ext)
         return self.tkImage
 

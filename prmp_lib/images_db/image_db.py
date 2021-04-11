@@ -1,9 +1,9 @@
+from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile, PRMP_ImageType, PRMP_Images, PRMP_IMAGES, PRMP_Image
 import os
 cwd = os.getcwd()
 
 
 def save_PRMP_Images():
-    from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile, PRMP_ImageType, PRMP_Images, PRMP_IMAGES
     for img_ext in PRMP_IMAGES:
         for name, data in img_ext.items():
             file = PRMP_ImageFile(name, b64=data)
@@ -31,18 +31,68 @@ def format_dir_pix_names():
     
     print(len(list(gg.values())))
 
+def run(size, files):
+    res = [PRMP_Image(a, thumb=size) for a in files]
+    for f in res: PRMP_ImageFile(f'{f.name}.{f.ext}', image=f.image).save()
 
 
-### dones
+    
 
-# logo
-# frames
-# prmps
+def changeImageSizes():
+    from threading import Thread
+    os.chdir('images/prmp_jpegs')
+    files = [f'raw/{a}' for a in os.listdir('raw')]
+    print(len(files))
+    size = 256, 256
+    fol = '%dx%d'%size
+    size = 1024, 1024
+    try: os.mkdir(fol)
+    except: print(fol,'already exists.')
+
+    files = [PRMP_ImageFile(a) for a in files]
+    f1 = files[:19], files[19:38], files[38:57]
+    os.chdir(fol)
+
+    for a in f1: Thread(target=run, args=[size, a]).start()
+
+    # d = [(a.ext, a.image.size, a.ext) for a in f1[0]]
+    # print(d)
+
+    # j = files[0]
+    # print(j.ext)
+    # print(j.data[:10])
+    # print(j.ext)
+    # print(j.ext)
+    # print(j.ext)
+    # print(j.ext)
 
 
 
 
-format_dir_pix_names()
+
+
+
+
+
+
+import ctypes, win32ui, sys, os
+
+d = ctypes.cdll.LoadLibrary('imageres.dll')
+
+d = win32ui.LoadLibrary('imageres.dll')
+
+print(d.GetFileName())
+d.rsrc
+
+# print(sys.executable)
+
+
+cmd = 'objdump -h imageres.dll'
+cmd = 'dumpbin imageres.dll'
+
+# os.system(cmd)
+
+
 
 
 

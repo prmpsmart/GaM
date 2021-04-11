@@ -12,10 +12,15 @@ from prmp_lib.prmp_gui.imagewidgets import *
 
 class MPVImage(PRMP_ImageCheckbutton):
     f = 0
-    def __init__(self, master, prmpImage='', mm=None, **kwargs):
-        self.filename = prmpImage or 'default_dp'
+    imageKwargs = dict(prmpImage='blue_admin',inbuilt=1, inExt='png', resize=(80, 80))
+    def __init__(self, master, mm=None, imageKwargs={}, resize=(80, 80), **kwargs):
+
+        if not imageKwargs.get('prmpImage', None):
+            imageKwargs = self.imageKwargs
+
+        self.filename = imageKwargs.get('prmpImage')
         self.mm = mm
-        super().__init__(master, prmpImage=prmpImage, tipKwargs=dict(text=self.filename), **kwargs)
+        super().__init__(master, tipKwargs=dict(text=self.filename), imageKwargs=imageKwargs,  bindMenu=0, variable=1, **kwargs)
         self.bind('<Double-1>', self.open)
     
     def open(self, event):
@@ -27,36 +32,14 @@ class MPVImage(PRMP_ImageCheckbutton):
         self.mm.preview.size((*geo, event.widget.winfo_rootx(), event.widget.winfo_rooty()))
         self.mm.preview.deiconify()
         
-    def set(self, file):
+    def set(self, file=''):
         self.filename = str(file)
         self.set_tooltip_text(dict(text=os.path.basename(self.filename or '')))
-        self.loadImage(file)
-
-
-class ChoosePath(LabelText):
-    def __init__(self, master, text='', callback=None, **kwargs):
-        FONT = self.PRMP_FONT
-        FONT['size'] = 20
-        super().__init__(master, longent=.3, topKwargs=dict(text=text, font=FONT, image=PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1), compound='left'), tipKwargs=dict(text='Double-click to choose folder!'), **kwargs)
-        self.T.bind('<Double-1>', self.load_dir)
-        self.T.bind('<1>', self.read_dir)
-        self.B.bind('<Double-1>', self.load_dir)
-        self.folder = ''
-        self.callback = callback
-
-    def read_dir(self, event):
-        folder = self.B.get()
-        if os.path.isdir(folder):
-            self.folder = folder
-            self.B.set(folder)
-            if self.callback: self.callback(folder)
-
-    def load_dir(self, event):
-        folder = dialogFunc(path=1, folder=1)
-        if folder:
-            self.folder = folder
-            self.B.set(folder)
-            if self.callback: self.callback(folder)
+        if not file: self.loadImage(**self.imageKwargs, name='blue_admin%d'%MPVImage.f)
+        else: self.loadImage(prmpImage=file, resize=(80, 80), name=f'{file}_{MPVImage.f}')
+        MPVImage.f += 1
+        if MPVImage.f == 200: MPVImage.f = 0
+        self.paint()
 
 
 class MassivePhotoViewer(PRMP_MainWindow):
@@ -110,7 +93,7 @@ class MassivePhotoViewer(PRMP_MainWindow):
         self.diff = self.m ** 2
         self.folder = ''
         
-        self.after(100, lambda: threading.Thread(target=self.afterload).start())
+        self.after(100, lambda: threading.Thread(target=self.load).start())
         pp = {}
         # pp.update(PRMP_PNGS)
         # pp.update(PRMP_JPEGS)
@@ -127,18 +110,18 @@ class MassivePhotoViewer(PRMP_MainWindow):
     def as_wall(self):
         MPVImage.f += 1
         for img_lbl in self.image_labels:
-            if img_lbl.var.get() == '1':
+            if img_lbl.variable.get() == '1':
                 
                 img = img_lbl.prmpImage.image
 
-                self.img = PRMP_Image(image=img, resize=self.geo, name=f'{os.path.basename(img_lbl.filename or "PRMP_Test")}{MPVImage.f}', for_tk=1)
+                self.img = PRMP_Image(image=img, resize=self.geo, name=f'PRMP_Test{MPVImage.f}', for_tk=1)
                 # print(self.old)
                 self.canvas.delete(self.old)
                 self.old = self.canvas.create_image(0, 0, image=self.img, anchor='nw')
                 self.change_color(img)
                 return
         
-    def afterload(self):
+    def load(self):
         r = c = v = 0
         hh = 80
 
@@ -150,11 +133,12 @@ class MassivePhotoViewer(PRMP_MainWindow):
             x = r * (hh+30)
             y = c * (hh+10)
 
-            one = MPVImage(self.canvas, width=hh, height=hh, imageKwargs=dict(prmpImage='blue_admin',inbuilt=1, inExt='png', resize=(80, 80)),bindMenu=0, fullsize=0,  mm=self)
+            one = MPVImage(self.canvas, width=hh, height=hh, mm=self)
             self.canvas.create_window(x, y, window=one, anchor='nw')
 
             self.image_labels.append(one)
-        for a in self.image_labels: a.paint()
+
+        # for a in self.image_labels: a.paint()
     
     def load_dir(self, folder):
         self.folder = folder
@@ -175,13 +159,13 @@ class MassivePhotoViewer(PRMP_MainWindow):
             labels = dict(itertools.zip_longest(self.image_labels, pictures, fillvalue=None))
 
             for wid, file in labels.items():
-                if wid:
+                if wid and file:
                     wid.set(file)
-                    wid.var.set('0')
+                    if wid.checkVar: wid.variable.set('0')
 
     def _load_dict(self, dic):
         labels = dict(itertools.zip_longest(self.image_labels, list(dic.items()), fillvalue=None))
-        # return
+        return
         co = 0
         for wid, tup in labels.items():
             # if co  == 10: return
@@ -206,7 +190,7 @@ class MassivePhotoViewer(PRMP_MainWindow):
     def picked(self):
         _p = []
         for pp in self.image_labels:
-            if pp.var.get() == '1': _p.append(pp.filename)
+            if pp.variable.get() == '1': _p.append(pp.filename)
         return _p
 
     def proceed(self):
@@ -256,12 +240,12 @@ class MassivePhotoViewer(PRMP_MainWindow):
     
     def next_page(self):
         self.current += 1
-        if self.current == self.total_pages+1: self.current = 1
+        if self.current > self.total_pages: self.current = 1
         self.load_images(self.current-1)
 
     def prev_page(self):
         self.current -= 1
-        if self.current == 0: self.current = 5
+        if self.current < 1: self.current = self.total_pages
         self.load_images(self.current-1)
 
 

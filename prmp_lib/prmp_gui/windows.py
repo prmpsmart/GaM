@@ -88,6 +88,9 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.paint()
         self.mainloop()
     
+    @property
+    def cont(self): return self.container
+    
     def change2Imgcolor(self, image, num_colors=10, update=1, button_fg='white', fg='white'):
         '''
         changes the PRMP_Theme defaults colors to the colors in image
@@ -109,7 +112,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
     change_color = change2Imgcolor
 
-    def __init__(self, container=True, containerConfig={},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, **kwargs):
+    def __init__(self, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, **kwargs):
         '''
         PRMP_Window a base class for all window class for common behaviours.
 
@@ -147,6 +150,8 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         tt, tooltype: 
         nwb, noWindowButtons: 
         cac, canvas_as_container: 
+        lac, label_as_container: 
+        cc, containerClass: 
 
         kwargs: other TKClass options to pass to the PRMP_Widget.__init__
         '''
@@ -169,7 +174,6 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             if tipping: PRMP_Window.TIPSMANAGER = PRMP_ToolTipsManager(self)
 
         self.container = None
-        self.canvas_as_container = canvas_as_container
         self.zoomed = False
         self.iconed = False
 
@@ -183,15 +187,6 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.titleText = title
 
         self.co = 0
-
-        if cac != None: canvas_as_container = cac
-
-        if container:
-            if canvas_as_container: self.container = Canvas(self, relief='groove')
-            else:
-                self.container = PRMP_Style_Frame(self)
-                self.container.configure(relief='groove')
-
         # normalizing of the parameters, from the abbr to their full meaning.
         if normTk: atb, asb, geo = 0, 0, ()
         if geo != None: geometry = geo
@@ -207,6 +202,18 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         if tbm != None: toggleMenuBar = tbm
         if tt != None: tooltype = tt
         if nwb != None: noWindowButtons = nwb
+        if cac != None: canvas_as_container = cac
+        if lac != None: label_as_container = lac
+        if cc != None: containerClass = cc
+
+        containerClass = containerClass or PRMP_Style_Frame
+
+        if container:
+            if canvas_as_container: containerClass = Canvas
+            elif label_as_container: containerClass = PRMP_Style_Label
+
+            self.container = containerClass(self)
+            self.container.configure(**containerConfig)
 
         self.noWindowButtons = noWindowButtons
 

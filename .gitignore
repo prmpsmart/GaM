@@ -18,6 +18,8 @@ creator.py
 *.ico
 *.xbm
 *.dll
+*.jpeg
+*.jpg
 
 build/
 c/

@@ -53,6 +53,8 @@ class PRMP_ImageWidget:
         self.isGif = False
 
         self.frame_counter = 0
+        self.resize = kwargs.pop('resize', self.resize)
+        self.thumb = kwargs.pop('thumb', self.thumb)
 
         if not self.winfo_ismapped():
             self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
@@ -60,9 +62,8 @@ class PRMP_ImageWidget:
 
         try:
             if prmpImage and not isinstance(prmpImage, PRMP_Image):
-                if not kwargs.get('resize'): kwargs['resize'] = self.resize
-                
-                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, **kwargs)
+                kwargs['for_tk'] = 1
+                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
             else: return
 
             if isinstance(prmpImage, PRMP_Image): self.imageFile = prmpImage.imageFile
@@ -96,15 +97,15 @@ class PRMP_ImageWidget:
             else:
                 if self.face: self.frame = self.prmpImage._find_faces(prmp_image=1, for_tk=1)
 
+            print(self.frame)
             self.config(image=self.frame)
             self.paint()
 
         except Exception as e:
+            self['image'] = None
+            # if self.loadDefault: self.loadImage(self.default_dp)
             raise e
 
-
-            self['image'] = ''
-            if self.loadDefault: self.loadImage(self.default_dp)
 
     def __renderGif(self):
         if not self.isGif: return
