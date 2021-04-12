@@ -549,11 +549,7 @@ class PRMP_ImageDB(PRMP_AdvMixins):
                         print(str(columns[-1]), '\n'*3)
                 # break
 
-
     def debugDB(self): self._debugDB(self.db_file)
-
-
-
 
 
 class PRMP_ImageFile(PRMP_File):
