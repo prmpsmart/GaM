@@ -32,6 +32,7 @@ except Exception as e:
 
 from .prmp_exts import *
 from .prmp_mixins import PRMP_AdvMixins
+import sqlite3
 
 
 class PRMP_ImageType:
@@ -383,6 +384,13 @@ class PRMP_Images:
             exts_all = glob[exts]
             if inbuilt in exts_all: return exts_all[inbuilt]
 
+
+class PRMP_ImageDB(PRMP_AdvMixins):
+
+    def __init__(self, db_file):
+        pass
+
+
 class PRMP_ImageFile(PRMP_File):
 
     @property
@@ -477,7 +485,6 @@ class PRMP_Image:
             self.tkImgClass = tk.PhotoImage
             if self.ext == 'xbm': self.tkImgClass = tk.BitmapImage
 
-    
     def createTkImage(self, name=''):
         self.setTkImgClass()
         self.tkImage = self.tkImgClass(self.img, name=name or self.name or self.name_n_ext)

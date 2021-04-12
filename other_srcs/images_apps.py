@@ -8,6 +8,16 @@ from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.image_widgets import *
 from prmp_lib.prmp_gui.tushed_widgets import *
 
+class Background:
+    img_count = 0
+    def load(self):
+        size = self.cont.width, self.cont.height
+        i = 'orange'
+        self.cont.loadImage(r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\images_db\images\prmp_jpgs\%s_lux.jpg'%i, resize=size, name='Background_%d'%self.img_count)
+        img = self.cont.image
+        self.change2Imgcolor(img)
+        self.img_count += 1
+        if self.img_count >20: self.img_count = 0
 
 class MPVImage(PRMP_ImageCheckbutton):
     f = 0
@@ -19,16 +29,16 @@ class MPVImage(PRMP_ImageCheckbutton):
 
         self.filename = imageKwargs.get('prmpImage')
         self.mm = mm
-        super().__init__(master, tipKwargs=dict(text=self.filename), imageKwargs=imageKwargs,  bindMenu=0, variable=1, **kwargs)
+        super().__init__(master, tipKwargs=dict(text=self.filename), imageKwargs=imageKwargs,  bindMenu=0, **kwargs)
         self.bind('<Double-1>', self.open)
     
     def open(self, event):
         geo=(500, 500)
-
         if self.mm.full_preview.get(): geo = self.prmpImage.image.size
-        self.mm.preview.setImage(self.prmpImage)
 
         self.mm.preview.size((*geo, event.widget.winfo_rootx(), event.widget.winfo_rooty()))
+        self.mm.preview.set(self.prmpImage)
+
         self.mm.preview.deiconify()
         
     def set(self, file=''):
@@ -40,6 +50,45 @@ class MPVImage(PRMP_ImageCheckbutton):
         if MPVImage.f == 200: MPVImage.f = 0
         self.paint()
 
+class Database_Images(PRMP_MainWindow, Background):
+
+    def __init__(self, callback=None, **kwargs):
+        super().__init__(containerClass=PRMP_ImageSLabel, geo=(450, 500), **kwargs)
+
+        
+        # listbox to hold da tables
+        # another listbox to hold images in each table
+        # button to return list of images in the 2nd listbox
+        # double click on the 1st listbox to load images into the 2nd listbox 
+        # double click on the 2st listbox to load image into PRMP_ImageDialog
+        # labelentry for path of the database
+        self.callback = callback
+
+        Label(self.cont, text='Tables', place=dict(relx=0, rely=0, relh=.08, relw=.43))
+        self.table_names = ListBox(self.cont, place=dict(relx=0, rely=.08, relh=.8, relw=.43))
+
+        PRMP_Separator(self.cont, place=dict(relx=.44, rely=0, relh=.88, relw=.008))
+        PRMP_Separator(self.cont, place=dict(relx=.451, rely=0, relh=.88, relw=.008))
+
+        self.current_table = Label(self.cont, text='Images in Table', place=dict(relx=.47, rely=0, relh=.08, relw=.53))
+        self.table_images = ListBox(self.cont, place=dict(relx=.47, rely=.08, relh=.8, relw=.53))
+
+        self.db_path = LabelEntry(self.cont, topKwargs=dict(text='DB File'), bottomKwargs=dict(_type='file', very=1, foreground='white'), place=dict(relx=.02, rely=.9, relh=.08, relw=.8), orient='h', longent=.2)
+        self.db_path.B.bind('<Double-1>', lambda e: self.db_path.set(dialogFunc(path=1, folder=0)))
+        self.db_path.B.bind('<Return>', self.loadFile)
+
+        if self.callback: Button(self.cont, text='Return', place=dict(relx=.85, rely=.9, relh=.078, relw=.13))
+
+        self.after(10, self.load)
+        self.start()
+
+    def loadFile(self, event=None):
+        db = self.db_path.get()
+        print(db)
+
+    
+    def isMaximized(self):
+        self.load()
 
 class Massive_Photo_Viewer(PRMP_MainWindow):
     
@@ -58,7 +107,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         PRMP_Separator(self.canvas, orient='vertical', place=dict(relx=.765, rely=0, relw=.005, relh=1))
         PRMP_Separator(self.canvas, orient='vertical', place=dict(relx=.775, rely=0, relw=.005, relh=1))
 
-        self.source_dir = ChooseDir(self.canvas, place=dict(relx=.79, rely=0, relw=.2, relh=.15), text='Source Folder', callback=self.load_dir)
+        self.source_dir = ChooseDir(self.canvas, place=dict(relx=.79, rely=.008, relw=.2, relh=.15), text='Source Folder', callback=self.load_dir)
 
         self.total = LabelLabel(self.canvas, topKwargs=dict(text='Total Pictures'), place=dict(relx=.79, rely=.17, relw=.2, relh=.04), longent=.65, orient='h', font='PRMP_FONT')
         
@@ -72,6 +121,11 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         self.full_preview = Checkbutton(self.canvas, text='Full size?', place=dict(relx=.81, rely=.34, relw=.1, relh=.04), image=PRMP_Image('zoom', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left')
 
         Button(self.canvas, text='Use as Wallpaper?', place=dict(relx=.81, rely=.4, relw=.15, relh=.04), image=PRMP_Image('as_wall', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.as_wall)
+        
+
+        Checkbutton(self.canvas, text='Load from Database?', place=dict(relx=.81, rely=.46, relw=.15, relh=.04), image=PRMP_Image('db_icon.png', resize=rv, inbuilt=0, inExt='png', for_tk=1), compound='left', command=self.from_database)
+
+
 
         self.varr = tk.StringVar(self)
         yy = .6
@@ -92,16 +146,16 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         self.diff = self.m ** 2
         self.folder = ''
         
-        self.after(100, lambda: threading.Thread(target=self.load).start())
-        pp = {}
-        # pp.update(PRMP_PNGS)
-        # pp.update(PRMP_JPEGS)
-        # pp.update(PRMP_XBMS)
-        pp.update(PRMP_GIFS)
-        # print(len(pp))
-        self.after(3000, lambda: threading.Thread(target=self._load_dict, args=[pp]).start())
+        # self.after(100, lambda: threading.Thread(target=self.load).start())
+        # pp = {}
+        # # pp.update(PRMP_PNGS)
+        # # pp.update(PRMP_JPEGS)
+        # # pp.update(PRMP_XBMS)
+        # pp.update(PRMP_GIFS)
+        # # print(len(pp))
+        # self.after(3000, lambda: threading.Thread(target=self._load_dict, args=[pp]).start())
         
-        self.preview = PRMP_ImageDialog(self, geo=geo, imageKwargs=dict(bindMenu=0, fullsize=1), asb=0, tooltype=1, atb=0)
+        self.preview = PRMP_ImageDialog(self, geo=geo, imageWidConfig=dict(fullsize=1), asb=0, tooltype=1, atb=0)
         self.preview.bind('<1>', lambda e: self.preview.withdraw())
 
         self.start()
@@ -247,8 +301,10 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         if self.current < 1: self.current = self.total_pages
         self.load_images(self.current-1)
 
+    def from_database(self):
+        pass
 
-class Image_Renamer(Tk):
+class Image_Renamer(Tk, Background):
 
     def __init__(self, folder='', **kwargs):
         super().__init__(containerClass=PRMP_ImageSLabel, containerConfig=dict(anchor='center'), geo=(800, 500), tipping=0, **kwargs)
@@ -345,12 +401,6 @@ class Image_Renamer(Tk):
 
         self.image.loadImage(self.current_file, name=f'{name}_{self.count+1}', resize=size)
 
-    def load(self):
-        size = self.cont.width, self.cont.height
-        self.cont.loadImage(r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\images_db\images\prmp_jpgs\orange_lux.jpg', resize=size)
-        img = self.cont.image
-        self.change2Imgcolor(img)
-
     def refresh(self):
         self.loadFolder(self.folder)
         self.path.set(self.folder)
@@ -373,14 +423,18 @@ class Image_Renamer(Tk):
 
 
 
-
 # folder = r'C:\Users\Administrator\Pictures\PRMPSmart Wallpapers'
 # folder = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\images_db\images\prmp_jpgs'
 
 
 # Image_Renamer(title='Image Renamer', folder=folder, tm=1)
 
+# app = Massive_Photo_Viewer
+# app = Image_Renamer
+app = Database_Images
 
-
+side = 'right-center'
+side = 'center'
+app(side=side, callback=9)
 
 

@@ -106,7 +106,7 @@ class PRMP_ClassMixins(PRMP_Mixins):
         return self.subs[item]
 
 
-class PRMP_AdvMixins(PRMP_Mixins):
+class PRMP_AdvMixins(PRMP_ClassMixins):
     
     def isArray(self, array):
         try:

@@ -483,8 +483,6 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         points = self.pointsToCenterOfScreen
         points[2] *= 2
         points[2] -= 50
-        print(points)
-
         self.setGeometry(points)
 
     def topLeftOfScreen(self):

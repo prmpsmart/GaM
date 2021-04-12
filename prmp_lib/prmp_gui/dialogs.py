@@ -251,25 +251,22 @@ CamD = PRMP_CameraDialog
 
 class PRMP_ImageDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, prmpImage=None, title='Image Dialog', imageKwargs={}, **kwargs):
-        self.prmpImage = prmpImage
+    def __init__(self, master=None, prmpImage=None, title='Image Dialog', imageKwargs={}, imageWidConfig={}, **kwargs):
+        if prmpImage: imageKwargs['prmpImage'] = prmpImage
         self.imageKwargs = imageKwargs
+        self.imageWidConfig = imageWidConfig
         # print(kwargs)
         super().__init__(master, title=title, **kwargs)
 
-    # def isMaximized(self): return self.getWid_H_W(self)
-
     def _setupDialog(self):
         self.imageKwargs['bindMenu'] = 1
-        self.imageLabel = PRMP_ImageSLabel(self.container, prmpImage=self.prmpImage, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), imageKwargs=self.imageKwargs)
+        self.imageLabel = PRMP_ImageSLabel(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat', anchor='center'), imageKwargs=self.imageKwargs, **self.imageWidConfig)
         self.set = self.imageLabel.set
-        # self.bind('<Return>', self.imageLabel.saveImage)
+        self.bind('<Return>', self.imageLabel.saveImage)
 
     def getImage(self, imageFile):
         self._setResult(imageFile)
         self.destroyDialog()
-    
-    def setImage(self, image): self.imageLabel.loadImage(image)
 
 ImgD = PRMP_ImageDialog
 

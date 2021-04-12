@@ -9,8 +9,6 @@ class PRMP_ImageWidget:
 
     def __init__(self, master, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=150, face=False, imageKwargs={}, config={}, **kwargs):
 
-        # if issubclass(self.WidgetClass, PRMP_Style_) and not config.get('anchor'): config['anchor'] = 'center'
-
         self.WidgetClass.__init__(self, master, config=config, **kwargs)
         if not _PIL_: print('PIL is not available for this program!')
 
@@ -19,6 +17,7 @@ class PRMP_ImageWidget:
         self.thumb = thumb
         self.resize = resize
         self.fullsize = fullsize
+        
         self.face = face
 
         self.frame_counter = 0
@@ -61,13 +60,15 @@ class PRMP_ImageWidget:
             return
 
         try:
+            if self.fullsize: self.resize = (self.width, self.height)
+
             if prmpImage and not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
                 prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
-                
-            else: return
 
-            if isinstance(prmpImage, PRMP_Image): self.imageFile = prmpImage.imageFile
+            if isinstance(prmpImage, PRMP_Image):
+                if self.resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(self.resize)))
+                else: self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
 
             self.frame = self.prmpImage = prmpImage
@@ -75,7 +76,7 @@ class PRMP_ImageWidget:
             if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
 
             self.image = self.prmpImage.image
-            if self.fullsize: self.resize = (self.width, self.height)
+            
 
             if self.prmpImage.ext == 'gif':
                 self.frames = []
@@ -100,12 +101,11 @@ class PRMP_ImageWidget:
 
             self.config(image=self.frame)
             self.paint()
-
-        except Exception as e:
+        except ValueError:
             self['image'] = None
-            # if self.loadDefault: self.loadImage(self.default_dp)
+            if self.loadDefault: self.loadImage(self.default_dp)
+        except Exception as e:
             raise e
-
 
     def __renderGif(self):
         if not self.isGif: return
