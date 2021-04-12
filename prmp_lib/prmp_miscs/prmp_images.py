@@ -32,7 +32,7 @@ except Exception as e:
 
 from .prmp_exts import *
 from .prmp_mixins import PRMP_AdvMixins
-import sqlite3
+import sqlite3, base64
 
 
 class PRMP_ImageType:
@@ -387,8 +387,173 @@ class PRMP_Images:
 
 class PRMP_ImageDB(PRMP_AdvMixins):
 
+    @classmethod
+    def _getCursor(cls, db_file):
+        connection = sqlite3.connect(db_file)
+        cursor = connection.cursor()
+
+        return cursor
+
+    @classmethod
+    def _getName(cls, name):
+        name = os.path.basename(name)
+        name = os.path.splitext(name)[0]
+        return name
+
+    @classmethod
+    def _getImagesDict(cls, folders):
+        dicts = {}
+        for folder in folders:
+            files = []
+            for file in os.listdir(folder):
+                file = os.path.join(folder, file) 
+                if os.path.isfile(file) and PRMP_ImageType.get(file): files.append(file)
+            dicts[folder] = files
+        return dicts
+    
+    @classmethod
+    def _createDB(cls, db_file, images_dict):
+        # creating the tables
+        _tbs = images_dict.keys()
+        tables = [cls._getName(table)for table in _tbs]
+        
+        cursor = cls._getCursor(db_file)
+        for table in tables: cursor.execute(f'CREATE TABLE {table} (name TEXT, ext TEXT, data BLOB)')
+
+        cls._fillDB(cursor, images_dict)
+    
+    @classmethod
+    def _getB64(cls, file): return base64.b64encode(open(file, 'rb').read())
+    
+    @classmethod
+    def _fillDB(cls, cursor, images_dict):
+        _tbs = images_dict.keys()
+        _tabs = [cls._getName(table) for table in _tbs]
+        tables = dict(zip(_tabs, _tbs))
+
+        for table, table_path in tables.items():
+            images_paths = images_dict[table_path]
+            # formatting the files
+            _filed = [cls._getName(file) for file in images_paths]
+            images_named = tuple(zip(_filed, images_paths))
+            
+            values = []
+            for name, image_path in images_named:
+                value = (name, PRMP_ImageType.get(image_path), cls._getB64(image_path))
+                values.append(value)
+            
+            cursor.executemany(f'INSERT INTO {table} VALUES (?,?,?)', values)
+
+        cursor.connection.commit()
+
+    @classmethod
+    def _createImageDB(cls, db_file, images_folder, sub_folders=False, obj=False):
+        images_folders = [images_folder]
+        if sub_folders:
+            for folder in os.listdir(images_folder):
+                folder = os.path.join(images_folder, folder)
+                if os.path.isdir(folder): images_folders.append(folder)
+
+        images_dict = cls._getImagesDict(images_folders)
+
+        cls._createDB(db_file, images_dict)
+        
+        if not obj: return cls(db_file)
+
     def __init__(self, db_file):
+        self.db_file = db_file
+        self.cursor = self._getCursor(db_file)
+    
+    def saveImages(self, images_folder, sub_folders=False): self._createImageDB(self.db_file, images_folder, sub_folders, 1)
+
+    @classmethod
+    def _getPRMPImage(cls, name, ext, b64): return PRMP_ImageFile(f'{name}.{ext}', b64=b64)
+
+    @classmethod
+    def _getPRMPImages(cls, images): return [PRMP_ImageFile(f'{name}.{ext}', b64=b64) for name, ext, b64 in images]
+    
+    def getImage(self, table, name):
+        t = (name,)
+        self.cursor.execute(f'SELECT * FROM {table} WHERE name=?', t)
+        # images = list(self.cursor)
+        return self._getPRMPImages(self.cursor)
+
+    def getTable(self, table):
+        self.cursor.execute(f'SELECT * FROM {table}')
+        return self._getPRMPImages(self.cursor)
+    
+    def saveImage(self, table, name, file_path=None):
+        image = self.getImage(table, name)
+        if image: image = image[0]
+        image.save(file_path)
+
+    def saveTable(self, table, folder=''):
+        folder = folder or table
+        if folder:
+            try: os.mkdir(folder)
+            except: pass
+        os.chdir(folder)
+        
+        images = self.getTable(table)
+        for image in images: image.save()
+    
+    def saveAll(self, folder=''):
+        if folder:
+            try: os.mkdir(folder)
+            except: pass
+        os.chdir(folder)
+
+    def addImage(self, table, file):
         pass
+
+    def addTable(self, images_folder): self.saveImages(images_folder, 0, 1)
+    
+    def addTables(self, images_folder): self.saveImages(images_folder, 1, 1)
+
+    @classmethod
+    def _debugDB(cls, db_file=None, cursor=None):
+
+        if not cursor: cursor = cls._getCursor(db_file)
+        dir_ = db_file + ' datas'
+        try: os.mkdir(dir_)
+        except: pass
+
+        connection = cursor.connection
+        cursor = connection
+        
+        schema = open(os.path.join(dir_, 'schema.txt'), 'w')
+        
+        for (tableName,) in cursor.execute(
+            """
+            select NAME from SQLITE_MASTER where TYPE='table' order by NAME;
+            """
+        ):
+            # '''
+            schema.write("\n{}:\n".format(tableName))
+            for  (columnID, columnName, columnType,  columnNotNull, columnDefault, columnPK) in cursor.execute("pragma table_info('{}');".format(tableName)):
+                
+                schema.write("    id={id}, name={name}, type={type}, null={null}, default={default}, pk={pk}\n\n".format(
+                    id=columnID,
+                    name=columnName,
+                    type=columnType if columnType else "''",
+                    null=" not null" if columnNotNull else "''",
+                    default=" [{}]".format(columnDefault) if columnDefault else "''",
+                    pk=" *{}".format(columnPK) if columnPK else "''",
+                ))
+                fi = open(os.path.join(dir_, tableName + '.txt'), 'w')
+                for columns in cursor.execute('select * from '+ tableName): fi.write(str(columns) + '\n')
+                # '''
+            if 'segdir' in tableName:
+                for columns in cursor.execute('select * from '+ tableName):
+                    if 'segdir' in tableName:
+                        print(str(columns[-1]), '\n'*3)
+                # break
+
+
+    def debugDB(self): self._debugDB(self.db_file)
+
+
+
 
 
 class PRMP_ImageFile(PRMP_File):

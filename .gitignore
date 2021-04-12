@@ -20,6 +20,9 @@ creator.py
 *.dll
 *.jpeg
 *.jpg
+*.txt
+*.prmp_db
+
 
 build/
 c/

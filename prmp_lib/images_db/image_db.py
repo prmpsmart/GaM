@@ -1,4 +1,4 @@
-from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile, PRMP_ImageType, PRMP_Images, PRMP_IMAGES, PRMP_Image
+from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile,  PRMP_ImageDB
 import os
 cwd = os.getcwd()
 
@@ -35,9 +35,6 @@ def run(size, files):
     res = [PRMP_Image(a, thumb=size) for a in files]
     for f in res: PRMP_ImageFile(f'{f.name}.{f.ext}', image=f.image).save()
 
-
-    
-
 def changeImageSizes():
     from threading import Thread
     os.chdir('images/prmp_jpegs')
@@ -67,33 +64,16 @@ def changeImageSizes():
     # print(j.ext)
 
 
+s = ['images/frames', 0]
+s = ['images', 1]
+db = 'image_db.prmp_db'
 
+# os.remove(db)
+# imageDB = PRMP_ImageDB._createImageDB(db, *s)
+imageDB = PRMP_ImageDB(db)
 
-
-
-
-
-
-
-import ctypes, win32ui, sys, os
-
-d = ctypes.cdll.LoadLibrary('imageres.dll')
-
-d = win32ui.LoadLibrary('imageres.dll')
-
-print(d.GetFileName())
-d.rsrc
-
-# print(sys.executable)
-
-
-cmd = 'objdump -h imageres.dll'
-cmd = 'dumpbin imageres.dll'
-
-# os.system(cmd)
-
-
-
-
+# print(imageDB.saveImage('prmp_jpgs', 'red_lux'))
+# print(imageDB.saveTable('frames'))
+imageDB.debugDB()
 
 
