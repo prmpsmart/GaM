@@ -2,7 +2,7 @@ import io, base64, zlib, pickle, zipfile
 from .prmp_mixins import PRMP_AdvMixins, os, PRMP_ClassMixins
 
 
-def zipPath(resource, destination='', latest=False, quiet=0):
+def zipPath(resource, destination='', latest=False, quiet=0, excludes=[]):
     # Create name of new zip file, based on original folder or file name
     resource = resource.rstrip('\\').rstrip('/')
     # if resource in destination: TranxFerLogger.warning('Loop: Save somewhere else!')
@@ -25,12 +25,20 @@ def zipPath(resource, destination='', latest=False, quiet=0):
     with zipfile.ZipFile(zipFileName, "w", compression=zipfile.ZIP_DEFLATED) as zipFile:
         if os.path.isdir(resource):
             for root, dirs, files in os.walk(resource):
-               for file in files:
-                   filename = os.path.join(root, file)
-                   arc = root.replace(resource, zipRootDir)
-                   arcname = os.path.join(arc, file)
-                   if not quiet: print('adding %s'%filename)
-                   zipFile.write(filename, arcname, zipfile.ZIP_DEFLATED)
+                for file in files:
+                    exc = False
+                    for exclude in excludes:
+                        if exclude in file: exc = True
+
+                    if exc: continue
+
+                    filename = os.path.join(root, file)
+                    arc = root.replace(resource, zipRootDir)
+                    arcname = os.path.join(arc, file)
+                    
+                    if not quiet: print('adding %s'%filename)
+                    
+                    zipFile.write(filename, arcname, zipfile.ZIP_DEFLATED)
         else: zipFile.write(resource, zipFileName, zipfile.ZIP_DEFLATED)
     return zipFileName
 
@@ -150,21 +158,25 @@ class PRMP_Exts(PRMP_AdvMixins):
     
     @classmethod
     def getname(cls, name):
+        name = str(name)
         name = os.path.splitext(os.path.basename(name))[0]
         name = name.replace(' ', '_').replace('-', '_').replace('.', '_')
         return name
     
     @classmethod
-    def getsplits(cls, file, name='', data=0):
+    def getsplits(cls, file, name='', data=False):
         '''
         :param file: str path to a file to read.
         :param name: name of the already encoded data passed as :param file: 
         '''
-
         if not data:
-            data = open(file, 'rb').read()
+            if isinstance(file, io.BytesIO): data = file.getvalue()
+            else: data = open(file, 'rb').read()
+            
             enc_data = base64.b64encode(data)
+
         else: enc_data = file
+        
         
         total = len(enc_data)
 
@@ -174,6 +186,7 @@ class PRMP_Exts(PRMP_AdvMixins):
         if mod: div += 1
 
         name = cls.getname(name or file)
+
         if div == 1: return {name: enc_data}
 
         splits = {}

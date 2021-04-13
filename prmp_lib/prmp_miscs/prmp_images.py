@@ -1,6 +1,6 @@
 
 
-__all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_GIFS', 'PRMP_XBMS', 'PRMP_Images', 'PRMP_ImageFile', 'PRMP_Image', 'PRMP_File', 'io', 'os', 'base64', 'zlib', 'pickle', 'PRMP_ImageType', 'Image', 'PhotoImage', 'BitmapImage', 'ImageSequence', 'PRMP_IMAGES']
+__all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_GIFS', 'PRMP_XBMS', 'PRMP_Images', 'PRMP_ImageFile', 'PRMP_Image', 'PRMP_File', 'io', 'os', 'base64', 'zlib', 'pickle', 'PRMP_ImageType', 'Image', 'PhotoImage', 'BitmapImage', 'ImageSequence', 'PRMP_IMAGES', 'PRMP_ImagesDB', 'PRMP_DB']
 
 from .pyized_images import *
 
@@ -150,15 +150,18 @@ class PRMP_ImageType:
             ext = test(data)
             if ext: return ext
 
+
 class PRMP_Images:
     @classmethod
     def grabscreen(cls, bbox=None):
         if not _PIL_: return
         return ImageGrab.grab(bbox)
+    
     @classmethod
     def grabclipboard(cls):
         if not _PIL_: return
         return ImageGrab.grabclipboard()
+    
     @classmethod
     def rgb2hex(cls, color):
         ''' To get the hex value of a color in rgb format
@@ -277,7 +280,7 @@ class PRMP_Images:
         palette.save(outfile, "PNG")
 
     @classmethod
-    def images_into_py(cls, folder='.', pyfile='pyized_images.py', merge={}, prefix='PRMP', space=10, add_all=0):
+    def images_into_py(cls, folder='', files=[], pyfile='pyized_images.py', merge={}, prefix='PRMP', space=10, add_all=0):
         '''
         _author_ = PRMPSmart
 
@@ -298,25 +301,26 @@ class PRMP_Images:
         if not merge: merge = {}
 
         pixs = {}
-        if folder:
-            for fd in os.listdir(folder):
-                # joining to make full path
-                pp = os.path.join(folder, fd)
-                if os.path.isfile(pp):
-                    # get image type
-                    ext = PRMP_ImageType.get(pp)
-                    # get usable name
-                    name = PRMP_Exts.getname(os.path.basename(pp))
+        if folder or files:
+            _files = files.copy()
 
-                    if ext:
-                        # if it exists already
-                        if ext in pixs:
-                            ext_dict = pixs[ext]
-                            ext_dict[name] = pp
-                        # if not
-                        else:
-                            ext_dict = {name: pp}
-                            pixs[ext] = ext_dict
+            if folder: _files.extend([file for file in os.listdir(folder) if os.path.isfile(file)])
+            
+            for file in _files:
+                # get image type
+                ext = PRMP_ImageType.get(file)
+                # get usable name
+                name = PRMP_Exts.getname(file)
+
+                if ext:
+                    # if it exists already
+                    if ext in pixs:
+                        ext_dict = pixs[ext]
+                        ext_dict[name] = file
+                    # if not
+                    else:
+                        ext_dict = {name: file}
+                        pixs[ext] = ext_dict
         
         # merging
         for ext, value_dicts in merge.items():
@@ -490,7 +494,15 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
     def _getPRMPImage(cls, name, ext, data): return PRMP_ImageFile(f'{name}.{ext}', data=data)
 
     @classmethod
-    def _getPRMPImages(cls, images): return [cls._getPRMPImage(name, ext, data) for name, ext, data in images]
+    def _getPRMPImages(cls, images):
+        prmpImages = []
+        # print(images)
+        for tups in images:
+            # print(tups)
+            if tups:
+                img = cls._getPRMPImage(*tups)
+                prmpImages.append(img)
+        return prmpImages
     
     @classmethod
     def _getImage(cls, table, name, raw=0, cursor=None, **kwargs):
@@ -499,10 +511,12 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
 
         cursor.execute(f'SELECT * FROM {table} WHERE name=?', t)
         images = list(cursor)
+        
         if not raw: images = cls._getPRMPImages(images)
         return images
     
-    def getImage(self, table, name, raw=0): return self._getPRMPImages(self._getImage(table, name, raw, cursor=self.cursor))
+    def getImage(self, table, name, raw=0):
+        return self._getImage(table, name, raw, cursor=self.cursor)
     
     @classmethod
     def _getImages(cls, images_dict, **kwargs):
@@ -635,13 +649,15 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
     def debugDB(self): self._debugDB(self.db_file)
 
     @classmethod
-    def _createPyizedImage(cls, images_dict, py_file='pyized_from_db.py', byExt=0, **kwargs):
+    def _createPyizedImage(cls, images_dict, pyfile='pyized_from_db.py', pyizedKwargs={}, **kwargs):
         
         tables_images = cls._getImages(images_dict, **kwargs)
-        print(tables_images)
+        images = []
+        for t, i in tables_images.items(): images.extend(i)
 
+        PRMP_Images.images_into_py(files=images, pyfile=pyfile, **pyizedKwargs)
 
-    def createPyizedImage(self, images_dict, py_file='pyized_from_db.py', *args, **kwargs): return self._createPyizedImage(images_dict, py_file=py_file, cursor=self.cursor, *args, **kwargs)
+    def createPyizedImage(self, images_dict, py_file='pyized_from_db.py', **kwargs): return self._createPyizedImage(images_dict, py_file=py_file, cursor=self.cursor, **kwargs)
 
 
 class PRMP_ImageFile(PRMP_File):
@@ -672,6 +688,7 @@ class PRMP_ImageFile(PRMP_File):
     def ext(self):
         if not self._ext: self._ext = PRMP_ImageType.get(self)
         return self._ext
+
 
 class PRMP_Image:
     count = 0
@@ -853,10 +870,11 @@ class PRMP_Image:
             return cl(array=array, **kwargs)
         else: return array
 
+PRMP_DB = None
+try: PRMP_DB = PRMP_ImagesDB.PRMP_DB()
+except: pass
 
 
 
 
 
-
-# tranxfer_c2 -D -A192.168.43.1 -P7767

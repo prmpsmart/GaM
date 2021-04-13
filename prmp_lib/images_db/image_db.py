@@ -1,6 +1,24 @@
-from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile,  PRMP_ImagesDB
+from prmp_lib.prmp_miscs.prmp_images import *
 import os
 cwd = os.getcwd()
+
+def rename_prmp_jpegs():
+    dd = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\Images\prmp_jpgs'
+    for file in os.listdir(dd):
+        new = 'wall_' + file
+        file = os.path.join(dd, file)
+        new = os.path.join(dd, new)
+        os.rename(file, new)
+
+
+def zippiin():
+    from prmp_lib.prmp_miscs.prmp_exts import zipPath
+
+    s = 'prmp_miscs'
+    f = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\%s'%s
+    f = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\src'
+
+    zipPath(f, 'zips', excludes=['prmp_db', '.pyc'], quiet=1, latest=1)
 
 
 def save_PRMP_Images():
@@ -31,9 +49,11 @@ def format_dir_pix_names():
     
     print(len(list(gg.values())))
 
+
 def run(size, files):
     res = [PRMP_Image(a, thumb=size) for a in files]
     for f in res: PRMP_ImageFile(f'{f.name}.{f.ext}', image=f.image).save()
+
 
 def changeImageSizes():
     from threading import Thread
@@ -64,22 +84,15 @@ def changeImageSizes():
     # print(j.ext)
 
 
-imageDB = PRMP_ImagesDB.PRMP_DB()
-# imageDB.saveImages('images', 1)
 
-# print(imageDB.saveImage('prmp_jpgs', 'red_lux'))
-# print(imageDB.saveTable('frames'))
-# imageDB.debugDB()
 
-# tables = imageDB.tableNames()
-# print(imageDB.tableImages(tables[4]))
-imgd = {
-    'prmp_jpgs': ['red_lux', 'purple_lux', 'orange_lux'], 
-    'gtk': ['gtk_clear', 'gtk_close']
-}
-imageDB.createPyizedImage(imgd, )
-# tabs = imageDB.getImages(imgd)
 
-# print(tabs)
+img = PRMP_DB.getImage('prmp_jpgs', 'orange_lux')[0]
+
+
+# print(type(img))
+
+
+
 
 

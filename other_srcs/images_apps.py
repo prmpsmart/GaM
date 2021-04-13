@@ -11,9 +11,13 @@ from prmp_lib.prmp_gui.tushed_widgets import *
 class Background:
     img_count = 0
     def load(self):
+        if not PRMP_DB: return
+
         size = self.cont.width, self.cont.height
+        img = PRMP_DB.getImage('prmp_jpgs', 'orange_lux')[0]
         i = 'orange'
-        self.cont.loadImage(r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\images_db\images\prmp_jpgs\%s_lux.jpg'%i, resize=size, name='Background_%d'%self.img_count)
+        self.cont.loadImage(img, resize=size, name='Background_%d'%self.img_count)
+
         img = self.cont.image
         self.change2Imgcolor(img)
         self.img_count += 1
@@ -146,7 +150,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         self.diff = self.m ** 2
         self.folder = ''
         
-        # self.after(100, lambda: threading.Thread(target=self.load).start())
+        self.after(100, lambda: threading.Thread(target=self.load).start())
         # pp = {}
         # # pp.update(PRMP_PNGS)
         # # pp.update(PRMP_JPEGS)
@@ -429,9 +433,9 @@ class Image_Renamer(Tk, Background):
 
 # Image_Renamer(title='Image Renamer', folder=folder, tm=1)
 
-# app = Massive_Photo_Viewer
+app = Massive_Photo_Viewer
 app = Image_Renamer
-# app = Database_Images
+app = Database_Images
 
 side = 'right-center'
 side = 'center'
