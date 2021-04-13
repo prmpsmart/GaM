@@ -1,4 +1,4 @@
-from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile,  PRMP_ImageDB
+from prmp_lib.prmp_miscs.prmp_images import PRMP_ImageFile,  PRMP_ImagesDB
 import os
 cwd = os.getcwd()
 
@@ -64,12 +64,7 @@ def changeImageSizes():
     # print(j.ext)
 
 
-s = ['images/frames', 0]
-s = ['images', 1]
-db = 'image_db.prmp_db'
-
-# os.remove(db)
-imageDB = PRMP_ImageDB(db)
+imageDB = PRMP_ImagesDB.PRMP_DB()
 # imageDB.saveImages('images', 1)
 
 # print(imageDB.saveImage('prmp_jpgs', 'red_lux'))
@@ -78,5 +73,13 @@ imageDB = PRMP_ImageDB(db)
 
 # tables = imageDB.tableNames()
 # print(imageDB.tableImages(tables[4]))
+imgd = {
+    'prmp_jpgs': ['red_lux', 'purple_lux', 'orange_lux'], 
+    'gtk': ['gtk_clear', 'gtk_close']
+}
+imageDB.createPyizedImage(imgd, )
+# tabs = imageDB.getImages(imgd)
 
-print(imageDB.getImage('prmp_jpgs', 'red_lux')[0].save())
+# print(tabs)
+
+
