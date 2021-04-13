@@ -226,6 +226,7 @@ class PRMP_Images:
         if not _PIL_: return
         # Resize image to speed up processing
         img = Image.open(image) if isinstance(image, (str, bytes)) else image
+        
         if resize: img.thumbnail((resize, resize))
 
         # Reduce to palette

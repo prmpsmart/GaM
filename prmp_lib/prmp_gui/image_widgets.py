@@ -28,8 +28,10 @@ class PRMP_ImageWidget:
         self.frames = None
         self.durations = None
         self.isGif = False
-        
+        self.prmpImage = None
+        self.imageFile = None
         self.loadDefault = loadDefault
+
 
         self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
 
@@ -71,7 +73,7 @@ class PRMP_ImageWidget:
         try:
             if fullsize: resize = (self.width, self.height)
 
-            if prmpImage and not isinstance(prmpImage, PRMP_Image):
+            if not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
                 prmpImage = PRMP_Image(prmpImage, thumb=thumb, resize=resize, **kwargs)
 
@@ -86,7 +88,7 @@ class PRMP_ImageWidget:
                 if resize: self.frame = prmpImage.resizeTk(resize)
 
             self.image = self.prmpImage.image
-            
+            print(self.imageFile)
 
             if self.prmpImage.ext == 'gif':
                 self.frames = []
@@ -113,8 +115,9 @@ class PRMP_ImageWidget:
                 if self.face: self.frame = self.prmpImage._find_faces(prmp_image=1, for_tk=1)
 
             self.config(image=self.frame)
-            self.paint()
-        except ValueError:
+            # self.paint()
+        except ValueError as e:
+            print(e)
             self['image'] = None
             if self.loadDefault: self.loadImage(self.default_dp)
         except Exception as e:

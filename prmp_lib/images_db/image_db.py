@@ -14,9 +14,9 @@ def rename_prmp_jpegs():
 def zippiin():
     from prmp_lib.prmp_miscs.prmp_exts import zipPath
 
-    s = 'prmp_miscs'
+    s = 'prmp_gui'
     f = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp_lib\%s'%s
-    f = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\src'
+    # f = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\other_srcs'
 
     zipPath(f, 'zips', excludes=['prmp_db', '.pyc'], quiet=1, latest=1)
 
@@ -84,10 +84,10 @@ def changeImageSizes():
     # print(j.ext)
 
 
+zippiin()
 
 
-
-img = PRMP_DB.getImage('prmp_jpgs', 'orange_lux')[0]
+# img = PRMP_DB.getImage('prmp_jpgs', 'orange_lux')[0]
 
 
 # print(type(img))

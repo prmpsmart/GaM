@@ -4,8 +4,8 @@ from ...utils.auths import Authorisation
 
 from .gam_dialogs import *
 from .gam_images import GaM_PNGS
-from prmp_lib.prmp_gui.tushed_widgets import LoginEntry
-from prmp_lib.prmp_gui.imagewidgets import PRMP_ImageSLabel, PRMP_ImageCheckbutton
+from prmp_lib.prmp_gui.tushed_widgets import Tushed_Entry
+from prmp_lib.prmp_gui.image_widgets import PRMP_ImageSLabel, PRMP_ImageCheckbutton
 
 
 def show_admin_required(): PRMP_MsgBox(title="ADMIN Required", msg="An ADMIN permission is required, and any changes would not be saved.", _type="error", ask=0)
@@ -104,17 +104,17 @@ class Base_Password(PRMP_FillWidgets, PRMP_ClassMixins):
     def loadWidgets(self):
         widgets = self.resultsWidgets
 
-        if 'name' in widgets: self.name = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_name), required=1, show='', font=15)
+        if 'name' in widgets: self.name = Tushed_Entry(self.frame, entryKwargs=dict(placeholder=self.ent_name), required=1, show='', font=15)
 
-        if 'username' in widgets: self.username = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_usr), required=1, show='', font=15, positions=(.8, .1, 0, .1, 0), _pass=self.check_username)
+        if 'username' in widgets: self.username = Tushed_Entry(self.frame, entryKwargs=dict(placeholder=self.ent_usr), required=1, show='', font=15, positions=(.8, .1, 0, .1, 0), _pass=self.check_username)
 
         if 'admin' in widgets: self.admin = PRMP_ImageCheckbutton(self.frame, text="Admin?", command=self.admin_add, highlightable=9, compound='left', imageKwargs=dict(prmpImage='blue_admin', inbuilt=1, resize=(23, 23)))
 
-        if 'password' in widgets: self.password = LoginEntry(self.frame, entryKwargs=dict(placeholder=self.ent_pwd, required=1), font=15, positions=(.7, 0, .1, .1, .1))
+        if 'password' in widgets: self.password = Tushed_Entry(self.frame, entryKwargs=dict(placeholder=self.ent_pwd, required=1), font=15, positions=(.7, 0, .1, .1, .1))
 
-        if 'old' in widgets: self.old = LoginEntry(self.frame, entryKwargs=dict(required=1), font=15, positions=(.9, 0, 0, .1, 0))
+        if 'old' in widgets: self.old = Tushed_Entry(self.frame, entryKwargs=dict(required=1), font=15, positions=(.9, 0, 0, .1, 0))
 
-        if 'new' in widgets: self.new = LoginEntry(self.frame, entryKwargs=dict(required=1), font=15)
+        if 'new' in widgets: self.new = Tushed_Entry(self.frame, entryKwargs=dict(required=1), font=15)
 
         if 'hint' in widgets: self.hint = Entry(self.frame, required=0)
 
@@ -556,11 +556,14 @@ class Login(GaM_Dialog):
         if self.callback: self.callback(self.destroy)
 
     def place_widgs(self):
-        rw = .6
-        rx = (1-rw)/2
+        rx, rw = self.pass_login.rx_rw(.75)
+        self.pass_login.username.place(relx=rx, rely=.4, relh=.09, relw=rw)
+        self.pass_login.password.place(relx=rx, rely=.6, relh=.09, relw=rw)
 
-        self.pass_login.username.place(relx=rx, rely=.45, relh=.065, relw=rw)
-        self.pass_login.password.place(relx=rx, rely=.6, relh=.065, relw=rw)
+        rrx = rx+(.6*rw)
+        rrw = .4*rw
+        self.pass_login.forgot_chk.place(relx=rrx, rely=.75, relh=.06, relw=rrw)
+
         self.anime.place(relx=rx, rely=.9, relw=rw, relh=.05)
 
 

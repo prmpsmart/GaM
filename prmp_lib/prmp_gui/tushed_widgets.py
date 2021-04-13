@@ -95,7 +95,7 @@ class Tushed_Entry(Frame):
             self.entry.bind('<Return>', self.invokeAction)
 
         self.loaded = True
-        LoginEntry.imageLoaded = True
+        Tushed_Entry.imageLoaded = True
     
     def empty(self, event=None):
         self.entry.empty()

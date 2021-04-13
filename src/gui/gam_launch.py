@@ -28,10 +28,10 @@ def testLogin(func):
     else:
         from src.gui.gam.auths_gui import Login
         func()
-        testGaM = None
+        # testGaM = None
         Login(geo=(450, 600), tw=1, title='Login', callback=testGaM, asb=0, b4t=1, delay=0)
 
-def start(): Splash(imageKwargs=dict(b64=GaM_PNGS['red_gam']), asb=0, callback=testLogin, delay=50000, geo=(1200, 700))
+def start(): Splash(imageKwargs=dict(b64=GaM_PNGS['red_gam']), asb=1, callback=testLogin, delay=5000, geo=(1200, 700), b4t=1, themeIndex=81)
 
 
 
@@ -39,8 +39,8 @@ def start(): Splash(imageKwargs=dict(b64=GaM_PNGS['red_gam']), asb=0, callback=t
 
 
 
-testLogin(int)
-# start()
+# testLogin(int)
+start()
 
 
 
