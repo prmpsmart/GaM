@@ -15,7 +15,7 @@ from .image_widgets import PRMP_ImageSLabel
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
 
-    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=1, bell=False, delay=0, tt=False, tooltype=False, wait=False, **kwargs):
+    def __init__(self, master=None, _return=True, values={}, ntb=1, nrz=0, tm=1, gaw=1, tw=1, editable=True, callback=None, show=1, grab=0, bell=False, delay=0, tt=False, tooltype=False, wait=False, withdraw=False, **kwargs):
 
         self.tooltype = tt or tooltype
         if self.tooltype: grab = 0
@@ -46,7 +46,7 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
         self.focus()
         if delay: self.after(delay, self.destroy)
 
-        if self.tooltype: self.withdraw()
+        if withdraw: self.withdraw()
         elif wait: self.wait_window()
         elif show: self.mainloop()
 
@@ -261,6 +261,7 @@ class PRMP_ImageDialog(PRMP_Dialog):
     def _setupDialog(self):
         self.imageKwargs['bindMenu'] = 1
         self.imageLabel = PRMP_ImageSLabel(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat', anchor='center'), imageKwargs=self.imageKwargs, **self.imageWidConfig)
+        
         self.set = self.imageLabel.set
         self.bind('<Return>', self.imageLabel.saveImage)
 

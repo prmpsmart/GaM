@@ -290,7 +290,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
         if noTitleBar or tooltype:
             self.overrideredirect(True)
-            if not tooltype: self.after(10, self.addWindowToTaskBar)
+            if not tooltype: self.after(10, self.addWindowToTaskBar); print(9)
 
         else: self.setAttributes()
 

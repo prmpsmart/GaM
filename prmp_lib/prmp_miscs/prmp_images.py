@@ -583,6 +583,7 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
         images = [images[0] for images in table_images]
         return images
     
+    @property
     def tableNames(self): return self._tableNames(connection=self.connection)
     
     def tableImages(self, table): return self._tableImages(table, connection=self.connection)

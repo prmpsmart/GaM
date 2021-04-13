@@ -212,6 +212,7 @@ class PRMP_Theme(PRMP_GuiMixins):
     DEFAULT_FONT = {'family': 'Segoe Marker', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     DEFAULT_MINUTE_FONT = {'family': 'Segoe Marker', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+
     BIG_FONT = {'family': 'Segoe Marker', 'size': 31, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     DEFAULT_MENU_FONT = {'family': 'Adobe Garamond Pro Bold', 'size': 10, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
@@ -234,6 +235,8 @@ class PRMP_Theme(PRMP_GuiMixins):
     NORMAL_FONT = {'family': 'Minion Pro', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     PRMP_FONT = {'family': 'Times New Roman', 'size': 11, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+    
+    BIG_PRMP_FONT = {'family': 'Times New Roman', 'size': 23, 'weight': 'bold', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
 
     PRMP_FONTS = []
 
@@ -331,12 +334,11 @@ class PRMP_Theme(PRMP_GuiMixins):
         except: return default
 
     def createDefaultFonts(self):
-        fonts = ['DEFAULT_FONT', 'DEFAULT_MINUTE_FONT', 'BIG_FONT', 'DEFAULT_MENU_FONT', 'DEFAULT_BUTTON_FONT', 'DEFAULT_BUTTONS_FONT', 'DEFAULT_SMALL_BUTTON_FONT', 'DEFAULT_TITLE_FONT', 'DEFAULT_STATUS_FONT', 'DEFAULT_LABEL_FONT', 'DEFAULT_LABELFRAME_FONT', 'HEADING_FONT', 'NORMAL_FONT', 'PRMP_FONT']
-        for df in fonts:
-            font = PRMP_Theme.__dict__[df]
-            try: fo = Font(self, name=df, exists=0, **font)
-            except: fo = Font(self, name=df, exists=1, **font)
-            PRMP_Theme.PRMP_FONTS.append(fo)
+        for font_name, font_dict in PRMP_Theme.__dict__.items():
+            if ('_FONT' in font_name) and isinstance(font_dict, dict):
+                try: fo = Font(self, name=font_name, exists=0, **font_dict)
+                except: fo = Font(self, name=font_name, exists=1, **font_dict)
+                PRMP_Theme.PRMP_FONTS.append(fo)
 
     def _prevTheme(self):
         cur = PRMP_Theme.CURRENT_THEME

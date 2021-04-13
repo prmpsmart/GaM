@@ -2,6 +2,7 @@ from . import *
 from .scrollables import *
 from prmp_lib.prmp_gui.two_widgets import *
 from prmp_lib.prmp_gui.dialogs import *
+from prmp_lib.prmp_miscs.prmp_images import PRMP_DB
 
 from .image_widgets import PRMP_ImageSButton
 import math, os
@@ -131,32 +132,53 @@ class Tushed_Entry(Frame):
     def getFromSelf(self, *args): return self.entry.getFromSelf(*args)
 
 
-class ChooseDir(LabelText):
-    def __init__(self, master, text='', callback=None, **kwargs):
-        FONT = self.PRMP_FONT
-        FONT['size'] = 20
+class ChoosePath(LabelText):
+    def __init__(self, master, text='', callback=None, folder=0, bottomKwargs={}, customFont=0, **kwargs):
+        if customFont:
+            FONT = self.PRMP_FONT
+            FONT['size'] = 20
+        else: FONT = 'DEFAULT_FONT'
+
         tip = self.topest.tipping
-        super().__init__(master, longent=.3, topKwargs=dict(text=text, font=FONT, image=PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1), compound='left'), tipKwargs=dict(text='Double-click to choose folder!') if tip else {}, **kwargs)
+        image = None
+
+        if folder:
+            self.image = PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1)
+            pathType = 'dir'
+        else:
+            if PRMP_DB:
+                image = PRMP_DB.getImage('soft_scraps', 'file_open')[0]
+                self.image = PRMP_Image(image, resize=(25, 25), for_tk=1)
+            pathType = 'file'
+        
+        bottomKwargs.update(dict(_type=pathType))
+
+        super().__init__(master, topKwargs=dict(text=text, font=FONT, image=self.image, compound='left'), tipKwargs=dict(text='Double-click to choose folder!') if tip else {}, bottomKwargs=bottomKwargs, **kwargs)
+
+
         self.T.bind('<Double-1>', self.load_dir)
         self.T.bind('<1>', self.read_dir)
         self.B.bind('<Double-1>', self.load_dir)
-        self.folder = ''
+
+        self._folder = folder
+        self.path = ''
         self.callback = callback
 
     def read_dir(self, event):
-        folder = self.B.get()
-        if os.path.isdir(folder):
-            self.folder = folder
-            self.B.set(folder)
-            if self.callback: self.callback(folder)
+        path = self.B.get()
+        self._set(path)
 
     def load_dir(self, event):
-        folder = dialogFunc(path=1, folder=1)
-        if folder:
-            self.folder = folder
-            self.B.set(folder)
-            if self.callback: self.callback(folder)
-ChooseFolder = ChooseDir
+        path = dialogFunc(path=1, folder=self._folder)
+        self._set(path)
+
+    
+    def _set(self, path):
+        func = os.path.isdir if self._folder else os.path.isfile
+        if path and func(path):
+            self.path = path
+            self.B.set(path)
+            if self.callback: self.callback(path)
 
 
 class Hierachy(PRMP_TreeView):

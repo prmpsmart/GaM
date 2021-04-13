@@ -2,10 +2,12 @@ from . import *
 from .core_ttk import PRMP_Style_
 from prmp_lib.prmp_miscs.prmp_images import *
 from prmp_lib.prmp_miscs.prmp_images import _PIL_
+import time
 
 
 class PRMP_ImageWidget:
     WidgetClass = None
+    count = 0
 
     def __init__(self, master, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=150, face=False, imageKwargs={}, config={}, **kwargs):
 
@@ -20,6 +22,7 @@ class PRMP_ImageWidget:
         
         self.face = face
 
+        self.lastRender = 0
         self.frame_counter = 0
         self.frame = None
         self.frames = None
@@ -50,30 +53,37 @@ class PRMP_ImageWidget:
     def loadImage(self, prmpImage=None, event=None, **kwargs):
         self.delMenu()
         self.isGif = False
+        self.lastRender = time.time()
 
         self.frame_counter = 0
-        self.resize = kwargs.pop('resize', self.resize)
-        self.thumb = kwargs.pop('thumb', self.thumb)
+        resize = kwargs.pop('resize', self.resize)
+        thumb = kwargs.pop('thumb', self.thumb)
+        fullsize = kwargs.pop('fullsize', self.fullsize)
 
-        if not self.winfo_ismapped():
-            self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
-            return
+        name = kwargs.get('name')
+        if not name: kwargs['name'] = f'{prmpImage}_{self.className}_{PRMP_ImageWidget.count}'
+
+
+        # if not self.winfo_ismapped():
+        #     self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
+        #     return
 
         try:
-            if self.fullsize: self.resize = (self.width, self.height)
+            if fullsize: resize = (self.width, self.height)
 
             if prmpImage and not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
-                prmpImage = PRMP_Image(prmpImage, thumb=self.thumb, resize=self.resize, **kwargs)
+                prmpImage = PRMP_Image(prmpImage, thumb=thumb, resize=resize, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image):
-                if self.resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(self.resize)))
+                if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)))
                 else: self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
 
             self.frame = self.prmpImage = prmpImage
 
-            if prmpImage.ext == 'xbm': self.frame = prmpImage.resizeTk(self.resize)
+            if prmpImage.ext == 'xbm':
+                if resize: self.frame = prmpImage.resizeTk(resize)
 
             self.image = self.prmpImage.image
             
@@ -82,19 +92,22 @@ class PRMP_ImageWidget:
                 self.frames = []
                 self.durations = []
                 for frame in ImageSequence.Iterator(self.image):
-                    if self.resize: frame = frame.resize(self.resize)
-                    elif self.thumb: frame.thumbnail(self.thumb)
+                    if resize: frame = frame.resize(resize)
+                    elif thumb: frame.thumbnail(thumb)
                     tkimg = PhotoImage(frame)
                     self.frames.append(tkimg)
                     self.durations.append(frame.info['duration'])
                 if self.frames: self.frame = self.frames[self.frame_counter]
 
                 self.isGif = True
-                self.__renderGif()
-            
-            elif self.resize: self.frame = self.prmpImage.resizeTk(self.resize)
+                self.cancel_current_gif = True
 
-            elif self.thumb: self.frame = self.prmpImage.thumbnailTk(self.thumb)
+                self.__renderGif(self.lastRender)
+
+            
+            elif resize: self.frame = self.prmpImage.resizeTk(resize)
+
+            elif thumb: self.frame = self.prmpImage.thumbnailTk(thumb)
 
             else:
                 if self.face: self.frame = self.prmpImage._find_faces(prmp_image=1, for_tk=1)
@@ -106,12 +119,16 @@ class PRMP_ImageWidget:
             if self.loadDefault: self.loadImage(self.default_dp)
         except Exception as e:
             raise e
+        
+        if PRMP_ImageWidget.count > 1000: PRMP_ImageWidget.count = 0
 
-    def __renderGif(self):
-        if not self.isGif: return
-        if not self.frames: return
-        if not self.winfo_exists(): return
+        PRMP_ImageWidget.count += 1
 
+    def __renderGif(self, magic=''):
+        if not (self.isGif or self.frames or self.winfo_exists()): return
+
+        if magic != self.lastRender: return
+        
         # Update Frame
         self.frame = self.frames[self.frame_counter]
         self.config(image=self.frames[self.frame_counter])
@@ -120,7 +137,7 @@ class PRMP_ImageWidget:
         self.frame_counter += 1
         if self.frame_counter >= len(self.frames): self.frame_counter = 0
         # self.after(self.durations[self.frame_counter], self.__renderGif)
-        self.after(100, self.__renderGif)
+        self.after(120, lambda: self.__renderGif(magic))
 
     def removeImage(self):
         self.delMenu()
@@ -131,8 +148,8 @@ class PRMP_ImageWidget:
     def _removeImage(self, val):
         if val: self.loadImage()
 
-    def set(self, imageFile=None):
-        if imageFile: self.loadImage(imageFile)
+    def set(self, imageFile=None, **kwargs):
+        if imageFile: self.loadImage(imageFile, **kwargs)
 
     def changeImage(self, e=0):
         self.delMenu()
