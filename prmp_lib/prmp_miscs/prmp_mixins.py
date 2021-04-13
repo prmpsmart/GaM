@@ -269,7 +269,8 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         num = float(num)
         numStr = str(num) + '0'
         endIndex = numStr.index('.') + place + 1
-        return numStr[:endIndex]
+        finised = numStr[:endIndex]
+        return float(finised)
 
     def approximate(self, num, size=1):
         assert size > 0

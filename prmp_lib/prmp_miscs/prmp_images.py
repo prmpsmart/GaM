@@ -31,7 +31,7 @@ except Exception as e:
     print(e)
 
 from .prmp_exts import *
-from .prmp_mixins import PRMP_AdvMixins
+from .prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins
 import sqlite3, base64
 
 
@@ -385,14 +385,13 @@ class PRMP_Images:
             if inbuilt in exts_all: return exts_all[inbuilt]
 
 
-class PRMP_ImageDB(PRMP_AdvMixins):
+class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
 
     @classmethod
-    def _getCursor(cls, db_file):
+    def _open(cls, db_file, cursor=False):
         connection = sqlite3.connect(db_file)
-        cursor = connection.cursor()
-
-        return cursor
+        if cursor: return connection.cursor()
+        else: return connection
 
     @classmethod
     def _getName(cls, name):
@@ -417,13 +416,13 @@ class PRMP_ImageDB(PRMP_AdvMixins):
         _tbs = images_dict.keys()
         tables = [cls._getName(table)for table in _tbs]
         
-        cursor = cls._getCursor(db_file)
+        cursor = cls._open(db_file, 1)
         for table in tables: cursor.execute(f'CREATE TABLE {table} (name TEXT, ext TEXT, data BLOB)')
 
         cls._fillDB(cursor, images_dict)
     
     @classmethod
-    def _getB64(cls, file): return base64.b64encode(open(file, 'rb').read())
+    def _getData(cls, file): return open(file, 'rb').read()
     
     @classmethod
     def _fillDB(cls, cursor, images_dict):
@@ -439,7 +438,7 @@ class PRMP_ImageDB(PRMP_AdvMixins):
             
             values = []
             for name, image_path in images_named:
-                value = (name, PRMP_ImageType.get(image_path), cls._getB64(image_path))
+                value = (name, PRMP_ImageType.get(image_path), cls._getData(image_path))
                 values.append(value)
             
             cursor.executemany(f'INSERT INTO {table} VALUES (?,?,?)', values)
@@ -462,7 +461,8 @@ class PRMP_ImageDB(PRMP_AdvMixins):
 
     def __init__(self, db_file):
         self.db_file = db_file
-        self.cursor = self._getCursor(db_file)
+        self.connection = self._open(db_file)
+        self.cursor = self.connection.cursor()
     
     def saveImages(self, images_folder, sub_folders=False): self._createImageDB(self.db_file, images_folder, sub_folders, 1)
 
@@ -470,13 +470,17 @@ class PRMP_ImageDB(PRMP_AdvMixins):
     def _getPRMPImage(cls, name, ext, b64): return PRMP_ImageFile(f'{name}.{ext}', b64=b64)
 
     @classmethod
-    def _getPRMPImages(cls, images): return [PRMP_ImageFile(f'{name}.{ext}', b64=b64) for name, ext, b64 in images]
+    def _getPRMPImages(cls, images): return [PRMP_ImageFile(f'{name}.{ext}', data=data) for name, ext, data in images]
     
     def getImage(self, table, name):
         t = (name,)
         self.cursor.execute(f'SELECT * FROM {table} WHERE name=?', t)
-        # images = list(self.cursor)
         return self._getPRMPImages(self.cursor)
+    
+    def getImagej(self, table, name):
+        t = (name,)
+        self.cursor.execute(f'SELECT * FROM {table} WHERE name=?', t)
+        return list(self.cursor)
 
     def getTable(self, table):
         self.cursor.execute(f'SELECT * FROM {table}')
@@ -511,26 +515,51 @@ class PRMP_ImageDB(PRMP_AdvMixins):
     def addTables(self, images_folder): self.saveImages(images_folder, 1, 1)
 
     @classmethod
-    def _debugDB(cls, db_file=None, cursor=None):
+    def _getConnection(cls, db_file='', cursor=None):
+        if cursor: connection = cursor.connection
+        elif db_file: connection = cls._open(db_file)
+        return connection
 
-        if not cursor: cursor = cls._getCursor(db_file)
+    @classmethod
+    def _getCursor(cls, db_file='', connection=None):
+        if connection: cursor = connection.cursor()
+        elif db_file: connection = cls._open(db_file, 1)
+        return cursor
+
+    @classmethod
+    def _tableNames(cls, db_file='', connection=None, cursor=None):
+        if not connection: connection = cls._getConnection(db_file=db_file, cursor=cursor)
+        table_names = list(connection.execute("SELECT NAME FROM SQLITE_MASTER WHERE TYPE='table' ORDER BY NAME"))
+        names = [name[0] for name in table_names]
+        return names
+
+    @classmethod
+    def _tableImages(cls, table, db_file='', connection=None, cursor=None):
+        if not connection: connection = cls._getConnection(db_file=db_file, cursor=cursor)
+        table_images = list(connection.execute(f"SELECT name FROM {table} ORDER BY name"))
+        images = [images[0] for images in table_images]
+        return images
+    
+    def tableNames(self): return self._tableNames(connection=self.connection)
+    
+    def tableImages(self, table): return self._tableImages(table, connection=self.connection)
+
+    @classmethod
+    def _debugDB(cls, db_file=None, cursor=None, connection=None):
+
+        if not connection: connection = cls._getConnection(db_file=db_file, cursor=cursor)
+
         dir_ = db_file + ' datas'
         try: os.mkdir(dir_)
         except: pass
 
-        connection = cursor.connection
-        cursor = connection
-        
         schema = open(os.path.join(dir_, 'schema.txt'), 'w')
+        tableNames = cls._tableNames(connection=connection)
         
-        for (tableName,) in cursor.execute(
-            """
-            select NAME from SQLITE_MASTER where TYPE='table' order by NAME;
-            """
-        ):
+        for tableName in tableNames:
             # '''
             schema.write("\n{}:\n".format(tableName))
-            for  (columnID, columnName, columnType,  columnNotNull, columnDefault, columnPK) in cursor.execute("pragma table_info('{}');".format(tableName)):
+            for (columnID, columnName, columnType,  columnNotNull, columnDefault, columnPK) in connection.execute("PRAGMA table_info('{}');".format(tableName)):
                 
                 schema.write("    id={id}, name={name}, type={type}, null={null}, default={default}, pk={pk}\n\n".format(
                     id=columnID,
@@ -541,15 +570,46 @@ class PRMP_ImageDB(PRMP_AdvMixins):
                     pk=" *{}".format(columnPK) if columnPK else "''",
                 ))
                 fi = open(os.path.join(dir_, tableName + '.txt'), 'w')
-                for columns in cursor.execute('select * from '+ tableName): fi.write(str(columns) + '\n')
-                # '''
+                for columns in connection.execute('SELECT * FROM '+ tableName):
+                    # IMAGEDB hack
+                    name, ext, data = columns
+
+                    size = len(data)
+                    _ext = 'Bs'
+                    byte = 1024.0
+
+                    if size > byte-1:
+                        size /= byte
+                        _ext = 'Kbs'
+
+                    if size > byte-1:
+                        size /=  byte
+                        _ext = 'Mbs'
+
+                    if size > byte-1:
+                        size /=  byte
+                        _ext = 'Gbs'
+                    
+                    size = cls.decimalPlace(None, size, 2)
+                    
+                    columns = name, ext, f'{size} {_ext}'
+                    # IMAGEDB hack
+                    
+                    fi.write(str(columns) + '\n')
+                
             if 'segdir' in tableName:
-                for columns in cursor.execute('select * from '+ tableName):
+                for columns in connection.execute('SELECT * FROM '+ tableName):
                     if 'segdir' in tableName:
                         print(str(columns[-1]), '\n'*3)
                 # break
 
     def debugDB(self): self._debugDB(self.db_file)
+
+    @classmethod
+    def _createPyizedImage(cls, images_dict, py_file='pyized_from_db.py', db_file='', connection=None, cursor=None):
+        pass
+
+    def createPyizedImage(self, images_dict, py_file='pyized_from_db.py', *args, **kwargs): return self._createPyizedImage(images_dict, py_file=py_file, *args, **kwargs)
 
 
 class PRMP_ImageFile(PRMP_File):

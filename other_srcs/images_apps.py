@@ -430,8 +430,8 @@ class Image_Renamer(Tk, Background):
 # Image_Renamer(title='Image Renamer', folder=folder, tm=1)
 
 # app = Massive_Photo_Viewer
-# app = Image_Renamer
-app = Database_Images
+app = Image_Renamer
+# app = Database_Images
 
 side = 'right-center'
 side = 'center'

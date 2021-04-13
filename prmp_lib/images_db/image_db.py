@@ -69,12 +69,14 @@ s = ['images', 1]
 db = 'image_db.prmp_db'
 
 # os.remove(db)
-# imageDB = PRMP_ImageDB._createImageDB(db, *s)
 imageDB = PRMP_ImageDB(db)
+# imageDB.saveImages('images', 1)
 
 # print(imageDB.saveImage('prmp_jpgs', 'red_lux'))
 # print(imageDB.saveTable('frames'))
-imageDB.debugDB()
+# imageDB.debugDB()
 
+# tables = imageDB.tableNames()
+# print(imageDB.tableImages(tables[4]))
 
-        
+print(imageDB.getImage('prmp_jpgs', 'red_lux')[0].save())
