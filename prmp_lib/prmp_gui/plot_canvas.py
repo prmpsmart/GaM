@@ -4,19 +4,19 @@ from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
 
 
 class PlotDatas:
-    def __init__(self, xticks=[], ys=[], labels=[], xlabel='', ylabel='', plot=0):
+    def __init__(self, xticks=[], ys=[], labels=[], xlabel='', ylabel=''):
         self.xticks = xticks
         self.ys = ys
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.labels = labels
-        self._x_axis(plot)
+        self._x_axis()
 
     def float_it(self, num):
         re = float('%.2f' % num)
         return re
 
-    def _x_axis(self, plot=0):
+    def _x_axis(self):
         try:
             assert len(self.labels) == len(self.ys), f'Length of "labels-> {len(self.labels)}" must be equal to the length of "ys-> {len(self.ys)}"'
 
@@ -100,7 +100,6 @@ class Plots(PRMP_ClassMixins):
         if set_xticks: self.subplot.set_xticks(set_xticks)
         if set_yticks: self.subplot.set_yticks(set_yticks)
 
-        if xticks: self.subplot.set_xticklabels(xticks)
         if xticks: self.subplot.set_xticklabels(xticks, rotation=axisrotate[0])
 
         if yticks: self.subplot.set_yticklabels(yticks, rotation=axisrotate[1])
@@ -146,29 +145,32 @@ class Plots(PRMP_ClassMixins):
 
     def set_grid(self, grid):
         if not grid: return
+
         self._grid = grid
-        lw, ls, c = grid['lw'], grid['ls'], grid['c']
-        self.subplot.grid(lw=lw, ls=ls, c=c)
+        self.subplot.grid(**grid)
 
     def clear(self):
         self.subplot.cla()
         self.draw()
         self.chart_datas = {}
 
-    def plot(self, xticks=[], ys=[], labels=[], markers=[], lss=[], linestyle=[], lw=0, linewidth=0, alpha=0, switch=0):
+    def plot(self, xticks=[], ys=[], labels=[], markers=[], lss=[], linestyle=[], lw=1, linewidth=1, alpha=0, switch=0):
         if linestyle: lss = linestyle
         if linewidth: lw = linewidth
-        if not lw: lw = 2
+
+        if not lw: lw = 1
         if not alpha:  alpha = 1
 
-        plotDatas = PlotDatas(xticks=xticks, ys=ys, labels=labels, xlabel=self.chart_datas.get('xlabel', ''), ylabel=self.chart_datas.get('ylabel', ''), plot=1)
+        plotDatas = PlotDatas(xticks=xticks, ys=ys, labels=labels, xlabel=self.chart_datas.get('xlabel', ''), ylabel=self.chart_datas.get('ylabel', ''))
 
         if switch: plotDatas.switch()
 
         self.annotation.update(dict(xticks=plotDatas.xticks, xlabel=plotDatas.xlabel, ylabel=plotDatas.ylabel))
 
         try:
-            indexes = range(len(plotDatas.labels))
+            # assert not isinstance(ys[0], (float, int))
+            indexes = range(len(ys[0]))
+
             for index in indexes:
                 y = plotDatas.ys[index]
                 label = plotDatas.labels[index]
@@ -185,7 +187,7 @@ class Plots(PRMP_ClassMixins):
                 self.subplot.plot(plotDatas.xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
 
         except Exception as e:
-            # print(e, 'error first')
+            # print(e, __file__)
             if markers:
                 markers = markers[0]
                 markersize = 10
@@ -198,7 +200,7 @@ class Plots(PRMP_ClassMixins):
 
             try: self.subplot.plot(plotDatas.xticks, plotDatas.ys, label=plotDatas.labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
             except Exception as e:
-                # print(e)
+                print(e)
                 pass
 
     def bar(self, xticks=[], ys=[], labels=[], xlabel='', title='', switch='', ylabel='', axisrotate=(20, 0)):

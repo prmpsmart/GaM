@@ -123,10 +123,10 @@ class Column(Col_Mixins):
                 if self._attr:
                     for attr in self._attr:
                         try:
-                            val = obj[attr]
+                            val = getattr(obj, attr, None)
                             if val != None: break
                         except: pass
-                else: val = obj[self.attr] or val
+                else: val = getattr(obj, self.attr, None) or val
 
                 if val:
                     if self.type: val = self.type(val)
@@ -137,7 +137,6 @@ class Column(Col_Mixins):
     def proof(self, obj): return self.getFromObj(obj) == self.value
 
     def __getitem__(self, item): return PRMP_Mixins.__getitem__(self, item)
-
 
 class Columns(Col_Mixins):
     def __init__(self, columns):

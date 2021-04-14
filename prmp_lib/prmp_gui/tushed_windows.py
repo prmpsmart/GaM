@@ -1,3 +1,7 @@
+from . import *
+from .dialogs import *
+from .tushed_widgets import *
+
 
 class PRMP_SolidScreen(PRMP_MainWindow):
     def __init__(self, side='top-center', gaw=1, bd=12, geo=(),**kwargs):
@@ -12,7 +16,7 @@ SS = PRMP_SolidScreen
 
 class ColumnViewerDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(500, 500), column=None, **kwargs):
+    def __init__(self, master=None, title='Columns Viewer Dialog', geo=(300, 300), column=None, **kwargs):
         self.column = column
         super().__init__(master, title=title, geo=geo, **kwargs)
 
@@ -31,7 +35,7 @@ class ColumnViewerDialog(PRMP_Dialog):
     def processInput(self):
         result = self.get()
 
-        print(result)
+        # print(result)
 
 
 class ColumnsExplorerDialog(PRMP_Dialog):

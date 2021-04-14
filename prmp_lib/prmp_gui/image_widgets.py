@@ -150,7 +150,9 @@ class PRMP_ImageWidget:
 
     def changeImage(self, e=0):
         self.delMenu()
-        file = askopenfilename(filetypes=picTypes)
+        from .dialogs import dialogFunc
+        from .core_tk import picTypes
+        file = dialogFunc(path=True, filetypes=picTypes)
         if file: self.loadImage(file)
 
     def bindMenu(self):

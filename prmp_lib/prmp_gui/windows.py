@@ -156,7 +156,6 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         kwargs: other TKClass options to pass to the PRMP_Widget.__init__
         '''
 
-
         if themeIndex: PRMP_Theme.setThemeIndex(themeIndex)
         elif theme: PRMP_Theme.setTheme(theme)
 
@@ -290,7 +289,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
         if noTitleBar or tooltype:
             self.overrideredirect(True)
-            if not tooltype: self.after(10, self.addWindowToTaskBar); print(9)
+            if not tooltype: self.after(10, self.addWindowToTaskBar)
 
         else: self.setAttributes()
 

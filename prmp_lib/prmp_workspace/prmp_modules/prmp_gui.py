@@ -6017,7 +6017,6 @@ class PhotoViewer(PRMP_MainWindow):
     def byIndex(self, e=0):
         index = self.index.get()
         try:
-            print(index)
             index = int(index)
             assert 0 <= index <= self._total, f'Index {index} is not in range 0 ... {self._total}.'
             self._index = index

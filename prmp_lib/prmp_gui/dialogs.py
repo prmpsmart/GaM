@@ -1,7 +1,7 @@
 
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp_lib.prmp_miscs.prmp_images import *
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins, PRMP_AdvMixins
-from prmp_lib.prmp_miscs.prmp_images import PRMP_XBMS
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
 from tkinter.simpledialog import askstring, askfloat, askinteger
@@ -9,6 +9,9 @@ from . import *
 from .core import PRMP_FillWidgets
 from .date_widgets import PRMP_Calendar
 from .image_widgets import PRMP_ImageSLabel
+from .tushed_widgets import *
+from .miscs import Columns, Column
+
 
 
 
@@ -268,7 +271,6 @@ class PRMP_ImageDialog(PRMP_Dialog):
     def getImage(self, imageFile):
         self._setResult(imageFile)
         self.destroyDialog()
-
 ImgD = PRMP_ImageDialog
 
 class Splash(PRMP_Dialog):
@@ -322,8 +324,6 @@ class AttributesExplorerDialog(PRMP_Dialog):
             self.callback(w)
             self.destroy()
 
-
-
 class AttributesViewerDialog(PRMP_Dialog):
 
     def __init__(self, master=None, title='Attributes Viewer Dialog', geo=(700, 300), obj=None, attr=None, dialog=None, **kwargs):
@@ -333,12 +333,6 @@ class AttributesViewerDialog(PRMP_Dialog):
         super().__init__(master, title=title, geo=geo, **kwargs)
 
     def _setupDialog(self): AttributesViewer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), attr=self.attr, obj=self.obj, dialog=self.dialog)
-
-
-
-
-
-
 
 
 
@@ -371,6 +365,7 @@ def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
     else: return filedialog.askdirectory(**kwargs)
 
 def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, **kwargs):
+    from .tushed_windows import ColumnsExplorerDialog, ColumnViewerDialog
     if obj:
         if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
         elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
@@ -382,4 +377,7 @@ def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, **kwa
     elif float_: return askfloat(*args, **kwargs)
     elif int_: return askinteger(*args, **kwargs)
     else: return showDialog(**kwargs)
+
+
+
 

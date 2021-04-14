@@ -2,7 +2,7 @@ from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.two_widgets import *
 from prmp_lib.prmp_gui.image_widgets import *
 from prmp_lib.prmp_gui.dialogs import *
-from prmp_lib.prmp_gui.tushed_widgets import *
+from prmp_lib.prmp_gui.tushed_windows import *
 from prmp_lib.prmp_miscs.prmp_datetime import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
 from ...backend.gam.gam import GaM
 from ...backend.dc.dc_regions import *
@@ -200,9 +200,6 @@ class HierachyNColumnsExplorer(Frame):
         self.columns = self.tree.columns
         self.setColumns = self.tree.setColumns
         self.viewObjs = self.tree.viewObjs
-        # self.tw = self.tree.tw
-        # self.tw = self.tree.tw
-        # self.tw = self.tree.tw
 
         Button(self, text='Columns Explorer', place=dict(relx=.1, rely=.935, relw=.2, relh=.06), command=self.openColumnExplorer)
 

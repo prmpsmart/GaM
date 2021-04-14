@@ -1416,7 +1416,6 @@ class PRMP_Image:
         if self._animatedFrames: return self._animatedFrames
         else:
             for frame in ImageSequence.Iterator(self.img):
-                print(99)
                 if self._resize: img = frame.resize(self._resize)
                 elif self._thumb:
                     frame.thumbnail(self._thumb)

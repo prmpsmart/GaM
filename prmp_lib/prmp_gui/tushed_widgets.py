@@ -1,7 +1,8 @@
 from . import *
 from .scrollables import *
-from prmp_lib.prmp_gui.two_widgets import *
-from prmp_lib.prmp_gui.dialogs import *
+from .two_widgets import *
+from .dialogs import *
+from .miscs import *
 from prmp_lib.prmp_miscs.prmp_images import PRMP_DB
 
 from .image_widgets import PRMP_ImageSButton
@@ -219,11 +220,11 @@ class Hierachy(PRMP_TreeView):
 
     def viewSelected(self, e=0):
         current = self.selected()
+
         if current: self.openDialog(master=self, obj=current)
 
     def getSubs(self, obj, item=''):
         return obj.subs
-
 
     def _viewObjs(self, obj, parent=''):
         if not obj: return
@@ -234,7 +235,6 @@ class Hierachy(PRMP_TreeView):
         else:
             raw = self.columns.getFromObj(obj)
             first, *columns = raw
-            # print(raw)
 
             item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
 
@@ -457,7 +457,6 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         LabelFrame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self)
-        from .two_widgets import LabelLabel, LabelEntry
 
         self.callback = callback
         self.columns = columns
@@ -543,7 +542,6 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         self.setListBox()
 
-
     def setListBox(self):
         self.listbox.clear()
         tops = self.columns
@@ -581,15 +579,11 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         self.columns.process(results)
 
-
-
     def getColumns(self, e=0):
         listbox = self.listbox.curselection()
         self.updateCol(listbox)
 
         if self.callback: self.callback(self.columns, e)
-
-
 
     # def setTreeview(self, values, parent=''):
     #     if isinstance(values, list):

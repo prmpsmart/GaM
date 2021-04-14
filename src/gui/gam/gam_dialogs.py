@@ -29,6 +29,7 @@ class PersonDialog(GaM_Dialog):
 
         if person: title = f'{person.master.className} {title}'
         values = person or values
+        print(geo)
 
         super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
 
@@ -54,9 +55,9 @@ class PersonDialog(GaM_Dialog):
 
         self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41), loadDefault=1)
 
-        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
+        # self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
 
-        # self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
+        self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
         self.date.B.disabled()
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'date'])
