@@ -41,7 +41,8 @@ class PersonDialog(GaM_Dialog):
 
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
 
-        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True, very=1), orient='h', place=dict(relx=.02, rely=0, relh=.14, relw=.96), longent=.25)
+        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True, very=1, foreground=PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR), orient='h', place=dict(relx=.02, rely=0, relh=.14, relw=.96), longent=.25)
+        self.bind('<<PRMP_STYLE_CHANGED>>', self.changeNameFG)
 
         self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.02, rely=.14, relh=.14, relw=.96), longent=.5, orient='h')
 
@@ -51,13 +52,16 @@ class PersonDialog(GaM_Dialog):
 
         self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, rely=.56, relh=.44, relw=.96), bottomKwargs=dict(required=True), longent=.3, orient='h')
 
-        self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41))
+        self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41), loadDefault=1)
 
-        # self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
-        self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
+        self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
+
+        # self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
         self.date.B.disabled()
 
         self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'date'])
+    def changeNameFG(self, event=None):
+        self.name.B.kwargs['foreground'] = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
 
     def action(self):
         if self.result:
@@ -310,6 +314,7 @@ class StartDialog(GaM_Dialog):
     def action(self):
         if self.callback: self.callback(self.destroy)
 
+
 class GaM_StartDialog(StartDialog):
     TOP = GaM
     MANAGER = 'CEO'
@@ -329,6 +334,7 @@ class GaM_StartDialog(StartDialog):
         self.Top = self.TOP(date=date)
         super()._createTOP(e)
 
+
 class Office_StartDialog(StartDialog):
     TOP = Office
 
@@ -339,7 +345,7 @@ class Office_StartDialog(StartDialog):
         super()._setupDialog()
 
     def _createTOP(self, e=0):
-        if e: OfficeDialog(self, callback=self._createOFFICE, first=1)
+        if e: OfficeDialog(self, callback=self._createOFFICE, first=1, geo=(300, 300))
 
     def _createOFFICE(self, result=0):
         if not result: return

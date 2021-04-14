@@ -9,19 +9,13 @@ class PRMP_ImageWidget:
     WidgetClass = None
     count = 0
 
-    def __init__(self, master, thumb=None, resize=None, bindMenu=0, fullsize=False, loadDefault=0, imgDelay=150, face=False, imageKwargs={}, config={}, **kwargs):
+    def __init__(self, master, bindMenu=0,  loadDefault=0, imgDelay=150, face=False, imageKwargs={}, config={}, **kwargs):
 
         self.WidgetClass.__init__(self, master, config=config, **kwargs)
         if not _PIL_: print('PIL is not available for this program!')
 
         self.rt = None
-        
-        self.thumb = thumb
-        self.resize = resize
-        self.fullsize = fullsize
-        
         self.face = face
-
         self.lastRender = 0
         self.frame_counter = 0
         self.frame = None
@@ -32,8 +26,7 @@ class PRMP_ImageWidget:
         self.imageFile = None
         self.loadDefault = loadDefault
 
-
-        self.default_dp = PRMP_Image('profile_pix', inbuilt=True, thumb=self.thumb)
+        self.default_dp = PRMP_Image('profile_pix', inbuilt=True, for_tk=1)
 
         if bindMenu: self.bindMenu()
 
@@ -41,6 +34,7 @@ class PRMP_ImageWidget:
             imageKwargs['for_tk'] = 1
             self.after(imgDelay, lambda: self.loadImage(**imageKwargs))
             # self.loadImage(**imageKwargs)
+        elif loadDefault: self.after(imgDelay, lambda: self.loadImage(self.default_dp))
 
         # self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
 
@@ -58,9 +52,11 @@ class PRMP_ImageWidget:
         self.lastRender = time.time()
 
         self.frame_counter = 0
-        resize = kwargs.pop('resize', self.resize)
-        thumb = kwargs.pop('thumb', self.thumb)
-        fullsize = kwargs.pop('fullsize', self.fullsize)
+        _resize = (self.width, self.height)
+
+        resize = kwargs.get('resize', _resize)
+        
+        thumb = kwargs.get('thumb')
 
         name = kwargs.get('name')
         if not name: kwargs['name'] = f'{prmpImage}_{self.className}_{PRMP_ImageWidget.count}'
@@ -71,7 +67,6 @@ class PRMP_ImageWidget:
         #     return
 
         try:
-            if fullsize: resize = (self.width, self.height)
 
             if not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
@@ -88,7 +83,6 @@ class PRMP_ImageWidget:
                 if resize: self.frame = prmpImage.resizeTk(resize)
 
             self.image = self.prmpImage.image
-            print(self.imageFile)
 
             if self.prmpImage.ext == 'gif':
                 self.frames = []

@@ -40,7 +40,8 @@ def start(): Splash(imageKwargs=dict(b64=GaM_PNGS['red_gam']), asb=1, callback=t
 
 
 # testLogin(int)
-start()
+# start()
+testGaM(int)
 
 
 

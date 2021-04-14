@@ -576,8 +576,8 @@ SButton = PSB = PRMP_Style_Button
 class PRMP_Style_Checkbutton(PRMP_InputButtons, PRMP_Style_, ttk.Checkbutton):
     TkClass = ttk.Checkbutton
 
-    def __init__(self, master=None, asLabel=False, config={}, var=1, **kwargs):
-        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, var=var, **kwargs)
+    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
+        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, **kwargs)
 
         self.toggleSwitch()
 SCheckbutton = PSC = PRMP_Style_Checkbutton

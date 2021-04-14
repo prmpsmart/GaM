@@ -546,11 +546,13 @@ class PRMP_Widget(PRMP_Theme):
         self.nonText = nonText
 
         self.toggleGroup = []
+        
+        isRadio = 0
 
         variable = self.checkVar
-        if self.PRMP_WIDGET == 'Radiobutton': self.value = self.kwargs.get('value')
+        if 'Radiobutton' in self.PRMP_WIDGET: isRadio, self.value = 1, self.kwargs.get('value')
 
-        elif self.PRMP_WIDGET == 'Checkbutton': self.value, variable = '1', variable or 1
+        elif 'Checkbutton' in self.PRMP_WIDGET: self.value, variable = '1', variable or 1
 
         if variable and not isinstance(variable, tk.StringVar):
             variable = tk.StringVar()
@@ -559,9 +561,8 @@ class PRMP_Widget(PRMP_Theme):
         if variable:
             self.variable = variable
             config['variable'] = variable
-            isChk = self.PRMP_WIDGET == 'Checkbutton'
             
-            if not isChk: config['value'] = self.value
+            if isRadio: config['value'] = self.value
 
         self._ttk_ = _ttk_
         self.TkClass.__init__(self, self.master, **config)

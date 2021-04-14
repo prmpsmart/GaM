@@ -124,7 +124,7 @@ PD = PRMP_Dialog
 
 class PRMP_CalendarDialog(PRMP_Dialog):
 
-    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(500, 500), min_=None, max_=None, date=None, **kwargs):
+    def __init__(self, master=None, month=None, title='PRMP_Calendar Dialog', geo=(300, 300), min_=None, max_=None, date=None, **kwargs):
         self.min = min_
         self.max = max_
         self.month = date or month
@@ -234,7 +234,7 @@ class PRMP_CameraDialog(PRMP_Dialog):
     def isMaximized(self): return self.getWid_H_W(self)
 
     def _setupDialog(self):
-        from .imagewidgets import PRMP_Camera
+        from .image_widgets import PRMP_Camera
         self.PC = PRMP_Camera
         self.camera = PRMP_Camera(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat'), **self.cameraKwargs)
         self.set = self.camera.setImage

@@ -1,5 +1,6 @@
 from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.two_widgets import *
+from prmp_lib.prmp_gui.image_widgets import *
 from prmp_lib.prmp_gui.dialogs import *
 from prmp_lib.prmp_gui.tushed_widgets import *
 from prmp_lib.prmp_miscs.prmp_datetime import MONTHS_NAMES, DAYS_NAMES, PRMP_DateTime
