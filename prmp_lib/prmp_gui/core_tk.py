@@ -11,8 +11,8 @@ class PRMP_(PRMP_Widget):
     Base class for all widgets based on tkinter.__init__ widgets
     '''
 
-    def __init__(self, **kwargs):
-        super().__init__(_ttk_=False, **kwargs)
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, _ttk_=False, **kwargs)
 P_ = PRMP_
 
 #   from tk widgets --> PRMP_
@@ -59,7 +59,6 @@ class PRMP_Frame(PRMP_, tk.Frame):
     TkClass = tk.Frame
 
     def __init__(self, master, bd=2, relief='flat', highlightable=False, **kwargs):
-
         PRMP_.__init__(self, master, relief=relief, highlightable=highlightable, nonText=True, **kwargs)
 
     @property

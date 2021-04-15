@@ -6,10 +6,9 @@ class PRMP_Style_(PRMP_Widget):
     '''
     Base class for all widgets based on tkinter.ttk widgets
     '''
-    PRMP_STYLE_EVENT = '<<PRMP_STYLE_CHANGED>>'
 
-    def __init__(self, highlightable=False, **kwargs):
-        super().__init__(_ttk_=True, highlightable=highlightable, **kwargs)
+    def __init__(self, master, highlightable=False, **kwargs):
+        super().__init__(master, _ttk_=True, highlightable=highlightable, **kwargs)
 
     @property
     def style(self): return PRMP_Window.STYLE
@@ -20,6 +19,7 @@ PS_ = PRMP_Style_
 class PRMP_Style(ttk.Style, PRMP_Mixins):
     LOADED = False
     PRMP_Window = None
+    PRMP_STYLE_EVENT = '<<PRMP_STYLE_CHANGED>>'
 
     ttkthemes = ("black", "blue", 'prmp')
     ttkstyles = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')

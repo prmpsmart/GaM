@@ -300,6 +300,8 @@ class PRMP_Images:
         space = '\n' * space
 
         if not merge: merge = {}
+        if not prefix.endswith('_'): prefix += '_'
+        prefix += '%sS'
 
         pixs = {}
         if folder or files:
@@ -338,7 +340,7 @@ class PRMP_Images:
         pyfile = open(pyfile, 'w')
         
         if add_all:
-            keys = [prefix + '_' + k.upper() + 'S' for k in pixs.keys()]
+            keys = [prefix % k.upper() for k in pixs.keys()]
             _all_ = '__all__ = {}{}'.format(keys, space)
             pyfile.write(_all_)
 
@@ -366,11 +368,30 @@ class PRMP_Images:
                 if len(keys) > 1: pyfile.write("{} = {}{}".format(name, ' + '.join(keys), space))
 
         for ext, names in exts.items():
-            EXTS = prefix + '_' + ext.upper() + 'S = {'
+            EXTS = prefix % ext.upper() + ' = {'
             for name in names: EXTS += "'{}': {}, ".format(name, name)
             EXTS = EXTS[:-2]
             EXTS += '}' + space
             pyfile.write(EXTS)
+        
+        IMAGES = prefix % 'IMAGE' + ' = {'
+        for ext in exts:
+            EXT = prefix % ext.upper()
+            IMAGES += "'{}': {}, ".format(ext, EXT)
+        IMAGES = IMAGES[:-2]
+        IMAGES += '}' + space
+        pyfile.write(IMAGES)
+
+        IMAGES_LIST = prefix % 'IMAGE' + '_LIST = ['
+        bb = [prefix % ext.upper() for ext in exts]
+        for b in bb: IMAGES_LIST += b + ', '
+        IMAGES_LIST = IMAGES_LIST[:-2]
+        IMAGES_LIST += ']' + space
+        pyfile.write(IMAGES_LIST)
+
+        # for ext in exts:
+        print(bb)
+
         
         pyfile.close()
 

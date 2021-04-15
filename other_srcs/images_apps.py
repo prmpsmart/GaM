@@ -13,9 +13,9 @@ class Background:
     def load(self):
         if not PRMP_DB: return
 
+        i = 'red'
         size = self.cont.width, self.cont.height
-        img = PRMP_DB.getImage('prmp_jpgs', 'orange_lux')[0]
-        i = 'orange'
+        img = PRMP_DB.getImage('prmp_jpgs', '%s_lux'%i)[0]
         self.cont.loadImage(img, resize=size, name='Background_%d'%self.img_count)
 
         img = self.cont.image
@@ -164,7 +164,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         Button(self.canvas, text='Use as Wallpaper?', place=dict(relx=.81, rely=.4, relw=.15, relh=.04), image=PRMP_Image('as_wall', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.as_wall)
         
 
-        Button(self.canvas, text='Load from Database?', place=dict(relx=.81, rely=.46, relw=.15, relh=.04), image=PRMP_Image('db_icon.png', resize=rv, inbuilt=0, inExt='png', for_tk=1), compound='left', command=self.from_database)
+        Button(self.canvas, text='Load from Database?', place=dict(relx=.81, rely=.46, relw=.15, relh=.04), image=PRMP_Image('db_icon', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.from_database)
 
 
 
@@ -367,12 +367,12 @@ class Image_Renamer(Tk, Background):
         self.total_images = 0
 
         self.image = PRMP_ImageSLabel(self.cont, place=dict(relx=.02, rely=.02, relh=.96, relw=.56))
-        self.path = ChooseFolder(self.cont, text='Choose Folder', place=dict(relx=.65, rely=0, relh=.25, relw=.3), callback=self.loadFolder)
+        self.path = ChoosePath(self.cont, text='Choose Folder', place=dict(relx=.65, rely=0, relh=.25, relw=.3), callback=self.loadFolder, folder=1)
 
         self.total = LabelEntry(self.cont, topKwargs=dict(text='Total'), place=dict(relx=.65, rely=.28, relh=.08, relw=.3), orient='h', bottomKwargs=dict(state='readonly', foreground='black'))
         self.index = LabelSpin(self.cont, topKwargs=dict(text='Index'), place=dict(relx=.65, rely=.37, relh=.08, relw=.3), orient='h', bottomKwargs=dict(_type='number', very=1, background='white'), func=self.loadIndex, bttk=0)
 
-        self.index.B.bind('<FocusIn>', lambda e: self.focus())
+        # self.index.B.bind('<FocusIn>', lambda e: self.focus())
 
         Button(self.cont, place=dict(relx=.7, rely=.55, relh=.08, relw=.2), command=self.refresh, text='Refresh')
 

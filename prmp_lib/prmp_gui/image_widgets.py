@@ -55,6 +55,7 @@ class PRMP_ImageWidget:
         _resize = (self.width, self.height)
 
         resize = kwargs.get('resize', _resize)
+        kwargs['resize'] = _resize
         
         thumb = kwargs.get('thumb')
 
@@ -70,7 +71,7 @@ class PRMP_ImageWidget:
 
             if not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
-                prmpImage = PRMP_Image(prmpImage, thumb=thumb, resize=resize, **kwargs)
+                prmpImage = PRMP_Image(prmpImage, thumb=thumb, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image):
                 if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)))
