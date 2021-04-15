@@ -3,6 +3,10 @@ from .core import *
 __all__ = ['PRMP_Style', 'PRMP_Style_Button', 'PRMP_Style_Checkbutton', 'PRMP_Style_Entry', 'PRMP_Style_Frame', 'PRMP_Style_Label', 'PRMP_Style_LabelFrame', 'PRMP_Menubutton', 'PRMP_Style_OptionMenu', 'PRMP_Style_PanedWindow', 'PRMP_Style_Radiobutton', 'PRMP_Style_Scale', 'PRMP_Style_Scrollbar', 'PRMP_Style_Spinbox', 'PRMP_Combobox', 'PRMP_LabeledScale', 'PRMP_Notebook', 'PRMP_Progressbar', 'PRMP_Separator', 'PRMP_Sizegrip', 'PRMP_Treeview', 'SButton', 'SCheckbutton', 'SEntry', 'SFrame', 'SLabel', 'SLabelFrame', 'SOptionMenu', 'SPanedWindow', 'SRadiobutton', 'SScale', 'SScrollbar', 'SSpinbox', 'Combobox', 'LabeledScale', 'Notebook', 'Progressbar', 'Separator', 'Sizegrip', 'Treeview', 'Menubutton', 'ttk']
 
 class PRMP_Style_(PRMP_Widget):
+    '''
+    Base class for all widgets based on tkinter.ttk widgets
+    '''
+    PRMP_STYLE_EVENT = '<<PRMP_STYLE_CHANGED>>'
 
     def __init__(self, highlightable=False, **kwargs):
         super().__init__(_ttk_=True, highlightable=highlightable, **kwargs)
@@ -20,24 +24,23 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
     ttkthemes = ("black", "blue", 'prmp')
     ttkstyles = ('winnative', 'clam', 'alt', 'default', 'classic', 'vista', 'xpnative')
 
-    def __init__(self, master=None):
+    def __init__(self, master):
         super().__init__(master)
         if not PRMP_Style.LOADED: self.createPrmp()
         self.theme_use('prmp')
 
     def tupledFont(self, fontDict):
+        '''
+        fontDict: a dict containing dict parameters
+            {'family': 'Segoe Marker', 'size': 12, 'weight': 'normal', 'slant': 'roman', 'underline': 0, 'overstrike': 0}
+        returns something like;
+            ('-family', 'Segoe Marker', '-size', '12', '-weight', 'normal', '-slant', 'roman', '-underline', '0', '-overstrike', '0')
+        '''
         options = []
         for k, v in fontDict.items():
             options.append("-"+k)
             options.append(str(v))
         return tuple(options)
-
-    def getPixs(self, name):
-        name_dict = {}
-        for pix in os.listdir(name):
-            base, ext = os.path.splitext(pix)
-            name_dict[base] = os.path.join(name, pix)
-        return name_dict
 
     def getImageKeys(self, name):
         nameKeys = []
@@ -53,7 +56,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
         cwd = cwd.replace('\\', '/')
         return cwd
 
-    def styleImages(self, name):
+    def _styleImages(self, name):
         script = '''
         set imgdir %s
 
@@ -76,6 +79,9 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
         return imageKeys
 
     def createPrmp(self):
+        '''
+        creates the style PRMP fo use through out this prmp_gui library.
+        '''
         if PRMP_Style.LOADED: return
 
         self._images = (
@@ -113,7 +119,9 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
 
     @property
     def settings(self):
-
+        '''
+        updtes the various widget styling parameters with the latest colors.
+        '''
         button_color =   PRMP_Theme.DEFAULT_BUTTON_COLOR
         prmpsmart_botton_color = PRMP_Theme.OFFICIAL_PRMPSMART_BUTTON_COLOR
         error_button_color = PRMP_Theme.DEFAULT_ERROR_BUTTON_COLOR
@@ -558,7 +566,7 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
             from .windows import PRMP_Window
             PRMP_Style.PRMP_Window = PRMP_Window
 
-        if PRMP_Style.PRMP_Window: PRMP_Style.PRMP_Window.TOPEST.event_generate('<<PRMP_STYLE_CHANGED>>')
+        if PRMP_Style.PRMP_Window: PRMP_Style.PRMP_Window.TOPEST.event_generate(self.PRMP_STYLE_EVENT)
         return _settings
 
     def update(self, event=None):
@@ -569,15 +577,15 @@ Style = PSt = PRMP_Style
 class PRMP_Style_Button(PRMP_Style_, ttk.Button):
     TkClass = ttk.Button
 
-    def __init__(self, master=None, font='DEFAULT_BUTTON_FONT', asEntry=False, asLabel=False, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,font=font, asEntry=asEntry, config=config, **kwargs)
+    def __init__(self, master, font='DEFAULT_BUTTON_FONT', **kwargs):
+        PRMP_Style_.__init__(self, master, font=font, **kwargs)
 SButton = PSB = PRMP_Style_Button
 
 class PRMP_Style_Checkbutton(PRMP_InputButtons, PRMP_Style_, ttk.Checkbutton):
     TkClass = ttk.Checkbutton
 
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, asLabel=asLabel, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 
         self.toggleSwitch()
 SCheckbutton = PSC = PRMP_Style_Checkbutton
@@ -585,72 +593,72 @@ SCheckbutton = PSC = PRMP_Style_Checkbutton
 class PRMP_Style_Entry(PRMP_Input, PRMP_Style_, ttk.Entry):
     TkClass = ttk.Entry
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
         PRMP_Input.__init__(self, **kwargs)
 SEntry = PSE = PRMP_Style_Entry
 
 class PRMP_Style_Frame(PRMP_Style_, ttk.Frame):
     TkClass = ttk.Frame
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, nonText=True, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, nonText=True, **kwargs)
 SFrame = PSF = PRMP_Style_Frame
 
 class PRMP_Style_Label(PRMP_Style_, ttk.Label):
     TkClass = ttk.Label
 
-    def __init__(self, master=None, font='DEFAULT_LABEL_FONT', config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,font=font, config=config, **kwargs)
+    def __init__(self, master, font='DEFAULT_LABEL_FONT', **kwargs):
+        PRMP_Style_.__init__(self, master, font=font, **kwargs)
 SLabel = PSL = PRMP_Style_Label
 
 class PRMP_Style_LabelFrame(PRMP_Style_, ttk.LabelFrame):
     TkClass = ttk.LabelFrame
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 SLabelFrame = PSLF = PRMP_Style_LabelFrame
 
 class PRMP_Menubutton(PRMP_Style_, ttk.Menubutton):
     TkClass = ttk.Menubutton
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 Menubutton = PM = PRMP_Menubutton
 
 class PRMP_Style_OptionMenu(PRMP_Style_, ttk.OptionMenu):
     TkClass = ttk.OptionMenu
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 SOptionMenu = PSO = PRMP_Style_OptionMenu
 
 class PRMP_Style_PanedWindow(PRMP_Style_, ttk.PanedWindow):
     TkClass = ttk.PanedWindow
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 SPanedWindow = PSP = PRMP_Style_PanedWindow
 
 class PRMP_Style_Radiobutton(PRMP_InputButtons, PRMP_Style_, ttk.Radiobutton):
     TkClass = ttk.Radiobutton
 
-    def __init__(self, master=None, asLabel=False, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,asLabel=asLabel, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 SRadiobutton = PSR = PRMP_Style_Radiobutton
 
 class PRMP_Style_Scale(PRMP_Style_, ttk.Scale):
     TkClass = ttk.Scale
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 SScale = PSS = PRMP_Style_Scale
 
 class PRMP_Style_Scrollbar(PRMP_Style_, ttk.Scrollbar):
     TkClass = ttk.Scrollbar
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 
     def set(self, first, last): return ttk.Scrollbar.set(self, first, last)
 SScrollbar = PSSc = PRMP_Style_Scrollbar
@@ -658,8 +666,8 @@ SScrollbar = PSSc = PRMP_Style_Scrollbar
 class PRMP_Style_Spinbox(PRMP_Input, PRMP_Style_, ttk.Spinbox):
     TkClass = ttk.Spinbox
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
         PRMP_Input.__init__(self, **kwargs)
 
 
@@ -670,11 +678,11 @@ SSpinbox = PSSp = PRMP_Style_Spinbox
 class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
     TkClass = ttk.Combobox
 
-    def __init__(self, master=None, type_='', config={}, values=[], **kwargs):
+    def __init__(self, master, _type='', values=[], **kwargs):
 
-        if type_.lower() == 'gender': values = ['Male', 'Female']
+        if _type.lower() == 'gender': values = ['Male', 'Female']
 
-        PRMP_Style_.__init__(self, master=master, config=config, **kwargs)
+        PRMP_Style_.__init__(self, master, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)
         self.objects = {}
         self.changeValues(values)
@@ -694,8 +702,8 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
         get = self.get()
         if get in self.objects: return self.objects[get]
 
-    @property
-    def PRMP_WIDGET(self): return 'Combobox'
+    # @property
+    # def PRMP_WIDGET(self): return 'Combobox'
 
     def changeValues(self, values):
         self.values = values
@@ -707,21 +715,25 @@ Combobox = PCb = PRMP_Combobox
 class PRMP_LabeledScale(PRMP_Style_, ttk.LabeledScale):
     TkClass = ttk.LabeledScale
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 LabeledScale = PLS = PRMP_LabeledScale
 
 class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
     TkClass = ttk.Notebook
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+    def __init__(self, master, closable=0, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 
-        self.bind('<Button-1>', self._button_press)
-        self.bind('<ButtonRelease-1>', self._button_release)
-        self.bind('<Motion>', self._mouse_over)
+        if closable:
+            self.bind('<Button-1>', self._button_press)
+            self.bind('<ButtonRelease-1>', self._button_release)
+            self.bind('<Motion>', self._mouse_over)
 
     def _button_press(self, event):
+        '''
+        hack to simulate an active close button on each tab
+        '''
         widget = event.widget
         element = widget.identify(event.x, event.y)
         if "close" in element:
@@ -730,14 +742,16 @@ class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
             widget._active = index
 
     def _button_release(self, event):
+        '''
+        hack to simulate an active close button on each tab
+        '''
         widget = event.widget
-        if not widget.instate(['pressed']):
-                return
+        if not widget.instate(['pressed']): return
         element = widget.identify(event.x, event.y)
-        try:
-            index = widget.index("@%d,%d" % (event.x, event.y))
-        except tk.TclError:
-            pass
+        
+        try: index = widget.index("@%d,%d" % (event.x, event.y))
+        except tk.TclError: pass
+
         if "close" in element and widget._active == index:
             widget.forget(index)
             widget.event_generate("<<NotebookTabClosed>>")
@@ -746,43 +760,46 @@ class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
         widget._active = None
 
     def _mouse_over(self, event):
+        '''
+        hack to simulate an active close button on each tab
+        '''
         widget = event.widget
         element = widget.identify(event.x, event.y)
-        if "close" in element:
-            widget.state(['alternate'])
-        else:
-            widget.state(['!alternate'])
+        
+        if "close" in element: widget.state(['alternate'])
+        else: widget.state(['!alternate'])
 Notebook = PN = PRMP_Notebook
 
 class PRMP_Progressbar(PRMP_Style_, ttk.Progressbar):
     TkClass = ttk.Progressbar
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 Progressbar = PPb = PRMP_Progressbar
 
 class PRMP_Separator(PRMP_Style_, ttk.Separator):
     TkClass = ttk.Separator
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 Separator = PS = PRMP_Separator
 
 class PRMP_Sizegrip(PRMP_Style_, ttk.Sizegrip):
     TkClass = ttk.Sizegrip
 
-    def __init__(self, master=None, config={}, **kwargs):
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+    def __init__(self, master, **kwargs):
+        PRMP_Style_.__init__(self, master, **kwargs)
 Sizegrip = PSg = PRMP_Sizegrip
 
 class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
     TkClass = ttk.Treeview
 
-    def __init__(self, master=None, config={}, callback=None, tipping={}, **kwargs):
+    def __init__(self, master, callback=None, tipping={}, **kwargs):
         '''
-        :param tipping: kwargs for the tips on the items of the tree
+        tipping: kwargs for the tips on the items of the tree.
+        callback: function to be called when an item is selected.
         '''
-        PRMP_Style_.__init__(self, master=master,config=config, **kwargs)
+        PRMP_Style_.__init__(self, master, **kwargs)
         self.bind('<<TreeviewSelect>>', self.selected)
 
         self.ivd = self.itemsValuesDict = {}
@@ -808,6 +825,9 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
             self.tipManager.add_tooltip(item, text=tip)
 
     def getChildren(self, item=None):
+        '''
+        if not item, it returns all the children.
+        '''
         children = self.get_children(item)
         childrenList = []
 
@@ -828,11 +848,9 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
         newItem = ttk.Treeview.insert(self, item, position, text=text, **kwargs)
 
         self.ivd[newItem] = value or text
-        # print(self.ivd)
         if tip: self.addItemTip(newItem, tip)
 
         return newItem
-
 
     def delete(self, *items):
         for item in items:

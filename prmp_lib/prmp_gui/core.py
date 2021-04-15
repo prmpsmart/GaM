@@ -244,6 +244,9 @@ class PRMP_Theme(PRMP_GuiMixins):
 
     @classmethod
     def setTheme(cls, theme):
+        '''
+        theme: a key in PRMP_Theme.THEMES_DICTS
+        '''
         # normalize available l&f values
         lf_values = [item.lower() for item in cls.themesList()]
         # option 1
@@ -260,7 +263,6 @@ class PRMP_Theme(PRMP_GuiMixins):
         selection = cls.themesList()[ix]
 
         cls.CURRENT_THEME = selection
-
 
         try:
             colors = cls.THEMES_DICTS[selection]
@@ -287,20 +289,23 @@ class PRMP_Theme(PRMP_GuiMixins):
 
     @classmethod
     def setOptions(cls, button_color=None, progress_meter_color=None, background_color=None, input_elements_background_color=None, input_text_color=None, scrollbar_color=None, text_color=None):
+        '''
+        updating the global theme.
+        '''
 
-        if button_color != None: PRMP_Theme.DEFAULT_BUTTON_COLOR = button_color
+        if button_color: PRMP_Theme.DEFAULT_BUTTON_COLOR = button_color
 
-        if progress_meter_color != None: PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR = progress_meter_color
+        if progress_meter_color: PRMP_Theme.DEFAULT_PROGRESS_BAR_COLOR = progress_meter_color
 
-        if background_color != None: PRMP_Theme.DEFAULT_BACKGROUND_COLOR = background_color
+        if background_color: PRMP_Theme.DEFAULT_BACKGROUND_COLOR = background_color
 
-        if input_elements_background_color != None: PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR = input_elements_background_color
+        if input_elements_background_color: PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR = input_elements_background_color
 
-        if text_color != None: PRMP_Theme.DEFAULT_FOREGROUND_COLOR = text_color
+        if text_color: PRMP_Theme.DEFAULT_FOREGROUND_COLOR = text_color
 
-        if scrollbar_color != None: PRMP_Theme.DEFAULT_SCROLLBAR_COLOR = scrollbar_color
+        if scrollbar_color: PRMP_Theme.DEFAULT_SCROLLBAR_COLOR = scrollbar_color
 
-        if input_text_color is not None: PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR = input_text_color
+        if input_text_color: PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR = input_text_color
 
         return True
 
@@ -318,6 +323,9 @@ class PRMP_Theme(PRMP_GuiMixins):
     def fontsNames(self): return self.tk.splitlist(self.tk.call("font", "names"))
 
     def parseFont(self, font, name=''):
+        '''
+        creates a new font if not existing, returns the font.
+        '''
         if isinstance(font, str):
             if font in self.fontsNames: return font
             return Font(name=font)
@@ -341,6 +349,8 @@ class PRMP_Theme(PRMP_GuiMixins):
                 PRMP_Theme.PRMP_FONTS.append(fo)
 
     def _prevTheme(self):
+        'changes to previous theme'
+
         cur = PRMP_Theme.CURRENT_THEME
         ths = PRMP_Theme.themesList()
         ind = ths.index(cur)
@@ -351,6 +361,8 @@ class PRMP_Theme(PRMP_GuiMixins):
         return [theme, next_]
 
     def _nextTheme(self):
+        'changes to next theme'
+
         cur = PRMP_Theme.CURRENT_THEME
         ths = PRMP_Theme.themesList()
         ind = ths.index(cur)
@@ -360,7 +372,8 @@ class PRMP_Theme(PRMP_GuiMixins):
         PRMP_Theme.setTheme(theme)
         return [theme, prev]
 
-    def _paint(self, nno=None):
+    def _paint(self):
+        'paints the widget with _ttk_ = False'
         if not self._ttk_:
             kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback']}
 
@@ -380,16 +393,13 @@ class PRMP_Theme(PRMP_GuiMixins):
 
             _dict = {}
 
-            asLabel = kwargs.get('asLabel')
-            if asLabel != None:
-                asLabel = kwargs.pop('asLabel')
-                wt = 'Label' if asLabel else wt
+            asLabel = kwargs.pop('asLabel', None)
+            if asLabel != None: wt = 'Label' if asLabel else wt
 
             asEntry = kwargs.get('asEntry')
             if asEntry != None:
                 asEntry = kwargs.pop('asEntry')
                 wt = 'Entry' if asEntry else wt
-                # _dict.update(dict(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background))
                 try: self.config(**dict(activebackground=activebackground, activeforeground=activeforeground, highlightbackground=background))
                 except: pass
 
@@ -463,13 +473,11 @@ class PRMP_Theme(PRMP_GuiMixins):
 
                 child.paint()
 
-    def _paintAll(self, event=None):
-        self._paint(not event)
+    def _paintAll(self):
+        self._paint()
         self._paintChildren()
 
-    def paint(self, event=None):
-        # print(e)
-        self._paintAll(not event)
+    def paint(self): self._paintAll()
     
     @classmethod
     def updateTheme(cls):
@@ -477,17 +485,21 @@ class PRMP_Theme(PRMP_GuiMixins):
 
     @classmethod
     def currentThemeIndex(cls): return cls.themesList().index(cls.CURRENT_THEME)
+
     @classmethod
     def currentThemeDict(cls): return cls.THEMES_DICTS[cls.CURRENT_THEME]
 
 
 class PRMP_Widget(PRMP_Theme):
+    # the tkinter widget to use for this widget.
     TkClass = None
+    # the tips class to use for this widget.
     TipsClass = None
+    # default PRMP window base class.
     PRMP_Window = None
 
     def after(self, time, func):
-        # print(func)
+        'Wrapping the default widget.after to only call if the widget exists.'
         h = 0
         try:
             if not self.winfo_exists(): return
@@ -499,7 +511,9 @@ class PRMP_Widget(PRMP_Theme):
     def topest(self): return self.PRMP_Window.TOPEST
 
     @property
-    def _children(self): return self.winfo_children()
+    def _children(self):
+        'default tkinter children'
+        return self.winfo_children()
 
     @property
     def topest2(self):
@@ -511,6 +525,7 @@ class PRMP_Widget(PRMP_Theme):
 
     @property
     def toplevel(self):
+        'returns the PRMP_Window hosting this widget.'
         master = self.master
         from .windows import PRMP_Tk, PRMP_Toplevel
         while True:
@@ -518,9 +533,25 @@ class PRMP_Widget(PRMP_Theme):
             if isinstance(master, (PRMP_Tk, PRMP_Toplevel)): return master
             master = master
 
-    def __init__(self, master=None, _ttk_=False, tipKwargs={}, status='', relief='groove', nonText=False, asEntry=False, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', config={}, hl=None, **kwargs):
+    def __init__(self, master, _ttk_=False, tipKwargs={}, tip={}, status='', relief='groove', nonText=False, asEntry=False, hl=None, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', config={}, **kwargs):
         '''
-        :param tipKwargs: dict of [Label options, follow, delay]
+        master: another widget hosting this widget or None
+        _ttk_: bool whether this widget is based on tkinter.ttk or not.
+        tip or tipKwargs: dict of [Label options, follow, delay]
+        status: text to show in the status bar; defaults to text of this widget.
+        relief: defaults to PRMP's chosen relief 'GROOVE'
+        nonText: bool whether this widget can have a text on it.
+            Frame don't.
+        asEntry: bool whether to style widget like an Entry widget;
+            hack is: relief set to 'SUNKEN'
+        hl or highlightable: whether to change relief to 'solid' if mouse is hovering on this widget.
+        place, grid, pack: dict or bool,
+            dict containing parameters to tkinter's widget.[place, pack, grid];
+                OR
+            bool: in the case of pack and grid to use the GEOMETRY's manager discretion.
+        font: sets the font for this widget.
+        config: parameters to pass to the tkinter widget constructor unchanged.
+        kwargs: other options maybe to tkinter widgets or there direct subclasses.
         '''
 
         config = config.copy()
@@ -538,10 +569,10 @@ class PRMP_Widget(PRMP_Theme):
             self.kwargs['asEntry'] = asEntry
         self.kwargs['relief'] = relief
 
+        self.font = None
         self.prmp_master = self.kwargs.pop('prmp_master', self.master)
 
         self._status = status
-        self.font = None
         self.highlightable = highlightable
         self.nonText = nonText
 
@@ -572,6 +603,7 @@ class PRMP_Widget(PRMP_Theme):
         try: self.useFont(font)
         except: pass
 
+        tipKwargs = tip or tipKwargs
         if bool(tipKwargs) and not isinstance(tipKwargs, dict) and self.kwargs.get('text'): tipKwargs = dict(text=self.kwargs.get('text'))
 
         self.tooltip = None
@@ -589,18 +621,21 @@ class PRMP_Widget(PRMP_Theme):
         if not isinstance(self, PRMP_Widget.PRMP_Window): self.positionWidget(place=place, pack=pack, grid=grid)
 
     def entered(self, event=None):
+        'mouse is entered widget'
         if not self.nonText: self.statusShow()
         if self.highlightable:
             try: self.configure(relief='solid')
             except: pass
 
     def left(self, event=None):
+        'mouse is left widget'
         if self.highlightable:
             re = self.kwargs.get('relief', 'flat')
             try: self.configure(relief=re)
             except: pass
 
     def statusShow(self):
+        'shows the text of this widget aon the status bar if present in the window.'
         root = self.winfo_toplevel()
         if root and getattr(root, 'statusBar', None): root.statusBar.set(self.status)
 

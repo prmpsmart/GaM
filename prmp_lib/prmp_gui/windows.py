@@ -159,11 +159,11 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         if themeIndex: PRMP_Theme.setThemeIndex(themeIndex)
         elif theme: PRMP_Theme.setTheme(theme)
 
-
         PRMP_Widget.__init__(self, geo=geo, nonText=True, **kwargs)
 
         if PRMP_Window.TOPEST == None:
-            self.bind('<<PRMP_STYLE_CHANGED>>', self.paint)
+            from .core_ttk import PRMP_Style
+            self.bind(PRMP_Style.PRMP_STYLE_EVENT, self.paint)
 
             PRMP_Window.TOPEST = self
             self.createDefaultFonts()
