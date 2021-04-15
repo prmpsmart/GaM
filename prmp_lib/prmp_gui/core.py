@@ -634,16 +634,12 @@ class PRMP_Widget(PRMP_Theme):
             try: self.configure(relief=re)
             except: pass
 
+    def get(self): return self['text']
+
     def statusShow(self):
         'shows the text of this widget aon the status bar if present in the window.'
         root = self.winfo_toplevel()
         if root and getattr(root, 'statusBar', None): root.statusBar.set(self.status)
-
-    def getWid_H_W(self, wid):
-        wid.update()
-        return (wid.winfo_width(), wid.winfo_height())
-
-    def get(self): return self['text']
 
     @property
     def width(self):
@@ -657,8 +653,14 @@ class PRMP_Widget(PRMP_Theme):
         try: return int(self.winfo_height())
         except: return -1
 
+    def getWid_H_W(self, wid):
+        'returns the width and height of this widget'
+        wid.update()
+        return (wid.winfo_width(), wid.winfo_height())
+
     @property
     def winfos(self):
+        'the defaults winfo methods to get useful infos on this widget'
         geo_infos = [self.winfo_geometry, self.winfo_height, self.winfo_pointerx, self.winfo_pointerxy, self.winfo_pointery, self.winfo_rootx, self.winfo_rooty, self.winfo_screendepth, self.winfo_screenheight, self.winfo_width, self.winfo_x, self.winfo_y]
 
         unnecessaries = [self.winfo_reqheight, self.winfo_reqwidth, self.winfo_depth, self.winfo_screenmmheight, self.winfo_screenmmwidth, self.winfo_vrootheight, self.winfo_vrootwidth, self.winfo_vrootx, self.winfo_vrooty, ]
@@ -667,6 +669,7 @@ class PRMP_Widget(PRMP_Theme):
 
     @property
     def tupled_winfo_geometry(self):
+        'returns tupled geometry values, from the tkinter interpreter.'
         geo = self.winfo_geometry()
         first = geo.split('x')
         second = first[1].split('+')
@@ -675,24 +678,29 @@ class PRMP_Widget(PRMP_Theme):
         return ret
 
     def getText(self):
+        'returns widget current text.'
         try: return self['text']
         except Exception as er: self.printError('get', er)
 
     @property
     def status(self):
+        'returns widget current status text.'
         if self._status: return self._status
         try: return self.kwargs.get('text', '')
         except: return self['text']
 
     def set(self, values):
+        'sets the values, text parameter for widgets not having values.'
         try: self.config(text=values)
         except Exception as er: self.printError('set', er)
 
     def light(self):
+        'changes fg to bg and vice-versa.'
         if self._ttk_: return
         self.configure(background=PRMP_Theme.DEFAULT_FOREGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_BACKGROUND_COLOR)
 
     def unlight(self):
+        'reset to default colors.'
         if self._ttk_: return
         self.configure(background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR, foreground=PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
