@@ -14,6 +14,35 @@ from .miscs import Columns, Column
 
 
 
+def showDialog(title=None, msg=None, which=None):
+    if which == 'error': messagebox.showerror(title, msg)
+    elif which == 'info': messagebox.showinfo('Information', msg)
+    elif which == 'warn': messagebox.showwarning('Warning', msg)
+
+def confirmDialog(title=None, msg=None, which=None):
+    if which == 1: return messagebox.askyesno(title, msg)
+    if which == 2: return messagebox.askquestion(title, msg)
+    if which == 3: return messagebox.askokcancel(title, msg)
+    if which == 4: return messagebox.askretrycancel(title, msg)
+    if which == 5: return messagebox.askyesnocancel(title, msg)
+
+def askDialog(string=0, number=0, f=0)
+
+def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
+    if folder == False:
+        if opened == False:
+            if many == False:
+                if save == False: return filedialog.askopenfilename(**kwargs)
+                else: return filedialog.asksaveasfilename(**kwargs)
+            else: return filedialog.askopenfilenames(**kwargs)
+        else:
+            if many == False:
+                if save == False: return filedialog.askopenfile(**kwargs)
+                else: return filedialog.asksaveasfile(**kwargs)
+            else: return filedialog.askopenfiles(**kwargs)
+    else: return filedialog.askdirectory(**kwargs)
+
+
 
 
 class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
@@ -262,7 +291,7 @@ class PRMP_ImageDialog(PRMP_Dialog):
         super().__init__(master, title=title, **kwargs)
 
     def _setupDialog(self):
-        self.imageKwargs['bindMenu'] = 1
+        self.imageWidConfig['bindMenu'] = self.imageWidConfig.get('bindMenu', 1)
         self.imageLabel = PRMP_ImageSLabel(self.container, place=dict(relx=.01, rely=.01, relh=.98, relw=.98), callback=self.getImage, config=dict(relief='flat', anchor='center'), imageKwargs=self.imageKwargs, **self.imageWidConfig)
         
         self.set = self.imageLabel.set
@@ -272,6 +301,8 @@ class PRMP_ImageDialog(PRMP_Dialog):
         self._setResult(imageFile)
         self.destroyDialog()
 ImgD = PRMP_ImageDialog
+
+
 
 class Splash(PRMP_Dialog):
     def __init__(self, master=None, prmpImage='', ntb=1, atb=0, asb=0, geo=(800, 500), title='Goodness and Mercy', imageKwargs={}, delay=2000, **kwargs):
@@ -305,64 +336,6 @@ class Splash(PRMP_Dialog):
 
     def set(self): pass
 
-
-
-
-
-
-class AttributesExplorerDialog(PRMP_Dialog):
-
-    def __init__(self, master=None, title='Attributes Explorer Dialog', geo=(600, 500), obj=None, dialog=None, **kwargs):
-        self.obj = obj
-        self.dialog = dialog
-        super().__init__(master, title=title, geo=geo, **kwargs)
-
-    def _setupDialog(self): AttributesExplorer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), values=self.values, obj=self.obj,  dialog=self.dialog, callback=self._callback)
-
-    def _callback(self, w):
-        if self.callback:
-            self.callback(w)
-            self.destroy()
-
-class AttributesViewerDialog(PRMP_Dialog):
-
-    def __init__(self, master=None, title='Attributes Viewer Dialog', geo=(700, 300), obj=None, attr=None, dialog=None, **kwargs):
-        self.attr = attr
-        self.obj = obj
-        self.dialog = dialog
-        super().__init__(master, title=title, geo=geo, **kwargs)
-
-    def _setupDialog(self): AttributesViewer(self.container, place=dict(relx=.02, rely=.02, relh=.96, relw=.96), attr=self.attr, obj=self.obj, dialog=self.dialog)
-
-
-
-
-
-def showDialog(title=None, msg=None, which=None):
-    if which == 'error': messagebox.showerror(title, msg)
-    elif which == 'info': messagebox.showinfo('Information', msg)
-    elif which == 'warn': messagebox.showwarning('Warning', msg)
-
-def confirmDialog(title=None, msg=None, which=None):
-    if which == 1: return messagebox.askyesno(title, msg)
-    if which == 2: return messagebox.askquestion(title, msg)
-    if which == 3: return messagebox.askokcancel(title, msg)
-    if which == 4: return messagebox.askretrycancel(title, msg)
-    if which == 5: return messagebox.askyesnocancel(title, msg)
-
-def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
-    if folder == False:
-        if opened == False:
-            if many == False:
-                if save == False: return filedialog.askopenfilename(**kwargs)
-                else: return filedialog.asksaveasfilename(**kwargs)
-            else: return filedialog.askopenfilenames(**kwargs)
-        else:
-            if many == False:
-                if save == False: return filedialog.askopenfile(**kwargs)
-                else: return filedialog.asksaveasfile(**kwargs)
-            else: return filedialog.askopenfiles(**kwargs)
-    else: return filedialog.askdirectory(**kwargs)
 
 def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, **kwargs):
     from .tushed_windows import ColumnsExplorerDialog, ColumnViewerDialog

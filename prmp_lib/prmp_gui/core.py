@@ -499,7 +499,7 @@ class PRMP_Widget(PRMP_Theme):
     PRMP_Window = None
 
     def after(self, time, func):
-        'Wrapping the default widget.after to only call if the widget exists.'
+        'Wrapping the default tkinter widget.after to only call if the widget exists.'
         h = 0
         try:
             if not self.winfo_exists(): return
@@ -508,7 +508,9 @@ class PRMP_Widget(PRMP_Theme):
         if h: super().after(time, func)
 
     @property
-    def topest(self): return self.PRMP_Window.TOPEST
+    def topest(self):
+        'The first window to be created.'
+        return self.PRMP_Window.TOPEST
 
     @property
     def _children(self):
@@ -517,6 +519,7 @@ class PRMP_Widget(PRMP_Theme):
 
     @property
     def topest2(self):
+        'the window hosting this widget, same as widget.toplevel'
         master = self.master
         while True:
             master = master.master
@@ -525,7 +528,7 @@ class PRMP_Widget(PRMP_Theme):
 
     @property
     def toplevel(self):
-        'returns the PRMP_Window hosting this widget.'
+        'returns the window hosting this widget.'
         master = self.master
         from .windows import PRMP_Tk, PRMP_Toplevel
         while True:

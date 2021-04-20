@@ -724,6 +724,9 @@ class PRMP_Notebook(PRMP_Style_, ttk.Notebook):
 
     def __init__(self, master, closable=0, **kwargs):
         PRMP_Style_.__init__(self, master, **kwargs)
+        '''
+        closable: to check if the tabs of this Notebook can be closed.
+        '''
 
         if closable:
             self.bind('<Button-1>', self._button_press)

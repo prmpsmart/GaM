@@ -189,10 +189,14 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         strs = [int(''.join(d)) for d in numbers]
         return strs
 
-    def numWithCommas(self, num=None, fl=0):
+    def numWithCommas(self, num=None):
         if num == None: num = self
 
-        num = float(num) if fl else int(num)
+        return f'{num:,.02f}'
+
+        ''' below is the prmp implementation
+
+        fl = isinstance(num, float)
 
         div = 3
         str_num = str(num)
@@ -223,6 +227,7 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         _minus = '-' if minus else ''
         result = _minus + result
         return result
+    '''
 
     def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num, 1))
 
@@ -266,11 +271,14 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         except: return False
 
     def decimalPlace(self, num, place=1):
+        return f'{num:.{place}f}'
+        ''' below is the prmp implementation
         num = float(num)
         numStr = str(num) + '0'
         endIndex = numStr.index('.') + place + 1
         finised = numStr[:endIndex]
         return float(finised)
+        '''
 
     def approximate(self, num, size=1):
         assert size > 0

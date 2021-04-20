@@ -1,21 +1,25 @@
 from . import *
-from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime, datetime
 # print(dir())
 
 
 class PRMP_DateWidget:
     attr = 'date'
     def __init__(self, min_=None, max_=None, callback=None):
+        '''
+        min_: minimum date.
+        max_: maximum date.
+        callback: function to call with the chossen date as the parameter to the function.
+        '''
         self.callback = callback
         self.date = None
-        from .dialogs import PRMP_CalendarDialog, PRMP_DateTime
+        from .dialogs import PRMP_CalendarDialog
         self.CD = PRMP_CalendarDialog
-        self.DT = PRMP_DateTime
         self.min = min_
         self.max = max_
 
     def verify(self):
-        if self.DT.checkDateTime(self.date, 1): return True
+        if PRMP_DateTime.checkDateTime(self.date, 1): return True
         else: return False
 
     def action(self): self.CD(self, side=self.topest.side, _return=1, min_=self.min, max_=self.max, callback=self.set)
@@ -26,17 +30,12 @@ class PRMP_DateWidget:
         if text: return PRMP_DateTime.getDMYFromString(text)
 
     def set(self, date):
-        if date == '':
-            self.config(text=date)
-            return
-        if isinstance(date, str):
-            try:
-                if '-' in date: d, m, y = date.split('-')
-                elif '/' in date: d, m, y = date.split('/')
-                else: return
-                self.date = self.DT.createDateTime(int(y), int(m), int(d))
-            except: return
-        elif isinstance(date, self.DT): self.date = date
+        '''
+        date: a str or instance of datetime.date
+        '''
+        if isinstance(date, str): date = PRMP_DateTime.getDMYFromString(date)
+        elif isinstance(date, datetime.date): ...
+        self.date = date
         self.show()
 
     def show(self):
@@ -50,7 +49,6 @@ class PRMP_DateButton(PRMP_DateWidget, PRMP_Button):
 
         PRMP_DateWidget.__init__(self, min_=min_, max_=max_, callback=callback)
         self['text'] = placeholder
-
 PDB = PRMP_DateButton
 
 class PRMP_MonthButton(PRMP_DateButton): attr = 'monthName'
@@ -60,6 +58,7 @@ class PRMP_MonthYearButton(PRMP_DateButton): attr = 'monthYear'
 
 
 class PRMP_DateTimeView(LabelFrame):
+    'A widget that shows the time and date in some sub-widgets.'
 
     def __init__(self, master, text='Date and Time', **kwargs):
         super().__init__(master, config=dict(text=text), **kwargs)
@@ -95,7 +94,7 @@ class PRMP_DateTimeView(LabelFrame):
 class PRMP_Calendar(Frame):
 
     choosen = None
-    _version_ = '3.3.0' # Alpha by PRMPSmart
+    _version_ = '3.4.0' # Alpha by PRMPSmart
 
     background=PRMP_Theme.DEFAULT_BACKGROUND_COLOR
     header_fg=PRMP_Theme.DEFAULT_BUTTON_COLOR[0]
@@ -110,6 +109,7 @@ class PRMP_Calendar(Frame):
 
 
     class DayLabel(PRMP_Label):
+        'buttons on the main calendar frame'
         highlight_bg = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
         highlight_fg = PRMP_Theme.DEFAULT_FOREGROUND_COLOR
         now_fg = 'white'
@@ -208,7 +208,13 @@ class PRMP_Calendar(Frame):
                 self.clicked()
                 self.returnMethod(self.day)
 
-    def __init__(self, master=None, month=None, callback=None, min_=None, max_=None, **kwargs):
+    def __init__(self, master, month=None, callback=None, min_=None, max_=None, **kwargs):
+        '''
+        month: datetime.date instance to use as the opening month.
+        calllback: function to call with the choosen date as a parameter.
+        min_: minimum datetime.date instance viewable
+        max_: maximum datetime.date instance viewable
+        '''
         super().__init__(master, **kwargs)
         month = kwargs.pop('date', month)
 
@@ -241,6 +247,8 @@ class PRMP_Calendar(Frame):
         self._for = PRMP_Button(self, text=self._forward, command=self.nextYear, background=PRMP_Theme.DEFAULT_BUTTON_COLOR[1], foreground=PRMP_Theme.DEFAULT_BUTTON_COLOR[0], font=PRMP_Theme.DEFAULT_MINUTE_FONT)
         self._for.place(relx=.88, rely=0, relw=.12, relh=.1)
 
+        # setting the needed labels for the calendar
+        # this one for the headers [Mon...Sun], [Next, Prev, etc]
         col = 0
         self.headers = []
         daysAbbrs = [PRMP_DateTime.daysAbbr[-1]] + PRMP_DateTime.daysAbbr[:-1]
@@ -251,7 +259,7 @@ class PRMP_Calendar(Frame):
             d.place(relx=x, rely=.1, relw=w, relh=.15)
             self.headers.append(d)
             col += 1
-
+        # this one for the date labels
         h = .75 / 6
         y = .25
         for d in range(42):
@@ -261,7 +269,8 @@ class PRMP_Calendar(Frame):
             btn = self.DayLabel(self, returnMethod=self.choosenDay, text=d, relief='groove')
             btn.place(relx=x, rely=y, relw=w, relh=h)
             self.daysButtons.append(btn)
-
+        
+        # setting the reset configs
         self.reset = self.daysButtons[-4]
         self.reset.empty()
         self.reset.config(command=self.resetDate, text='☂', background='red', foreground='white', relief='ridge')
@@ -308,7 +317,7 @@ class PRMP_Calendar(Frame):
         self.updateDays()
 
     def updateDays(self):
-
+        # updates the calendar with the current month (datetime.date instance)
         self.monthNameLbl.config(text=self.month.monthName)
         self.yearLbl.config(text=self.month.year)
         monthDates = self.month.monthDates

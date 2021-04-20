@@ -33,7 +33,7 @@ class MPVImage(PRMP_ImageCheckbutton):
 
         self.filename = imageKwargs.get('prmpImage')
         self.mm = mm
-        super().__init__(master, tipKwargs=dict(text=self.filename), imageKwargs=imageKwargs,  bindMenu=0, **kwargs)
+        super().__init__(master, tipKwargs=dict(text=self.filename), imageKwargs=imageKwargs, **kwargs)
         self.bind('<Double-1>', self.open)
     
     def open(self, event):
@@ -76,7 +76,7 @@ class Database_Images(PRMP_MainWindow, Background):
 
         self.db_path = ChoosePath(self.cont, text='DB File', bottomKwargs=dict(_type='file', very=1, foreground='white'), place=dict(relx=.02, rely=.82, relh=.17, relw=.7), orient='h', longent=.25, folder=0)
 
-        self.db_path.set(r'C:/Users/Administrator/Coding_Projects/Python/Dev_Workspace/GaM/prmp_lib/prmp_miscs/images_db.prmp_db')
+        self.db_path.set(db_file)
 
         self.preview = PRMP_ImageDialog(self, withdraw=1, ntb=0, asb=0, atb=0)
         self.preview.imageLabel.bind('<1>', lambda e: self.preview.withdraw())
@@ -166,8 +166,6 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
 
         Button(self.canvas, text='Load from Database?', place=dict(relx=.81, rely=.46, relw=.15, relh=.04), image=PRMP_Image('db_icon', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.from_database)
 
-
-
         self.varr = tk.StringVar(self)
         yy = .6
         self._copy = Radiobutton(self.canvas, text='Copy', place=dict(relx=.79, rely=yy, relw=.07, relh=.04), config=dict(value='copy', variable=self.varr, compound='left', image=PRMP_Image('copy', resize=rv, inbuilt=1, inExt='png', for_tk=1)))
@@ -196,7 +194,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         # # print(len(pp))
         # self.after(3000, lambda: threading.Thread(target=self._load_dict, args=[pp]).start())
         
-        self.preview = PRMP_ImageDialog(self, geo=geo, imageWidConfig=dict(fullsize=1), asb=0, tooltype=1, atb=0, withdraw=1)
+        self.preview = PRMP_ImageDialog(self, geo=geo, imageWidConfig=dict(fullsize=1, bindMenu=0), asb=0, tooltype=1, atb=0, withdraw=1)
         self.preview.bind('<1>', lambda e: self.preview.withdraw())
 
         self.start()
@@ -232,7 +230,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
 
             self.image_labels.append(one)
 
-        # for a in self.image_labels: a.paint()
+        self.paint()
     
     def load_dir(self, folder='', images=[]):
         self.folder = folder
@@ -348,11 +346,9 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
 
     def from_database(self):
         file = dialogFunc(path=1)
-        if file: Database_Images(self, db_file=file, callback=self.load_db, tooltype=1, tw=1, tm=1)
+        if file: Database_Images(self, db_file=file, callback=self.load_db, tooltype=0, tw=1, tm=0)
     
     def load_db(self, images): self.load_dir(images=images)
-
-
 
 class Image_Renamer(Tk, Background):
 

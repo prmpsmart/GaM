@@ -99,7 +99,7 @@ class PRMP_Setup:
             return files, f'/{folder}'
         else: return [folder], ''
 
-    def build_ext(self, folder='', scripts=[], description='', meta_datas={}, classifiers=classifiers, platforms=platforms, keywords=[], license='', name='', inplace=False, dest='', version='1.0'):
+    def build_ext(self, folder='', scripts=[], description='', meta_datas={}, classifiers=classifiers, platforms=platforms, keywords=[], license='', name='', inplace=False, dest='', version='1.0', include_dirs=[]):
         self.holder = Holder()
         name = name or path.basename(folder[:-3]) if folder.endswith('.py') else folder
 
@@ -125,6 +125,9 @@ class PRMP_Setup:
         if not self.holder.dest: self.holder.dest = dest or 'pyd'
 
         self.holder.directory = '--inplace' if inplace else f'-b{self.holder.dest}'
+        self.holder.include_dirs = include_dirs
+        if include_dirs: self.holder.include_dirs = [f'-I{incl_d}' for incl_d in include_dirs]
+        print(self.holder.include_dirs)
 
     def _build_ext(self):
         from distutils.core import setup
@@ -134,7 +137,7 @@ class PRMP_Setup:
             except: pass
         ext_modules = cythonize(self.holder.scripts, language_level=3, build_dir='c', output_dir='c')
 
-        sys.argv.extend(['build_ext', self.holder.directory])
+        sys.argv.extend(['build_ext', self.holder.directory, *self.holder.include_dirs])
         setup(ext_modules=ext_modules, **self.holder.meta_datas)
 
     def pyinstaller(self, scripts=[], console=True, extra_commands=[], log_level='info', datas={}, binaries={}, name='', onefile=False, icon='', clean=False, noconfirm=False):

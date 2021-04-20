@@ -40,7 +40,6 @@ class PRMP_Checkbutton(PRMP_InputButtons, PRMP_, tk.Checkbutton):
     def disabled(self):
         self['fg'] = PRMP_Theme.DEFAULT_BACKGROUND_COLOR
         self.state('disabled')
-
 Checkbutton = PC = PRMP_Checkbutton
 
 class PRMP_Entry(PRMP_Input, PRMP_, tk.Entry):
@@ -149,7 +148,6 @@ class PRMP_Spinbox(PRMP_Input, PRMP_, tk.Spinbox):
         PRMP_Input.__init__(self, **kwargs)
 
     def get(self): return float(self.TkClass.get(self))
-
 Spinbox = PSp = PRMP_Spinbox
 
 
@@ -259,3 +257,8 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
             for sel in sels: select.append(self.values[sel])
             return select
 Listbox = PLb = PRMP_Listbox
+
+
+
+
+
