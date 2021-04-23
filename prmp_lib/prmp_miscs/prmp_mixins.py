@@ -191,45 +191,9 @@ class PRMP_StrMixins(PRMP_ClassMixins):
 
     def numWithCommas(self, num=None):
         if num == None: num = self
-
         return f'{num:,.02f}'
 
-        ''' below is the prmp implementation
-
-        fl = isinstance(num, float)
-
-        div = 3
-        str_num = str(num)
-
-        if fl:
-            str_num, afterFloat = str_num.split('.')
-            if afterFloat == '0': afterFloat = '00'
-
-        minus = 0
-        if str_num.startswith('-'):
-            minus = 1
-            str_num = str_num[1:]
-
-        num_list = list(str_num)
-        num_len = len(str_num)
-        num_rem = num_len % div
-        num_div = num_len // div
-        if not num_rem: num_div -= 1
-        co, to = -3, 0
-        for _ in range(num_div):
-            num_list.insert(co - to, ",")
-            co -= 3
-            to += 1
-
-        result = "".join(num_list)
-        if fl: result = result + '.' + afterFloat
-
-        _minus = '-' if minus else ''
-        result = _minus + result
-        return result
-    '''
-
-    def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num, 1))
+    def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num))
 
     def addSignToNum(self, num):
         try: float(num)

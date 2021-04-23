@@ -56,15 +56,15 @@ class GaM_App(PRMP_MainWindow):
         self.viewMenu = None # search, details
         self.settingsMenu = None # load, save, security, theme, plot color, save path
 
-        self.viewMenu = Menu(config=dict(tearoff=0))
+        self.viewMenu = Menu(self, config=dict(tearoff=0))
         view = [dict(label='Search', command=lambda : showSnS(self.obj)), dict(label='Details', command=lambda : showOD(self.obj)), dict(label='Update Current Object', command=lambda : updateObj(self.obj))]
         for vie in view: self.viewMenu.add_command(**vie)
 
-        self.settingsMenu = Menu(config=dict(tearoff=0))
+        self.settingsMenu = Menu(self, config=dict(tearoff=0))
         settings = [dict(label='Load', command=self.load), dict(label='Save', command=self.save), dict(label='Security', command=security), dict(label='Others')]
         for sett in settings: self.settingsMenu.add_command(**sett)
 
-        self.helpMenu = Menu(config=dict(tearoff=0))
+        self.helpMenu = Menu(self, config=dict(tearoff=0))
         help_ = [dict(label='Welcome'), dict(label='Documentation'), dict(label='Keyboard Shortcuts Reference'), dict(label='About')]
         for hel in help_: self.helpMenu.add_command(**hel)
 

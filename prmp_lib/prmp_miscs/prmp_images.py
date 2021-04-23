@@ -942,8 +942,10 @@ class PRMP_Image:
         else: return array
 
 PRMP_DB = None
-try: PRMP_DB = PRMP_ImagesDB.PRMP_DB()
-except: pass
+
+if os.environ.get('PRMP_DB'):
+    try: PRMP_DB = PRMP_ImagesDB.PRMP_DB()
+    except: pass
 
 
 

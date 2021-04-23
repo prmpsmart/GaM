@@ -342,7 +342,7 @@ class AttributesExplorer(LabelFrame):
         self.set(values)
 
     def openAttribute(self):
-        from .dialogs import PRMP_MsgBox, AttributesViewerDialog
+        from .tushed_windows import PRMP_MsgBox, AttributesViewerDialog
 
         if not self.obj: PRMP_MsgBox(self, title='Object Error', message='No object is given!')
 

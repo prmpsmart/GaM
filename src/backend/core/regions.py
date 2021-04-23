@@ -68,21 +68,19 @@ class Region(Object):
     
     def __init__(self, manager, name=None, date=None, location=None, phone=None, previous=None, number=None, **kwargs):
         
-        Object.__init__(self, manager, previous=previous, date=date, name=name, number=number, **kwargs)
-        
-        
         self._personsManager = None
         self._subRegionsManager = None
-        
         self._location = location
         
+        Object.__init__(self, manager, previous=previous, date=date, name=name, number=number, **kwargs)
         
         self._accountsManager = self.AccountsManager(self, **kwargs)
         
         if self.SubRegionsManager:
             self._subRegionsManager = self.SubRegionsManager(self)
             
-        if self.PersonsManager: self._personsManager = self.PersonsManager(self, name=name, date=date, phone=phone, **kwargs)
+        if self.PersonsManager:
+            self._personsManager = self.PersonsManager(self, name=name, date=date, phone=phone, **kwargs)
     
     def __str__(self): return f'{self.manager.master} | {self.className}({self.name})'
     

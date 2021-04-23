@@ -1129,6 +1129,9 @@ class PRMP_InputButtons:
         if value == self.value: return True
         elif not self.variable: return self['text']
         else: return False
+    
+    def clear(self): self.variable.set('0')
+
 PIB = PRMP_InputButtons
 
 class PRMP_FillWidgets(PRMP_Mixins):
@@ -1160,7 +1163,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 # B = widget.getFromSelf('Bottom', None)
                 # if B: B.set(B.getFromSelf('placeholder', ''))
                 # else: widget.set(widget.getFromSelf('placeholder', widget.getFromSelf('text', '')))
-                widget.empty()
+                widget.clear()
 
     @property
     def notEditables(self): return self.__notEditables

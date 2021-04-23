@@ -132,6 +132,10 @@ class TwoWidgets(PRMP_Frame):
             self.Top.disabled()
             self.Bottom.disabled()
 
+    def clear(self):
+        if hasattr(self.Bottom, 'clear'): self.Bottom.clear()
+        else: self.Bottom['text'] = ''
+    empty = clear
 
     def active(self, wh=''):
         if wh == 't': self.Top.active()

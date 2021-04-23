@@ -81,11 +81,10 @@ class SubOffice(Region):
     Manager = 'Office'
 
     def __str__(self):
-        master = self.manager if self.strManager else self.manager
-        # return f'{master}'
-        return f'{master} | {self.name}'
-    @property
+        if self.strManager: return f'{self.manager} | {self.location} {self.DEPARTMENT}'
+        else: return f'{self.manager} | {self.name}'
 
+    @property
     def name(self):
         _name = self.manager if self.strManager else self.manager.name
         return f'{_name} {self.DEPARTMENT}'
