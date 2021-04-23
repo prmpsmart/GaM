@@ -11,6 +11,7 @@ from .date_widgets import PRMP_Calendar
 from .image_widgets import PRMP_ImageSLabel
 from .tushed_widgets import *
 from .miscs import Columns, Column
+from tkinter.simpledialog import askinteger, askfloat, askstring
 
 
 
@@ -26,7 +27,12 @@ def confirmDialog(title=None, msg=None, which=None):
     if which == 4: return messagebox.askretrycancel(title, msg)
     if which == 5: return messagebox.askyesnocancel(title, msg)
 
-def askDialog(string=0, number=0, f=0)
+def askDialog(string=0, number=0, f=0, title='', prompt='', **kwargs):
+    if string: ask = askstring
+    elif number: ask = askfloat if f else askinteger
+    
+    return ask(title, prompt, **kwargs)
+
 
 def askPath(opened=False, folder=False, many=False, save=False, **kwargs):
     if folder == False:

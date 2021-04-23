@@ -572,7 +572,6 @@ class PRMP_Widget(PRMP_Theme):
             self.kwargs['asEntry'] = asEntry
         self.kwargs['relief'] = relief
 
-        self.font = None
         self.prmp_master = self.kwargs.pop('prmp_master', self.master)
 
         self._status = status
@@ -606,6 +605,7 @@ class PRMP_Widget(PRMP_Theme):
         try: self.useFont(font)
         except: pass
 
+        # if tip or tipKwargs, set the tipKwargs to text if its boool
         tipKwargs = tip or tipKwargs
         if bool(tipKwargs) and not isinstance(tipKwargs, dict) and self.kwargs.get('text'): tipKwargs = dict(text=self.kwargs.get('text'))
 
@@ -656,7 +656,8 @@ class PRMP_Widget(PRMP_Theme):
         try: return int(self.winfo_height())
         except: return -1
 
-    def getWid_H_W(self, wid):
+    @property
+    def size(self, wid):
         'returns the width and height of this widget'
         wid.update()
         return (wid.winfo_width(), wid.winfo_height())
@@ -782,10 +783,8 @@ class PRMP_Widget(PRMP_Theme):
         for one in group: one.addToggleGroup(group)
 
     def useFont(self, font=None):
-        if font: self.font = self.parseFont(font)
-        if self.font: self['font'] = self.font
-
-        return self
+        if font: font = self.parseFont(font)
+        if font: self['font'] = font
 
     def bindOverrelief(self, wid, relief='solid', **kwargs):
         if wid._ttk_: return

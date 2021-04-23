@@ -40,7 +40,7 @@ class MPVImage(PRMP_ImageCheckbutton):
         geo=(500, 500)
         if self.mm.full_preview.get(): geo = self.prmpImage.image.size
 
-        self.mm.preview.size((*geo, event.widget.winfo_rootx(), event.widget.winfo_rooty()))
+        self.mm.preview.setSize((*geo, event.widget.winfo_rootx(), event.widget.winfo_rooty()))
         self.mm.preview.set(self.prmpImage)
 
         self.mm.preview.deiconify()
@@ -64,6 +64,7 @@ class Database_Images(PRMP_MainWindow, Background):
         self.currentTable = ''
         self.currentImage = None
         self.images = {}
+        db_file = r'C:/Users/Administrator/Coding_Projects/Python/Dev_Workspace/GaM/prmp_lib/prmp_miscs/images_db.prmp_db'
 
         Label(self.cont, text='Tables', place=dict(relx=0, rely=0, relh=.08, relw=.43), font='BIG_PRMP_FONT')
         self.table_names = ListBox(self.cont, place=dict(relx=0, rely=.08, relh=.72, relw=.43), callback=self.loadTable)
@@ -112,6 +113,7 @@ class Database_Images(PRMP_MainWindow, Background):
 
         self.currentTable = table
         self.images = self.prmpDB.getTable(table)
+        
         self.table_images.set(self.images)
     
     def preview_image(self, event=None, selected=None):
@@ -121,7 +123,7 @@ class Database_Images(PRMP_MainWindow, Background):
         self.currentImage = image
 
         self.preview.setTitle(f'{self.currentTable} --> {image}')
-        self.preview.set(image, fullsize=self.fullsize.get())
+        self.preview.set(image, )
         
         if not self.preview.winfo_ismapped(): self.preview.deiconify()
     
@@ -138,7 +140,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
 
         self.canvas = self.addWidget(Canvas, place=dict(relx=0, rely=0, relw=1, relh=1))
         
-        self._img = PRMP_Image('purple_beau', inbuilt=1, inExt='jpeg', resize=geo)
+        self._img = PRMP_Image('purple_lux', inbuilt=1, inExt='jpeg', resize=geo)
         self.change_color(self._img.image)
 
         self.img = self._img.createTkImage()
@@ -233,6 +235,7 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         self.paint()
     
     def load_dir(self, folder='', images=[]):
+        images = images or  []
         self.folder = folder
         self.pictures = images.copy()
 
@@ -476,7 +479,7 @@ class Image_Renamer(Tk, Background):
 # Image_Renamer(title='Image Renamer', folder=folder, tm=1)
 
 app = Image_Renamer
-app = Massive_Photo_Viewer
+# app = Massive_Photo_Viewer
 # app = Database_Images
 # app = PRMP_ImageDialog
 

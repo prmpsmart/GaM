@@ -235,6 +235,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
 
     def set(self, values, showAttr=''):
         self.clear()
+        values = values or []
         for val in values:
             # value = val[showAttr] if showAttr else str(val)
             value = getattr(val, showAttr, None) if showAttr else str(val)

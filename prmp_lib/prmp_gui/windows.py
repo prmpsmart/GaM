@@ -112,7 +112,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
     change_color = change2Imgcolor
 
-    def __init__(self, master=None, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, **kwargs):
+    def __init__(self, master=None, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, promptExit=False, **kwargs):
         '''
         PRMP_Window a base class for all window class for common behaviours.
 
@@ -131,6 +131,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         tipping: 
         themeIndex: 
         theme: 
+        promptExit: 
 
         tkIcon: 
         prmpIcon: 
@@ -184,6 +185,8 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.side = side
         self.tipping = tipping
         self.titleText = title
+        
+        self.promptExit = promptExit
 
         self.co = 0
         # normalizing of the parameters, from the abbr to their full meaning.
@@ -386,41 +389,6 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
     @property
     def y_h(self): return (30, self.geo[1]-60)
 
-    # @property
-    # def rel_x_w(self):
-    #     x, y = self.geo[:2]
-    #     _x, w = self.x_w
-    #     return (_x, w/x)
-
-    # @property
-    # def rel_y_h(self):
-    #     x, y = self.geo[:2]
-    #     _y, h = self.y_h
-    #     return (_y, h/y)
-
-    # def YH(self, geo=()):
-    #     if not geo: return self.y_h
-    #     x, y = geo[:2]
-    #     return (30, y-60)
-
-    # def XW(self, geo=()):
-    #     if not geo: return self.x_w
-    #     x, y = geo[:2]
-    #     return (2, x-4)
-
-    # def relYH(self, geo=()):
-    #     if not geo: return self.rel_y_h
-    #     _y, h = self.y_h
-    #     x, y = geo[:2]
-    #     return (_y, h/y)
-
-    # def relXW(self, geo=()):
-    #     if not geo: return self.rel_x_w
-    #     _x, w = self.x_w
-    #     x, y = geo[:2]
-    #     return (_x, w/x)
-
-
     def getWhichSide(self): return random.randint(1, 15) % 3
 
     @property
@@ -433,12 +401,6 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         show_x = (screen_x - x) // 2
         show_y = (screen_y - y) // 2
         return [x, y, show_x, show_y]
-
-    def position(self, pos):
-        if len(pos) == 2:
-            x, y = pos
-            geo = f'+{x}+{y}'
-            self.geometry(geo)
 
     @property
     def pointsToCenterOfScreen(self): return self._pointsToCenterOfScreen(*self.getXY)
@@ -457,7 +419,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             self.lastPoints = points
             self.geometry(self.getSubbedGeo(points))
 
-    size = setGeometry
+    setSize = position = setGeometry
 
     def centerOfTopOfScreen(self):
         points = self.pointsToCenterOfScreen
@@ -544,6 +506,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.overrideredirect(False)
         self.iconify()
         self.iconed = True
+        self.isMinimized()
 
     def deiconed(self, event=None):
         if self.iconed:
@@ -568,6 +531,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             self.TkClass.state(self, 'zoomed')
             self.isMaximized()
 
+    # events
     def isMaximized(self): pass
 
     def isMinimized(self): pass
@@ -599,14 +563,14 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         rv = (20, 20)
 
         if not self.noWindowButtons and self.__r != 1:
-            self.imgMin = PRMP_Image('green', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
+            self.imgMin = PRMP_Image('button_blank_green', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
 
-            self.imgMax = PRMP_Image('yellow', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
+            self.imgMax = PRMP_Image('button_blank_yellow', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
         if not self.noWindowButtons:
-            self.imgExit = PRMP_Image('red', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
+            self.imgExit = PRMP_Image('button_blank_red', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._exit = B(fr, config=dict(text=self.x_btn2, command=self.destroySelf, image=self.imgExit, style='exit.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
             self._icon = L(fr)
@@ -733,12 +697,11 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             os.sys.exit(self.save())
 
         if self == self.topest:
-            from .dialogs import PRMP_MsgBox
-            PRMP_MsgBox(self, title='Exit', message='Are you sure to exit?', callback=out)
+            if self.promptExit:
+                from .dialogs import PRMP_MsgBox
+                PRMP_MsgBox(self, title='Exit', message='Are you sure to exit?', callback=out)
+            else: out(1)
         else: self.destroy()
-
-    @property
-    def caller(self): return self.kwargs.get('caller')
 
     def _colorize(self):
         topest = self.topest
@@ -786,12 +749,10 @@ class PRMP_MainWindow(PRMP_ClassMixins):
 
         if master: self.root = PRMP_Toplevel(master, _ttk_=_ttk_, **kwargs)
         else: self.root = PRMP_Tk(_ttk_=_ttk_, **kwargs)
-        # self.root.root = self.root
 
         for k, v in self.class_.__dict__.items():
             if k.startswith('__') or k == 'root': continue
             if callable(v): self.root.__dict__[k] = functools.partial(v, self)
-
 
     def __str__(self): return str(self.root)
 
@@ -800,9 +761,7 @@ class PRMP_MainWindow(PRMP_ClassMixins):
         if attr != self._unget: return attr
         else: return getattr(self.root, name)
 
-    def __getattr__(self, name):
-        # print(name)
-        return self[name]
+    def __getattr__(self, name): return self[name]
 
 MainWindow = PMW = PRMP_MainWindow
 
@@ -820,11 +779,16 @@ class PRMP_ToolTip(Toplevel):
         if key == self.key: return self.keyval() if callable(self.keyval) else self.keyval
         else: return self.cgetsub(key) if self.cgetsub else self.cgetsub
 
-    def __init__(self, master, bg='', background='', fg='', foreground='', font='', alpha=.8, pos=None, position=(), text='', _ttk_=0, relief='solid', **kwargs):
+    def __init__(self, master, alpha=.8, bg='', background='', fg='', font='', foreground='', pos=None, position=(), relief='flat', text='', _ttk_=0, **kwargs):
         '''
         Construct a Tooltip with parent master.
-        kwargs: ttk.Label options,
         alpha: float. Tooltip opacity between 0 and 1.
+        bg, background: for the tip
+        fg, foreground: for the tip
+        pos, position: position to place the tip
+        relief: for the tip
+        _ttk_: whether to use tkinter.ttk Entry or not
+        kwargs: ttk.Label options,
         '''
 
         foreground = fg or foreground
@@ -893,7 +857,6 @@ class PRMP_ToolTip(Toplevel):
 
         self.configure(**style_dict)
 
-
     def deiconify(self):
         self.update_style()
         super().deiconify()
@@ -914,6 +877,12 @@ ToolTip = PRMP_ToolTip
 class PRMP_ToolTipsManager:
 
     def __init__(self, widget=None, delay=200, text='', **kwargs):
+        '''
+        widget: tkinter widget
+        delay: delay to pop-up tip
+        text: the text on the tip
+        kwargs: options for the tooltip window e.g bg, font etc
+        '''
 
         self.widget = widget
         self.istree = isinstance(widget, ttk.Treeview)

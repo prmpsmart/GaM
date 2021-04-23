@@ -144,7 +144,7 @@ class ChoosePath(LabelText):
         image = None
 
         if folder:
-            self.image = PRMP_Image('add_folder', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1)
+            self.image = PRMP_Image('folder_add', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1)
             pathType = 'dir'
         else:
             if PRMP_DB:

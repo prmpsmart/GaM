@@ -36,7 +36,7 @@ class PRMP_ImageWidget:
             # self.loadImage(**imageKwargs)
         elif loadDefault: self.after(imgDelay, lambda: self.loadImage(self.default_dp))
 
-        # self.bind('<Configure>', lambda e: self.loadImage(self.prmpImage, event=e, **imageKwargs))
+        self.bind('<Configure>', lambda e: self.loadImage(event=e, **imageKwargs))
 
     def disabled(self):
         self.unBindMenu()
