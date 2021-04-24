@@ -13,7 +13,6 @@ class GaM_App(PRMP_MainWindow):
         super().__init__(master, title=title, **kwargs)
         self.obj = obj
 
-
         self.root.save = self.save
         self._setupApp()
 
@@ -51,7 +50,6 @@ class GaM_App(PRMP_MainWindow):
             if isinstance(obj, Account): obj.balanceAccount()
 
         def security(): from .auths_gui import Security; Security()
-
 
         self.viewMenu = None # search, details
         self.settingsMenu = None # load, save, security, theme, plot color, save path

@@ -73,26 +73,26 @@ class Tushed_Entry(Frame):
         self.entry.place(relx=0, rely=0, relw=e, relh=1)
 
         if p:
-            self._passes = PRMP_Image(filename='red', name='red_pass', **self.dic), PRMP_Image(filename='yellow', name='yellow_pass', **self.dic), PRMP_Image(filename='green', name='green_pass', **self.dic)
+            self._passes = PRMP_Image(filename='button_blank_red', name='red_pass', **self.dic), PRMP_Image(filename='button_blank_yellow', name='yellow_pass', **self.dic), PRMP_Image(filename='button_blank_green', name='green_pass', **self.dic)
 
             self.pass_ = PRMP_ImageSButton(self, place=dict(relx=e, rely=0, relw=p, relh=1), config=dict(style='buttons.TButton'))
             self.after(100, self.validating)
             self.entry.bind('<KeyRelease>', self.validating)
 
         if s:
-            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=dict(**self.dic, prmpImage='highlight'), config=dict(style='buttons.TButton'))
+            self.show = PRMP_ImageSButton(self, place=dict(relx=e+p, rely=0, relw=s, relh=1), imageKwargs=dict(**self.dic, prmpImage='highlighter_blue'), config=dict(style='buttons.TButton'))
 
             self.show.bind('<ButtonPress-1>', lambda e: self.entry.configure(show=''))
             self.show.bind('<ButtonRelease-1>', lambda e: self.entry.configure(show=self.show))
         else: self.entry.config(show='')
         
         if c:
-            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1), imageKwargs=dict(**self.dic, prmpImage='clear'), config=dict(style='buttons.TButton'))
+            self.clear = PRMP_ImageSButton(self, place=dict(relx=e+s+p, rely=0, relw=c, relh=1), imageKwargs=dict(**self.dic, prmpImage='gtk_cancel'), config=dict(style='buttons.TButton'))
 
             self.clear.bind('<1>', self.empty)
 
         if a:
-            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=dict(**self.dic, prmpImage='next'), config=dict(style='buttons.TButton'))
+            self.action = PRMP_ImageSButton(self, place=dict(relx=e+s+p+c, rely=0, relw=a, relh=1), imageKwargs=dict(**self.dic, prmpImage='button_next'), config=dict(style='buttons.TButton'))
             self.entry.bind('<Return>', self.invokeAction)
 
         self.loaded = True

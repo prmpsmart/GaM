@@ -454,7 +454,7 @@ class PRMP_Theme(PRMP_GuiMixins):
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
 
             else:
-                try: self.configure(background=background)
+                try: self.configure(background=background, relief=relief, borderwidth=borderwidth)
                 except: pass
                 return self
             
@@ -1163,7 +1163,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                 # B = widget.getFromSelf('Bottom', None)
                 # if B: B.set(B.getFromSelf('placeholder', ''))
                 # else: widget.set(widget.getFromSelf('placeholder', widget.getFromSelf('text', '')))
-                widget.clear()
+                widget.empty()
 
     @property
     def notEditables(self): return self.__notEditables

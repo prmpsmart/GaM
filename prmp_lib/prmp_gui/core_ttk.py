@@ -328,8 +328,15 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
             },
             'TMenubutton': {
                 'configure': {
-                    'relief': 'flat'
+                    'relief': 'groove',
+                    'overrlief': 'solid',
+                    'font': button_font
                 },
+                'map': {
+                    'relief': [('hover', 'solid')],
+                    'backgound': [('hover', foreground)],
+                    'foregound': [('hover', background)]
+                }, 
                 'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.indicator', {'side': 'right', 'sticky': ''}), ('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
             },
             'Window.TMenubutton': {
@@ -337,17 +344,17 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                     'relief': 'flat',
                     'overrelief': 'groove'
                 },
-                'mapping': {
-                    'relief': [('hover', 'sunken')],
+                'map': {
+                    'relief': [('hover', 'groove')],
                     'backgound': [('hover', foreground)],
                     'foregound': [('hover', background)]
                 },
                 # 'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.indicator', {'side': 'right', 'sticky': ''}), ('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
                 'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
             },
-            'TPanedwindow': {
-                '': ''
-            },
+            # 'TPanedwindow': {
+                # '': ''
+            # },
             'TRadiobutton': {
                 'configure': {
                     'indicatorcolor': background,

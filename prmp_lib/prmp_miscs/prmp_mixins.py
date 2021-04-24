@@ -190,10 +190,10 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         return strs
 
     def numWithCommas(self, num=None):
-        if num == None: num = self
+        if num == None: num = float(self)
         return f'{num:,.02f}'
 
-    def numWithSign_Commas(self, num): return self.addSignToNum(self.numWithCommas(num))
+    def numWithSign_Commas(self, num=None): return self.addSignToNum(self.numWithCommas(num))
 
     def addSignToNum(self, num):
         try: float(num)

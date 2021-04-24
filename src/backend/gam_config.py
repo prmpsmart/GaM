@@ -55,7 +55,7 @@ class GaM_Settings:
     def saveDatas(cls):
         gam = GaM_Settings.GaM
         if not gam:
-            print('GaM_Settings.GaM = None')
+            print(f'{GaM_Settings.GaM = }')
             return
 
         gamBytes = pickle.dumps(gam)

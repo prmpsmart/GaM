@@ -564,7 +564,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
         if not self.noWindowButtons and self.__r != 1:
             self.imgMin = PRMP_Image('button_blank_green', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
-            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), tip='Minimize', font='DEFAULT_SMALL_BUTTON_FONT')
+            self._min = B(fr, config=dict(command=self.minimize, text=self.min_, image=self.imgMin, style='green.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
 
             self.imgMax = PRMP_Image('button_blank_yellow', inbuilt=1, resize=rv, for_tk=1) if _PIL_ else None
             self._max = B(fr, config=dict(command=self.maximize, text=self.max_, image=self.imgMax, style='yellow.TButton'), font='DEFAULT_SMALL_BUTTON_FONT')
@@ -631,7 +631,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             bar.place(x=x, rely=0, relh=1, w=w)
             unbar.place_forget()
 
-            if not self.noWindowButtons: self._exit.place(x=xw-30, rely=0, relh=1, w=30)
+            if not self.noWindowButtons: self._exit.place(x=xw-30, rely=0, relh=1, w=25)
 
     def editStatus(self, text):
         if self.statusBar: self.statusBar.set(text)
@@ -647,8 +647,8 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         fr = F(self)
         self.statusBar = L(fr, config=dict(text='Status' or self.statusText, ), font='DEFAULT_STATUS_FONT')
         self.statusBar._moveroot()
-        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme), font='DEFAULT_SMALL_BUTTON_FONT', tip='Previous Theme')
-        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme), font='DEFAULT_SMALL_BUTTON_FONT', tip='Next Theme')
+        self._up = B(fr, config=dict(text=self.upArrow, command=self.prevTheme), font='DEFAULT_SMALL_BUTTON_FONT')
+        self._down = B(fr, config=dict(text=self.downArrow, command=self.nextTheme), font='DEFAULT_SMALL_BUTTON_FONT')
 
         if PRMP_Window.TIPSMANAGER:
             tipm = PRMP_Window.TIPSMANAGER
@@ -668,9 +668,9 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             if y < 0: return
             h = 30
             self.statusBar.master.place(x=0, y=y-h, h=h, w=xw)
-            self.statusBar.place(x=0, rely=0, relh=1, w=x-60)
-            self._up.place(x=x-60, rely=0, relh=1, w=30)
-            self._down.place(x=x-30, rely=0, relh=1, w=30)
+            self.statusBar.place(x=0, y=0, h=27, w=x-60)
+            self._up.place(x=x-60, rely=0, h=27, w=30)
+            self._down.place(x=x-30, rely=0, h=27, w=30)
 
     def closing(self): pass
 

@@ -748,8 +748,6 @@ class PRMP_ImageFile(PRMP_File):
         if isArray and _PIL_: image = Image.fromarray(array)
         if image: image.save(self, inExt)
 
-        PRMP_ImageFile.count += 1
-    
     @property
     def ext(self):
         if not self._ext: self._ext = PRMP_ImageType.get(self)
@@ -799,7 +797,8 @@ class PRMP_Image:
                 
             self.ext = self.imageFile.ext
 
-            img = self.image = self.image or Image.open(self.imageFile) if _PIL_ else None
+            try: img = self.image = self.image or Image.open(self.imageFile) if _PIL_ else None
+            except Exception as e: print(e); return None
 
             self.frames = getattr(img, 'n_frames', 1)
             

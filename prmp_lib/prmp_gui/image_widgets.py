@@ -62,18 +62,18 @@ class PRMP_ImageWidget:
         name = kwargs.get('name')
         if not name: kwargs['name'] = f'{prmpImage}_{self.className}_{PRMP_ImageWidget.count}'
 
-
         # if not self.winfo_ismapped():
         #     self.after(50, lambda: self.loadImage(prmpImage, **kwargs))
         #     return
 
         try:
-
             if not isinstance(prmpImage, PRMP_Image):
                 kwargs['for_tk'] = 1
                 prmpImage = PRMP_Image(prmpImage, thumb=thumb, **kwargs)
 
             if isinstance(prmpImage, PRMP_Image):
+                if not prmpImage.image: return
+                
                 if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)))
                 else: self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
@@ -112,7 +112,7 @@ class PRMP_ImageWidget:
             self.config(image=self.frame)
             # self.paint()
         except ValueError as e:
-            print(e)
+            # print(e)
             self['image'] = None
             if self.loadDefault: self.loadImage(self.default_dp)
         except Exception as e:

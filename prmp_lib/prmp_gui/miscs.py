@@ -123,10 +123,13 @@ class Column(Col_Mixins):
                 if self._attr:
                     for attr in self._attr:
                         try:
-                            val = getattr(obj, attr, None)
+                            if isinstance(attr, str): val = getattr(obj, attr, None)
+                            else: val = obj[attr]
                             if val != None: break
                         except: pass
-                else: val = getattr(obj, self.attr, None) or val
+                else:
+                    if isinstance(self.attr, str): val = getattr(obj, self.attr, None)
+                    else: val = obj[self.attr]
 
                 if val:
                     if self.type: val = self.type(val)

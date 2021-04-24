@@ -25,7 +25,7 @@ class Background:
 
 class MPVImage(PRMP_ImageCheckbutton):
     f = 0
-    imageKwargs = dict(prmpImage='blue_admin',inbuilt=1, inExt='png', resize=(80, 80))
+    imageKwargs = dict(prmpImage='user_preppy_blue',inbuilt=1, inExt='png', resize=(80, 80))
     def __init__(self, master, mm=None, imageKwargs={}, resize=(80, 80), **kwargs):
 
         if not imageKwargs.get('prmpImage', None):
@@ -156,21 +156,21 @@ class Massive_Photo_Viewer(PRMP_MainWindow):
         
         rv = 20, 20
 
-        self.pages = LabelLabel(self.canvas, topKwargs=dict(text='Pages', compound='left', image=PRMP_Image('pages', resize=rv, inbuilt=1, inExt='png', for_tk=1)), place=dict(relx=.79, rely=.22, relw=.2, relh=.04), orient='h', font='PRMP_FONT')
+        self.pages = LabelLabel(self.canvas, topKwargs=dict(text='Pages', compound='left', image=PRMP_Image('file_open', resize=rv, inbuilt=1, inExt='png', for_tk=1)), place=dict(relx=.79, rely=.22, relw=.2, relh=.04), orient='h', font='PRMP_FONT')
 
-        Button(self.canvas, text='Previous', place=dict(relx=.81, rely=.27, relw=.07, relh=.04), image=PRMP_Image('backward', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.prev_page)
-        Button(self.canvas, text='Next', place=dict(relx=.9, rely=.27, relw=.07, relh=.04), image=PRMP_Image('forward', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.next_page)
+        Button(self.canvas, text='Previous', place=dict(relx=.81, rely=.27, relw=.07, relh=.04), image=PRMP_Image('button_previous', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.prev_page)
+        Button(self.canvas, text='Next', place=dict(relx=.9, rely=.27, relw=.07, relh=.04), image=PRMP_Image('button_next', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.next_page)
 
         self.full_preview = Checkbutton(self.canvas, text='Full size?', place=dict(relx=.81, rely=.34, relw=.1, relh=.04), image=PRMP_Image('zoom', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left')
 
-        Button(self.canvas, text='Use as Wallpaper?', place=dict(relx=.81, rely=.4, relw=.15, relh=.04), image=PRMP_Image('as_wall', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.as_wall)
+        Button(self.canvas, text='Use as Wallpaper?', place=dict(relx=.81, rely=.4, relw=.15, relh=.04), image=PRMP_Image('image_png', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.as_wall)
         
 
-        Button(self.canvas, text='Load from Database?', place=dict(relx=.81, rely=.46, relw=.15, relh=.04), image=PRMP_Image('db_icon', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.from_database)
+        Button(self.canvas, text='Load from Database?', place=dict(relx=.81, rely=.46, relw=.15, relh=.04), image=PRMP_Image('gtk_floppy', resize=rv, inbuilt=1, inExt='png', for_tk=1), compound='left', command=self.from_database)
 
         self.varr = tk.StringVar(self)
         yy = .6
-        self._copy = Radiobutton(self.canvas, text='Copy', place=dict(relx=.79, rely=yy, relw=.07, relh=.04), config=dict(value='copy', variable=self.varr, compound='left', image=PRMP_Image('copy', resize=rv, inbuilt=1, inExt='png', for_tk=1)))
+        self._copy = Radiobutton(self.canvas, text='Copy', place=dict(relx=.79, rely=yy, relw=.07, relh=.04), config=dict(value='copy', variable=self.varr, compound='left', image=PRMP_Image('gtk_copy', resize=rv, inbuilt=1, inExt='png', for_tk=1)))
         self._delete = Radiobutton(self.canvas, text='Delete', place=dict(relx=.86, rely=yy, relw=.07, relh=.04), config=dict(value='delete', variable=self.varr, compound='left', image=PRMP_Image('delete', resize=rv, inbuilt=1, inExt='png', for_tk=1)))
         self._move = Radiobutton(self.canvas, text='Move', place=dict(relx=.93, rely=yy, relw=.06, relh=.04), config=dict(value='move', variable=self.varr, compound='left', image=PRMP_Image('move', resize=rv, inbuilt=1, inExt='png', for_tk=1)))
 
@@ -478,8 +478,8 @@ class Image_Renamer(Tk, Background):
 
 # Image_Renamer(title='Image Renamer', folder=folder, tm=1)
 
-app = Image_Renamer
-# app = Massive_Photo_Viewer
+# app = Image_Renamer
+app = Massive_Photo_Viewer
 # app = Database_Images
 # app = PRMP_ImageDialog
 

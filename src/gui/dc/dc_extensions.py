@@ -28,7 +28,7 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         self.commissions = Entry_Label(incomes, text='₦ 30,000c', place=dict(relx=.53, rely=.74, relh=.22, relw=.44), font=font2)
 
      # Debits
-        self._paidoutits = debits = LabelFrame(self, text='Debits')
+        self._paidouts = debits = LabelFrame(self, text='Debits')
         Label(debits, text='Withdrawals', place=dict(relx=.03, rely=.35, relh=.3, relw=.48), font=font2)
         Label(debits, text='Paidouts', place=dict(relx=.03, rely=.68, relh=.28, relw=.48), font=font2)
 
@@ -63,13 +63,13 @@ class DC_Digits(PRMP_FillWidgets, Frame):
 
     def placeVertically(self):
         self._incomes.place(relx=.02, rely=.008, relh=.256, relw=.96)
-        self._paidoutits.place(relx=.02, rely=.267, relh=.21, relw=.96)
+        self._paidouts.place(relx=.02, rely=.267, relh=.21, relw=.96)
         self._upfronts.place(relx=.02, rely=.48, relh=.198, relw=.96)
         self._balances.place(relx=.02, rely=.68, relh=.312, relw=.96)
 
     def placeHorizontally(self):
         self._incomes.place(relx=0, rely=0, relh=1, relw=.25)
-        self._paidoutits.place(relx=.25, rely=0, relh=1, relw=.25)
+        self._paidouts.place(relx=.25, rely=0, relh=1, relw=.25)
         self._upfronts.place(relx=.5, rely=0, relh=1, relw=.25)
         self._balances.place(relx=.75, rely=0, relh=1, relw=.25)
 

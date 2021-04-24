@@ -79,6 +79,7 @@ class Balances(DCRecordsManager):
 
 class BroughtForwards(DCRecordsManager):
     ObjectType = BroughtForward
+    
     def __init__(self, account):
         super().__init__(account, True)
 

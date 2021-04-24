@@ -68,7 +68,7 @@ class LoginFrame(SLabel):
     
     def load(self):
         res = self.width, self.height
-        self.image = PRMP_Image('purple_beau', inbuilt=1, resize=res, for_tk=1, inExt='jpeg')
+        self.image = PRMP_Image('orange_lux', inbuilt=1, resize=res, for_tk=1, inExt='jpeg')
         # self.create_image(0, 0, image=self.image)
         self['image'] = self.image
         if not LoginFrame.colored:
@@ -108,7 +108,9 @@ class Base_Password(PRMP_FillWidgets, PRMP_ClassMixins):
 
         if 'username' in widgets: self.username = Tushed_Entry(self.frame, entryKwargs=dict(placeholder=self.ent_usr), required=1, show='', font=15, positions=(.8, .1, 0, .1, 0), _pass=self.check_username)
 
-        if 'admin' in widgets: self.admin = PRMP_ImageCheckbutton(self.frame, text="Admin?", command=self.admin_add, highlightable=9, compound='left', imageKwargs=dict(prmpImage='blue_admin', inbuilt=1, resize=(23, 23)))
+        if 'admin' in widgets:
+            self.admin = Checkbutton(self.frame, text="Admin?", command=self.admin_add, highlightable=9, compound='left', image=PRMP_Image('user_preppy_blue', inbuilt=1, resize=(20, 20), for_tk=1))
+            # self.admin.paint()
 
         if 'password' in widgets: self.password = Tushed_Entry(self.frame, entryKwargs=dict(placeholder=self.ent_pwd, required=1), font=15, positions=(.7, 0, .1, .1, .1))
 
@@ -537,7 +539,7 @@ class Login(GaM_Dialog):
 
         x, y = geo = self.width, self.height
         
-        self.img = PRMP_Image('purple_beau', resize=geo, for_tk=1, inbuilt=1, inExt='jpeg', name='purple_beau%s'%self.loads)
+        self.img = PRMP_Image('purple_lux', resize=geo, for_tk=1, inbuilt=1, inExt='jpeg', name='purple_lux%s'%self.loads)
 
         self.container.create_image(0, 0, image=self.img, anchor='nw')
 
