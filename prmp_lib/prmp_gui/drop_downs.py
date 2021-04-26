@@ -140,7 +140,7 @@ class PRMP_DropDownWidget:
             y = self.winfo_rooty()
             py = y + h
 
-            if self.geo: self.dropdown_window.size((*self.geo, x, py))
+            if self.geo: self.dropdown_window.setSize((*self.geo, x, py))
             get = self.get()
 
             if get: self.dropdown_window.set(get)

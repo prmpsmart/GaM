@@ -339,6 +339,12 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                 }, 
                 'layout': [('Menubutton.border', {'sticky': 'nswe', 'children': [('Menubutton.focus', {'sticky': 'nswe', 'children': [('Menubutton.indicator', {'side': 'right', 'sticky': ''}), ('Menubutton.padding', {'expand': '1', 'sticky': 'we', 'children': [('Menubutton.label', {'side': 'left', 'sticky': ''})]})]})]})]
             },
+            'Button.TMenubutton': {
+                'configure': {
+                    'foreground': button_foreground,
+                    'background': button_background
+                }
+            },
             'Window.TMenubutton': {
                 'configure': {
                     'relief': 'flat',

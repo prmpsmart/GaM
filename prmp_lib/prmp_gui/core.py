@@ -684,7 +684,7 @@ class PRMP_Widget(PRMP_Theme):
     def getText(self):
         'returns widget current text.'
         try: return self['text']
-        except Exception as er: self.printError('get', er)
+        except Exception as er: self.printError('get', er, __file__)
 
     @property
     def status(self):
@@ -696,7 +696,7 @@ class PRMP_Widget(PRMP_Theme):
     def set(self, values):
         'sets the values, text parameter for widgets not having values.'
         try: self.config(text=values)
-        except Exception as er: self.printError('set', er)
+        except Exception as er: self.printError('set', er, __file__)
 
     def light(self):
         'changes fg to bg and vice-versa.'
@@ -1131,6 +1131,7 @@ class PRMP_InputButtons:
         else: return False
     
     def clear(self): self.variable.set('0')
+    empty = clear
 
 PIB = PRMP_InputButtons
 
@@ -1180,7 +1181,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                         value = values.get(widgetName, '')
                         widget.set(value)
                     # except Exception as er: print(f'ERROR {er}.')
-                else: print(f'Error [{widgetName}, {widget}]')
+                else: print(f'Error [{widgetName}, {widget}]', __file__)
             if isinstance(values, dict): self.values.update(values)
             return True
         else:

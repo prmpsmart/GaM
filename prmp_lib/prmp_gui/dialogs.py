@@ -134,11 +134,15 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
         if result:
             self._setResult(result)
             self.action()
-            self.save()
+            # self.save()
 
         else: PRMP_MsgBox(self, title='No Input Error', message='No input whatsoever is given.', _type='error', ask=0)
 
-    def action(self): print('redefine this method for functionality')
+    def action(self):
+        if self.callback:
+            self.callback(self.result)
+            return
+        print('redefine this method for functionality')
 
     def save(self): print('redefine this method for functionality')
 
@@ -170,7 +174,7 @@ class PRMP_CalendarDialog(PRMP_Dialog):
         super().__init__(master, title=title, geo=geo, editable=False, **kwargs)
 
     def _setupDialog(self):
-        self.calendar = self.addWidget(PRMP_Calendar, config=dict(callback=self.getDate, max_=self.max, min_=self.min, month=self.month), place=dict(relx=0, rely=0, relh=1, relw=1))
+        self.calendar = PRMP_Calendar(self.cont, callback=self.getDate, max_=self.max, min_=self.min, month=self.month, place=dict(relx=0, rely=0, relh=1, relw=1))
 
     def afterPaint(self): self.calendar.afterPaint()
 

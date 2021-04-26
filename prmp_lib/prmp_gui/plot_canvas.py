@@ -1,4 +1,4 @@
-from . import PRMP_Frame
+from . import PRMP_Frame, PRMP_Label, PRMP_Button, PRMP_Checkbutton
 import random
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
 
@@ -338,6 +338,19 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
     def set_grid(self, grid): super().set_grid(grid)
 
     def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPlotting(chart=self.chart, grid=self._grid, **self.chart_datas)
+
+
+
+class OptPlot(PRMP_Frame):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, **kwargs)
+
+        h = .9
+        self.canvas = PRMP_Label(self, text='Plot Canvas', place=dict(relx=0, rely=0, relw=1, relh=h))
+        PRMP_Button(self, text='Plot', place=dict(relx=0, rely=h, relw=.25, relh=1-h))
+        PRMP_Button(self, text='Bar', place=dict(relx=.25, rely=h, relw=.25, relh=1-h))
+        PRMP_Button(self, text='Pie', place=dict(relx=.5, rely=h, relw=.25, relh=1-h))
+        PRMP_Checkbutton(self, text='Switch', place=dict(relx=.75, rely=h, relw=.25, relh=1-h))
 
 
 

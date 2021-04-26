@@ -1,0 +1,275 @@
+# Daily Analysis Book for the Daily Contribution department
+
+
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins, PRMP_TkMixins
+from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
+
+
+class Area(PRMP_AdvMixins, PRMP_StrMixins):
+    columns = ['current', 'last', 'next', 'upfrontLoan', 'upfrontRepay', 'paidout', 'transfer', 'bto', 'withdraw']
+
+    def __str__(self): return f'{self.className}({self.number}, sort="{self.sort}")'
+
+    def __repr__(self): return f'<{self}>'
+
+    def __init__(self, number, date, sort='date', **datas):
+        assert number
+
+        self.subs = []
+        self.number = number
+        self.sort = sort
+        self.date = self.getDate(date)
+        for key in self.columns:
+            val = datas.get(key) or 0
+            setattr(self, key, val)
+
+    def get(self, attr, default=None): return self.getFromSelf(attr, default)
+    
+    @property
+    def balance(self): return self.bto + self.paidout - self.total
+
+    @property
+    def total(self): return sum([self.current, self.last, self.next])
+    
+    @property
+    def excess(self):
+        if self.balance > 0: return self.balance
+        return 0
+    
+    @property
+    def deficit(self):
+        if self.balance < 0: return abs(self.balance)
+        return 0
+
+
+class Areas:
+
+    areas = []
+    sorts = ['date', 'week', 'month', 'year', 'years']
+    meths = dict(date='isSameDate', week='isSameWeekMonthYear', month='isSameMonthYear', year='isSameYear')
+
+    @classmethod
+    def createArea(cls, number, date, **datas):
+        areas = cls.sort(date, 'date')
+        for area in areas:
+            if area.number  == number and area.date.date == date.date: raise ValueError('An Area with same number and date already exists.')
+
+        area = Area(number, date, **datas)
+        cls.areas.append(area)
+        return area
+    
+    @classmethod
+    def sort(cls, date, type):
+        assert type in cls.sorts[:-1], f'Valid sort types are {cls.sorts[:-1]}.'
+        _areas = []
+
+        if type != 'years':
+            meth = getattr(date, cls.meths[type])
+            for area in cls.areas:
+                if meth(area.date): _areas.append(area)
+        else: _areas = cls.areas
+        
+        areas_d = {}
+        for area in _areas:
+            num = area.number
+            if num not in areas_d: areas_d[num] = Area(num, date, type)
+            
+            area_d = areas_d[num]
+
+            for col in Area.columns:
+                old = area_d[col]
+                o_new = area[col]
+                new = old + o_new
+                setattr(area_d, col, new)
+
+        areas = list(areas_d.values())
+        return areas
+    
+    @classmethod
+    def sortYears(cls, number, year1, year2):
+        areas_d = {}
+
+        for area in cls.areas:
+            year = area.date.year
+            if year1 <= year <= year2:
+                
+                if year not in areas_d:
+                    year_date = PRMP_DateTime(year, 1, 1)
+                    areas_d[year] = Area(area.number, year_date, 'years')
+                            
+                area_d = areas_d[year]
+
+                for col in Area.columns:
+                    old = area_d[col]
+                    o_new = area[col]
+                    new = old + o_new
+                    setattr(area_d, col, new)
+
+        areas = list(areas_d.values())
+        return areas
+
+    @classmethod
+    def sortAll(cls): return cls.sort(PRMP_DateTime.now(), 'years')
+
+
+from prmp_lib.prmp_gui import *
+from prmp_lib.prmp_gui.scrollables import PRMP_ListBox
+from prmp_lib.prmp_gui.plot_canvas import OptPlot
+from prmp_lib.prmp_gui.two_widgets import TwoWidgets, LabelCombo, LabelEntry
+from prmp_lib.prmp_gui.drop_downs import PRMP_DropDownCalendarEntry
+from prmp_lib.prmp_gui.tushed_widgets import Hierachy
+from prmp_lib.prmp_gui.dialogs import PRMP_Dialog, PRMP_MsgBox
+
+
+class DateWidget(TwoWidgets):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', required=1), **kwargs)
+    
+    def set(self, date): self.B.set(date)
+
+
+class DAB_Input(PRMP_FillWidgets, Frame):
+    fields = ['date', 'number', *Area.columns]
+    def __init__(self, master, area=None, **kwargs):
+        Frame.__init__(self, master, **kwargs)
+        PRMP_FillWidgets.__init__(self, area)
+        
+        self.area = area
+
+        self.date = DateWidget(self, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
+        
+        self.number = LabelEntry(self, topKwargs={'text': 'Number'}, place=dict(x=10, y=60, w=190, h=40), orient='h', bottomKwargs=dict(_type='number', very=1, required=1))
+
+        income = LabelFrame(self, text='Income', place=dict(x=0, y=100, w=255, h=155))
+        
+        self.last = LabelEntry(income, topKwargs={'text': 'Last'}, place=dict(x=0, y=0, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+        self.current = LabelEntry(income, topKwargs={'text': 'Current'}, place=dict(x=0, y=40, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1, required=1), longent=.53)
+        self.next = LabelEntry(income, topKwargs={'text': 'Next'}, place=dict(x=0, y=80, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+
+        upfront = LabelFrame(self, text='Upfront', place=dict(x=380, y=0, w=215, h=115))
+        
+        self.upfrontLoan = LabelEntry(upfront, topKwargs={'text': 'Loan'}, place=dict(x=0, y=0, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+        self.upfrontRepay = LabelEntry(upfront, topKwargs={'text': 'Repay'}, place=dict(x=0, y=40, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+
+        debit = LabelFrame(self, text='Debit', place=dict(x=280, y=140, w=215, h=115))
+        
+        self.paidout = LabelEntry(debit, topKwargs={'text': 'Paidout'}, place=dict(x=0, y=0, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+        self.withdraw = LabelEntry(debit, topKwargs={'text': 'Withdraw'}, place=dict(x=0, y=40, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+
+        broughtToOffice = LabelFrame(self, text='Brought To Office', place=dict(x=510, y=140, w=215, h=115))
+        
+        self.transfer = LabelEntry(broughtToOffice, topKwargs={'text': 'Transfer'}, place=dict(x=0, y=0, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1), longent=.53)
+        self.bto = LabelEntry(broughtToOffice, topKwargs={'text': 'Bto'}, place=dict(x=0, y=40, w=210, h=40), orient='h', bottomKwargs=dict(_type='number', very=1, required=1), longent=.53)
+
+        self.addResultsWidgets(self.fields)
+        self.set(area)
+
+    def createArea(self):
+        data = self.get()
+        if self.validateData(data):
+            try: return Areas.createArea(**data)
+            except Exception as error: PRMP_MsgBox(self, title=error.__class__.__name__, msg=error, _type='error')
+        return False
+
+    def validateData(self, data):
+        data = data or self.get()
+        date = data['date']
+        if not isinstance(data['date'], PRMP_DateTime):
+            PRMP_MsgBox(self, title='Invalid Date', msg='Provided date is of invalid type.', _type='error')
+            return False
+        if not data['number']:
+            PRMP_MsgBox(self, title='Invalid Number', msg='Provide number above zero.', _type='error')
+            return False
+        return True
+
+
+class DAB_Dialog(PRMP_Dialog):
+
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, geo=(740, 400), callback=self.updateArea, **kwargs)
+
+    def _setupDialog(self):
+        self.addEditButton()
+        self.input = DAB_Input(self.cont, place=dict(x=2, y=2, relw=.99, relh=.85), area=self.kwargs.get('area'))
+
+        for field in DAB_Input.fields: setattr(self, field, self.input.getFromSelf(field))
+
+        self.addResultsWidgets(DAB_Input.fields)
+    
+    def updateArea(self, data):
+        area = self.kwargs.get('area')
+        if area and data:
+            if self.input.validateData(data): area.__dict__.update(data)
+            self.destroyDialog()
+
+
+class DAB_Hierachy(Hierachy):
+
+    @property
+    def openDialog(self):
+        def load(master, obj):
+            if obj: DAB_Dialog(master, area=obj)
+        
+        return load
+
+
+class DAB_Ui(PRMP_MainWindow):
+    columns = [('Date', {'date': 'date'}), ('DC', 'number'), 'Last', 'Current', 'Next', 'Total', 'Upfront Loan', 'Upfront Repay', 'Excess', 'Deficit', 'Paidout', 'Transfer', ('BTO', 'bto'), 'Withdraw']
+    def __init__(self, master=None, **kwargs):
+        super().__init__(master, geo=(1500, 850), themeIndex=51, resize=(0, 0), **kwargs)
+
+        font = self.PRMP_FONT.copy()
+        font['size'] = 20
+        self.title = Label(self.cont, text='Title', place=dict(x=0, y=0, relh=.05, relw=1), font=font)
+        self.tree = DAB_Hierachy(self.cont, place=dict(x=0, rely=.05, relw=1, relh=.55), columns=self.columns)
+        relh = .6
+        # self.tree.
+
+        note = Notebook(self.cont, place=dict(x=0, rely=relh, relw=.5, relh=1-relh))
+
+        self.input = DAB_Input(note)
+        note.add(self.input)
+        note.tab(0, text='Input')
+        Button(self.input, text='Add', place=dict(x=650, y=20, w=50, h=30), command=self.add)
+        self.bind('<Return>', lambda e: self.add())
+
+        self.sort = Frame(note)
+        note.add(self.sort)
+        note.tab(1, text='Sort')
+ 
+        self.sort_date = DateWidget(self.sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
+
+        self.sort_type = LabelCombo(self.sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts))
+        
+        Button(self.sort, text='Sort', place=dict(x=10, y=100, w=220, h=40), command=self.sort)
+
+        self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh))
+        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1))
+
+        self.plot = OptPlot(self.cont, place=dict(relx=.65, rely=relh, relw=.35, relh=1-relh))
+
+        self.load()
+
+        self.start()
+    
+    def sort(self):
+        pass
+
+    def load(self):
+        date = PRMP_DateTime.now()
+        areas = Areas.sort(date, 'date')
+        self.title.set(f'Daily Analysis Book of {date.date}.')
+        self.tree.viewObjs(areas)
+
+    def add(self):
+        area = self.input.createArea()
+        areas = Areas.sort(area.date, 'date')
+        self.title.set(f'Daily Analysis Book of {area.date.date}.')
+        self.tree.viewObjs(areas)
+
+
+
+
+DAB_Ui()
+# DAB_Dialog(None, area={'date': PRMP_DateTime(2021, 4, 26, 1, 14), 'number': 1.0, 'current': 0.0, 'last': 0.0, 'next': 0.0, 'upfrontLoan': 0.0, 'upfrontRepay': 0.0, 'paidout': 0.0, 'transfer': 0.0, 'bto': 0.0, 'withdraw': 0.0}, themeIndex=51)
+

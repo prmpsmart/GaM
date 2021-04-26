@@ -131,7 +131,7 @@ class Column(Col_Mixins):
                     if isinstance(self.attr, str): val = getattr(obj, self.attr, None)
                     else: val = obj[self.attr]
 
-                if val:
+                if val != None:
                     if self.type: val = self.type(val)
                 return val or ''
 

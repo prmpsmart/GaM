@@ -2,7 +2,7 @@ import sys
 sys.path.append(r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM')
 
 
-from prmp_lib.prmp_miscs.prmp_mixins import PRMP_Mixins
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_AdvMixins
 from prmp_lib.prmp_miscs.prmp_exts import PRMP_File, os
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
 
@@ -18,7 +18,7 @@ DEST = r'C:\Users\Administrator\Documents\GaM OFFICE\DC matters\Contributions'
 columns = ['number', 'rate', 'amount', 'money']
 
 
-class Contribution(PRMP_Mixins):
+class Contribution(PRMP_AdvMixins):
 
     def __init__(self, number, rate, amount):
         amount = float(amount)
@@ -63,7 +63,7 @@ class Contribution(PRMP_Mixins):
         if other == None: return True
         return self.number >= other.number
 
-class Contributions(PRMP_Mixins):
+class Contributions(PRMP_AdvMixins):
     def __init__(self, area, month=None, date=None,commission=False):
         date = self.getDate(date)
         month = self.getDate(month)

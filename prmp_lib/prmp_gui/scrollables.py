@@ -69,8 +69,8 @@ class PRMP_ListBox(PRMP_Frame):
         if ret != self._unget: return ret
         else: return getattr(self.listbox, attr)
 
-    def __init__(self, master=None, listboxConfig={}, callback=None, **kwargs):
-        super().__init__(master=master, **kwargs)
+    def __init__(self, master, listboxConfig={}, callback=None, **kwargs):
+        super().__init__(master, **kwargs)
 
         self.listbox = PRMP_Listbox(self, callback=callback, **listboxConfig)
 

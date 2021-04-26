@@ -489,7 +489,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             if self._addStatusBar: bottom = 30
             else: bottom = 0
 
-        if self.container: self.container.place(x=0, y=top, w=self.winfo_width(), h=h or self.winfo_height()-bottom)
+        if self.container: self.container.place(x=0, y=top, relw=1, h=h or self.winfo_height()-bottom-5)
 
         self.placeTitlebar()
         self.placeStatusBar()
@@ -631,7 +631,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             bar.place(x=x, rely=0, relh=1, w=w)
             unbar.place_forget()
 
-            if not self.noWindowButtons: self._exit.place(x=xw-30, rely=0, relh=1, w=25)
+            if not self.noWindowButtons: self._exit.place(x=xw-30, rely=0, relh=1, w=28)
 
     def editStatus(self, text):
         if self.statusBar: self.statusBar.set(text)
@@ -670,7 +670,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             self.statusBar.master.place(x=0, y=y-h, h=h, w=xw)
             self.statusBar.place(x=0, y=0, h=27, w=x-60)
             self._up.place(x=x-60, rely=0, h=27, w=30)
-            self._down.place(x=x-30, rely=0, h=27, w=30)
+            self._down.place(x=x-30, rely=0, h=27, w=28)
 
     def closing(self): pass
 

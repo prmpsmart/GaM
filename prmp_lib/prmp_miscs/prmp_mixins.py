@@ -11,7 +11,7 @@ class PRMP_Mixins:
     Errors = PRMP_Errors
     containers = list, set, tuple
 
-    def printError(self, func, error): print("Errors from {}->{}: {}".format(self, func, error))
+    def printError(self, func, error, file=''): print("Errors from {}->{}: {}, {}".format(self, func, error, file))
 
     @classmethod
     def notImp(cls): raise NotImplementedError('A subclass of {} should call this method.'.format(cls))
@@ -118,7 +118,7 @@ class PRMP_AdvMixins(PRMP_ClassMixins):
         from .prmp_datetime import PRMP_DateTime
 
         if date == None: date = PRMP_DateTime.now()
-        elif isinstance(date, str): date = PRMP_DateTime.getDMYFromDate(date)
+        elif isinstance(date, str): date = PRMP_DateTime.getDMYFromString(date)
         PRMP_DateTime.checkDateTime(date, 1)
         return date
 
