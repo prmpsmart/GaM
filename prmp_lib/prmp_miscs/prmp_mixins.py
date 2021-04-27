@@ -11,6 +11,22 @@ class PRMP_Mixins:
     Errors = PRMP_Errors
     containers = list, set, tuple
 
+    def propertize(self, name):
+        if name.startswith('_'): return name
+        if name:
+            name = str(name)
+            nm = name.replace(' ', '')
+            fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
+            return fin
+
+    @property
+    def AlphabetsSwitch(self):
+        d = {}
+        for n in range(65, 91):
+            d[chr(n)] = chr(n+32)
+            d[chr(n+32)] = chr(n)
+        return d
+
     def printError(self, func, error, file=''): print("Errors from {}->{}: {}, {}".format(self, func, error, file))
 
     @classmethod
@@ -31,7 +47,7 @@ class PRMP_ClassMixins(PRMP_Mixins):
     def mroStr(self): return [s.__name__ for s in self.mro]
 
     @property
-    def mro(self): return self.class_.__mro__
+    def mro(self): return self.__class__.__mro__
 
     @property
     def class_(self): return self.__class__
@@ -263,22 +279,6 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         strNum = str(num)
         listNum = list(strNum)
         return strNum.strip('0')
-
-    @property
-    def AlphabetsSwitch(self):
-        d = {}
-        for n in range(65, 91):
-            d[chr(n)] = chr(n+32)
-            d[chr(n+32)] = chr(n)
-        return d
-
-    def propertize(self, name):
-        if name.startswith('_'): return name
-        if name:
-            name = str(name)
-            nm = name.replace(' ', '')
-            fin = self.AlphabetsSwitch[nm[0].upper()] + nm[1:]
-            return fin
 
 
 class PRMP_GuiMixins(PRMP_StrMixins):

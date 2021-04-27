@@ -205,6 +205,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
         if isinstance(values, (list, tuple, dict)): self.values = values.copy()
         else: self.values = values
 
+
         # index of the lastt value in the Listbox
         self.last = 0
         self.callback = callback
@@ -216,6 +217,7 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
 
         if defBinds: self.bindings(defaultBinds)
         self.bindings(bindings)
+        self.set(values)
 
     def bindings(self, binds):
         '''

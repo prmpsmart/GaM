@@ -134,14 +134,14 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
         if result:
             self._setResult(result)
             self.action()
-            # self.save()
+            self.save()
 
         else: PRMP_MsgBox(self, title='No Input Error', message='No input whatsoever is given.', _type='error', ask=0)
 
     def action(self):
-        if self.callback:
-            self.callback(self.result)
-            return
+        # if self.callback:
+        #     self.callback(self.result)
+        #     return
         print('redefine this method for functionality')
 
     def save(self): print('redefine this method for functionality')

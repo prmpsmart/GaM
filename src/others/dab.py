@@ -3,6 +3,8 @@
 
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins, PRMP_TkMixins
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
+from prmp_lib.prmp_miscs.prmp_exts import PRMP_File
+import threading, os
 
 
 class Area(PRMP_AdvMixins, PRMP_StrMixins):
@@ -63,6 +65,8 @@ class Areas:
         assert type in cls.sorts[:-1], f'Valid sort types are {cls.sorts[:-1]}.'
         _areas = []
 
+        if type == 'date': return [area for area in cls.areas if area.date.date == date.date]
+
         if type != 'years':
             meth = getattr(date, cls.meths[type])
             for area in cls.areas:
@@ -111,6 +115,21 @@ class Areas:
     @classmethod
     def sortAll(cls): return cls.sort(PRMP_DateTime.now(), 'years')
 
+DAB_FILE = 'dab.db'
+DAB_DB = PRMP_File(DAB_FILE)
+
+obj = DAB_DB.loadObj()
+
+def SAVE_DAB_DB():
+    def save(obj):
+        os.remove(DAB_FILE)
+        db = PRMP_File(DAB_FILE)
+        db.saveObj(obj)
+        db.save()
+
+    threading.Thread(target=save, args=[Areas.areas]).start()
+
+if obj: Areas.areas = obj
 
 from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.scrollables import PRMP_ListBox
@@ -186,7 +205,8 @@ class DAB_Input(PRMP_FillWidgets, Frame):
 class DAB_Dialog(PRMP_Dialog):
 
     def __init__(self, master=None, **kwargs):
-        super().__init__(master, geo=(740, 400), callback=self.updateArea, **kwargs)
+        self.tree = master
+        super().__init__(master, geo=(740, 400), callback=self.updateArea, _return=1, **kwargs)
 
     def _setupDialog(self):
         self.addEditButton()
@@ -200,7 +220,12 @@ class DAB_Dialog(PRMP_Dialog):
         area = self.kwargs.get('area')
         if area and data:
             if self.input.validateData(data): area.__dict__.update(data)
-            self.destroyDialog()
+            self.tree.reload()
+    
+    def action(self):
+        self.destroyDialog()
+    
+    def save(self): SAVE_DAB_DB()
 
 
 class DAB_Hierachy(Hierachy):
@@ -214,7 +239,15 @@ class DAB_Hierachy(Hierachy):
 
 
 class DAB_Ui(PRMP_MainWindow):
-    columns = [('Date', {'date': 'date'}), ('DC', 'number'), 'Last', 'Current', 'Next', 'Total', 'Upfront Loan', 'Upfront Repay', 'Excess', 'Deficit', 'Paidout', 'Transfer', ('BTO', 'bto'), 'Withdraw']
+    columns = [('Date', {'date': 'date'}), ('DC', 'number'), 'Last', 'Current', 'Next', 'Total', 'Upfront Loan', 'Upfront Repay', 'Excess', 'Deficit', 'Paidout', 'Transfer', ('B-T-O', 'bto'), 'Withdraw']
+    columns_lists = []
+    
+    for a in columns[2:]:
+        a = a[1] if isinstance(a, tuple) else a
+        columns_lists. append(PRMP_StrMixins().propertize(a))
+    
+    _title = 'Daily Analysis Book of %s'
+    
     def __init__(self, master=None, **kwargs):
         super().__init__(master, geo=(1500, 850), themeIndex=51, resize=(0, 0), **kwargs)
 
@@ -223,8 +256,7 @@ class DAB_Ui(PRMP_MainWindow):
         self.title = Label(self.cont, text='Title', place=dict(x=0, y=0, relh=.05, relw=1), font=font)
         self.tree = DAB_Hierachy(self.cont, place=dict(x=0, rely=.05, relw=1, relh=.55), columns=self.columns)
         relh = .6
-        # self.tree.
-
+        
         note = Notebook(self.cont, place=dict(x=0, rely=relh, relw=.5, relh=1-relh))
 
         self.input = DAB_Input(note)
@@ -233,17 +265,19 @@ class DAB_Ui(PRMP_MainWindow):
         Button(self.input, text='Add', place=dict(x=650, y=20, w=50, h=30), command=self.add)
         self.bind('<Return>', lambda e: self.add())
 
-        self.sort = Frame(note)
-        note.add(self.sort)
+        sort = Frame(note)
+        note.add(sort)
         note.tab(1, text='Sort')
  
-        self.sort_date = DateWidget(self.sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
+        self.sort_date = DateWidget(sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
 
-        self.sort_type = LabelCombo(self.sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts))
+        self.sort_type = LabelCombo(sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts))
         
-        Button(self.sort, text='Sort', place=dict(x=10, y=100, w=220, h=40), command=self.sort)
+        Button(sort, text='Sort', place=dict(x=10, y=100, w=220, h=40), command=self.sort)
 
-        self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh))
+        self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
+        # self.list.set(self.columns_lists)
+
         Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1))
 
         self.plot = OptPlot(self.cont, place=dict(relx=.65, rely=relh, relw=.35, relh=1-relh))
@@ -253,19 +287,43 @@ class DAB_Ui(PRMP_MainWindow):
         self.start()
     
     def sort(self):
-        pass
+        date = self.sort_date.get()
+        if not date: PRMP_MsgBox(self, title='Invalid Date', msg='Choose a valid date.', _type='error')
+        sort_type = self.sort_type.get()
+        if sort_type not in self.sort_type.B.values: PRMP_MsgBox(self, title='Invalid Sort Type', msg='CHoose a valid Sort Type.', _type='error')
+
+        self._sort(date, sort_type)
+
+    def _sort(self, date, sort_type):
+        if sort_type == 'date':
+            areas = Areas.sort(date, 'date')
+            text = date.date
+        elif sort_type == 'week':
+            pass
+        elif sort_type == 'month':
+            pass
+        elif sort_type == 'year':
+            pass
+        elif sort_type == 'years':
+            pass
+        
+        self.updateTable(areas, text)
+
+    def save(self): SAVE_DAB_DB()
 
     def load(self):
         date = PRMP_DateTime.now()
         areas = Areas.sort(date, 'date')
-        self.title.set(f'Daily Analysis Book of {date.date}.')
-        self.tree.viewObjs(areas)
+        self.updateTable(areas, date.date)
 
     def add(self):
         area = self.input.createArea()
         areas = Areas.sort(area.date, 'date')
-        self.title.set(f'Daily Analysis Book of {area.date.date}.')
-        self.tree.viewObjs(areas)
+        self.updateTable(areas, area.date.date)
+    
+    def updateTable(self, objs, title):
+        self.title.set(self._title % title)
+        self.tree.viewObjs(objs)
 
 
 
