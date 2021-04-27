@@ -10,9 +10,28 @@ import threading, os
 class Area(PRMP_AdvMixins, PRMP_StrMixins):
     columns = ['current', 'last', 'next', 'upfrontLoan', 'upfrontRepay', 'paidout', 'transfer', 'bto', 'withdraw']
 
-    def __str__(self): return f'{self.className}({self.number}, sort="{self.sort}")'
+    def __str__(self): return f'{self.className}({self.number}, {self.date.date}, sort="{self.sort}")'
 
     def __repr__(self): return f'<{self}>'
+    
+    def __lt__(self, other):
+        if other == None: return False
+        return self.number < other.number
+    def __le__(self, other):
+        if other == None: return False
+        return self.number <= other.number
+    def __eq__(self, other):
+        if other == None: return False
+        return self.number is other.number
+    def __ne__(self, other):
+        if other == None: return True
+        return self.number != other.number
+    def __gt__(self, other):
+        if other == None: return True
+        return self.number > other.number
+    def __ge__(self, other):
+        if other == None: return True
+        return self.number >= other.number
 
     def __init__(self, number, date, sort='date', **datas):
         assert number
@@ -24,6 +43,7 @@ class Area(PRMP_AdvMixins, PRMP_StrMixins):
         for key in self.columns:
             val = datas.get(key) or 0
             setattr(self, key, val)
+        # self.excess = self.balance if self.balance > 0 else 0
 
     def get(self, attr, default=None): return self.getFromSelf(attr, default)
     
@@ -122,22 +142,41 @@ obj = DAB_DB.loadObj()
 
 def SAVE_DAB_DB():
     def save(obj):
-        os.remove(DAB_FILE)
+        try: os.remove(DAB_FILE)
+        except: pass
         db = PRMP_File(DAB_FILE)
         db.saveObj(obj)
         db.save()
 
     threading.Thread(target=save, args=[Areas.areas]).start()
 
-if obj: Areas.areas = obj
+datas = 0
+if obj:
+    Areas.areas = obj
+    if datas:
+        Areas.areas = []
+        SAVE_DAB_DB()
+        print('Saved Empty')
+else:
+    from dab_datas import dab_datas
+    for date, number_d in dab_datas.items():
+        for number, datas in number_d.items(): Areas.createArea(number, date, **datas)
+    SAVE_DAB_DB()
+    print('Saved DAB_DATAS')
+
+
+
+
+# datas = 1
+if datas: exit()
 
 from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.scrollables import PRMP_ListBox
-from prmp_lib.prmp_gui.plot_canvas import OptPlot
 from prmp_lib.prmp_gui.two_widgets import TwoWidgets, LabelCombo, LabelEntry
 from prmp_lib.prmp_gui.drop_downs import PRMP_DropDownCalendarEntry
 from prmp_lib.prmp_gui.tushed_widgets import Hierachy
 from prmp_lib.prmp_gui.dialogs import PRMP_Dialog, PRMP_MsgBox
+from prmp_lib.prmp_gui.plot_canvas import OptPlot, PlotDatas
 
 
 class DateWidget(TwoWidgets):
@@ -239,17 +278,19 @@ class DAB_Hierachy(Hierachy):
 
 
 class DAB_Ui(PRMP_MainWindow):
-    columns = [('Date', {'date': 'date'}), ('DC', 'number'), 'Last', 'Current', 'Next', 'Total', 'Upfront Loan', 'Upfront Repay', 'Excess', 'Deficit', 'Paidout', 'Transfer', ('B-T-O', 'bto'), 'Withdraw']
-    columns_lists = []
+
+    def sign(num):
+        if num: return PRMP_StrMixins().numWithSign_Commas(num)
+        return ''
     
-    for a in columns[2:]:
-        a = a[1] if isinstance(a, tuple) else a
-        columns_lists. append(PRMP_StrMixins().propertize(a))
+    columns = [dict(text='Date', attr={'date': 'date'}), dict(text='DC', attr='number', type=int), dict(text='Last', type=sign), dict(text='Current', type=sign), dict(text='Next', type=sign), dict(text='Total', type=sign), dict(text='Upfront Loan', type=sign), dict(text='Upfront Repay', type=sign), dict(text='Excess', type=sign), dict(text='Deficit', type=sign), dict(text='Paidout', type=sign), dict(text='Transfer', type=sign), dict(text='B-T-O', attr='bto', type=sign), dict(text='Withdraw', type=sign)]
     
-    _title = 'Daily Analysis Book of %s'
+    columns_lists = ['Last', 'Current', 'Next', 'Total', 'Upfront Loan', 'Upfront Repay', 'Excess', 'Deficit', 'Paidout', 'Transfer', 'Bto', 'Withdraw']
+    
+    _title_ = 'Daily Analysis Book of %s'
     
     def __init__(self, master=None, **kwargs):
-        super().__init__(master, geo=(1500, 850), themeIndex=51, resize=(0, 0), **kwargs)
+        super().__init__(master, geo=(1500, 850), themeIndex=51, resize=(1, 1), **kwargs)
 
         font = self.PRMP_FONT.copy()
         font['size'] = 20
@@ -271,22 +312,35 @@ class DAB_Ui(PRMP_MainWindow):
  
         self.sort_date = DateWidget(sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
 
-        self.sort_type = LabelCombo(sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts))
+        self.sort_type = LabelCombo(sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts), func=self.sort)
         
-        Button(sort, text='Sort', place=dict(x=10, y=100, w=220, h=40), command=self.sort)
+        Button(sort, text='View All', place=dict(x=10, y=100, w=220, h=40), command=lambda: self.updateTable(Areas.areas, 'All Areas.'))
 
         self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
-        # self.list.set(self.columns_lists)
 
-        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1))
+        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1),command=self.load)
 
-        self.plot = OptPlot(self.cont, place=dict(relx=.65, rely=relh, relw=.35, relh=1-relh))
 
-        self.load()
+        self._areas = []
+        self._title = ''
+        self._sort_type = ''
+        self.plot = None
+
+        self.after(100, self.loadUI)
 
         self.start()
     
-    def sort(self):
+    def load(self):
+        if not self.plot: return
+
+        lists = self.list.selected or self.columns_lists
+        datas = [area[lists] for area in self._areas]
+        dates = [area.date for area in self._areas]
+        names = [f'Area {area.number}' for area in self._areas]
+
+        if self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='', ylabel='', title=self._title, marker=True)
+
+    def sort(self, event=None):
         date = self.sort_date.get()
         if not date: PRMP_MsgBox(self, title='Invalid Date', msg='Choose a valid date.', _type='error')
         sort_type = self.sort_type.get()
@@ -295,39 +349,43 @@ class DAB_Ui(PRMP_MainWindow):
         self._sort(date, sort_type)
 
     def _sort(self, date, sort_type):
-        if sort_type == 'date':
-            areas = Areas.sort(date, 'date')
-            text = date.date
-        elif sort_type == 'week':
-            pass
-        elif sort_type == 'month':
-            pass
-        elif sort_type == 'year':
-            pass
-        elif sort_type == 'years':
-            pass
+        self._sort_type = sort_type
+
+        areas = Areas.sort(date, sort_type)
+
+        if sort_type == 'date': text = f'{date.date}.'
+        elif sort_type == 'week': text = f'Week {date.week} of {date.monthName} {date.year}.'
+        elif sort_type == 'month': text = f'{date.monthName} {date.year}.'
+        elif sort_type == 'year': text = f'{date.year}.'
+        elif sort_type == 'years': text = 'Years.'
         
         self.updateTable(areas, text)
 
     def save(self): SAVE_DAB_DB()
 
-    def load(self):
+    def loadUI(self):
         date = PRMP_DateTime.now()
         areas = Areas.sort(date, 'date')
         self.updateTable(areas, date.date)
+        relh = .6
+        self.plot = OptPlot(self.cont, place=dict(relx=.65, rely=relh, relw=.35, relh=1-relh))
+        self.plot.paint()
 
     def add(self):
         area = self.input.createArea()
         areas = Areas.sort(area.date, 'date')
         self.updateTable(areas, area.date.date)
     
-    def updateTable(self, objs, title):
-        self.title.set(self._title % title)
-        self.tree.viewObjs(objs)
+    def updateTable(self, areas, title):
+        areas.sort()
+        self._areas = areas
+        self._title = self._title_ % title
+        self.title.set(self._title)
+        self.tree.viewObjs(areas)
 
 
 
 
-DAB_Ui()
 # DAB_Dialog(None, area={'date': PRMP_DateTime(2021, 4, 26, 1, 14), 'number': 1.0, 'current': 0.0, 'last': 0.0, 'next': 0.0, 'upfrontLoan': 0.0, 'upfrontRepay': 0.0, 'paidout': 0.0, 'transfer': 0.0, 'bto': 0.0, 'withdraw': 0.0}, themeIndex=51)
+DAB_Ui()
 
