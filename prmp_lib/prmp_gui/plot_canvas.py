@@ -4,6 +4,7 @@ from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
 
 
 class PlotDatas:
+    
     def __init__(self, xticks=[], ys=[], labels=[], xlabel='', ylabel=''):
         self.xticks = xticks
         self.ys = ys
@@ -28,7 +29,6 @@ class PlotDatas:
             self.space = self.float_it(1. / (self.d_1_point))
 
         except Exception as e:
-            # print(e)
             self.x_points = len(self.ys)
             self.d_1_point = 1
             self.width = .6
@@ -71,12 +71,13 @@ class PlotDatas:
             self._x_axis()
 
             return 1
-        else: print('d_1_point=1', __file__)
+        # else: print('d_1_point=1', __file__)
 
 Bar = PlotDatas
 
 class Plots(PRMP_ClassMixins):
     bkcol = 'white'
+   
     def __init__(self, bkcol=''):
         self.big = 1
 
@@ -167,11 +168,11 @@ class Plots(PRMP_ClassMixins):
 
         self.annotation.update(dict(xticks=plotDatas.xticks, xlabel=plotDatas.xlabel, ylabel=plotDatas.ylabel))
 
-        try:
-            # assert not isinstance(ys[0], (float, int))
-            indexes = range(len(ys[0]))
+        if plotDatas.d_1_point != 1:
+            indexes = range(len(plotDatas.ys))
 
             for index in indexes:
+                print(index)
                 y = plotDatas.ys[index]
                 label = plotDatas.labels[index]
 
@@ -186,8 +187,7 @@ class Plots(PRMP_ClassMixins):
 
                 self.subplot.plot(plotDatas.xticks, y, label=label, marker=marker, ls=ls, lw=lw, markersize=markersize, alpha=alpha)
 
-        except Exception as e:
-            # print(e, __file__)
+        else:
             if markers:
                 markers = markers[0]
                 markersize = 10
@@ -200,7 +200,7 @@ class Plots(PRMP_ClassMixins):
 
             try: self.subplot.plot(plotDatas.xticks, plotDatas.ys, label=plotDatas.labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
             except Exception as e:
-                print(e)
+                print(e.__class__.__name__, e, 'line 203')
                 pass
 
     def bar(self, xticks=[], ys=[], labels=[], xlabel='', title='', switch='', ylabel='', axisrotate=(20, 0)):
@@ -342,9 +342,9 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
 
 class OptPlot(PRMP_Frame):
+    
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
-
         self.plots = {}
         self.chart = 'plot'
         self.grid = dict(ls='dashdot', lw=1.5, c='black')
@@ -352,29 +352,18 @@ class OptPlot(PRMP_Frame):
 
         h = .9
         self.canvas = PRMP_PlotCanvas(self, text='Plot Canvas', place=dict(relx=0, rely=0, relw=1, relh=h))
-        PRMP_Button(self, text='Plot', place=dict(relx=0, rely=h, relw=.25, relh=1-h), command=lambda: self.change('plot'))
-        PRMP_Button(self, text='Bar', place=dict(relx=.25, rely=h, relw=.25, relh=1-h), command=lambda: self.change('bar'))
-        PRMP_Button(self, text='Pie', place=dict(relx=.5, rely=h, relw=.25, relh=1-h), command=lambda: self.change('pie'))
-        self._switch = PRMP_Checkbutton(self, text='Switch', place=dict(relx=.75, rely=h, relw=.25, relh=1-h), command=self.switch)
+        PRMP_Button(self, text='Plot', place=dict(relx=0, rely=h, relw=.25, relh=1-h), command=lambda: self.plot('plot'))
+        PRMP_Button(self, text='Bar', place=dict(relx=.25, rely=h, relw=.25, relh=1-h), command=lambda: self.plot('bar'))
+        PRMP_Button(self, text='Pie', place=dict(relx=.5, rely=h, relw=.25, relh=1-h), command=lambda: self.plot('pie'))
+        self._switch = PRMP_Checkbutton(self, text='Switch', place=dict(relx=.75, rely=h, relw=.25, relh=1-h), command=self.plot)
 
     def load(self, **kwargs):
         self.plots = kwargs.copy()
-        self.switch()
+        self.plot()
 
-    def plot(self, chart='', **kwargs):
+    def plot(self, chart=''):
         self.chart = chart or self.chart
-        self.canvas.doPlotting(chart=self.chart, **kwargs)
-    
-    def change(self, chart):
-        ch = chart
-        if chart != 'pie': ch = 'plot'
-        kwargs = self.plotKwargs[ch]
-        self.plot(chart=chart, grid=self.grid, **self.plots, **kwargs)
-    
-    def switch(self): self.plot(switch=self._switch.get())
-
-
-
-
-
-
+        kwargs = {}
+        if self.chart != 'bar': kwargs = self.plotKwargs[self.chart]
+        if self.chart != 'pie': kwargs['switch'] = self._switch.get()
+        self.canvas.doPlotting(chart=self.chart, **self.plots, grid=self.grid, **kwargs)

@@ -2,6 +2,7 @@
 .spyproject/
 __pycache__/
 database/
+databases/
 test*/
 img/
 test*.py

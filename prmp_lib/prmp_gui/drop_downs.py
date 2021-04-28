@@ -45,7 +45,8 @@ class PRMP_DropDownWidget:
         # handle appearance to make the entry behave like a Combobox but with a drop-down widget instead of a drop-down list
         self.bind('<Leave>', lambda e: self.state(['!active']))
         self.bind('<ButtonPress-1>', self._on_b1_press, '+')
-        self.bind('<Down>', self.drop_down, '+')
+        # self.bind('<Down>', self.drop_down, '+')
+
         # update entry content when date is selected in the Calendar
         # hide dropdown_window if it looses focus
         self.dropdown_window.bind('<FocusOut>', self._on_focus_out_dropdown_window, '+')
@@ -262,6 +263,7 @@ DDCb = DropDownCheckbutton = PRMP_DropDownCheckbutton
 
 
 class PRMP_DropDownCalendarWidget(PRMP_DropDownWidget):
+
     def __init__(self, *args, **kwargs):
         from .dialogs import PRMP_CalendarDialog
 
@@ -269,7 +271,53 @@ class PRMP_DropDownCalendarWidget(PRMP_DropDownWidget):
 
 
 class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
+
     def __init__(self, *args, **kwargs):
-        from .dialogs import PRMP_CalendarDialog
+        from .dialogs import PRMP_CalendarDialog, PRMP_DateTime
+        self.pd = PRMP_DateTime
 
         super().__init__(*args, ddwc=PRMP_CalendarDialog, ddwk=dict(gaw=0, geo=(300, 250)), **kwargs)
+        self.bind('<Right>', self.nextDay)
+        self.bind('<Left>', self.prevDay)
+
+        self.bind('<Up>', self.nextMonth)
+        self.bind('<Down>', self.prevMonth)
+
+        self.bind('<Alt-Up>', self.nextYear)
+        self.bind('<Alt-Down>', self.prevYear)
+    
+    def now(self): self.value = self.pd.now()
+    
+    def nextDay(self, event=None):
+        if not self.value: self.now()
+        value = self.value.addTimes(days=1)
+        self.set(value)
+
+    def prevDay(self, event=None): 
+        if not self.value: self.now()
+        value = self.value.addTimes(days=-1)
+        self.set(value)
+
+    def nextMonth(self, event=None): 
+        if not self.value: self.now()
+        value = self.value + 1
+        self.set(value)
+
+    def prevMonth(self, event=None): 
+        if not self.value: self.now()
+        value = self.value - 1
+        self.set(value)
+
+    def nextYear(self, event=None): 
+        if not self.value: self.now()
+        value = self.value.addTimes(days=365)
+        self.set(value)
+
+    def prevYear(self, event=None): 
+        if not self.value: self.now()
+        value = self.value.addTimes(days=-365)
+        self.set(value)
+
+
+
+

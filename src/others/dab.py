@@ -151,6 +151,7 @@ def SAVE_DAB_DB():
     threading.Thread(target=save, args=[Areas.areas]).start()
 
 datas = 0
+
 if obj:
     Areas.areas = obj
     if datas:
@@ -163,9 +164,6 @@ else:
         for number, datas in number_d.items(): Areas.createArea(number, date, **datas)
     SAVE_DAB_DB()
     print('Saved DAB_DATAS')
-
-
-
 
 # datas = 1
 if datas: exit()
@@ -180,6 +178,7 @@ from prmp_lib.prmp_gui.plot_canvas import OptPlot, PlotDatas
 
 
 class DateWidget(TwoWidgets):
+    
     def __init__(self, master, **kwargs):
         super().__init__(master, top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', required=1), **kwargs)
     
@@ -188,6 +187,7 @@ class DateWidget(TwoWidgets):
 
 class DAB_Input(PRMP_FillWidgets, Frame):
     fields = ['date', 'number', *Area.columns]
+    
     def __init__(self, master, area=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, area)
@@ -273,7 +273,6 @@ class DAB_Hierachy(Hierachy):
     def openDialog(self):
         def load(master, obj):
             if obj: DAB_Dialog(master, area=obj)
-        
         return load
 
 
@@ -297,6 +296,7 @@ class DAB_Ui(PRMP_MainWindow):
         self.title = Label(self.cont, text='Title', place=dict(x=0, y=0, relh=.05, relw=1), font=font)
         self.tree = DAB_Hierachy(self.cont, place=dict(x=0, rely=.05, relw=1, relh=.55), columns=self.columns)
         relh = .6
+        self.loaded = 0
         
         note = Notebook(self.cont, place=dict(x=0, rely=relh, relw=.5, relh=1-relh))
 
@@ -305,17 +305,18 @@ class DAB_Ui(PRMP_MainWindow):
         note.tab(0, text='Input')
         Button(self.input, text='Add', place=dict(x=650, y=20, w=50, h=30), command=self.add)
         self.bind('<Return>', lambda e: self.add())
-        self.bind('<<DropDown_value_changed>>', self.date_chosen)
+
 
         sort = Frame(note)
         note.add(sort)
         note.tab(1, text='Sort')
  
-        self.sort_date = DateWidget(sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
 
-        self.sort_type = LabelCombo(sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts), func=self.sort)
+        self.sort_type = LabelCombo(sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts), func=self.sort)
+        self.sort_date = DateWidget(sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4)
         
-        Button(sort, text='View All', place=dict(x=10, y=100, w=220, h=40), command=lambda: self.updateTable(Areas.areas, 'All Areas.'))
+        Button(sort, text='Sort', place=dict(x=250, y=10, w=60, h=30), command=self.sort)
+        Button(sort, text='View All', place=dict(x=10, y=200, w=220, h=40), command=lambda: self.updateTable(Areas.areas, 'All Areas.'))
 
         self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
 
@@ -327,28 +328,31 @@ class DAB_Ui(PRMP_MainWindow):
         self.plot = None
 
         self.after(100, self.loadUI)
+        self.bind('<<DropDown_value_changed>>', self.date_chosen)
 
         self.start()
     
     def date_chosen(self, event=None):
-        date = self.input.date.get()
-        if date:
-            areas = self._sort(date, 'date')
-            if areas:
-                self.loadPlot(areas)
-                self.plot.change('plot')
+        if event and (str(event.widget) == str(self.sort_date.B)): self.sort(quiet=1)
+        else:
+            date = self.input.date.get()
+            if date: self._sort(date, 'date')
 
-    def sort(self, event=None):
+    def sort(self, event=None, quiet=0):
         date = self.sort_date.get()
-        if not date: PRMP_MsgBox(self, title='Invalid Date', msg='Choose a valid date.', _type='error')
+        if not date:
+            if not quiet: PRMP_MsgBox(self, title='Invalid Date', msg='Choose a valid date.', _type='error')
+            
         sort_type = self.sort_type.get()
-        if sort_type not in self.sort_type.B.values: PRMP_MsgBox(self, title='Invalid Sort Type', msg='CHoose a valid Sort Type.', _type='error')
+        if sort_type not in self.sort_type.B.values: PRMP_MsgBox(self, title='Invalid Sort Type', msg='Choose a valid Sort Type.', _type='error')
+            
 
         self._sort(date, sort_type)
 
     def _sort(self, date, sort_type):
-        self._sort_type = sort_type
+        if not date: return
 
+        self._sort_type = sort_type
         areas = Areas.sort(date, sort_type)
 
         if sort_type == 'date': text = f'{date.date}.'
@@ -358,7 +362,8 @@ class DAB_Ui(PRMP_MainWindow):
         elif sort_type == 'years': text = 'Years.'
         
         self.updateTable(areas, text)
-        return areas
+        self.loadPlot(areas)
+        if self.loaded: self.plot.plot(chart='plot')
 
     def loadPlot(self, areas=[]):
         if not self.plot: return
@@ -367,19 +372,27 @@ class DAB_Ui(PRMP_MainWindow):
         lists = self.list.selected or self.columns_lists
         datas = [area[lists] for area in areas]
         dates = [area.date for area in areas]
-        names = [f'Area {area.number}' for area in areas]
+        names = [f'Area {int(area.number)}' for area in areas]
 
         if self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='', ylabel='', title=self._title)
 
     def save(self): SAVE_DAB_DB()
 
     def loadUI(self):
-        date = PRMP_DateTime.now()
+        self.sort_type.set('date')
+
+        date = PRMP_DateTime.now().addTimes(days=-1)
+        self.input.date.set(date)
+        self.sort_date.set(date)
+        
         areas = Areas.sort(date, 'date')
         self.updateTable(areas, date.date)
+        
         relh = .6
         self.plot = OptPlot(self.cont, place=dict(relx=.65, rely=relh, relw=.35, relh=1-relh))
         self.plot.paint()
+
+        self.loaded = 1
 
     def add(self):
         area = self.input.createArea()
@@ -394,8 +407,7 @@ class DAB_Ui(PRMP_MainWindow):
         self.tree.viewObjs(areas)
 
 
-
-
 # DAB_Dialog(None, area={'date': PRMP_DateTime(2021, 4, 26, 1, 14), 'number': 1.0, 'current': 0.0, 'last': 0.0, 'next': 0.0, 'upfrontLoan': 0.0, 'upfrontRepay': 0.0, 'paidout': 0.0, 'transfer': 0.0, 'bto': 0.0, 'withdraw': 0.0}, themeIndex=51)
+
 DAB_Ui()
 

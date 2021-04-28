@@ -1,6 +1,5 @@
 from . import *
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime, datetime
-# print(dir())
 
 
 class PRMP_DateWidget:
@@ -15,6 +14,7 @@ class PRMP_DateWidget:
         self.date = None
         from .dialogs import PRMP_CalendarDialog
         self.CD = PRMP_CalendarDialog
+
         self.min = min_
         self.max = max_
 
