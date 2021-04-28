@@ -297,10 +297,10 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
         return markers_give
 
     def doPlotting(self, expand=False, inApp=1, adjust={}, **kwargs):
-        pie = kwargs.get('pie', False)
+        chart = kwargs.get('chart', False)
         draw = True
 
-        if pie:
+        if chart == 'pie':
             if not adjust: adjust = dict(left=0, bottom=.3, right=1, top=.88, wspace=.2, hspace=0)
             if not inApp: draw = False
 
@@ -341,12 +341,15 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
     def show(self, o=0): Render(bkcol=self.bkcol, annotation=self.annotation).doPlotting(chart=self.chart, grid=self._grid, **self.chart_datas)
 
 
-
 class OptPlot(PRMP_Frame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
-        self.plotKwargs = {}
+        self.plots = {}
+        self.chart = 'plot'
+        self.grid = dict(ls='dashdot', lw=1.5, c='black')
+        self.plotKwargs = dict(plot=dict(marker=True), pie=dict(inApp=False, expand=True))
+
         h = .9
         self.canvas = PRMP_PlotCanvas(self, text='Plot Canvas', place=dict(relx=0, rely=0, relw=1, relh=h))
         PRMP_Button(self, text='Plot', place=dict(relx=0, rely=h, relw=.25, relh=1-h), command=lambda: self.change('plot'))
@@ -355,28 +358,20 @@ class OptPlot(PRMP_Frame):
         self._switch = PRMP_Checkbutton(self, text='Switch', place=dict(relx=.75, rely=h, relw=.25, relh=1-h), command=self.switch)
 
     def load(self, **kwargs):
-        self.plotKwargs = kwargs.copy()
-        self.plotKwargs['grid'] = dict(ls='dashdot', lw=1.5, c='black')
-        self.plotKwargs['marker'] = 1
+        self.plots = kwargs.copy()
         self.switch()
 
-    def plot(self):
-        chart = self.plotKwargs.get('chart')
-        if chart and chart != 'plot':
-            marker = self.plotKwargs.get('marker')
-            if marker: del self.plotKwargs['marker']
-        self.canvas.doPlotting(**self.plotKwargs)
+    def plot(self, chart='', **kwargs):
+        self.chart = chart or self.chart
+        self.canvas.doPlotting(chart=self.chart, **kwargs)
     
     def change(self, chart):
-        if chart == 'pie':
-            self.plotKwargs['inApp'] = False
-            self.plotKwargs['expand'] = True
-        self.plotKwargs['chart'] = chart
-        self.plot()
+        ch = chart
+        if chart != 'pie': ch = 'plot'
+        kwargs = self.plotKwargs[ch]
+        self.plot(chart=chart, grid=self.grid, **self.plots, **kwargs)
     
-    def switch(self):
-        self.plotKwargs['switch'] = self._switch.get()
-        self.plot()
+    def switch(self): self.plot(switch=self._switch.get())
 
 
 

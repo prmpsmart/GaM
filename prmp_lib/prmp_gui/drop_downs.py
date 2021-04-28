@@ -118,6 +118,7 @@ class PRMP_DropDownWidget:
         value = self.getValue(value)
         self.WidgetClass.set(self, value)
         if readonly: self.state(('readonly',))
+        self.event_generate('<<DropDown_value_changed>>')
 
     def getValue(self, value):
         if self.attr: value = getattr(value, self.attr, None)

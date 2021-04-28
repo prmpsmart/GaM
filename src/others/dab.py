@@ -305,6 +305,7 @@ class DAB_Ui(PRMP_MainWindow):
         note.tab(0, text='Input')
         Button(self.input, text='Add', place=dict(x=650, y=20, w=50, h=30), command=self.add)
         self.bind('<Return>', lambda e: self.add())
+        self.bind('<<DropDown_value_changed>>', self.date_chosen)
 
         sort = Frame(note)
         note.add(sort)
@@ -318,8 +319,7 @@ class DAB_Ui(PRMP_MainWindow):
 
         self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
 
-        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1),command=self.load)
-
+        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1),command=self.loadPlot)
 
         self._areas = []
         self._title = ''
@@ -330,15 +330,13 @@ class DAB_Ui(PRMP_MainWindow):
 
         self.start()
     
-    def load(self):
-        if not self.plot: return
-
-        lists = self.list.selected or self.columns_lists
-        datas = [area[lists] for area in self._areas]
-        dates = [area.date for area in self._areas]
-        names = [f'Area {area.number}' for area in self._areas]
-
-        if self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='', ylabel='', title=self._title, marker=True)
+    def date_chosen(self, event=None):
+        date = self.input.date.get()
+        if date:
+            areas = self._sort(date, 'date')
+            if areas:
+                self.loadPlot(areas)
+                self.plot.change('plot')
 
     def sort(self, event=None):
         date = self.sort_date.get()
@@ -360,6 +358,18 @@ class DAB_Ui(PRMP_MainWindow):
         elif sort_type == 'years': text = 'Years.'
         
         self.updateTable(areas, text)
+        return areas
+
+    def loadPlot(self, areas=[]):
+        if not self.plot: return
+        areas = areas or self._areas
+
+        lists = self.list.selected or self.columns_lists
+        datas = [area[lists] for area in areas]
+        dates = [area.date for area in areas]
+        names = [f'Area {area.number}' for area in areas]
+
+        if self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='', ylabel='', title=self._title)
 
     def save(self): SAVE_DAB_DB()
 
