@@ -184,6 +184,8 @@ class DateWidget(TwoWidgets):
     
     def set(self, date): self.B.set(date)
 
+class TotalsWidget(PRMP_Frame):
+    ...
 
 class DAB_Input(PRMP_FillWidgets, Frame):
     fields = ['date', 'number', *Area.columns]
