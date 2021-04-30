@@ -280,11 +280,14 @@ class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
         self.bind('<Right>', self.nextDay)
         self.bind('<Left>', self.prevDay)
 
-        self.bind('<Up>', self.nextMonth)
-        self.bind('<Down>', self.prevMonth)
+        self.bind('<Up>', self.nextWeek)
+        self.bind('<Down>', self.prevWeek)
 
-        self.bind('<Alt-Up>', self.nextYear)
-        self.bind('<Alt-Down>', self.prevYear)
+        self.bind('<Alt-Up>', self.nextMonth)
+        self.bind('<Alt-Down>', self.prevMonth)
+
+        self.bind('<Shift-Up>', self.nextYear)
+        self.bind('<Shift-Down>', self.prevYear)
     
     def now(self): self.value = self.pd.now()
     
@@ -296,6 +299,16 @@ class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
     def prevDay(self, event=None): 
         if not self.value: self.now()
         value = self.value.addTimes(days=-1)
+        self.set(value)
+    
+    def nextWeek(self, event=None):
+        if not self.value: self.now()
+        value = self.value.addTimes(days=7)
+        self.set(value)
+
+    def prevWeek(self, event=None): 
+        if not self.value: self.now()
+        value = self.value.addTimes(days=-7)
         self.set(value)
 
     def nextMonth(self, event=None): 

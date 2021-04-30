@@ -2,14 +2,7 @@ from .core import tk
 from . import *
 from .miscs import *
 
-__all__ = [
-'PRMP_ListBox', 
-'PRMP_TreeView', 
-'PRMP_ScrollText', 
-'ScrollableFrame', 
-'ScrolledText', 
-'ScrolledEntry', 'ListBox', 'TreeView', 'ScrollText'
-]
+__all__ = ['PRMP_ListBox', 'PRMP_TreeView', 'PRMP_ScrollText', 'ScrollableFrame', 'ScrolledText', 'ScrolledEntry', 'ListBox', 'TreeView', 'ScrollText', 'Hierachy']
 
 class AutoScroll:
     '''Configure the scrollbars for a widget.'''
@@ -263,10 +256,189 @@ class ScrolledText(AutoScroll, tk.Text):
         tk.Text.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
 
+
 class ScrolledEntry(AutoScroll, tk.Entry):
 
     @create_container
     def __init__(self, master, **kw):
         tk.Entry.__init__(self, master, **kw)
         AutoScroll.__init__(self, master)
+
+
+class Hierachy(PRMP_TreeView):
+
+    def __init__(self, master=None, columns=[], toggleOpen=True, binds=[], **kwargs):
+        self._toggleOpen = False
+        self.toop = toggleOpen
+        self.last = []
+        self.binds = binds
+        super().__init__(master=master, columns=columns, **kwargs)
+
+        self.bindings()
+
+    @property
+    def openDialog(self):
+        from .dialogs import dialogFunc
+        return dialogFunc
+
+    def toggleOpen(self, e=0):
+        if self._toggleOpen: self._toggleOpen = False
+        else: self._toggleOpen = True
+
+        if self.last: self.viewObjs(*self.last)
+
+    def bindings(self):
+        self.treeview.bind('<Control-Return>', self.viewSelected, '+')
+        if self.toop:
+            self.treeview.bind('<Control-o>', self.toggleOpen, '+')
+            self.treeview.bind('<Control-O>', self.toggleOpen, '+')
+
+        self.treeview.bind('<Control-r>', self.reload, '+')
+        self.treeview.bind('<Control-R>', self.reload, '+')
+
+        for event, func, sign in self.binds: self.treeview.bind(event, func, sign)
+
+    def reload(self, e=0):
+        if self.last: self.viewObjs(*self.last)
+
+    def viewSelected(self, e=0):
+        current = self.selected()
+
+        if current: self.openDialog(master=self, obj=current)
+
+    def getSubs(self, obj, item=''):
+        return obj.subs
+
+    def _viewObjs(self, obj, parent=''):
+        if not obj: return
+
+        if isinstance(obj, list):
+            subs = obj
+            item = parent
+        else:
+            raw = self.columns.getFromObj(obj)
+            first, *columns = raw
+
+            item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
+
+            subs = self.getSubs(obj, item)
+
+        if isinstance(subs, list):
+            for sub in subs:
+                # print(subs)
+                if sub: self._viewObjs(sub, item)
+
+    def viewObjs(self, obj, parent=''):
+        if not parent: self.clear()
+        self._viewObjs(obj, parent)
+        self.last = obj, parent
+
+    def viewSubs(self, obj): self.viewObjs(obj[:])
+
+
+class Table(Frame):
+    
+    def toNum(self, value):
+        numbers = [str(num) for num in range(10)] + ['.']
+        value = str(value)
+        for val in value:
+            if val not in numbers: value = value.replace(val, '')
+        return float(value or 0)
+
+    def __init__(self, master, title='', treeKwargs={}, reserve=0, output=float, converter=None, offset=3, treeWidget=(), **kwargs):
+        '''
+        master: parent of this widget.
+        title: title of this table.
+        treeKwargs: parameters of the Treeview.
+        reserve: number of columns to not process in each row.
+        output: function to format the processed values.
+        converter: function to process the raw values, default is Table.toNum.
+        offset: number of empty rows to leave before writing the totals.
+        treeWidget: A subclass of Treeview, or any widget to use as the holder of the contents of the table
+        kwargs: parameters for Frame.__init__() 
+        '''
+
+
+
+        super().__init__(master, **kwargs)
+        
+        self.reserve = reserve
+        self.output = output
+        self.offset = offset
+        self.converter = converter or self.toNum
+
+        font = self.PRMP_FONT.copy()
+        font['size'] = 20
+        self.title = Label(self, text=title, place=dict(x=0, y=0, h=40, relw=1), font=font)
+
+        treeWidget = treeWidget or Hierachy
+        self.tree = treeWidget(self, place=dict(x=0, y=42, relw=1, relh=1), **treeKwargs)
+
+        self.bind('<Map>', self.resize)
+    
+    def resize(self, event=None):
+        width, height = self.width, self.height
+        self.title.place(x=0, y=0, h=40, relw=1)
+        self.tree.place(x=0, y=40, relw=1, relh=((height-40)/height))
+    
+    def setTitle(self, title): self.title.set(title)
+
+    @property
+    def columns(self): return self.tree.columns
+
+    def getTotals(self, values):
+        processed_values = []
+        for value in values:
+            proc_val = self.columns.getFromObj(value)[self.reserve:]
+            proc_val = [self.converter(val) for val in proc_val]
+            processed_values.append(proc_val)
+
+        totalInner = len(processed_values[0])
+
+        combined = [0 for _ in range(totalInner)]
+        
+        for p_v in processed_values:
+            for index, inner in enumerate(p_v): combined[index] += float(inner or 0)
+        
+
+        outputs = []
+        for val in combined:
+            if val: out = self.output(val)
+            else: out = ''
+            outputs.append(out)
+        
+        return outputs
+    
+    def updateTable(self, title, values):
+        self.setTitle(title)
+        self.viewObjs(values)
+
+    def viewObjs(self, values):
+        self.tree.viewObjs(values)
+        
+        if not values: return
+        totals = self.getTotals(values)
+        
+        offset_rows = ['' for _ in self.columns[1:]]
+        text = totals[0]
+        if self.reserve:
+            totals = offset_rows[:self.reserve-1] + totals
+            text = 'Totals'
+        
+        for _ in range(self.offset): self.tree.insert('', text='', values=offset_rows)
+
+        self.tree.insert('', text=text, values=totals)
+    
+    def clear(self):
+        self.title.clear()
+        self.tree.clear()
+
+
+
+
+
+
+
+
+
 

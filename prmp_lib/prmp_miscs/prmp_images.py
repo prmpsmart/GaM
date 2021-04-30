@@ -517,6 +517,7 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
             cursor.executemany(f'INSERT INTO {table} VALUES (?,?,?)', values)
 
         cursor.connection.commit()
+        cursor.connection.close()
     
 
     @classmethod

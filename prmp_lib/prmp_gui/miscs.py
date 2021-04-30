@@ -135,7 +135,9 @@ class Column(Col_Mixins):
                     if self.type: val = self.type(val)
                 return val or ''
 
-            except Exception as e: return ''
+            except Exception as e:
+                # print(e)
+                return ''
 
     def proof(self, obj): return self.getFromObj(obj) == self.value
 

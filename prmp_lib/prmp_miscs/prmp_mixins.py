@@ -134,7 +134,8 @@ class PRMP_AdvMixins(PRMP_ClassMixins):
         from .prmp_datetime import PRMP_DateTime
 
         if date == None: date = PRMP_DateTime.now()
-        elif isinstance(date, str): date = PRMP_DateTime.getDMYFromString(date)
+
+        elif isinstance(date, (str, bytes)): date = PRMP_DateTime.getDMYFromString(date)
         PRMP_DateTime.checkDateTime(date, 1)
         return date
 
@@ -180,7 +181,7 @@ class PRMP_StrMixins(PRMP_ClassMixins):
 
     email_regex = r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
 
-    def getNumsInStrAsList(self, string, length=[], dontRaise=False):
+    def getNumsInStrAsList(self, string, lengths=[], dontRaise=False):
         strs = list(string.replace(' ', ''))
 
         numbers = []
@@ -192,7 +193,7 @@ class PRMP_StrMixins(PRMP_ClassMixins):
             except: non_num.append(count)
             count += 1
 
-        if len(non_num) not in length:
+        if len(non_num) not in lengths:
             if not dontRaise: raise AssertionError(f'Provide {length} numbers separated by non-numerics')
             return
 
@@ -205,25 +206,27 @@ class PRMP_StrMixins(PRMP_ClassMixins):
         strs = [int(''.join(d)) for d in numbers]
         return strs
 
-    def numWithCommas(self, num=None):
-        if num == None: num = float(self)
+    def numWithCommas(self, num=None, func=float, s='.02f'):
+        if num == None: num = func(self)
+        # return f'{num:,{s}}'
         return f'{num:,.02f}'
 
-    def numWithSign_Commas(self, num=None): return self.addSignToNum(self.numWithCommas(num))
+    def numWithSign_Commas(self, num=None):
+        return f'{self._moneySign} {num:,.02f}'
+        # return self.addSignToNum(self.numWithCommas(num))
 
     def addSignToNum(self, num):
-        try: float(num)
-        except:
-            if num == self._moneySign: return num
+        if num == self._moneySign: return num
 
-        return '{} {}'.format(self._moneySign, num)
+        return f'{self._moneySign} {num}'
 
     numberToMoney = addSignToMoney = addSignToNum
 
     def stripSignFromNum(self, num):
         num = num.replace(self._moneySign, '')
         num = num.replace(' ', '')
-        return num.replace(' ', '').replace(self._moneySign, '')
+        num = num.replace(',', '')
+        return num
 
     moneyToNumber = stripSignFromMoney = stripSignFromNum
 

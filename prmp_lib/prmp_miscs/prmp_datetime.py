@@ -2,7 +2,7 @@ __author__ = 'PRMPSmart@gmail.com'
 
 import datetime
 from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
-from .prmp_mixins import PRMP_AdvMixins, PRMP_Errors
+from .prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins, PRMP_Errors
 
 DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
 WEEKS = ['Week %d'%a for a in range(1, 6)]
@@ -226,7 +226,7 @@ class CompareByYear:
         return self.date.year >= other.date.year
 
 
-class PRMP_DateTime(datetime.datetime, PRMP_AdvMixins):
+class PRMP_DateTime(datetime.datetime, PRMP_AdvMixins, PRMP_StrMixins):
     date_fmt = "%d/%m/%Y" # default date format, subclass PRMP_DateTime and set date_fmt to your own format
     
     daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
@@ -576,7 +576,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_AdvMixins):
     def weekName(self): return 'Week {}'.format(self.week)
 
     @classmethod
-    def getDate(cls, status=0, form=1, day_=0):
+    def get__Date(cls, status=0, form=1, day_=0):
 
         now = cls.now()
         days = cls.timedelta(status)
@@ -597,8 +597,9 @@ class PRMP_DateTime(datetime.datetime, PRMP_AdvMixins):
     @classmethod
     def getDMYFromString(cls, date):
         if date:
-            if isinstance(date, str):
-                try: day, month, year = cls.getNumsInStrAsList(None, date, [2], 1)
+            if isinstance(date, (str, bytes)):
+                try:
+                    day, month, year = cls.getNumsInStrAsList(None, date, [2], 1)
                 except Exception as e: return
 
                 day, month, year = int(day), int(month), int(year)

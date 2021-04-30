@@ -638,6 +638,8 @@ class PRMP_Widget(PRMP_Theme):
             except: pass
 
     def get(self): return self['text']
+    def clear(self): self['text'] = ''
+    empty = clear
 
     def statusShow(self):
         'shows the text of this widget aon the status bar if present in the window.'

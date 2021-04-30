@@ -860,7 +860,7 @@ class PRMP_Treeview(PRMP_Style_, ttk.Treeview):
         elif leng > 1: return childrenList
         else: return childrenList[0]
 
-    def insert(self, item, position='end',  value=None, text='', tip='', **kwargs):
+    def insert(self, item, position='end', value=None, text='', tip='', **kwargs):
         newItem = ttk.Treeview.insert(self, item, position, text=text, **kwargs)
 
         self.ivd[newItem] = value or text

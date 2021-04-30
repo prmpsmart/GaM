@@ -113,24 +113,25 @@ class Plots(PRMP_ClassMixins):
     def doAnnotation(self):
         if self.annotation: self.annotate(**self.genAnnot(**self.annotation))
 
-    def doPlotting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
+    def doPlotting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=True, **kwargs):
         self.clear()
         self.chart = chart.lower()
-
-        func = self.getFromSelf(self.chart)
-        
-        if self.chart == 'pie': kwargs = {k: v for k, v in kwargs.items() if k in ['ys', 'labels', 'explode', 'shadow', 'title']}
-        func(**kwargs)
-
-        # if kwargs:
-        self.doAnnotation()
-        self.legend()
-        self.set_grid(grid)
+        self._draw = draw
 
         if autoAdjust:
             adjust = {}
             self.adjust()
         elif adjust: self.adjust(**adjust)
+
+        func = self.getFromSelf(self.chart)
+        
+        if self.chart == 'pie': kwargs = {k: v for k, v in kwargs.items() if k in ['ys', 'labels', 'explode', 'shadow', 'title']}
+
+        func(**kwargs)
+
+        self.doAnnotation()
+        self.legend()
+        self.set_grid(grid)
 
         if draw: self.draw()
 
@@ -172,7 +173,6 @@ class Plots(PRMP_ClassMixins):
             indexes = range(len(plotDatas.ys))
 
             for index in indexes:
-                print(index)
                 y = plotDatas.ys[index]
                 label = plotDatas.labels[index]
 
@@ -198,9 +198,9 @@ class Plots(PRMP_ClassMixins):
             if lss: lss = lss[0]
             else: lss = None
 
-            try: self.subplot.plot(plotDatas.xticks, plotDatas.ys, label=plotDatas.labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
+            try: self.subplot.plot(plotDatas.xticks, plotDatas.ys[0], label=plotDatas.labels, marker=markers, ls=lss, lw=lw, markersize=markersize, alpha=alpha)
             except Exception as e:
-                print(e.__class__.__name__, e, 'line 203')
+                # print(e.__class__.__name__, e, 'line 203')
                 pass
 
     def bar(self, xticks=[], ys=[], labels=[], xlabel='', title='', switch='', ylabel='', axisrotate=(20, 0)):
@@ -222,15 +222,16 @@ class Plots(PRMP_ClassMixins):
                 y = barObj.ys[ind]
                 label = barObj.labels[ind]
 
-                bar_h(x, y, barObj.width,  label=label)
+                bar_h(x, y, barObj.width, label=label)
 
-        else: bar_h(barObj.plot_points, barObj.ys, label=barObj.labels)
+        else: bar_h(barObj.plot_points, barObj.ys[0], label=barObj.labels)
 
     barh = bar
 
     def hist(self, *args): pass
 
     def pie(self, ys=[], labels=[], explode=[], shadow=None, title=''):
+        if not self._draw: return
         self.annotation = dict(title=title)
 
         if not self.pie: return
@@ -292,8 +293,8 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
         markers_give = []
         while len(markers_give) <= num:
             mark = random.choice(markers)
-            if mark in markers_give: pass
-            else: markers_give.append(mark)
+            # if mark in markers_give: continue
+            markers_give.append(mark)
         return markers_give
 
     def doPlotting(self, expand=False, inApp=1, adjust={}, **kwargs):
@@ -347,7 +348,7 @@ class OptPlot(PRMP_Frame):
         super().__init__(master, **kwargs)
         self.plots = {}
         self.chart = 'plot'
-        self.grid = dict(ls='dashdot', lw=1.5, c='black')
+        self.grid = dict(ls='dotted', lw=1.5, c='black')
         self.plotKwargs = dict(plot=dict(marker=True), pie=dict(inApp=False, expand=True))
 
         h = .9
