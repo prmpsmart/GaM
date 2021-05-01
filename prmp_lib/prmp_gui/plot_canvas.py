@@ -113,7 +113,7 @@ class Plots(PRMP_ClassMixins):
     def doAnnotation(self):
         if self.annotation: self.annotate(**self.genAnnot(**self.annotation))
 
-    def doPlotting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=True, **kwargs):
+    def doPlotting(self, chart='plot', grid=None, adjust={}, draw=True, autoAdjust=False, **kwargs):
         self.clear()
         self.chart = chart.lower()
         self._draw = draw
@@ -309,7 +309,7 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
 
         if adjust: dic['adjust'] = adjust
 
-        super().doPlotting(**dic)
+        super().doPlotting(autoAdjust=1, **dic)
         if expand: self.show()
 
     def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, axisrotate=(20, 0), **kwargs):

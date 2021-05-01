@@ -350,7 +350,7 @@ class DAB_Ui(PRMP_MainWindow):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, geo=(1500, 850), resize=(1, 1), be=0, **kwargs)
 
-        self.table = Table(self.cont, place=dict(x=0, y=0, relw=1, relh=.55), treeKwargs=dict(columns=self.columns), reserve=2, output=DAB_Ui.sign, converter=self.mixin.stripSignFromNum)
+        self.table = Table(self.cont, place=dict(x=0, y=0, relw=1, relh=.55), treeKwargs=dict(columns=self.columns), reserve=2, output=DAB_Ui.sign, converter=self.mixin.stripSignFromNum, treeWidget=DAB_Hierachy)
 
         relh = .6
         self.loaded = 0
