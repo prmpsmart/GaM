@@ -12,7 +12,6 @@ try:
 except Exception as e:
     _PIL_ = False
     print('PIL <pillow> image library is not installed.')
-    print(e)
 
 try:
     import cv2
@@ -20,7 +19,6 @@ try:
 except Exception as e:
     _CV2_ = False
     print('cv2 <opencv-python> computer vision library is not installed.')
-    print(e)
 
 try:
     import cv2
@@ -28,7 +26,6 @@ try:
 except Exception as e:
     _CV2_ = False
     print('cv2 <opencv-python> computer vision library is not installed.')
-    print(e)
 
 from .prmp_exts import *
 from .prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins
@@ -552,9 +549,7 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
     def _getPRMPImages(cls, images):
         'returns instances of PRMP_ImageFile from the database datas'
         prmpImages = []
-        # print(images)
         for tups in images:
-            # print(tups)
             if tups:
                 img = cls._getPRMPImage(*tups)
                 prmpImages.append(img)

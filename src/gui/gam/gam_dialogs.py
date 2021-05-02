@@ -5,7 +5,6 @@ from ...backend.office.office_regions import Office
 
 
 class GaM_Dialog(PRMP_Dialog):
-    # def __init__(self, master=None, delay=0, **kwargs): super().__init__(master, delay=delay, **kwargs)
 
     def defaults(self):
         self.root._save = GaM_Settings.threadSave
@@ -29,9 +28,8 @@ class PersonDialog(GaM_Dialog):
 
         if person: title = f'{person.master.className} {title}'
         values = person or values
-        print(geo)
 
-        super().__init__(master=master, title=title, geo=geo, values=values, **kwargs)
+        super().__init__(master, title=title, geo=geo, values=values, **kwargs)
 
     def _setupDialog(self):
 
@@ -49,7 +47,7 @@ class PersonDialog(GaM_Dialog):
 
         self.email = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Email')), bottomKwargs=dict(_type='email'), place=dict(relx=.02, rely=.28, relh=.14, relw=.96), longent=.25, orient='h')
 
-        self.gender = LabelCombo(self.contact,  topKwargs=dict(config=dict(text='Gender')), bottomKwargs=dict(type_='gender'), place=dict(relx=.02, rely=.42, relh=.14, relw=.96), longent=.25, orient='h')
+        self.gender = LabelCombo(self.contact,  topKwargs=dict(config=dict(text='Gender')), bottomKwargs=dict(_type='gender'), place=dict(relx=.02, rely=.42, relh=.14, relw=.96), longent=.25, orient='h')
 
         self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, rely=.56, relh=.44, relw=.96), bottomKwargs=dict(required=True), longent=.3, orient='h')
 

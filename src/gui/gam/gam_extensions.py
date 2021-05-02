@@ -67,9 +67,7 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
 
         if non == 0:
             win = window(master, **kwargs)
-            if not master:
-                # print('here')
-                win.start()
+            if not master: win.start()
         else: dialogFunc(master=master, **kwargs)
 
 

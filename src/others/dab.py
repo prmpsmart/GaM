@@ -446,10 +446,9 @@ class DAB_Ui(PRMP_MainWindow):
 
         lists = self.list.selected or self.columns_lists
         datas = [area[lists] for area in areas]
-        dates = [area.date for area in areas]
         names = [f'Area {int(area.number)}' for area in areas]
 
-        if self.loaded and self.plot and self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='', ylabel='', title=self._title)
+        if self.loaded and self.plot and self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='Areas', ylabel='Amounts', title=self._title)
 
     def add(self):
         area = self.input.createArea()

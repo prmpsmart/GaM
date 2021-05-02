@@ -18,15 +18,11 @@ class PRMP_DropDownWidget:
         self._determine_downarrow_name_after_id = ''
 
         # dropdown_window
-        dropdown_windowclass = ddwc or dropdown_windowclass
-        dropdown_windowkwargs = ddwk or dropdown_windowkwargs
-        self.geo = dropdown_windowkwargs.get('geo')
+        self.dropdown_windowclass = ddwc or dropdown_windowclass
+        self.dropdown_windowkwargs = ddwk.copy() or dropdown_windowkwargs.copy()
+        self.geo = self.dropdown_windowkwargs.get('geo')
 
         self.WidgetClass.__init__(self, master, **kwargs)
-
-        if issubclass(dropdown_windowclass, (PRMP_Window, PRMP_MainWindow)): dropdown_windowkwargs.update(dict(tooltype=1, normTk=1, withdraw=1))
-        self.dropdown_window = dropdown_windowclass(self, callback=self.set, **dropdown_windowkwargs) if dropdown_windowclass else Toplevel(self, **dropdown_windowkwargs)
-        self.dropdown_window.withdraw()
 
         # add validation to Entry so that only desired input format are accepted
 
@@ -47,6 +43,16 @@ class PRMP_DropDownWidget:
         self.bind('<ButtonPress-1>', self._on_b1_press, '+')
         # self.bind('<Down>', self.drop_down, '+')
 
+        self.after(300, self.createDDW)
+
+    
+    def createDDW(self):
+        if self.dropdown_window: return
+        
+        if issubclass(self.dropdown_windowclass, (PRMP_Window, PRMP_MainWindow)): self.dropdown_windowkwargs.update(dict(tooltype=1, normTk=1, withdraw=1))
+        self.dropdown_window = self.dropdown_windowclass(self, callback=self.set, **self.dropdown_windowkwargs) if self.dropdown_windowclass else Toplevel(self, **self.dropdown_windowkwargs)
+        self.dropdown_window.withdraw()
+        
         # update entry content when date is selected in the Calendar
         # hide dropdown_window if it looses focus
         self.dropdown_window.bind('<FocusOut>', self._on_focus_out_dropdown_window, '+')
@@ -133,6 +139,7 @@ class PRMP_DropDownWidget:
 
     def drop_down(self, event=None):
         """Display or withdraw the drop_down window depending on its current state."""
+        # if not self.dropdown_window: self.createDDW()
 
         if self.dropdown_window.winfo_ismapped(): self.dropdown_window.withdraw()
         else:
