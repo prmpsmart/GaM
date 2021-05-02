@@ -824,7 +824,8 @@ class PRMP_Widget(PRMP_Theme):
     def config(self, tipKwargs={}, **kwargs):
         if tipKwargs: self.set_tooltip_text(tipKwargs)
         self.kwargs.update(kwargs)
-        self.TkClass.configure(self, **kwargs)
+        try: self.TkClass.configure(self, **kwargs)
+        except: pass
 
     @property
     def PRMP_WIDGET(self): return self.className.replace('PRMP_', '')

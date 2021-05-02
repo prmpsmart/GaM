@@ -1,7 +1,3 @@
-import sys
-sys.path.append(r'C:\Users\Administrator\Coding_Projects\PYTHON\Dev_Workspace\GaM')
-
-
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_AdvMixins
 from prmp_lib.prmp_miscs.prmp_exts import PRMP_File, os
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
@@ -62,6 +58,7 @@ class Contribution(PRMP_AdvMixins):
     def __ge__(self, other):
         if other == None: return True
         return self.number >= other.number
+
 
 class Contributions(PRMP_AdvMixins):
     def __init__(self, area, month=None, date=None,commission=False):
@@ -135,6 +132,8 @@ class Contributions(PRMP_AdvMixins):
         file = PRMP_File(filename=file)
         conts = file.loadObj()
         return conts
+
+
 
 class App(PRMP_Dialog):
 
