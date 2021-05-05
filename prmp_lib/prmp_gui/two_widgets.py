@@ -78,7 +78,6 @@ class TwoWidgets(PRMP_Frame):
             bottomKw = bottomKwargs.copy()
 
         self.Bottom = bottom_wid(self, status=placeholder, **bottomKw)
-        # if bottom == 'entry': print(bottomKw)
 
         self.required = getattr(self.Bottom, 'required', False)
 

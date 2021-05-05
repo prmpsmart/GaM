@@ -287,21 +287,15 @@ class ObjectHome(GaM_App):
         obj = self.obj
 
 
-        self.detailsNote = Notebook(self.container, place=dict(relx=.005, rely=.005, relh=.87, relw=.24))
+        self.detailsNote = Notebook(self.container, place=dict(relx=.005, rely=.005, relh=.932, relw=.24))
 
         self.frame1 = Frame(self.detailsNote)
         self.detailsNote.add(self.frame1, padding=3)
         self.detailsNote.tab(0, text='Details', compound='left', underline='-1')
 
+        self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.94, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=obj.date.date if obj else ''))
 
-
-        self.date = LabelLabel(self.container, place=dict(relx=.005, rely=.88, relh=.05, relw=.15), orient='h', topKwargs=dict(text='Date'), bottomKwargs=dict(text=obj.date.date if obj else ''))
-
-        UniqueID(self.container, place=dict(relx=.17, rely=.88, relh=.045, relw=.07), obj=obj)
-
-        Button(self.container, place=dict(relx=.005, rely=.94, relh=.04, relw=.08), text='Object Details', command=self.openObjDet)
-
-        Button(self.container, place=dict(relx=.1, rely=.94, relh=.04, relw=.1), text='Sort and Search', command=self.openSNS)
+        UniqueID(self.container, place=dict(relx=.17, rely=.94, relh=.045, relw=.07), obj=obj)
 
         self.note = Notebook(self.container, place=dict(relx=.25, rely=.005, relh=.99, relw=.745))
 
@@ -352,16 +346,18 @@ class AccountHome(ObjectHome):
         super()._setupApp()
 
         account = self.account = self.obj
-        name, self._manager = (account.manager.name, account.manager) if account else ('', None)
+        name, self._manager = (account.manager.name, account.manager) if account != None else ('', None)
 
-        self.manager = LabelButton(self.frame1, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.15, relw=.99), bottomKwargs=dict(command=self.openManager, text=name))
+        self.manager = LabelButton(self.frame1, topKwargs=dict(text='Manager'), place=dict(relx=.005, rely=.005, relh=.14, relw=.99), bottomKwargs=dict(command=self._openManager, text=name))
 
         self.recordsManagers = SubsList(self.frame1, text='Records Managers', place=dict(relx=.005, rely=.16, relh=.63, relw=.99))
 
-        if account: self.recordsManagers.set(account, showAttr='name')
+        if account:
+            account.balanceAccount()
+            self.recordsManagers.set(account, showAttr='name')
 
-    def openManager(self):
-        if self._manager: openCores(self._manager, edit=0)
+    def _openManager(self, event=None):
+        if self._manager: openCores(master=self, obj=self._manager, edit=0)
 
 
 class ManagerHome(TreeColumns, GaM_App):

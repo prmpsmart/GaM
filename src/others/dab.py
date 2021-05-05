@@ -207,11 +207,15 @@ class Areas:
     save = save1
     load = load1
 
+if 0:
+    Areas.load3()
+    Areas.save1()
+    Areas.save2()
+    exit()
+
 Areas.load()
 SAVE_DAB_DB = Areas.save
 
-# SAVE_DAB_DB()
-# exit()
 
 from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.scrollables import PRMP_ListBox, Table

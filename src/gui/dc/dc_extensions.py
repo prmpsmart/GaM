@@ -144,9 +144,10 @@ class DC_Overview(Frame):
 
         self.dcDigits = DC_Digits(self)
 
-        self.plotCanvas1 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+        # prmp
+        # self.plotCanvas1 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
-        self.plotCanvas2 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
+        # self.plotCanvas2 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
         if orient == 'v': self.placeVertically()
         else: self.placeHorizontally()
@@ -156,6 +157,7 @@ class DC_Overview(Frame):
         # self.topest.addAfters(self.afterload)
 
     def afterload(self):
+        return # prmp
         self.plotCanvas1.draw()
         self.plotCanvas2.draw()
         self.testDraw()
@@ -179,8 +181,9 @@ class DC_Overview(Frame):
         self._next.place(relx=.68, rely=.005, relw=.15, relh=.04)
         self.plotDialog.place(relx=.85, rely=.005, relw=.15, relh=.04)
         self.dcDigits.placeVertically()
-        self.plotCanvas1.place(relx=.375, rely=.051, relh=.4745, relw=.625)
-        self.plotCanvas2.place(relx=.375, rely=.5255, relh=.4745, relw=.625)
+        # prmp
+        # self.plotCanvas1.place(relx=.375, rely=.051, relh=.4745, relw=.625)
+        # self.plotCanvas2.place(relx=.375, rely=.5255, relh=.4745, relw=.625)
 
     def placeHorizontally(self):
         self.month.place(relx=.005, rely=.002, relh=.051, relw=.3)
@@ -190,8 +193,9 @@ class DC_Overview(Frame):
         self.plotDialog.place(relx=.898, rely=.007, relh=.04, relw=.1)
         self.dcDigits.place(relx=0, rely=.05, relh=.28, relw=1)
         self.dcDigits.placeHorizontally()
-        self.plotCanvas1.place(relx=0, rely=.33, relh=.67, relw=.5)
-        self.plotCanvas2.place(relx=.5, rely=.33, relh=.67, relw=.5)
+        # prmp
+        # self.plotCanvas1.place(relx=0, rely=.33, relh=.67, relw=.5)
+        # self.plotCanvas2.place(relx=.5, rely=.33, relh=.67, relw=.5)
 
     def updateDCDigits(self, account):
         if account:

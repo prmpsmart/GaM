@@ -38,7 +38,6 @@ class DCRegion(Region):
     subTypes = ['Regions', 'Accounts', 'Records Managers', 'Persons']
     ObjectSortClass = DCSort
 
-
     @property
     def subs(self): return self.accountsManager or []
 

@@ -156,7 +156,7 @@ class Plots(PRMP_ClassMixins):
         self.draw()
         self.chart_datas = {}
 
-    def plot(self, xticks=[], ys=[], labels=[], markers=[], lss=[], linestyle=[], lw=1, linewidth=1, alpha=0, switch=0):
+    def plot(self, xticks=[], ys=[], labels=[], markers=[], marker=False, lss=[], linestyle=[], lw=1, linewidth=1, alpha=0, switch=0):
         if linestyle: lss = linestyle
         if linewidth: lw = linewidth
 
@@ -168,6 +168,9 @@ class Plots(PRMP_ClassMixins):
         if switch: plotDatas.switch()
 
         self.annotation.update(dict(xticks=plotDatas.xticks, xlabel=plotDatas.xlabel, ylabel=plotDatas.ylabel))
+        if marker and not markers:
+            markers = self.marker_chooser(len(plotDatas.ys))
+            self.chart_datas['markers'] = markers
 
         if plotDatas.d_1_point != 1:
             indexes = range(len(plotDatas.ys))
@@ -287,7 +290,7 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
         if num == 1: return ls[0]
         else: return ls
 
-    def marker_choser(self, num):
+    def marker_chooser(self, num):
         markers = {'point':'.', 'circle':'o', 'triangle_down ':'v', 'triangle_up':'^', 'triangle_left':'<', 'triangle_right':'>', 'octagon':'8', 'square':'s', 'pentagon':'p', 'plus': 'P', 'star' :'*', 'hexagon1':'h', 'hexagon2':'H', 'cancel':'X', 'diamond':'D', 'thin_diamond':'d', 'underscore':'_'}
         markers = list(markers.values())
         markers_give = []
@@ -312,16 +315,13 @@ class PRMP_PlotCanvas(Plots, PRMP_Frame):
         super().doPlotting(autoAdjust=1, **dic)
         if expand: self.show()
 
-    def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', marker=None, lss=None, annot={}, axisrotate=(20, 0), **kwargs):
-
-        if marker: markers = self.marker_choser(len(labels))
-        else: markers = None
+    def plot(self, xticks=[], labels=[], xlabel='', ylabel='', title='', lss=None, annot={}, axisrotate=(20, 0), ys=[], **kwargs):
 
         if lss: lss = self.ls_choser(len(labels))
 
         self.annotation = dict(xticks=xticks, axisrotate=axisrotate, xlabel=xlabel, title=title, ylabel=ylabel, **annot)
 
-        self.chart_datas = dict(xticks=xticks, labels=labels, markers=markers, lss=lss, **kwargs)
+        self.chart_datas = dict(xticks=xticks, labels=labels, lss=lss, ys=ys, **kwargs)
 
         super().plot(**self.chart_datas)
 

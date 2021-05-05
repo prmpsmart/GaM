@@ -241,8 +241,10 @@ class UniqueID(Button):
             date = self.obj.date.date
             uniqueID = self.obj.uniqueID
             self.view.setTitle(self.obj.name)
-
-        LabelEntry(self.view.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.02, rely=.02, relh=.96, relw=.96), bottomKwargs=dict(state='readonly')).set(uniqueID)
+        # tipKwargs=dict(text='Right Click to destroy.'))
+        a = LabelEntry(self.view.container, topKwargs=dict(text='Unique ID'), place=dict(relx=.02, rely=.02, relh=.96, relw=.96), bottomKwargs=dict(state='readonly'))
+        a.set(uniqueID)
+        a.T.bind('<3>', lambda e: self.view.destroy())
 
         self.view.paint()
 
@@ -357,13 +359,13 @@ class SubsList(LabelFrame):
 
         self.callback = callback
 
-        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.13, relw=.35), topKwargs=totalConfig, orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
+        self.total = LabelLabel(self, place=dict(relx=0, rely=0, relh=.15, relw=.35), topKwargs=totalConfig, orient='h', bottomKwargs=dict(font='DEFAULT_FONT'), longent=.6)
 
-        Button(self, place=dict(relx=.4, rely=0, relh=.1, relw=.25), text='Reload', command=self.reload)
+        Button(self, place=dict(relx=.4, rely=0, relh=.15, relw=.25), text='Reload', command=self.reload)
 
-        self.dialog = Checkbutton(self, place=dict(relx=.68, rely=0, relh=.1, relw=.3), text='Dialog?', var=1)
+        self.dialog = Checkbutton(self, place=dict(relx=.68, rely=0, relh=.15, relw=.3), text='Dialog?', var=1)
 
-        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.135, relh=.865, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
+        self.listbox = ListBox(self, text='Subs', place=dict(relx=0, rely=.15, relh=.8, relw=1), callback=self.clicked, listboxConfig=listboxConfig)
 
         self.listbox.bind('<Double-1>', self.clicked)
 
@@ -397,10 +399,10 @@ class RegionDetails(PRMP_FillWidgets, LabelFrame):
 
         self.region = region
 
-        self.office = LabelLabel(self, topKwargs=dict(text='Office'), place=dict(relx=.02, rely=0, relh=.23, relw=.96), orient='h', longent=.3, bottomKwargs=dict(font='DEFAULT_FONT'))
-        self.department = LabelLabel(self, topKwargs=dict(text='Department'), place=dict(relx=.02, rely=.24, relh=.23, relw=.96), orient='h', longent=.3)
-        self.sup = LabelLabel(self, topKwargs=dict(text='Superscript'), place=dict(relx=.02, rely=.48, relh=.23, relw=.96), orient='h', longent=.3)
-        self.sub = LabelLabel(self, topKwargs=dict(text='Subscript'), place=dict(relx=.02, rely=.72, relh=.23, relw=.96), orient='h', longent=.3)
+        self.office = LabelLabel(self, topKwargs=dict(text='Office'), place=dict(relx=.02, rely=0, relh=.23, relw=.96), orient='h', longent=.4, bottomKwargs=dict(font='DEFAULT_FONT'))
+        self.department = LabelLabel(self, topKwargs=dict(text='Department'), place=dict(relx=.02, rely=.24, relh=.23, relw=.96), orient='h', longent=.4)
+        self.sup = LabelLabel(self, topKwargs=dict(text='Superscript'), place=dict(relx=.02, rely=.48, relh=.23, relw=.96), orient='h', longent=.4)
+        self.sub = LabelLabel(self, topKwargs=dict(text='Subscript'), place=dict(relx=.02, rely=.72, relh=.23, relw=.96), orient='h', longent=.4)
 
         self.addResultsWidgets(['office', 'department', 'sup', 'sub'])
 

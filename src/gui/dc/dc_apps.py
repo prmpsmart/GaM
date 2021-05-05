@@ -52,6 +52,7 @@ class DC_RegionHome(FillTable, TreeColumns, RegionHome):
 
     def _setupApp(self):
         super()._setupApp()
+        return
 
         self.frame2 = ProperDetails(self.detailsNote, callback=self.fillTable, obj=self.obj)
         self.detailsNote.add(self.frame2, padding=3)

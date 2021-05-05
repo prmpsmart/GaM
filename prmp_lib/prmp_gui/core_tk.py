@@ -239,8 +239,10 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
         self.clear()
         values = values or []
         for val in values:
-            # value = val[showAttr] if showAttr else str(val)
-            value = getattr(val, showAttr, None) if showAttr else str(val)
+            
+            if isinstance(showAttr, str): value = getattr(val, showAttr, None) if showAttr else str(val)
+            else: value = val[showAttr] if showAttr else str(val)
+
             self.insert(value)
         self.values = values
 

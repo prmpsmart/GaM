@@ -12,7 +12,7 @@ class GaM_Settings:
     Users = []
     Super_Users = []
 
-    cwd = os.getcwd()
+    cwd = os.path.dirname(__file__)
     dataPath = os.path.join(cwd, 'data.prmp')
     otherDataPath = os.path.join(cwd, 'specialData.prmp')
 
