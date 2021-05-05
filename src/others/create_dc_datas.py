@@ -10,7 +10,7 @@ from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime as PD
 
 gam = GaM_Settings
 # gam.loadAll()
-print(gam.GaM)
+# print(gam.GaM)
 
 from src.backend.office.office_regions import DCOffice
 
@@ -18,64 +18,42 @@ dcoffice = DCOffice(manager='Mrs. Oloruntobi Beatrice', location='35b Esho stree
 dcoffice[0]._date = PD(2021, 5, 1)
 gam.GaM = dcoffice
 
-for _ in range(6): dcoffice.areasManager.createArea()
+areasM = dcoffice.areasManager
+
+for _ in range(6): areasM.createArea()
+from dc_datas import clients
+
+pp = lambda obj: print(obj['name'])
+
+month = PD.now()
+for area_num, clients_datas in clients.items():
+    area = areasM.getSub(number=area_num)
+    areaAcc = area.accountsManager[0]
+    clientsM = area.clientsManager
+    multis = []
+    
+    for data in clients_datas:
+        client = clientsM.createClient(**data)
+
+        if accs:= data.get('accs'):
+            name = data['name']
+            lednum = list(accs.keys())[0]
+            rate = list(accs.values())[0]
+            multis.append([name, lednum, rate])
+    
+        if multis:
+            current = areaAcc.ledgerNumbers + 1
+            for name, lednum, rate in multis:
+                if current == lednum:
+                    client = clientsM.getSub(name=name)
+                    client['accountsManager'].createAccount(rate=rate)
+
+ar2 = areasM.getSub(number=2)
 
 
+gla = ar2.clientsManager.getSub(name='Mum Ayo')
 
 
-
-
-
-
-
-
-obj = dcoffice#.areasManager
-print(obj[:])
-print(obj.date)
-print(obj[0].date)
-
-
-
-# GaM_Settings.saveAll()
-
-# through the areasManager
-    # through the accountsManager
-        # create accounts
-    # create area
-        # through the clientsmanager
-            # create clients (date, name, rate)
-        # through the accountsManager
-            # create accounts (date, month)
-        # through the dailycontributionsManager
-            # create daily contribution and add thrift
-            # update the dailycontribution
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# print(gam.GaM)
-
-
-
-
-
-
-
-
-
-
+print(gla[:])
+gam.saveAll()
 

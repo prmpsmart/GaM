@@ -367,6 +367,10 @@ class DAB_Ui(PRMP_MainWindow):
         Button(self.input, text='Add', place=dict(x=650, y=20, w=50, h=30), command=self.add)
         self.bind('<Return>', lambda e: self.add())
 
+        self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
+
+        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1), command=self.loadPlot)
+
         sort = Frame(note)
         note.add(sort)
         note.tab(1, text='Sort')
@@ -377,9 +381,7 @@ class DAB_Ui(PRMP_MainWindow):
         Button(sort, text='Sort', place=dict(x=250, y=10, w=60, h=30), command=self.sort)
         Button(sort, text='View All', place=dict(x=10, y=200, w=220, h=40), command=lambda: self.updateTable(Areas.areas, 'All Areas.'))
 
-        self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
-
-        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1), command=self.loadPlot)
+        Button(sort, text='Delete', command=self.deleteArea, place=dict(x=550, y=10, w=60, h=30))
 
         self._areas = []
         self._title = ''
@@ -391,6 +393,8 @@ class DAB_Ui(PRMP_MainWindow):
         self.bind('<<DropDown_value_changed>>', self.date_chosen)
 
         self.start()
+    
+    def deleteArea(self): pass
     
     def loadUI(self):
         self.sort_type.set('date')

@@ -1,5 +1,5 @@
 from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
-import pprint
+# import pprint
 
 def dt(day, month): return PRMP_DateTime(2021, month, day)
 
@@ -234,11 +234,6 @@ clients = {
         c('Mr Adebayo', 200)]}
 
 
-
-
-
-
-# pprint.pprint(clients)
 
 
 

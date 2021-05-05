@@ -489,7 +489,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             if self._addStatusBar: bottom = 30
             else: bottom = 0
 
-        if self.container: self.container.place(x=0, y=top, relw=1, h=h or self.winfo_height()-bottom-5)
+        if self.container: self.container.place(x=0, y=top, relw=1, h=h or self.winfo_height()-bottom)
 
         self.placeTitlebar()
         self.placeStatusBar()
