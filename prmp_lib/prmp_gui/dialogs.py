@@ -331,11 +331,11 @@ class Splash(PRMP_Dialog):
 
         self.imageKwargs['prmpImage'] = self.prmpImage
 
-        self.image = PRMP_ImageSLabel(cont, place=dict(relx=0, rely=0, relw=1, relh=.9), resize=self.geo, imageKwargs=self.imageKwargs, imgDelay=0)
+        self.image = PRMP_ImageSLabel(cont, place=dict(relx=0, rely=0, relw=1, relh=1), resize=self.geo, imageKwargs=self.imageKwargs, imgDelay=0)
         
-        self.after(100, lambda: self.root.change_color(self.image.imageFile.image, 20))
+        # self.after(100, lambda: self.root.change_color(self.image.imageFile.image, 20))
 
-        self.load = PRMP_ImageSLabel(cont, place=dict(relx=0, rely=.9, relw=1, relh=.1), imageKwargs=dict(prmpImage='line_boxes', inbuilt=1, inExt='gif'), resize=(280, 50))
+        self.load = PRMP_ImageSLabel(self.image, place=dict(relx=.32, rely=.92, relw=.3, relh=.05), imageKwargs=dict(prmpImage='line_boxes', inbuilt=1, inExt='gif'), resize=(280, 50))
 
         # self.after(self.delay, self.destroy)
         self.after(self.delay, self.processCallback)

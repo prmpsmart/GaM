@@ -14,7 +14,7 @@ gam = GaM_Settings
 
 from src.backend.office.office_regions import DCOffice
 
-dcoffice = DCOffice(manager='Mrs. Oloruntobi Beatrice', location='35b Esho street, Akure Ondo State.', date=PD(2017, 4, 7))
+dcoffice = DCOffice(manager='Owode', location='35b Esho street, Akure Ondo State.', date=PD(2017, 4, 7))
 dcoffice[0]._date = PD(2021, 5, 1)
 gam.GaM = dcoffice
 

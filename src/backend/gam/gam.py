@@ -1,7 +1,7 @@
 from ..office.office_regions import OfficesManager, Region
 from .gam_accounts import GaMAccountsManager
 from ..core.regions_managers import Person, PersonsManager
-from ..gam_config import GaM_Settings
+from ...utils.gam_config import GaM_Settings
 
 class CEO(Person): Manager = 'CEOsManager'
 

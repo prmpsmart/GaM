@@ -4,17 +4,17 @@ from src.gui.gam.gam_images import GaM_PNGS
 
 from src.utils.auths import Authorisation
 
-# GaM_Settings.loadOtherDatas()
-# Authorisation.login_cmd('prmpsmart', 'princerm')
+GaM_Settings.loadOtherDatas()
+Authorisation.login_cmd('prmpsmart', 'princerm')
 
 def startGaM(func):
     from src.gui.gam.gam_apps import openCores
     func()
     # print(GaM_Settings.GaM)
-    openCores(obj=GaM_Settings.GaM)
+    openCores(obj=GaM_Settings.GaM, themeIndex=7)
 
 def testGaM(func):
-    # GaM_Settings.loadDatas()
+    GaM_Settings.loadDatas()
     if not GaM_Settings.GaM:
         from src.gui.gam.gam_apps import DCOffice_StartDialog
         func()
@@ -31,21 +31,6 @@ def testLogin(func):
         # testGaM = None
         Login(geo=(450, 600), tw=1, title='Login', callback=testGaM, asb=0, b4t=1, delay=0)
 
-def start(): Splash(imageKwargs=dict(b64=GaM_PNGS['red_gam']), asb=1, callback=testLogin, delay=5000, geo=(1200, 700), b4t=1, themeIndex=81)
-
-
-
-
-
-
-
-# testLogin(int)
-# start()
-testGaM(int)
-
-
-
-
-
+def start(): Splash(imageKwargs=dict(b64=GaM_PNGS['red_gam']), callback=testLogin, delay=5000, geo=(1200, 700), b4t=1, themeIndex=7)
 
 
