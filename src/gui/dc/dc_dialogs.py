@@ -1,16 +1,19 @@
 from ..gam.gam_dialogs import *
 from .dc_extensions import *
 
+
 class ClientDialog(PersonDialog):
 
     def __init__(self, master=None, title='New Client Dialog', manager=None, client=None, geo=(550, 500), **kwargs):
-        self.client = client
         self.manager = manager
         if not self.manager:
-            if self.client:
+            if client:
                 kwargs['person'] = client
-                self.manager = self.client.manager
+                self.manager = client.manager
         super().__init__(master=master, title=title, geo=geo, manager=self.manager, **kwargs)
+    
+    @property
+    def client(self): return self.person
 
     def _setupDialog(self):
         super()._setupDialog()
@@ -18,7 +21,7 @@ class ClientDialog(PersonDialog):
         clientDetails = PRMP_LabelFrame(self, config=dict(text='Client Details'))
         clientDetails.place(x=2, y=290, h=100, relw=.35)
 
-        self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number'),orient='h', place=dict(relx=.02, rely=0, relh=.45, relw=.8), longent=.45)
+        self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number', required=1, very=1),orient='h', place=dict(relx=.02, rely=0, relh=.45, relw=.8), longent=.45)
 
         self.cardDue = PRMP_Checkbutton(clientDetails, text='Card Due', place=dict(relx=.02, rely=.5, relh=.45, relw=.8))
 
@@ -27,8 +30,12 @@ class ClientDialog(PersonDialog):
     def action(self, e=0):
         # print(self.result)
         if self.result:
-            if self.client: PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question', callback=self.updateClient)
-            elif self.manager: PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question', callback=self.newClient)
+            if self.client:
+                if self.confirm: PRMP_MsgBox(self, title='Edit Client Details', message='Are you sure to edit the details of this client?', _type='question', callback=self.updateClient)
+                else: self.updateClient(1)
+            elif self.manager:
+                if self.confirm: PRMP_MsgBox(self, title='Client Creation', message='Are you sure to create a new client?', _type='question', callback=self.newClient)
+                else: self.newClient(1)
 
     def updateClient(self, w):
         if w:
@@ -41,6 +48,8 @@ class ClientDialog(PersonDialog):
         if w:
             client = self.manager.createClient(**self.result)
             self._setResult(client)
+            self.emptyWidgets(['name'])
+            self.name.B.focus_set()
         self.destroyDialog()
 
 
@@ -718,7 +727,4 @@ class ContribDialog(GaM_Dialog):
 
     def _save(self, w=0):
         if w: self.contributions.save()
-
-
-
 

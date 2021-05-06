@@ -780,6 +780,7 @@ class PRMP_Image:
         self._animatedTkFrames = []
         self._animatedFrames = []
 
+
         if filename or image or b64 or isArray:
             if not isinstance(filename, (PRMP_ImageFile)):
                 if image: self.imageFile = PRMP_ImageFile(filename, image=image)
@@ -806,6 +807,7 @@ class PRMP_Image:
 
             self.img = img
 
+            self.setTkImgClass()
             if self.for_tk: self.createTkImage(self.name)
 
             PRMP_Image.count += 1
@@ -813,6 +815,8 @@ class PRMP_Image:
         else: raise ValueError('imageFile is None')
     
     def setTkImgClass(self):
+        print('called')
+        
         if _PIL_:
             if self.ext == 'xbm': self.tkImgClass = BitmapImage
             else: self.tkImgClass = PhotoImage

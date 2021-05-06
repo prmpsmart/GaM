@@ -98,8 +98,8 @@ class PersonsManager(ObjectsManager):
     MultipleSubsPerMonth = True
 
     
-    def __init__(self, master, **kwargs):
-        super().__init__(master)
+    def __init__(self, master, date=None, **kwargs):
+        super().__init__(master, date=date)
         self.createPerson(**kwargs)
 
     @property

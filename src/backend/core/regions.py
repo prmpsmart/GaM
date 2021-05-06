@@ -143,6 +143,11 @@ class Region(Object):
     @property
     def gender(self): return self.person.gender if self.person else ''
     
+    # @property
+    # def name(self):
+    #     if self.className == 'Clients': return self.person.name
+    #     else: return self._name
+
     @property
     def phone(self): return self.person.phone if self.person else ''
     
@@ -164,7 +169,7 @@ class Region(Object):
         return manager.region
     
     @property
-    def person(self): return self.personsManager.lastPerson
+    def person(self): return self.personsManager.lastPerson if self.personsManager else None
     
     @property
     def personsManager(self): return self._personsManager

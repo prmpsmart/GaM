@@ -62,6 +62,11 @@ class Client(DCRegion):
     def area(self): return self.manager.area
 
     @property
+    def name(self):
+        if self.person: self._name = self.person.name
+        return self._name
+
+    @property
     def cardDue(self): return self.cardDues
 
     @cardDue.setter

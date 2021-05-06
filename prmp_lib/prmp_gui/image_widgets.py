@@ -50,7 +50,7 @@ class PRMP_ImageWidget:
         self.delMenu()
         self.isGif = False
         self.lastRender = time.time()
-
+        
         self.frame_counter = 0
         _resize = (self.width, self.height)
 
@@ -74,7 +74,7 @@ class PRMP_ImageWidget:
             if isinstance(prmpImage, PRMP_Image):
                 if not prmpImage.image: return
                 
-                if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)))
+                if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)), for_tk=1)
                 else: self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
 
@@ -117,6 +117,7 @@ class PRMP_ImageWidget:
             if self.loadDefault: self.loadImage(self.default_dp)
         except Exception as e:
             raise e
+            pass
         
         if PRMP_ImageWidget.count > 1000: PRMP_ImageWidget.count = 0
 

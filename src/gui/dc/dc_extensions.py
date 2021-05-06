@@ -146,7 +146,6 @@ class DC_Overview(Frame):
 
         # prmp
         # self.plotCanvas1 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
-
         # self.plotCanvas2 = PRMP_PlotCanvas(self, relief='groove', canvasConfig=dict(background="yellow", borderwidth="2"))
 
         if orient == 'v': self.placeVertically()
