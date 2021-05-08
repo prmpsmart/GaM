@@ -70,7 +70,6 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
         self.editBtn = None
 
         self._setupDialog()
-        self.set()
 
         if editable:
             if values: self.editInput(0)
@@ -79,11 +78,12 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
         self.defaults()
 
         self.paint()
-        if bell: self.bell()
 
         self.focus()
+        self.addAfter(self.set)
         if delay: self.after(delay, self.destroy)
 
+        if bell: self.bell()
         if withdraw: self.withdraw()
         elif wait: self.wait_window()
         elif show: self.mainloop()
@@ -196,7 +196,7 @@ CD = PRMP_CalendarDialog
 
 class PRMP_MessageDialog(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(350, 160), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, okText='', msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, **kwargs):
+    def __init__(self, master=None, geo=(350, 170), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, okText='', msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, **kwargs):
 
         message = msg or message
 
@@ -211,23 +211,23 @@ class PRMP_MessageDialog(PRMP_Dialog):
         if okText: ask = 0
 
         if ask: delay = 0
-        # print(ask, delay)
         self.ask = ask
 
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, delay=delay, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, delay=delay, hl=0, **kwargs)
 
     def _setupDialog(self):
-        self.placeContainer(h=self.geo[1]-50)
+        self.placeContainer(h=0)
+
         if self.plenty: self.label = PRMP_Text(self.container, state='disabled')
-        else: self.label = PRMP_Label(self.container, config=dict(bitmap='', wraplength=250), font='PRMP_FONT')
+        else: self.label = PRMP_Label(self.container, config=dict(bitmap='', wraplength=250), font='PRMP_FONT', relief='flat', hl=0)
 
         self.label.set(self.message)
         self.label.place(x=0, y=0, relh=.75, relw=.85)
 
-        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)))
-        self.bitmap.place(relx=.85, y=0, relh=1, relw=.15)
+        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)), hl=0, relief='flat')
+        self.bitmap.place(relx=.85, y=0, relh=.8, relw=.15)
 
-        self.yes = PRMP_Button(self, config=dict(text='Yes' if self.ask else self.okText or 'Ok', command=self.yesCom))
+        self.yes = PRMP_Button(self, config=dict(text='Yes' if self.ask else self.okText or 'Ok', command=self.yesCom), relief='flat', hl=0)
 
         if not self.ask:
             self.yes.place(relx=.3, rely=.83, relh=.15, relw=.37)

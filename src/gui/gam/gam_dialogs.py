@@ -15,21 +15,24 @@ class GaM_Dialog(PRMP_Dialog):
         for wid in self._disabledWidgets: self[wid].disabled()
 
     def defaults(self):
-        self.root._save = GaM_Settings.threadSave
-        self.root._load = GaM_Settings.threadLoad
+        self.root.save = self.save
+        self.root.load = self.load
         self.disabledWidgets()
+        # self.after(2000, self.focus)
+    
+    def load(self):
+        GaM_Settings.threadLoad
 
     def save(self):
         # from .auths_gui import make_change
         # make_change(self._save, silent=1)
-
-        self._save()
+        GaM_Settings.threadSave()
         # PRMP_MsgBox(title='Successful', message='Saving is successful.', )
     
     def destroyDialog(self):
-        self._save()
+        self.save()
         super().destroyDialog()
-
+    
 
 class PersonDialog(GaM_Dialog):
 
@@ -52,25 +55,24 @@ class PersonDialog(GaM_Dialog):
 
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
 
-        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True, very=1), orient='h', place=dict(relx=.02, rely=0, relh=.14, relw=.96), longent=.25)
+        self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True, very=1), orient='h', place=dict(relx=.02, y=0, h=32, relw=.96), longent=.25)
         # self.bind('<<PRMP_STYLE_CHANGED>>', self.changeNameFG)
 
-        self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.02, rely=.14, relh=.14, relw=.96), longent=.5, orient='h')
+        self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.02, y=32, h=32, relw=.96), longent=.5, orient='h')
 
-        self.email = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Email')), bottomKwargs=dict(_type='email'), place=dict(relx=.02, rely=.28, relh=.14, relw=.96), longent=.25, orient='h')
+        self.email = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Email')), bottomKwargs=dict(_type='email'), place=dict(relx=.02, y=64, h=32, relw=.96), longent=.25, orient='h')
 
-        self.gender = LabelCombo(self.contact,  topKwargs=dict(config=dict(text='Gender')), bottomKwargs=dict(_type='gender', very=1), place=dict(relx=.02, rely=.42, relh=.14, relw=.96), longent=.25, orient='h')
+        self.gender = LabelCombo(self.contact,  topKwargs=dict(config=dict(text='Gender')), bottomKwargs=dict(_type='gender', very=1), place=dict(relx=.02, y=96, h=32, relw=.96), longent=.25, orient='h')
 
-        self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, rely=.56, relh=.44, relw=.96), bottomKwargs=dict(required=0), longent=.3, orient='h')
+        self.address = LabelText(self.contact,  topKwargs=dict(config=dict(text='Address')), place=dict(relx=.02, y=132, h=80, relw=.96), bottomKwargs=dict(required=0), longent=.3, orient='h')
 
         self.image = PRMP_ImageLabel(self.container, place=dict(relx=.58, y=10, h=190, relw=.41), loadDefault=1)
 
         # self.date = LabelDateButton(self.container, topKwargs=dict(config=dict(text='Reg Date')), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
 
-        self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
-        self.date.B.disabled()
+        self.regDate = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Reg Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date'), place=dict(relx=.58, y=205, h=40, relw=.41), orient='h')
 
-        self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'date'])
+        self.addResultsWidgets(['name', 'phone', 'email', 'image', 'address', 'gender', 'regDate'])
     
     def changeNameFG(self, event=None):
         self.name.B.kwargs['foreground'] = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR

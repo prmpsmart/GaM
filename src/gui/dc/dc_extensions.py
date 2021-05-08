@@ -118,7 +118,6 @@ class DC_Digits(PRMP_FillWidgets, Frame):
         # self.incomes.set(account.incomes.name)
 
 
-
 class DC_Overview(Frame):
 
     def __init__(self, master, title='DC Overview', orient='v', obj=None, account=None, **kwargs):
@@ -439,15 +438,17 @@ class DailyContTotal(PRMP_FillWidgets, Frame):
 
         self._refresh()
 
-    def _refresh(self):
-        if  not self.dcContrib: return
-        self.date.set(self.dcContrib.date.date)
-        for wid in self.resultsWidgets: self.getFromSelf(wid).normal()
-        self.set()
-        for wid in self.resultsWidgets: self.getFromSelf(wid).readonly()
+    def _refresh(self, dcContrib=None):
+        self.dcContrib = dcContrib #or self.dcContrib
+        
+        if not self.dcContrib:
+            for wid in self.resultsWidgets: self.getFromSelf(wid).set('')
+        else:
+            self.date.set(self.dcContrib.date.date)
+            self.set(self.dcContrib)
 
     def refresh(self):
-        self._refresh()
+        self._refresh(self.dcContrib)
         PRMP_MsgBox(self, title='Successful', message='The refresh is successful.', ask=0, okText='Ok')
 
 

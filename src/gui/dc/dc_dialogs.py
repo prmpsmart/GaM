@@ -4,7 +4,7 @@ from .dc_extensions import *
 
 class ClientDialog(PersonDialog):
 
-    def __init__(self, master=None, title='New Client Dialog', manager=None, client=None, geo=(550, 500), **kwargs):
+    def __init__(self, master=None, title='New Client Dialog', manager=None, client=None, geo=(550, 450), **kwargs):
         self.manager = manager
         if not self.manager:
             if client:
@@ -18,12 +18,14 @@ class ClientDialog(PersonDialog):
     def _setupDialog(self):
         super()._setupDialog()
 
-        clientDetails = PRMP_LabelFrame(self, config=dict(text='Client Details'))
-        clientDetails.place(x=2, y=290, h=100, relw=.35)
+        self.contact.place(x=2, y=2, h=320, relw=.55)
 
-        self.rate = LabelEntry(clientDetails, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number', required=1, very=1),orient='h', place=dict(relx=.02, rely=0, relh=.45, relw=.8), longent=.45)
+        # clientDetails = PRMP_LabelFrame(self, config=dict(text='Client Details'))
+        # clientDetails.place(x=2, y=290, h=100, relw=.35)
 
-        self.cardDue = PRMP_Checkbutton(clientDetails, text='Card Due', place=dict(relx=.02, rely=.5, relh=.45, relw=.8))
+        self.rate = LabelEntry(self.contact, topKwargs=dict(config=dict(text='Rate')), bottomKwargs=dict(_type='number', required=1, very=1),orient='h', place=dict(relx=.02, y=214, h=30, relw=.6), longent=.45)
+
+        self.cardDue = PRMP_Checkbutton(self.contact, text='Card Due', place=dict(relx=.02, y=246, h=30, relw=.3))
 
         self.addResultsWidgets(['rate', 'cardDue'])
 
@@ -39,7 +41,7 @@ class ClientDialog(PersonDialog):
 
     def updateClient(self, w):
         if w:
-            self.client.person.update(**self.result)
+            self.client.person.update(self.result)
             self.client.changeRate(self.result['rate'])
             self._setResult(self.client)
         self.destroyDialog()
@@ -193,23 +195,47 @@ class ClientsList(GaM_Dialog):
 
 class DailyContributionDailog(GaM_Dialog):
 
-    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1500, 800), **kwargs):
+    def __init__(self, master=None, title='Area 1 Daily Contribution', dcContrib=None, geo=(1500, 800), manager=None, **kwargs):
+        self.manager = manager
         self.dcContrib = dcContrib
-        super().__init__(master, title=title, geo=geo, **kwargs)
 
-    def changeDate(self, date):
-        if date: self.totals.date.set(date.date)
+        if not self.manager:
+            if dcContrib: self.manager = dcContrib.manager.master
+
+        self._account = None
+        self._clientAccount = None
+
+        if self.manager: self._area = self.manager.master
+        else: self._area = None
+
+        super().__init__(master, title=title, geo=geo, **kwargs)
 
     def _placeSubmitButton(self):
         x, y = self.containerGeo
         self.submitBtn.place(x=120 , y=y-40, h=30, w=60)
+    
+    def changeDate(self, date):
+        def thh(num):
+            strnum = str(num)
+            if strnum[-1] == '1': rt = 'st'
+            elif strnum[-1] == '2': rt = 'nd'
+            else: rt = 'th'
+            return strnum + rt
+
+        self.dcContrib = None
+        if isinstance(date, PRMP_DateTime):
+            # self.totals.date.set(date.date)
+            if self.manager: self.dcContrib = self.manager.getSub(**{'date-d': date})
+            self.setTitle(f'Area {self._area.number} Daily Contribution on {date.dayName}, {thh(date.day)} of {date.monthName} {date.year}')
+
+        self.update()
 
     def _setupDialog(self):
         self.addEditButton()
 
         self.area = Button(self.container, command=self.openArea, text='Area', place=dict(relx=.007, rely=.005, relw=.17, relh=.05))
 
-        self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate), longent=.37)
+        # self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate), longent=.37)
 
         self.account = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.06, relw=.2, relh=.1), longent=.4, func=self.setAreaAccountDependents)
         self.account.get = self.account.B.getObj
@@ -259,35 +285,37 @@ class DailyContributionDailog(GaM_Dialog):
 
 
         self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
-        self.view.setColumns(TreeColumns.columns(self.dcContrib))
+        self.view.setColumns(TreeColumns.columns('DailyContribution'))
 
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
+
+        self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', callback=self.changeDate), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', longent=.37)
 
         self.addResultsWidgets(['date', 'ledgerNumber', 'clientName', 'month', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'bto'])
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
 
     def defaults(self):
-        # self.bind('<Up>', lambda e: self.ledgerNumber.B.event_generate('<<Increment>>'), '+')
-        # self.bind('<Down>', lambda e: self.ledgerNumber.B.event_generate('<<Decrement>>'), '+')
+        self.bind('<Up>', lambda e: self.ledgerNumber.B.event_generate('<<Increment>>'))
+        self.bind('<Down>', lambda e: self.ledgerNumber.B.event_generate('<<Decrement>>'))
+        self.ledgerNumber.B.bind('<FocusIn>', lambda e: self.focus())
+
+        self.bind('<Left>', lambda e: self.date.B.prevDay())
+        self.bind('<Right>', lambda e: self.date.B.nextDay())
+        self.date.B.bind('<FocusIn>', lambda e: self.focus())
 
         self.bind('<Return>', self.addThrift, '+')
-
         self.container.bind('<1>', lambda e: self.focus())
+        self.date.set(self.dcContrib if not self.dcContrib else  self.dcContrib.date.date)
 
-        self._account = None
-        self._clientAccount = None
 
-        if self.dcContrib:
-            self._area = self.dcContrib.manager.master
+        if self._area:
+            self.setTitle(f'Area {self._area.number} Daily Contribution')
             self.account.B.setObjs(self._area, 'name')
             self.area.set(self._area.name)
+        
+        super().defaults()
 
-        else: self._area = None
-
-        self.update()
-
-        # self.editBtn.set(False)
-        # self.editInput()
+        # self.update()
 
     def getThriftDetails(self): return self.get(self.thriftWidgets)
 
@@ -299,14 +327,14 @@ class DailyContributionDailog(GaM_Dialog):
         self.update()
 
     def update(self, e=0):
-        if not self.dcContrib: return
         if self._account: self.setClientNumbers()
-
-        self.contributed.B.config(to=len(self.dcContrib), from_=1)
-        self.date.set(self.dcContrib.date.date)
-        self.view.viewSubs(self.dcContrib)
-        self.bto.set(self.dcContrib.bto)
-        self.totals._refresh()
+        
+        if self.dcContrib == None: self.view.clear()
+        else:
+            self.contributed.B.config(to=len(self.dcContrib), from_=1)
+            self.view.viewSubs(self.dcContrib)
+            self.bto.set(self.dcContrib.bto)
+        self.totals._refresh(self.dcContrib)
 
     def openArea(self): openCores(self, obj=self._area)
 
@@ -368,8 +396,18 @@ class DailyContributionDailog(GaM_Dialog):
         except AssertionError as e:
             PRMP_MsgBox(self, title='Account Error', message=e, ask=0, _type='error')
             return
+        date = self.date.get()
+        if not date:
+            PRMP_MsgBox(self, title='Date Error', message='Select a date for this contributions.', ask=0, _type='error')
+            return
 
-        try: self.dcContrib.createThrift(**thriftDetails)
+        try:
+            if not self.dcContrib:
+                if self.manager: self.dcContrib = self.manager.createSub(date=date)
+                else: return
+            print(thriftDetails)
+
+            self.dcContrib.createThrift(**thriftDetails)
         except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error', delay=5000)
 
         self.update()
@@ -418,6 +456,7 @@ class DailyContributionDailog(GaM_Dialog):
             self.clientName.set(self._clientAccount.region.name)
             self.rate.set(self._clientAccount.rate)
             self.clientMonth.set(self._clientAccount.month.monthYear)
+
         else:
             self._clientAccount = None
             # PRMP_MsgBox(self, title='Not Found', message=f'No Client with account\'s ledger number = {num}.', ask=0, _type='error')
@@ -427,7 +466,7 @@ class DailyContributionDailog(GaM_Dialog):
         try:
             assert bto > 0, 'Brought to office cannot be less than 0'
             self.dcContrib.addBTO(bto)
-            self.totals._refresh()
+            self.totals._refresh(self.dcContrib)
         except AssertionError as error: PRMP_MsgBox(self, title=error.__class__.__name__, message=error, ask=0)
 
     def addNewClient(self):

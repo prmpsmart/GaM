@@ -54,11 +54,10 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
                 window = ThriftDetailsDialog if not edit else ThriftDialog
                 kwargs.update(title=obj.name, thrift=obj)
             else: window = ThriftDialog
-        elif isinstance(obj, DailyContribution):
-            if not create:
-                window = DailyContributionDailog
-                kwargs.update(title=obj.name, dcContrib=obj)
-            else: window = ThriftDialog
+        elif isinstance(obj, (DailyContribution, DailyContributionsManager)):
+            window = DailyContributionDailog
+            if isinstance(obj, DailyContribution): kwargs.update(dcContrib=obj)
+            else: kwargs.update(manager=obj)
         elif isinstance(obj, ObjectsManager):
             if not create: kwargs.update(title=f'{obj.name} Subscripts Details', obj=obj)
         else:
@@ -75,11 +74,11 @@ def openCores(master=None, obj=None, create=0, edit=0, **kwargs):
 class TreeColumns:
     @staticmethod
     def columns(sup):
-        if isinstance(sup, (RecordsManager, Account)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
+        if isinstance(sup, (RecordsManager, Account)) or str(sup) in ['RecordsManager', 'Account']: return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
 
-        elif isinstance(sup, (DailyContributionsManager)): return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
+        elif isinstance(sup, (DailyContributionsManager)) or str(sup) == 'DailyContributionsManager': return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
 
-        elif isinstance(sup, (DailyContribution)): return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
+        elif isinstance(sup, (DailyContribution)) or str(sup) == 'DailyContribution': return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
 
         # elif isinstance(sup, ClientsAccounts):
         #     return [{'text':'L/N', 'attr': 'legderNumber'}, {'text':'Name', 'attr':{'region':'name'}}, {'text':'Brfs', 'attr':'BroughtForwards'}, 'Rates', {'text':'Contribs', 'attr':'Contributions'}, 'Incomes', {'text':'Norm-Inc', 'attr':'NormalIncomes'}, {'text':'Trans', 'attr':'Transfers'}, 'Savings', 'Debits', {'text':'Widrw', 'attr':'Withdrawals'}, 'Paidouts', {'text':'Upfs', 'attr':'Upfronts'}, {'text':'Bals', 'attr':'Balances'}]
@@ -386,9 +385,7 @@ class SubsList(LabelFrame):
 
     def clicked(self, selected=None, event=None):
         selected = selected[0]
-        # print(self.dialog.get())
-        # return
-        if self.dialog.get(): openCores(self, selected)
+        if self.dialog.get(): openCores(self, obj=selected)
         elif self.callback: self.callback(selected)
 
 
@@ -424,7 +421,6 @@ class RegionDetails(PRMP_FillWidgets, LabelFrame):
             ind = hie.index(h)
             key = vs[ind-co]
             values[key] = h.name
-        # print(values)
         super().set(values)
 
 

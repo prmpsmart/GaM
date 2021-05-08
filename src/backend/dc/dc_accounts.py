@@ -30,7 +30,8 @@ class DCAccount(Account):
     def __float__(self): return float(self.balances)
 
     @property
-    def name(self): return f'{self.className}({self.region.name} | {self._month.dayMonthYear})'
+    def name(self): return f'{self.className}({self.region.name} | {self._month.monthYear})'
+
     @property
     def month(self): return self._month
     @property

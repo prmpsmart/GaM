@@ -362,7 +362,7 @@ class AccountHome(ObjectHome):
 
 class ManagerHome(TreeColumns, GaM_App):
 
-    def __init__(self, master=None, geo=(1200, 600), title='Object Details', obj=None, **kwargs):
+    def __init__(self, master=None, geo=(1300, 600), title='Object Details', obj=None, **kwargs):
         super().__init__(master, geo=geo, title=title, obj=obj, **kwargs)
 
 
@@ -388,12 +388,10 @@ class ManagerHome(TreeColumns, GaM_App):
     def getNewObjectDialog(self, st, obj=None):
 
         className = self.obj.className
-        # print(className)
         obj = obj or self.obj
 
         if isinstance(obj, ObjectsManager):
             subName = obj.objectName
-            print(subName, st)
             if (subName == 'Client'):
                 from ..dc.dc_dialogs import ClientDialog
                 return ClientDialog

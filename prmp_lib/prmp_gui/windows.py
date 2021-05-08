@@ -489,7 +489,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             if self._addStatusBar: bottom = 30
             else: bottom = 0
 
-        if self.container: self.container.place(x=0, y=top, relw=1, h=h or self.winfo_height()-bottom)
+        if self.container: self.container.place(x=0, y=top, relw=1, h=h or self.winfo_height()-bottom-3)
 
         self.placeTitlebar()
         self.placeStatusBar()
@@ -796,7 +796,7 @@ class PRMP_ToolTip(Toplevel):
         position = pos or position or ()
 
         k = {}
-        if Toplevel != tk.Toplevel: k.update(dict(normTk=1))
+        if Toplevel != tk.Toplevel: k.update(normTk=1)
 
         super().__init__(master, background=background, padx=0, pady=0, tooltype=True, **k)
         self.transient(master)

@@ -5,12 +5,13 @@ from . import *
 class PRMP_DropDownWidget:
     WidgetClass = None
 
-    def __init__(self, master=None, ddwc=None, dropdown_windowclass=None, ddwk={}, dropdown_windowkwargs={}, attr='', valueType=str, validatecmd=None, **kwargs):
+    def __init__(self, master=None, ddwc=None, dropdown_windowclass=None, ddwk={}, dropdown_windowkwargs={}, attr='', valueType=str, validatecmd=None, callback=None, **kwargs):
         """
         Create an entry with a drop-down widget
         """
 
         self.dropdown_window = None
+        self.callback = callback
 
         self.attr = attr # will be used to get the attr of the return value from the dropdown_windowclass
         self.valueType = valueType # a function to be used to convert the attr of the desired value to be viewed in this widget
@@ -125,7 +126,8 @@ class PRMP_DropDownWidget:
         value = self.getValue(value)
         self.WidgetClass.set(self, value)
         if readonly: self.state(('readonly',))
-        self.event_generate('<<DropDown_value_changed>>')
+        if self.callback: self.callback(self.value)
+        # self.event_generate('<<DropDown_value_changed>>')
 
     def getValue(self, value):
         if self.attr: value = getattr(value, self.attr, None)

@@ -761,6 +761,7 @@ class PRMP_Image:
 
         pic = None
         self.imageFile = None
+        self.tkImgClass = None
 
         self.resizedImage = None
 
@@ -815,8 +816,6 @@ class PRMP_Image:
         else: raise ValueError('imageFile is None')
     
     def setTkImgClass(self):
-        print('called')
-        
         if _PIL_:
             if self.ext == 'xbm': self.tkImgClass = BitmapImage
             else: self.tkImgClass = PhotoImage
@@ -886,7 +885,7 @@ class PRMP_Image:
 
     def get(self): return self.imageFile
 
-    def resizeTk(self, rz): return self.tkImgClass(self.resize(rz))
+    def resizeTk(self, rz): return self.tkImgClass(self.resize(rz)) if self.tkImgClass else None
 
     def thumbnail(self, rz): self.image.thumbnail(rz)
 
@@ -916,7 +915,7 @@ class PRMP_Image:
     def find_faces(cls, cascPath='', image=None, array=None, as_image=False, prmp_image=False, **kwargs):
         if not _CV2_: return
 
-        cascPath = cascPath or r"C:\Users\Administrator\Documents\My\Archives\libraries\python\cv2\data\haarcascade_frontalface_default.xml"
+        cascPath = cascPath or r"C:\Users\Administrator\Documents\My\Programming\Third Party Applications\libraries\python\cv2\data\haarcascades\haarcascade_frontalface_default.xml"
 
         faceCascade = cv2.CascadeClassifier(cascPath)
 

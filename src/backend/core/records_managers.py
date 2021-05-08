@@ -232,6 +232,11 @@ class RecordsManager(ObjectsManager):
     def __repr__(self): return f'<{self.name}>'
 
     @property
+    def date(self):
+        if self.master: return self.master.date
+        return self._date
+
+    @property
     def money(self): return float(self)
 
     @property

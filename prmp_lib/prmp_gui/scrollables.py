@@ -333,7 +333,9 @@ class Hierachy(PRMP_TreeView):
         self._viewObjs(obj, parent)
         self.last = obj, parent
 
-    def viewSubs(self, obj): self.viewObjs(obj[:])
+    def viewSubs(self, obj):
+        if not obj: return
+        self.viewObjs(obj[:])
 
 
 class Table(Frame):

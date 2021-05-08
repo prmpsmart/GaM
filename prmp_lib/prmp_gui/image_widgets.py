@@ -74,7 +74,7 @@ class PRMP_ImageWidget:
             if isinstance(prmpImage, PRMP_Image):
                 if not prmpImage.image: return
                 
-                if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)), for_tk=1)
+                if resize: self.imageFile = PRMP_Image(image=(prmpImage.resize(resize)), for_tk=1).imageFile
                 else: self.imageFile = prmpImage.imageFile
             else: raise ValueError('prmpImage must be an instance of PRMP_Image')
 
@@ -101,7 +101,6 @@ class PRMP_ImageWidget:
 
                 self.__renderGif(self.lastRender)
 
-            
             elif resize: self.frame = self.prmpImage.resizeTk(resize)
 
             elif thumb: self.frame = self.prmpImage.thumbnailTk(thumb)

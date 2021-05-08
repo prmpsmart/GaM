@@ -373,12 +373,16 @@ class DailyContribution(ObjectsManager, Common):
         else: month = self.getDate(month)
         ledgerNumber = int(ledgerNumber)
 
-        prevs = self.getSub(number=ledgerNumber, month=month) or []
+        prevs = []
+        for thrift in self:
+            if thrift.account.ledgerNumber == ledgerNumber and thrift.month.isSameMonth(month): prevs.append(thrift)
+        print(prevs)
 
-        if prevs: raise ValueError(f'{prevs.name} already exists.')
+        if prevs: raise ValueError(f'Client with ledger number: {ledgerNumber} and month: {month.monthYear} already exists.')
 
         # clientAccount = self.getClientAccount(ledgerNumber, account, month)
         clientAccount = clientAccount or self.getClientAccount(ledgerNumber, account, month)
+        # print(ledgerNumber)
 
         if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {ledgerNumber}) does not exists.')
@@ -389,7 +393,7 @@ class DailyContribution(ObjectsManager, Common):
         month = self.getDate(month)
         account = account or self.accountsManager.getAccount(month=month)
 
-        if account: return account.getClientAccount(ledgerNumber)
+        if account: return account.getClientAccount(ledgerNumber, month=month)
 
     def deleteSub(self, number, month=None):
         pass
@@ -422,7 +426,7 @@ class DailyContributionsManager(ObjectsManager):
 
         date = self.getDate(date)
 
-        date_validations = [dict(value=True, attr='date', attrMethod='isSameDate', attrMethodParams=[date])]
+        date_validations = [dict(value=True, attr='date', attrMethod='isSameDate', attrMethodParams={'date': date})]
 
         prevs = self.sort(validations=date_validations)
 

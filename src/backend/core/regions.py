@@ -19,6 +19,10 @@ class Person(Object):
         
         if isinstance(manager, Region): date = manager.date
         
+        names = name.split(' ')
+        names = [name.title() for name in names]
+        name = ' '.join(names)
+
         super().__init__(manager, date=date, name=name)
 
         gender = gender.lower()
@@ -54,7 +58,7 @@ class Person(Object):
     def email(self, email):
         if email:
             if self.checkEmail(email): self.__email = email
-            else: raise ValueError(f'{email} is not a valid emeail.')
+            # else: raise ValueError(f'{email} is not a valid email.')
 
 class Region(Object):
     AccountsManager = AccountsManager
@@ -107,6 +111,7 @@ class Region(Object):
     
     @property
     def nextRegion(self): return self.next
+    
     @property
     def previousRegion(self): return self.previous
     

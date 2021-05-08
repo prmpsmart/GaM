@@ -351,7 +351,7 @@ class ObjectsMixins(CompareByDate, Mixins):
             else: self.__editableValues.append(child)
 
 
-    def update(self,  values={}):
+    def update(self, values={}):
         edit = self.editableValues
 
         for key in edit:
@@ -525,13 +525,11 @@ class ObjectsManager(ObjectsMixins):
 
         return ordered
 
-
     @property
     def subsByDate(self): return sorted(self._subs)
 
     @subs.setter
     def subs(self, subs): self._subs = subs
-
 
     @property
     def first(self):

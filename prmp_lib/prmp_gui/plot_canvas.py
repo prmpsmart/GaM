@@ -167,7 +167,7 @@ class Plots(PRMP_ClassMixins):
 
         if switch: plotDatas.switch()
 
-        self.annotation.update(dict(xticks=plotDatas.xticks, xlabel=plotDatas.xlabel, ylabel=plotDatas.ylabel))
+        self.annotation.update(xticks=plotDatas.xticks, xlabel=plotDatas.xlabel, ylabel=plotDatas.ylabel)
         if marker and not markers:
             markers = self.marker_chooser(len(plotDatas.ys))
             self.chart_datas['markers'] = markers
@@ -214,10 +214,10 @@ class Plots(PRMP_ClassMixins):
         self.annotation = dict(xlabel=barObj.xlabel, axisrotate=axisrotate, title=title, ylabel=barObj.ylabel)
         if self.chart == 'bar':
             bar_h = self.subplot.bar
-            self.annotation.update(dict(set_xticks=barObj.ranges, xticks=barObj.xticks))
+            self.annotation.update(set_xticks=barObj.ranges, xticks=barObj.xticks)
         else:
             bar_h = self.subplot.barh
-            self.annotation.update(dict(set_yticks=barObj.ranges, yticks=barObj.xticks))
+            self.annotation.update(set_yticks=barObj.ranges, yticks=barObj.xticks)
 
         if barObj.d_1_point != 1:
             for ind in barObj.d_ranges:

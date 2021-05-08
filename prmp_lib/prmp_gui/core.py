@@ -417,7 +417,7 @@ class PRMP_Theme(PRMP_GuiMixins):
                         if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_BUTTON_COLOR[1]
 
                 else: font = self.deriveFont(default='DEFAULT_LABEL_FONT')
-                _dict.update(dict(activebackground=activebackground,
+                _dict.update(activebackground=activebackground,
                             activeforeground=activeforeground,
                             background=background,
                             borderwidth=borderwidth,
@@ -427,19 +427,19 @@ class PRMP_Theme(PRMP_GuiMixins):
                             highlightcolor=highlightcolor,
                             font=font,
                             highlightthickness=highlightthickness,
-                            relief=relief, **kwargs))
+                            relief=relief, **kwargs)
 
             elif wt == 'LabelFrame':
                 font = self.deriveFont(default='DEFAULT_LABELFRAME_FONT')
-                _dict.update(dict(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font))
+                _dict.update(background=background, foreground=foreground, relief=relief, **kwargs, borderwidth=borderwidth, font=font)
 
-            elif wt == 'Scale': _dict.update(dict(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR))
+            elif wt == 'Scale': _dict.update(troughcolor=PRMP_Theme.DEFAULT_SCROLLBAR_COLOR)
 
             elif wt in ['Entry', 'Text', 'Listbox', 'Spinbox']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
                 font = self.deriveFont(default='DEFAULT_FONT')
-                _dict.update(dict(background=background,
+                _dict.update(background=background,
                             borderwidth=borderwidth,
                             foreground=foreground,
                             highlightbackground=highlightbackground,
@@ -447,7 +447,7 @@ class PRMP_Theme(PRMP_GuiMixins):
                             highlightthickness=highlightthickness,
                             relief='sunken',
                             font=font,
-                            **kwargs))
+                            **kwargs)
 
             elif wt in ['Scrollbar']:
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
@@ -927,8 +927,8 @@ class PRMP_Input:
     def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, **kwargs):
         _type = _type.lower()
 
-        self._read = False
-        if self.kwargs.get('state', None) == 'readonly': self._read = True
+        state = self.kwargs.get('state', state)
+        self.correctState(state)
 
         self.values = values
         self.very = very
@@ -1004,9 +1004,9 @@ class PRMP_Input:
         self._set(money)
 
     def getMoney(self):
-        money = self._get()
+        money = self._get() or 0
         if self.checkMoney(money): return float(self.moneyToNumber(money))
-        return money
+        return float(money)
 
     def entered(self, event=None):
         super().entered()
@@ -1071,12 +1071,17 @@ class PRMP_Input:
             self.set(self._moneySign)
 
     def normal(self, force=0):
-        if self._read and not force: return
         super().normal()
+        self._state = 1
         self.verify()
+    
+    def readonly(self):
+        self._state = 2
+        super().readonly()
 
     def disabled(self):
-        self._add_placeholder()
+        self._state = 0
+        # self._add_placeholder()
         super().disabled()
         self.verify()
 
@@ -1085,14 +1090,31 @@ class PRMP_Input:
         self.verify()
 
     def _set(self, values):
-        if self._read: self.normal(1)
+        former_state = self.current_state
+        if former_state != 1: self.normal(1)
         self.clear()
         self.insert(0, str(values))
-        if self._read: self.readonly()
+        if former_state == 0: self.disabled()
+        elif former_state == 2: self.readonly()
 
     def set(self, values):
         self._set(values)
         self.verify()
+    
+    def correctState(self, state=None):
+        state = state or self._state
+        disabled = (0, 'disabled')
+        normal = (1, 'normal')
+        readonly = (2, 'readonly')
+
+        if state in disabled: self._state = disabled[0]
+        elif state in normal: self._state = normal[0]
+        elif state in readonly: self._state = readonly[0]
+        
+        return self._state
+
+    @property
+    def current_state(self): return self.correctState()
     
     def setRange(self, from_=0, to=1, increment=.1): self.configure(from_=from_, to=to, increment=increment)
 
@@ -1115,7 +1137,7 @@ class PRMP_Input:
 
     def state(self, args=''):
         go = super().state(args)
-        if go and 'readonly' in args: self._read = True
+        if go and 'readonly' in args: self._state = 2
         return go
 PI = PRMP_Input
 
@@ -1180,10 +1202,8 @@ class PRMP_FillWidgets(PRMP_Mixins):
             for widgetName in widgets:
                 widget = self.getFromSelf(widgetName)
                 if widget:
-                    # try:
-                        value = values.get(widgetName, '')
-                        widget.set(value)
-                    # except Exception as er: print(f'ERROR {er}.')
+                    value = values.get(widgetName, '')
+                    widget.set(value)
                 else: print(f'Error [{widgetName}, {widget}]', __file__)
             if isinstance(values, dict): self.values.update(values)
             return True
@@ -1213,6 +1233,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                         return
                 else: result[widgetName] = get
         return result
+
 FW = PRMP_FillWidgets
 
 
