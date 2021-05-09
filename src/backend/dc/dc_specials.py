@@ -294,6 +294,7 @@ class DailyContribution(ObjectsManager, Common):
 
         self.number = number
         self.__bto = 0
+        self.records_dict = {}
 
     @property
     def lastMonths(self):
@@ -373,18 +374,16 @@ class DailyContribution(ObjectsManager, Common):
         else: month = self.getDate(month)
         ledgerNumber = int(ledgerNumber)
 
-        prevs = []
-        for thrift in self:
-            if thrift.account.ledgerNumber == ledgerNumber and thrift.month.isSameMonth(month): prevs.append(thrift)
-        print(prevs)
+        rec_key = f'{int(ledgerNumber)}, {month.monthYear}'
 
-        if prevs: raise ValueError(f'Client with ledger number: {ledgerNumber} and month: {month.monthYear} already exists.')
+        if rec_key in self.records_dict: raise ValueError(f'Client with ledger number: {ledgerNumber} and month: {month.monthYear} already exists.')
 
-        # clientAccount = self.getClientAccount(ledgerNumber, account, month)
         clientAccount = clientAccount or self.getClientAccount(ledgerNumber, account, month)
-        # print(ledgerNumber)
 
-        if clientAccount: return super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
+        if clientAccount:
+            clA = super().createSub(clientAccount=clientAccount, date=self.date, **kwargs)
+            self.records_dict[rec_key] = clA
+            return clA
         else: raise ValueError(f'ClientAccount({month.monthYear}, No. {ledgerNumber}) does not exists.')
 
     def createThrift(self, ledgerNumber=None, month=None, income=0, money=False, paidout=0, transfer=0, account=None, clientAccount=None): return self.createSub(ledgerNumber, month=month, income=income, money=money, paidout=paidout, transfer=transfer, account=account, clientAccount=clientAccount)

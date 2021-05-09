@@ -405,7 +405,6 @@ class DailyContributionDailog(GaM_Dialog):
             if not self.dcContrib:
                 if self.manager: self.dcContrib = self.manager.createSub(date=date)
                 else: return
-            print(thriftDetails)
 
             self.dcContrib.createThrift(**thriftDetails)
         except Exception as error: PRMP_MsgBox(self, title='Thrift Creation Error', message=error, ask=0, _type='error', delay=5000)
