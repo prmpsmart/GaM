@@ -698,18 +698,24 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
         PRMP_Style_.__init__(self, master, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)
         self.objects = {}
-        self.changeValues(values)
+        # self.changeValues(values)
 
     def setObjs(self, objs, attr):
-        values = []
-        co = 0
-        for obj in objs:
-            co += 1
-            val = obj[attr]
-            val = f'{co}. {val}'
-            self.objects[val] = obj
-            values.append(val)
-        self.changeValues(values)
+        for obj in objs: self.setObj(obj, attr)
+    
+    def setObj(self, obj, attr):
+        try: val = obj[attr]
+        except: val = getattr(obj, attr)
+        val = f'{len(self.values) + 1}. {val}'
+        if val in self.values: return
+
+        self.objects[val] = obj
+        self.values.append(val)
+        self.config(values=self.values)
+    
+    def setObjToView(self, obj):
+        for key, val in self.objects.items():
+            if str(val) == str(obj): self.set(key)
 
     def getObj(self):
         get = self.get()
@@ -717,10 +723,6 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
 
     # @property
     # def PRMP_WIDGET(self): return 'Combobox'
-
-    def changeValues(self, values):
-        self.values = values
-        self['values'] = values
 
     def getValues(self): return self['values']
 Combobox = PCb = PRMP_Combobox

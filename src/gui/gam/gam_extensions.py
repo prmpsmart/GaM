@@ -78,7 +78,7 @@ class TreeColumns:
 
         elif isinstance(sup, (DailyContributionsManager)) or str(sup) == 'DailyContributionsManager': return [{'text': 'Type', 'attr': 'className', 'width': 150}, {'text': 'Date', 'attr': {'date': 'date'}}, {'text': 'Money', 'type': float}, {'text': 'Note', 'width': 200}]
 
-        elif isinstance(sup, (DailyContribution)) or str(sup) == 'DailyContribution': return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'newContributions', 'type': float}]
+        elif isinstance(sup, (DailyContribution)) or str(sup) == 'DailyContribution': return [{'text': 'S/N', 'attr': 'number', 'width': 1}, {'text': 'Month', 'attr': [{'month': 'monthYear'}, 'name'], 'width': 80}, {'text': 'Name', 'attr': 'regionName', 'width': 100}, {'text': 'Ledger No.', 'attr': 'ledgerNumber'}, 'Rate', {'text': 'Thrift', 'attr': 'contributed'}, 'Income', 'Transfer', 'Paidout', {'text': 'Upfront R.', 'attr': 'upfrontRepay'}, 'Saved', {'text': 'Total', 'attr': 'totals', 'type': float}]
 
         # elif isinstance(sup, ClientsAccounts):
         #     return [{'text':'L/N', 'attr': 'legderNumber'}, {'text':'Name', 'attr':{'region':'name'}}, {'text':'Brfs', 'attr':'BroughtForwards'}, 'Rates', {'text':'Contribs', 'attr':'Contributions'}, 'Incomes', {'text':'Norm-Inc', 'attr':'NormalIncomes'}, {'text':'Trans', 'attr':'Transfers'}, 'Savings', 'Debits', {'text':'Widrw', 'attr':'Withdrawals'}, 'Paidouts', {'text':'Upfs', 'attr':'Upfronts'}, {'text':'Bals', 'attr':'Balances'}]
@@ -183,6 +183,20 @@ class GaM_Hierachy(Hierachy):
         elif isinstance(obj, ObjectsMixins): subs = obj.subs
 
         return subs
+    
+    def _printList(self, subs, item):
+        if isinstance(subs, list):
+            for sub in subs:
+                if isinstance(sub, Record):
+                    raw = self.columns.getFromObj(sub)
+                    first, *columns = raw
+                    sub_item = self.insert(item, text=first, values=columns, open=self._toggleOpen, value=sub)
+
+                    for obj in sub:
+                        raw = self.columns.getFromObj(obj)
+                        first, *columns = raw
+                        self.insert(sub_item, text=first, values=columns, open=self._toggleOpen, value=obj)
+                elif sub: self._viewObjs(sub, item)
 
 GH = GaM_Hierachy
 

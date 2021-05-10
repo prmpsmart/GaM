@@ -8,7 +8,7 @@ class DCRecordsManager(RecordsManager):
 
     def __init__(self, account, lastRecord=False):
         self._lastRecord = lastRecord
-        super().__init__(account)
+        super().__init__(account, date=account.date)
 
     def __int__(self):
         if self._lastRecord: return int(self.lastMoney)
@@ -211,9 +211,6 @@ class Incomes(DCRecordsManager):
 
 class Savings(DCRecordsManager):
     ObjectType = Saving
-
-    def __init__(self, account):
-        super().__init__(account)
 
     def addSaving(self, saving, **kwargs): return self.createRecord(saving, **kwargs)
 

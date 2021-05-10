@@ -322,10 +322,13 @@ class Hierachy(PRMP_TreeView):
             item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
 
             subs = self.getSubs(obj, item)
-
+        
+        self._printList(subs, item)
+    
+    def _printList(self, subs, item):
+        print('called', self)
         if isinstance(subs, list):
             for sub in subs:
-                # print(subs)
                 if sub: self._viewObjs(sub, item)
 
     def viewObjs(self, obj, parent=''):

@@ -182,9 +182,9 @@ class ClientsList(GaM_Dialog):
             name = self._area.name
             values = self._area.clientsManager
             valuesKwargs = dict(showAttr='name')
-        else: name, values, valuesKwargs = '', [], {}
+        else: name, values, valuesKwargs = 'Area', [], {}
 
-        self.area = LabelLabel(self.container, bottomKwargs=dict(text=self._area.name if self._area else 'Area'), place=dict(relx=0, rely=0, relh=.12, relw=1), orient='h', longent=.3, topKwargs=dict(text='Area'))
+        self.area = LabelLabel(self.container, bottomKwargs=dict(text=name), place=dict(relx=0, rely=0, relh=.12, relw=1), orient='h', longent=.3, topKwargs=dict(text='Area'))
 
         self.clients = SubsList(self.container, callback=self.returnClient, place=dict(relx=0, rely=.12, relh=.88, relw=1), values=values, valuesKwargs=valuesKwargs)
 
@@ -283,8 +283,7 @@ class DailyContributionDailog(GaM_Dialog):
 
         Button(self.container, text='Update', place=dict(relx=.225, rely=.945, relw=.07, relh=.04), command=self.dcUpdate)
 
-
-        self.view = Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
+        self.view = GaM_Hierachy(self.container, place=dict(relx=.3, rely=.005, relw=.695, relh=.69))
         self.view.setColumns(TreeColumns.columns('DailyContribution'))
 
         self.totals = DailyContTotal(self.container, place=dict(relx=.3, rely=.7, relw=.692, relh=.29), relief='groove', dcContrib=self.dcContrib)
@@ -306,11 +305,15 @@ class DailyContributionDailog(GaM_Dialog):
         self.bind('<Return>', self.addThrift, '+')
         self.container.bind('<1>', lambda e: self.focus())
         self.date.set(self.dcContrib if not self.dcContrib else  self.dcContrib.date.date)
-
+        
+        self.bind('<Control-U>', lambda e: self.dcUpdate())
+        self.bind('<Control-u>', lambda e: self.dcUpdate())
 
         if self._area:
             self.setTitle(f'Area {self._area.number} Daily Contribution')
             self.account.B.setObjs(self._area, 'name')
+            self.account.B.setObjToView(self._area[-1])
+            self.setAreaAccountDependents()
             self.area.set(self._area.name)
         
         super().defaults()
@@ -319,7 +322,9 @@ class DailyContributionDailog(GaM_Dialog):
 
     def getThriftDetails(self): return self.get(self.thriftWidgets)
 
-    def dcUpdate(self): PRMP_MsgBox(self, title='Update Confirmation.', message='Are you sure to update this Daily Contribution?', ask=1, callback=self._dcUpdate)
+    def dcUpdate(self):
+        if not self.dcContrib: return
+        PRMP_MsgBox(self, title='Update Confirmation.', message='Are you sure to update this Daily Contribution?', ask=1, callback=self._dcUpdate)
 
     def _dcUpdate(self, w):
         if not w: return
@@ -660,7 +665,7 @@ class ContribDialog(GaM_Dialog):
 
         fr2 = Frame(cont, place=dict(relx=.4, rely=0, relw=.6, relh=1), relief='groove')
 
-        self.tree = Hierachy(fr2, place=dict(relx=0, rely=0, relw=1, relh=.8), columns=columns)
+        self.tree = GaM_Hierachy(fr2, place=dict(relx=0, rely=0, relw=1, relh=.8), columns=columns)
         self.tree.tree.bind('<Delete>', self.delete)
 
         totals = LabelFrame(fr2, text='Totals', place=dict(relx=0, rely=.8, relw=1, relh=.2))
