@@ -239,3 +239,10 @@ class LabelMonthYearButton(TwoWidgets):
 LMYB = LabelMonthYearButton
 
 
+class DateWidget(TwoWidgets):
+    
+    def __init__(self, master, **kwargs):
+        super().__init__(master, top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', required=1), **kwargs)
+    
+    def set(self, date): self.B.set(date)
+

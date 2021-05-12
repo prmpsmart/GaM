@@ -2,7 +2,7 @@
 #  -*- coding: utf-8 -*-
 
 from .prmp_errors import PRMP_Errors
-import re, os, io, zipfile, subprocess
+import re, os, io
 
 class PRMP_Mixins:
     tempFile = 'prmpsmartTempFile'
@@ -194,7 +194,7 @@ class PRMP_StrMixins(PRMP_ClassMixins):
             count += 1
 
         if len(non_num) not in lengths:
-            if not dontRaise: raise AssertionError(f'Provide {length} numbers separated by non-numerics')
+            if not dontRaise: raise AssertionError(f'Provide {lengths} numbers separated by non-numerics')
             return
 
         count = 0

@@ -208,7 +208,8 @@ class Areas:
     load = load1
 
 if 0:
-    Areas.load3()
+    Areas.load()
+    # Areas.areas = Areas.areas[:-2]
     Areas.save1()
     Areas.save2()
     exit()
@@ -219,19 +220,10 @@ SAVE_DAB_DB = Areas.save
 
 from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.scrollables import PRMP_ListBox, Table
-from prmp_lib.prmp_gui.two_widgets import TwoWidgets, LabelCombo, LabelEntry, LabelSpin
-from prmp_lib.prmp_gui.drop_downs import PRMP_DropDownCalendarEntry
+from prmp_lib.prmp_gui.two_widgets import TwoWidgets, LabelCombo, LabelEntry, LabelSpin, DateWidget
 from prmp_lib.prmp_gui.tushed_widgets import Hierachy
 from prmp_lib.prmp_gui.dialogs import PRMP_Dialog, PRMP_MsgBox
 from prmp_lib.prmp_gui.plot_canvas import OptPlot, PlotDatas
-
-
-class DateWidget(TwoWidgets):
-    
-    def __init__(self, master, **kwargs):
-        super().__init__(master, top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', required=1), **kwargs)
-    
-    def set(self, date): self.B.set(date)
 
 
 class DAB_Input(PRMP_FillWidgets, Frame):
@@ -289,6 +281,10 @@ class DAB_Input(PRMP_FillWidgets, Frame):
             return False
         if not data['number']:
             PRMP_MsgBox(self, title='Invalid Number', msg='Provide number above zero.', _type='error')
+            return False
+        data = list({k: v for k, v in data.items() if k not in ['date', 'number']}.values())
+        if data.count(None) == len(data):
+            PRMP_MsgBox(self, title='Invalid Transaction', msg='Provide atleast a transaction.', _type='error')
             return False
         return True
 
@@ -352,7 +348,7 @@ class DAB_Ui(PRMP_MainWindow):
     _title_ = 'Daily Analysis Book of %s'
     
     def __init__(self, master=None, **kwargs):
-        super().__init__(master, geo=(1500, 850), resize=(1, 1), be=0, **kwargs)
+        super().__init__(master, geo=(1500, 850), resize=(1, 1), be=1, **kwargs)
 
         self.table = Table(self.cont, place=dict(x=0, y=0, relw=1, relh=.55), treeKwargs=dict(columns=self.columns), reserve=2, output=DAB_Ui.sign, converter=self.mixin.stripSignFromNum, treeWidget=DAB_Hierachy)
 

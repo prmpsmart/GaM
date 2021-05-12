@@ -1,10 +1,9 @@
 __author__ = 'PRMPSmart@gmail.com'
 
-import datetime
-from calendar import day_abbr, day_name, month_abbr, month_name, Calendar
+import datetime, calendar
 from .prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins, PRMP_Errors
 
-DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
+DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES = calendar.day_abbr[:], calendar.day_name[:], calendar.month_abbr[:], calendar.month_name[:]
 WEEKS = ['Week %d'%a for a in range(1, 6)]
 
 
@@ -229,7 +228,7 @@ class CompareByYear:
 class PRMP_DateTime(datetime.datetime, PRMP_AdvMixins, PRMP_StrMixins):
     date_fmt = "%d/%m/%Y" # default date format, subclass PRMP_DateTime and set date_fmt to your own format
     
-    daysAbbr, daysNames, monthsAbbrs, monthsNames = day_abbr[:], day_name[:], month_abbr[:], month_name[:]
+    daysAbbr, daysNames, monthsAbbrs, monthsNames = DAYS_ABBRS, DAYS_NAMES, MONTHS_ABBRS, MONTHS_NAMES
     Errors = PRMP_Errors.PRMP_DateTimeError
 
     timedelta = datetime.timedelta
@@ -457,7 +456,7 @@ class PRMP_DateTime(datetime.datetime, PRMP_AdvMixins, PRMP_StrMixins):
         year = int(year)
         if isinstance(month, str): month = MONTHS_NAMES[:].index(month)
 
-        ca = Calendar(0 if monday else 6)
+        ca = calendar.Calendar(0 if monday else 6)
 
         month_wks = ca.monthdatescalendar(year, month)
         month_wks2 = ca.monthdays2calendar(year, month)

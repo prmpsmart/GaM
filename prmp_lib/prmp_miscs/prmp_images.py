@@ -3,6 +3,8 @@
 __all__ = ['PRMP_PNGS', 'PRMP_JPEGS', 'PRMP_GIFS', 'PRMP_XBMS', 'PRMP_Images', 'PRMP_ImageFile', 'PRMP_Image', 'PRMP_File', 'io', 'os', 'base64', 'zlib', 'pickle', 'PRMP_ImageType', 'Image', 'PhotoImage', 'BitmapImage', 'ImageSequence', 'PRMP_IMAGES', 'PRMP_ImagesDB', 'PRMP_DB']
 
 from ._prmp_images import *
+import sqlite3, base64, os, tkinter as tk, numpy
+
 
 try:
     from PIL.ImageTk import Image, PhotoImage, BitmapImage
@@ -29,7 +31,7 @@ except Exception as e:
 
 from .prmp_exts import *
 from .prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins
-import sqlite3, base64, os
+
 
 
 class PRMP_ImageType:
@@ -469,7 +471,7 @@ class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
                 if os.path.isdir(folder): images_folders.append(folder)
 
         dicts = {}
-        for folder in folders:
+        for folder in images_folders:
             files = []
             for file in os.listdir(folder):
                 file = os.path.join(folder, file) 
@@ -820,7 +822,6 @@ class PRMP_Image:
             if self.ext == 'xbm': self.tkImgClass = BitmapImage
             else: self.tkImgClass = PhotoImage
         else:
-            import tkinter as tk
             self.tkImgClass = tk.PhotoImage
             if self.ext == 'xbm': self.tkImgClass = tk.BitmapImage
 
@@ -904,7 +905,6 @@ class PRMP_Image:
     def toarray(self, rgb2bgr=False):
         if not self.image: return
 
-        import numpy
         array = numpy.asarray(self.image)
         if _CV2_ and rgb2bgr: array = cv2.cvtColor(array, cv2.COLOR_RGB2BGR)
         return array

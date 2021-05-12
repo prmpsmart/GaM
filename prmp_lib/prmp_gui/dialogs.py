@@ -4,14 +4,13 @@ from prmp_lib.prmp_miscs.prmp_images import *
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins, PRMP_AdvMixins
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
-from tkinter.simpledialog import askstring, askfloat, askinteger
+import tkinter.simpledialog as simpledialog
 from . import *
 from .core import PRMP_FillWidgets
 from .date_widgets import PRMP_Calendar
 from .image_widgets import PRMP_ImageSLabel
 from .tushed_widgets import *
 from .miscs import Columns, Column
-from tkinter.simpledialog import askinteger, askfloat, askstring
 
 
 
@@ -28,8 +27,8 @@ def confirmDialog(title=None, msg=None, which=None):
     if which == 5: return messagebox.askyesnocancel(title, msg)
 
 def askDialog(string=0, number=0, f=0, title='', prompt='', **kwargs):
-    if string: ask = askstring
-    elif number: ask = askfloat if f else askinteger
+    if string: ask = simpledialog.askstring
+    elif number: ask = simpledialog.askfloat if f else simpledialog.askinteger
     
     return ask(title, prompt, **kwargs)
 

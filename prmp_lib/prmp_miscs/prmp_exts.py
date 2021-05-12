@@ -1,5 +1,5 @@
-import io, base64, zlib, pickle, zipfile
-from .prmp_mixins import PRMP_AdvMixins, os, PRMP_ClassMixins
+import base64, zlib, pickle, zipfile
+from .prmp_mixins import PRMP_AdvMixins, os, PRMP_ClassMixins, io
 
 
 def zipPath(resource, destination='', latest=False, quiet=0, excludes=[]):
