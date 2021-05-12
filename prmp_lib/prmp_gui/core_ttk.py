@@ -692,8 +692,15 @@ class PRMP_Combobox(PRMP_Input, PRMP_Style_, ttk.Combobox):
     TkClass = ttk.Combobox
 
     def __init__(self, master, _type='', values=[], **kwargs):
+        config = kwargs.get('config', {})
+        values = config.get('values', values)
 
         if _type.lower() == 'gender': values = ['Male', 'Female']
+
+
+        if values:
+            config['values'] = config.get('values', values)
+            kwargs['config'] = config
 
         PRMP_Style_.__init__(self, master, **kwargs)
         PRMP_Input.__init__(self, values=values, **kwargs)

@@ -200,7 +200,7 @@ class DailyContributionDailog(GaM_Dialog):
         self.dcContrib = dcContrib
 
         if not self.manager:
-            if dcContrib: self.manager = dcContrib.manager.master
+            if dcContrib: self.manager = dcContrib.manager
 
         self._account = None
         self._clientAccount = None
@@ -223,8 +223,8 @@ class DailyContributionDailog(GaM_Dialog):
             return strnum + rt
 
         self.dcContrib = None
+        date = PRMP_AdvMixins().getDate(date)
         if isinstance(date, PRMP_DateTime):
-            # self.totals.date.set(date.date)
             if self.manager: self.dcContrib = self.manager.getSub(**{'date-d': date})
             self.setTitle(f'Area {self._area.number} Daily Contribution on {date.dayName}, {thh(date.day)} of {date.monthName} {date.year}')
 
@@ -233,9 +233,9 @@ class DailyContributionDailog(GaM_Dialog):
     def _setupDialog(self):
         self.addEditButton()
 
-        self.area = Button(self.container, command=self.openArea, text='Area', place=dict(relx=.007, rely=.005, relw=.17, relh=.05))
+        dcContrib = self.dcContrib
 
-        # self.date = LabelDateButton(self.container, topKwargs=dict(text='Date'), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', bottomKwargs=dict(callback=self.changeDate), longent=.37)
+        self.area = Button(self.container, command=self.openArea, text='Area', place=dict(relx=.007, rely=.005, relw=.17, relh=.05))
 
         self.account = LabelCombo(self.container, topKwargs=dict(text='Area\'s Account'), place=dict(relx=.005, rely=.06, relw=.2, relh=.1), longent=.4, func=self.setAreaAccountDependents)
         self.account.get = self.account.B.getObj
@@ -290,6 +290,8 @@ class DailyContributionDailog(GaM_Dialog):
 
         self.date = TwoWidgets(self.container, topKwargs=dict(config=dict(text='Date')), top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', callback=self.changeDate), place=dict(relx=.18, rely=.005, relw=.11, relh=.05), orient='h', longent=.37)
 
+        if dcContrib: self.changeDate(dcContrib.date)
+
         self.addResultsWidgets(['date', 'ledgerNumber', 'clientName', 'month', 'account', 'income', 'money', 'paidout', 'transfer', 'contributed', 'bto'])
         self.thriftWidgets = ['income', 'paidout', 'money', 'transfer', 'ledgerNumber', 'account']
 
@@ -324,6 +326,7 @@ class DailyContributionDailog(GaM_Dialog):
 
     def dcUpdate(self):
         if not self.dcContrib: return
+
         PRMP_MsgBox(self, title='Update Confirmation.', message='Are you sure to update this Daily Contribution?', ask=1, callback=self._dcUpdate)
 
     def _dcUpdate(self, w):
@@ -381,12 +384,12 @@ class DailyContributionDailog(GaM_Dialog):
             PRMP_MsgBox(self, title='Removed Successful.', message=f'Thrift No. {get} has been successfully removed. ', ask=0, _type='info')
 
     def addThrift(self, e=0):
-        # self.month.B.flash()
-        # return
         if not self.editBtn.get(): return
+
         if e and (e.widget in [self.ledgerNumber.B, self.account.B, self.contributed.B]): return
 
         if self.ready.get(): self.isReady(1)
+
         else:
             PRMP_MsgBox(self, title='Ready to continue?', message='Are you sure to add this transaction?', _type='warn', callback=self.isReady)
             return

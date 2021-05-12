@@ -1,8 +1,8 @@
 from . import *
+from prmp_lib.prmp_miscs.prmp_mixins import PRMP_AdvMixins
 
 
-
-class PRMP_DropDownWidget:
+class PRMP_DropDownWidget(PRMP_AdvMixins):
     WidgetClass = None
 
     def __init__(self, master=None, ddwc=None, dropdown_windowclass=None, ddwk={}, dropdown_windowkwargs={}, attr='', valueType=str, validatecmd=None, callback=None, **kwargs):
@@ -298,47 +298,53 @@ class PRMP_DropDownCalendarEntry(PRMP_DropDownEntry):
         self.bind('<Shift-Up>', self.nextYear)
         self.bind('<Shift-Down>', self.prevYear)
     
-    def now(self): self.value = self.pd.now()
+    @property
+    def date(self):
+        if not self.value: self.value = None
+        self.value = self.getDate(self.value)
+        return self.value
+    
+    def now(self): self.date = self.pd.now()
     
     def nextDay(self, event=None):
-        if not self.value: self.now()
-        value = self.value.addTimes(days=1)
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date.addTimes(days=1)
+        self.set(date)
 
     def prevDay(self, event=None): 
-        if not self.value: self.now()
-        value = self.value.addTimes(days=-1)
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date.addTimes(days=-1)
+        self.set(date)
     
     def nextWeek(self, event=None):
-        if not self.value: self.now()
-        value = self.value.addTimes(days=7)
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date.addTimes(days=7)
+        self.set(date)
 
     def prevWeek(self, event=None): 
-        if not self.value: self.now()
-        value = self.value.addTimes(days=-7)
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date.addTimes(days=-7)
+        self.set(date)
 
     def nextMonth(self, event=None): 
-        if not self.value: self.now()
-        value = self.value + 1
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date + 1
+        self.set(date)
 
     def prevMonth(self, event=None): 
-        if not self.value: self.now()
-        value = self.value - 1
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date - 1
+        self.set(date)
 
     def nextYear(self, event=None): 
-        if not self.value: self.now()
-        value = self.value.addTimes(days=365)
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date.addTimes(days=365)
+        self.set(date)
 
     def prevYear(self, event=None): 
-        if not self.value: self.now()
-        value = self.value.addTimes(days=-365)
-        self.set(value)
+        if not self.date: self.now()
+        date = self.date.addTimes(days=-365)
+        self.set(date)
 
 
 

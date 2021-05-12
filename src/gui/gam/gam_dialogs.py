@@ -158,7 +158,7 @@ RecD = RecordDialog
 
 class AccountDialog(GaM_Dialog):
 
-    def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(500, 500), values={}, **kwargs):
+    def __init__(self, master=None, title='Account Dialog', account=None, manager=None, geo=(250, 250), values={}, **kwargs):
 
         self.manager = manager
         self.account = account
@@ -365,6 +365,7 @@ class Office_StartDialog(StartDialog):
         if not result: return
         self.Top = self.TOP(result['name'], **result)
         super()._createTOP(1)
+
 
 class DCOffice_StartDialog(Office_StartDialog):
     TOP = Office

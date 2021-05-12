@@ -182,6 +182,24 @@ class ChoosePath(LabelText):
             if self.callback: self.callback(path)
 
 
+class AttrLabelButton(LabelButton):
+    def __init__(self, master, **kwargs):
+        super().__init__(master, bottomKwargs=dict(command=self.getAttr), **kwargs)
+        self.attr = None
+
+    def getAttr(self):
+        from .extensions_dialogs import AttributesExplorerDialog
+        AttributesExplorerDialog(callback=self.setAttr)
+
+    def setAttr(self, attr):
+        if attr:
+            self.attr = attr[0]
+            self.set(self.attr)
+    
+    def get(self): return self.attr
+
+
+
 class AttributesViewer(LabelFrame):
 
     def __init__(self, master, attr='', obj=None, dialog=None, **kwargs):
@@ -359,7 +377,7 @@ class ColumnViewer(LabelFrame):
 
         self.text = LabelEntry(self, place=dict(relx=0, rely=0, relh=.2, relw=1), topKwargs=dict(text='text'), orient='h', longent=.3)
 
-        self.attr = LabelEntry(self, place=dict(relx=0, rely=.2, relh=.2, relw=1), topKwargs=dict(text='attr'), orient='h', longent=.3)
+        self.attr = AttrLabelButton(self, place=dict(relx=0, rely=.2, relh=.2, relw=1), topKwargs=dict(text='attr'), orient='h', longent=.3)
 
         self.value = LabelEntry(self, place=dict(relx=0, rely=.4, relh=.2, relw=1), topKwargs=dict(text='value'), orient='h', longent=.3)
 
@@ -405,50 +423,24 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         frame2 = Frame(self, place=dict(relx=.315, rely=0, relw=.685, relh=1))
 
-        self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.7, relw=1), columns=_cols)
+        self.treeview = Hierachy(frame2, place=dict(relx=0, rely=0, relh=.9, relw=1), columns=_cols)
         self.treeview.treeview.bind('<Delete>', self.deleteColumn, '+')
 
-        self.text = LabelEntry(frame2, place=dict(relx=.0, rely=.71, relw=.5, relh=.085), orient='h', longent=.23, topKwargs=dict(text='text'), bottomKwargs=dict(_type='text', required=True))
-        self.attr = Button(frame2, place=dict(relx=.55, rely=.71, relw=.1, relh=.085), text='attr', command=self.getAttr)
-        self._width = LabelEntry(frame2, place=dict(relx=0, rely=.8, relw=.3, relh=.085), orient='h', topKwargs=dict(text='width'), bottomKwargs=dict(_type='number'))
-        self.value = LabelEntry(frame2, place=dict(relx=.35, rely=.8, relw=.3, relh=.085), orient='h', longent=.4,  topKwargs=dict(text='value'), bottomKwargs=dict(_type='text'))
+        Button(frame2, text='Delete', place=dict(relx=.05, rely=.915, relh=.07, relw=.25), command=self.deleteColumn)
 
-        Button(frame2, text='Get', place=dict(relx=.8, rely=.75, relh=.15, relw=.15), command=self.getColumns)
-
-        Button(frame2, text='Delete', place=dict(relx=.1, rely=.915, relh=.07, relw=.25), command=self.deleteColumn)
-        Button(frame2, text='Add', place=dict(relx=.45, rely=.915, relh=.07, relw=.25), command=self.addColumn)
+        Button(frame2, text='Add', place=dict(relx=.38, rely=.915, relh=.07, relw=.25), command=self.addColumn)
+        
+        Button(frame2, text='Get', place=dict(relx=.7, rely=.915, relh=.07, relw=.25), command=self.getColumns)
 
         self._foc = None
         self._focObj = None
-        self._attr = ''
 
         self.set(columns)
-        self._cols = _cols
-
-        self.addResultsWidgets(_cols)
-
-    def width(self): return self._width
 
     def addColumn(self, e=0):
-        gets = self.get(['text', '_width', 'value'])
-        gets['attr'] = self._attr
-        width = gets['_width'] or 20
-        gets['width'] = int(width)
-        try: j = self.columns.addColumn(gets)
-        except:
-            from .dialogs import PRMP_MsgBox
-            PRMP_MsgBox(self, title='Error', _type='error', message='Try to add the "attr" value.')
-        self._attr = ''
-
-        self.set(self.columns)
-
-    def getAttr(self):
-        from .dialogs import AttributesExplorerDialog
-        AttributesExplorerDialog(callback=self.setAttr)
-
-    def setAttr(self, attr):
-        if attr: self._attr = attr[0]
-
+        from .extensions_dialogs import PRMP_MsgBox, ColumnViewerDialog
+        ColumnViewerDialog(self, manager=self.columns, callback=lambda e: self.set(self.columns), _return=1)
+    
     def deleteColumn(self, e=0):
         from .dialogs import PRMP_MsgBox
 
@@ -484,9 +476,7 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
 
         self.total.set(last)
 
-    def clicked(self, event=None, selected=None):
-        selected = self.listbox.selected
-        self.treeview.see
+    def clicked(self, event=None, selected=None): selected = self.listbox.selected
 
     def set(self, columns):
         if not columns: return
@@ -513,17 +503,3 @@ class ColumnsExplorer(PRMP_FillWidgets, LabelFrame):
         self.updateCol(listbox)
 
         if self.callback: self.callback(self.columns, e)
-
-    # def setTreeview(self, values, parent=''):
-    #     if isinstance(values, list):
-    #         for value in values: self.setTreeview(value, parent)
-
-    #     elif isinstance(values, dict):
-    #         for key, value in values.items():
-    #             item = self.treeview.insert(parent, text=key)
-    #             self.setTreeview(value, item)
-
-    #     elif isinstance(values, (str, bytes)):
-    #         self.treeview.insert(parent, text=values, value=values)
-    #         pass
-

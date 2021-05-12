@@ -347,13 +347,21 @@ class Splash(PRMP_Dialog):
     def set(self): pass
 
 
-def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, **kwargs):
-    from .tushed_windows import ColumnsExplorerDialog, ColumnViewerDialog
+def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, edit=False, **kwargs):
+    from .extensions_dialogs import ColumnsExplorerDialog, ColumnViewerDialog
     if obj:
         if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
         elif isinstance(obj, (PRMP_Image, PRMP_ImageFile)): PRMP_ImageDialog(image=obj, **kwargs)
-        elif isinstance(obj, Columns): ColumnsExplorerDialog(columns=obj, **kwargs)
-        elif isinstance(obj, Column): ColumnViewerDialog(column=obj, **kwargs)
+        elif isinstance(obj, (Columns, Column)):
+            win = ColumnsExplorerDialog
+            if isinstance(obj, Columns):
+                word = 'columns'
+                if edit: word = 'manager'
+            else:
+                win = ColumnViewerDialog
+                word = 'column'
+            kwargs[word] = obj
+            win(**kwargs)
     elif path: return askPath(**kwargs)
     elif ask: return confirmDialog(**kwargs)
     elif string: return askstring(*args, **kwargs)

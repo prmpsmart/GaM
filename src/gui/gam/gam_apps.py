@@ -29,7 +29,6 @@ class GaM_App(PRMP_MainWindow):
     def save(self, u=0):
         if u: self.saveIt()
         else: self._save()
-        # print(f'Saved {GaM_Settings.GaM}.')
 
     def load(self): self._load()
 
@@ -44,26 +43,62 @@ class GaM_App(PRMP_MainWindow):
 
         def showSnS(obj):
             if obj: SortNSearch(self, obj=self.obj)
-        def showOD(obj):
+
+        def showAM(obj):
             if obj: ManagerHome(self, obj=self.obj, title=f'{self.obj.name} Details.')
+
         def updateObj(obj):
             if isinstance(obj, Account): obj.balanceAccount()
 
+        def editObj(obj): openCores(obj=self.obj, edit=True)
+
         def security(): from .auths_gui import Security; Security()
 
-        self.viewMenu = None # search, details
-        self.settingsMenu = None # load, save, security, theme, plot color, save path
+        self.viewMenu = None
+        self.settingsMenu = None
 
         self.viewMenu = Menu(self, config=dict(tearoff=0))
-        view = [dict(label='Search', command=lambda : showSnS(self.obj)), dict(label='Details', command=lambda : showOD(self.obj)), dict(label='Update Current Object', command=lambda : updateObj(self.obj))]
+        view = [
+            dict(label='Search', 
+                command=lambda : showSnS(self.obj)
+                ), 
+            dict(label='As Manager', 
+                command=lambda : showAM(self.obj)
+                ), 
+            dict(label='Update Current Object', 
+                command=lambda : updateObj(self.obj)
+                ),
+            dict(label='Edit Current Object',
+                command=lambda : editObj(self.obj)
+                )
+            ]
+
         for vie in view: self.viewMenu.add_command(**vie)
 
         self.settingsMenu = Menu(self, config=dict(tearoff=0))
-        settings = [dict(label='Load', command=self.load), dict(label='Save', command=self.save), dict(label='Security', command=security), dict(label='Others')]
+        settings = [
+            dict(label='Load', 
+                command=self.load
+                ), 
+            dict(label='Save', 
+                command=self.save
+                ), 
+            dict(label='Security', 
+                command=security
+                ), 
+            dict(label='Others')
+        ]
+
         for sett in settings: self.settingsMenu.add_command(**sett)
 
         self.helpMenu = Menu(self, config=dict(tearoff=0))
-        help_ = [dict(label='Welcome'), dict(label='Documentation'), dict(label='Keyboard Shortcuts Reference'), dict(label='About')]
+        help_ = [
+            dict(label='Welcome'), 
+            dict(label='Documentation'), 
+            dict(label='Keyboard Shortcuts Reference'), 
+            dict(label='About')
+        ]
+        
         for hel in help_: self.helpMenu.add_command(**hel)
 
         Menubutton(self.menuBar, config=dict(menu=self.viewMenu, text="View", style='Window.TMenubutton'), place=dict(relx=.005, rely=.05, relw=.045, relh=.9), font='PRMP_FONT', relief='flat')
@@ -367,13 +402,18 @@ class ManagerHome(TreeColumns, GaM_App):
 
 
     def _setupApp(self):
-        if self.obj: self.setTitle(self.obj.name)
+        subTypes = []
+        name = 'Name'
+        if self.obj:
+            name = self.obj.name
+            subTypes = self.obj.subTypes
+            self.setTitle(name)
 
         sups = LabelFrame(self.container, place=dict(relx=.005, rely=.02, relh=.965, relw=.3), text='Object Subcripts')
 
-        self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=self.obj.name if self.obj else 'Name'))
+        self.sup = LabelButton(sups, place=dict(relx=.005, rely=0, relh=.07, relw=.99), topKwargs=dict(text='Super'), orient='h', longent=.2, command=self.openSup, bottomKwargs=dict(text=name))
 
-        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=self.obj.subTypes if self.obj else []), orient='h', longent=.4, func=self.changeSubs)
+        self.subType = LabelCombo(sups, place=dict(relx=.005, rely=.08, relh=.07, relw=.7), topKwargs=dict(text='Sub Type'), bottomKwargs=dict(values=subTypes), orient='h', longent=.4, func=self.changeSubs)
 
         self.new = Checkbutton(sups, text='New?', place=dict(relx=.77, rely=.09, relh=.05, relw=.22))
 

@@ -112,7 +112,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
     change_color = change2Imgcolor
 
-    def __init__(self, master=None, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, promptExit=False, **kwargs):
+    def __init__(self, master=None, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, promptExit=False, pe=None, **kwargs):
         '''
         PRMP_Window a base class for all window class for common behaviours.
 
@@ -131,12 +131,12 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         tipping: 
         themeIndex: 
         theme: 
-        promptExit: 
 
         tkIcon: 
         prmpIcon: 
         grab: 
         
+        pe, promptExit: 
         b4t, bind4Theme: 
         tbm, toggleMenuBar: 
         tw, toolWindow: 
@@ -191,6 +191,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.co = 0
         # normalizing of the parameters, from the abbr to their full meaning.
         if normTk: atb, asb, geo = 0, 0, ()
+        if pe != None: promptExit = pe
         if geo != None: geometry = geo
         if gaw != None: grabAnyWhere = gaw
         if ntb != None: noTitleBar = ntb

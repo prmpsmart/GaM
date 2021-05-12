@@ -326,7 +326,6 @@ class Hierachy(PRMP_TreeView):
         self._printList(subs, item)
     
     def _printList(self, subs, item):
-        print('called', self)
         if isinstance(subs, list):
             for sub in subs:
                 if sub: self._viewObjs(sub, item)
