@@ -1,5 +1,5 @@
 from .bases import Object, PRMP_DateTime, Errors
-from datetime import timedelta
+import datetime
 
 # Record is the {money, date} recieved daily a.k.a DayRecord
 
@@ -101,7 +101,7 @@ class Repayment(Record):
 
         if self.dueSeason == 'year': self.__dueDate = self.date + (self.dueTime * 12)
         elif self.dueSeason == 'month': self.__dueDate = self.date + self.dueTime
-        elif self.dueSeason == 'day': self.__dueDate = self.date + timedelta(days=self.dueTime)
+        elif self.dueSeason == 'day': self.__dueDate = self.date + datetime.timedelta(days=self.dueTime)
 
         if not self.ObjectType:
             from .records_managers import RecordsManager

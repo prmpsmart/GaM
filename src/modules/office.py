@@ -1,12 +1,54 @@
-from ..core.accounts import AccountsManager
-from ..core.regions_managers import RegionsManager, Region, Person, PersonsManager
+__author__ = "PRMP Smart"
+from core import RegionsManager, Region, Person, PersonsManager, AccountsManager
+from dc import AreasManager, AreaAccount, AreaAccountsManager
+from prmp_miscs import PRMP_StrMixins
 
-from ..dc.dc_regions import AreasManager
-# from ..dc.dc_sorts import DC_Sort
-from prmp_lib.prmp_miscs.prmp_mixins import PRMP_StrMixins
-# from ..coop.coop_regions import UnitsManager
 
-from .office_accounts import *
+
+# class CoopOfficeAccount(UnitAccount):
+#     Manager = 'CoopOffice'
+
+
+class DCOfficeAccount(AreaAccount):
+    Manager = 'DCOfficeAccountsManager'
+
+    def _balanceAccount(self, date=None):
+        areasAccounts = self.manager.sortSubRegionsAccountsByMonth(self.date)
+        for a in areasAccounts: a.balanceAccount()
+        if areasAccounts:
+            self.incomes.updateWithOtherManagers([account.incomes for account in areasAccounts])
+            
+            self.balances.updateWithOtherManagers([account.balances for account in areasAccounts])
+            
+            self.broughtForwards.updateWithOtherManagers([account.broughtForwards for account in areasAccounts])
+            
+            self.commissions.updateWithOtherManagers([account.commissions for account in areasAccounts])
+            
+            self.debits.updateWithOtherManagers([account.debits for account in areasAccounts])
+            
+            self.savings.updateWithOtherManagers([account.savings for account in areasAccounts])
+            
+            self.upfronts.updateWithOtherManagers([account.upfronts for account in areasAccounts])
+            
+            self.excesses.updateWithOtherManagers([account.excesses for account in areasAccounts])
+            
+            self.deficits.updateWithOtherManagers([account.deficits for account in areasAccounts])
+            
+            self.btos.updateWithOtherManagers([account.btos for account in areasAccounts])
+        
+            self.paidouts.updateWithOtherManagers([account.paidouts for account in areasAccounts])
+            
+            self.withdrawals.updateWithOtherManagers([account.withdrawals for account in areasAccounts])
+            
+            self.transfers.updateWithOtherManagers([account.transfers for account in areasAccounts])
+
+            self.normalIncomes.updateWithOtherManagers([account.normalIncomes for account in areasAccounts])
+
+
+class DCOfficeAccountsManager(AreaAccountsManager):
+    ObjectType = DCOfficeAccount
+
+
 
 class DCManagerDetail(Person):
     Manager = 'DCManagerDetailsManager'
@@ -105,7 +147,7 @@ class DCOffice(SubOffice):
     def __init__(self, manager, **kwargs):
         super().__init__(manager, **kwargs)
         self.subRegionsActiveByMonth = self.accountsManager.subRegionsActiveByMonth
-        from ..dc.dc_sorts import DCSort
+        from dc import DCSort
         self.allSort = DCSort(self)
     
     @property

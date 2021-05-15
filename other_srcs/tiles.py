@@ -1,10 +1,8 @@
 import os
-os.sys.path.append(r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\prmp')
-os.sys.path.append(os.path.dirname(__file__))
 
 import itertools, threading
 
-from prmp_gui.core import *
+from prmp_lib.prmp_gui import *
 
 class Tile(Checkbutton):
     def __init__(self, master, **kwargs):
@@ -31,18 +29,18 @@ class Tile(Checkbutton):
         # self.toggle()
 
 
-class Tiles(MainWindow):
+class Tiles(PRMP_MainWindow):
     
     def __init__(self, master=None, geo=(1300, 840), themeIndex=37, tiles=9, **kwargs):
-        super().__init__(master, geo=geo, themeIndex=themeIndex, asb=0, b4t=0, tipping=1, title='Tiles By PRMPSmart', resize=(0, 0), **kwargs)
+        super().__init__(master, geo=geo, themeIndex=themeIndex, asb=0, tipping=1, title='Tiles By PRMPSmart', resize=(0, 0), **kwargs)
 
         self.canvas = self.addWidget(Canvas, place=dict(relx=0, rely=0, relw=1, relh=1))
         self.bind('<B1-Motion>', self.moving)
         if tiles > 50: tiles = 50
         # self.bind('<Motion>', self.flash)
         
-        self._img = PRMP_Image('purple_beau', inbuilt=1, inExt='jpeg', resize=geo)
-        self.change_color(self._img.image)
+        self._img = PRMP_Image('purple_lux', inbuilt=1, inExt='jpeg', resize=geo)
+        # self.change_color(self._img.image)
 
         self.img = self._img.createTkImage()
         self.tiles = tiles
@@ -89,7 +87,6 @@ class Tiles(MainWindow):
         self.paint()
 
 
-
-Tiles(tiles=30, tm=1)
+Tiles(tiles=40, tm=1, be=1, b4t=1)
 
 

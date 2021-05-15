@@ -205,13 +205,11 @@ class PRMP_Listbox(PRMP_, tk.Listbox):
         if isinstance(values, (list, tuple, dict)): self.values = values.copy()
         else: self.values = values
 
-
         # index of the lastt value in the Listbox
         self.last = 0
         self.callback = callback
 
         defaultBinds = [('<<ListboxSelect>>', self.clicked, '+')]
-
 
         PRMP_.__init__(self, master, **kwargs)
 

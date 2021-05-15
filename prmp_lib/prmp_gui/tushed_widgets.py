@@ -141,15 +141,13 @@ class ChoosePath(LabelText):
         else: FONT = 'DEFAULT_FONT'
 
         tip = self.topest.tipping
-        image = None
+        self.image = None
 
         if folder:
-            self.image = PRMP_Image('folder_add', resize=(25, 25), inbuilt=1, inExt='png', for_tk=1)
+            self.image = PRMP_Image('folder_add', resize=(25, 25), inbuilt=1, for_tk=1)
             pathType = 'dir'
         else:
-            if PRMP_DB:
-                image = PRMP_DB.getImage('soft_scraps', 'file_open')[0]
-                self.image = PRMP_Image(image, resize=(25, 25), for_tk=1)
+            self.image = PRMP_Image('file_open', resize=(25, 25), for_tk=1,  inbuilt=1)
             pathType = 'file'
         
         bottomKwargs.update(dict(_type=pathType))

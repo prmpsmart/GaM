@@ -416,7 +416,7 @@ class PRMP_Images:
 
 
 class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
-    defaultDB = os.path.join(os.path.dirname(__file__), 'images_db.prmp_db')
+    defaultDB = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'images_db.prmp_db')
 
     @classmethod
     def PRMP_DB(cls): return cls(cls.defaultDB)
@@ -919,7 +919,7 @@ class PRMP_Image:
 
         faceCascade = cv2.CascadeClassifier(cascPath)
 
-        if image: array = cls(image=image).toarray()
+        if image: array = cls(image=age).toarray()
         
         gray = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
 
@@ -941,7 +941,7 @@ class PRMP_Image:
 
 PRMP_DB = None
 
-if os.environ.get('PRMP_DB'):
+if 'PRMP_DB' in os.environ:
     try: PRMP_DB = PRMP_ImagesDB.PRMP_DB()
     except: pass
 

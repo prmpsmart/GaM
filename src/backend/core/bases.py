@@ -1,8 +1,7 @@
 from .errors import Errors
 from .mixins import Mixins
 from prmp_lib.prmp_miscs.prmp_datetime import *
-from hashlib import sha224
-import time
+import time, hashlib
 
 class CompareByNumber:
     def __lt__(self, other):
@@ -307,7 +306,7 @@ class ObjectsMixins(CompareByDate, Mixins):
         self.previous = previous
         self.next = None
 
-        if not idReq: self._uniqueID = sha224(str(self).encode()).hexdigest()
+        if not idReq: self._uniqueID = hashlib.sha224(str(self).encode()).hexdigest()
 
         self._active = self._date
 
