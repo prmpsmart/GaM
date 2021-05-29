@@ -2,7 +2,8 @@ from .core import tk
 from . import *
 from .miscs import *
 
-__all__ = ['PRMP_ListBox', 'PRMP_TreeView', 'PRMP_ScrollText', 'ScrollableFrame', 'ScrolledText', 'ScrolledEntry', 'ListBox', 'TreeView', 'ScrollText', 'Hierachy']
+__all__ = ['PRMP_ListBox', 'PRMP_TreeView', 'PRMP_ScrollText', 'ScrollableFrame', 'ScrolledText', 'ScrolledEntry', 'ListBox', 'TreeView', 'ScrollText', 'Hierachy', 'Table']
+
 
 class AutoScroll:
     '''Configure the scrollbars for a widget.'''
@@ -267,19 +268,25 @@ class ScrolledEntry(AutoScroll, tk.Entry):
 
 class Hierachy(PRMP_TreeView):
 
-    def __init__(self, master=None, columns=[], toggleOpen=True, binds=[], **kwargs):
+    def __init__(self, master=None, columns=[], toggleOpen=True, binds=[], openDialog=None, image_get=None, **kwargs):
+
         self._toggleOpen = False
         self.toop = toggleOpen
+        self.images = []
         self.last = []
         self.binds = binds
+
+        self.image_get = image_get or self.get_image
         super().__init__(master=master, columns=columns, **kwargs)
 
-        self.bindings()
+        self._openDialog = openDialog
 
     @property
     def openDialog(self):
-        from .dialogs import dialogFunc
-        return dialogFunc
+        if self._openDialog: return self._openDialog
+        else:
+            from .dialogs import dialogFunc
+            return dialogFunc
 
     def toggleOpen(self, e=0):
         if self._toggleOpen: self._toggleOpen = False
@@ -319,11 +326,20 @@ class Hierachy(PRMP_TreeView):
             raw = self.columns.getFromObj(obj)
             first, *columns = raw
 
-            item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj)
+            image = self.image_get(obj)
+
+            if image:
+                d = dict(image=image)
+                self.images.append(image)
+            else: d = {}
+
+            item = self.insert(parent, text=first, values=columns, open=self._toggleOpen, value=obj, **d)
 
             subs = self.getSubs(obj, item)
         
         self._printList(subs, item)
+    
+    def get_image(self, obj): ...
     
     def _printList(self, subs, item):
         if isinstance(subs, list):
@@ -331,7 +347,9 @@ class Hierachy(PRMP_TreeView):
                 if sub: self._viewObjs(sub, item)
 
     def viewObjs(self, obj, parent=''):
-        if not parent: self.clear()
+        if not parent:
+            self.clear()
+            self.images = []
         self._viewObjs(obj, parent)
         self.last = obj, parent
 
@@ -349,7 +367,7 @@ class Table(Frame):
             if val not in numbers: value = value.replace(val, '')
         return float(value or 0)
 
-    def __init__(self, master, title='', treeKwargs={}, reserve=0, output=float, converter=None, offset=3, treeWidget=(), **kwargs):
+    def __init__(self, master, title='', treeKwargs={}, reserve=0, output=float, converter=None, offset=3, treeWidget=(), titleH=40, addTotals=False, **kwargs):
         '''
         master: parent of this widget.
         title: title of this table.
@@ -369,6 +387,8 @@ class Table(Frame):
         self.reserve = reserve
         self.output = output
         self.offset = offset
+        self.addTotals = addTotals
+        self.titleH = titleH
         self.converter = converter or self.toNum
 
         font = self.PRMP_FONT.copy()
@@ -382,7 +402,7 @@ class Table(Frame):
     
     def resize(self, event=None):
         width, height = self.width, self.height
-        self.title.place(x=0, y=0, h=40, relw=1)
+        self.title.place(x=0, y=0, h=self.titleH, relw=1)
         self.tree.place(x=0, y=40, relw=1, relh=((height-40)/height))
     
     def setTitle(self, title): self.title.set(title)
@@ -419,6 +439,8 @@ class Table(Frame):
 
     def viewObjs(self, values):
         self.tree.viewObjs(values)
+
+        if not self.addTotals: return
         
         if not values: return
         totals = self.getTotals(values)

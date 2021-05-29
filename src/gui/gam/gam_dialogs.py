@@ -56,7 +56,7 @@ class PersonDialog(GaM_Dialog):
         self.contact = self.addWidget(PRMP_Style_LabelFrame, config=dict(config=dict(text='Contact Details')), place=dict(x=2, y=2, h=250, relw=.55))
 
         self.name = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Name')), bottomKwargs=dict(required=True, very=1), orient='h', place=dict(relx=.02, y=0, h=32, relw=.96), longent=.25)
-        # self.bind('<<PRMP_STYLE_CHANGED>>', self.changeNameFG)
+        self.bind('<<PRMP_STYLE_CHANGED>>', self.changeNameFG)
 
         self.phone = LabelEntry(self.contact,  topKwargs=dict(config=dict(text='Phone Number')), bottomKwargs=dict(_type='number'), place=dict(relx=.02, y=32, h=32, relw=.96), longent=.5, orient='h')
 
@@ -185,6 +185,7 @@ class AccountDialog(GaM_Dialog):
 
             elif self.manager: PRMP_MsgBox(self, title='Account Creation', message='Are you sure to create a new account?', _type='question', callback=self.newAccount)
             else: PRMP_MsgBox(self, title='Account Dialog Error', message='No Account or Manager is given.', _type='error', ask=0)
+    
     # @property
     # def result(self):
     #     res = super().result

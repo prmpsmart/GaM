@@ -321,6 +321,17 @@ class PRMP_Theme(PRMP_GuiMixins):
 
     @property
     def fontsNames(self): return self.tk.splitlist(self.tk.call("font", "names"))
+    
+    def dictFont(self, font):
+        _font = {}
+        sts = [f.strip() for f in font.split('-') if f]
+        
+        for ff in sts:
+            f, b = ff.split(' ', 1)
+            b = b.replace('{', '').replace('}', '')
+            _font[f] = b
+        return _font
+
 
     def parseFont(self, font, name=''):
         '''
@@ -328,8 +339,10 @@ class PRMP_Theme(PRMP_GuiMixins):
         '''
         if isinstance(font, str):
             if font in self.fontsNames: return font
-            return Font(name=font)
-        elif isinstance(font, dict): return Font(**font, name=name)
+            elif '-family' in font: font = self.dictFont(font)
+            else: return Font(name=font)
+
+        if isinstance(font, dict): return Font(**font, name=name)
 
     def deriveFont(self, kwargs={}, default='DEFAULT_FONT'):
         if not kwargs: font = self.kwargs.get('font')
@@ -454,8 +467,9 @@ class PRMP_Theme(PRMP_GuiMixins):
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
 
             else:
-                try: self.configure(background=background, relief=relief, borderwidth=borderwidth)
-                except: pass
+                # try: 
+                self.configure(background=background, relief=relief, borderwidth=borderwidth)
+                # except Exception as e: print(e)
                 return self
             
             self.configure(**_dict)
@@ -536,7 +550,7 @@ class PRMP_Widget(PRMP_Theme):
             if isinstance(master, (PRMP_Tk, PRMP_Toplevel)): return master
             master = master
 
-    def __init__(self, master, _ttk_=False, tipKwargs={}, tip={}, status='', relief='groove', nonText=False, asEntry=False, hl=None, highlightable=True, place={}, grid={}, pack={}, font='DEFAULT_FONT', config={}, **kwargs):
+    def __init__(self, master, _ttk_=False, tipKwargs={}, tip={}, status='', relief='groove', nonText=False, asEntry=False, hl=None, highlightable=False, place={}, grid={}, pack={}, font='DEFAULT_FONT', config={}, **kwargs):
         '''
         master: another widget hosting this widget or None
         _ttk_: bool whether this widget is based on tkinter.ttk or not.
@@ -603,7 +617,8 @@ class PRMP_Widget(PRMP_Theme):
         self.kwargs.update(config)
 
         try: self.useFont(font)
-        except: pass
+        except Exception as er: pass
+        # except Exception as er: print(er)
 
         # if tip or tipKwargs, set the tipKwargs to text if its boool
         tipKwargs = tip or tipKwargs
@@ -785,6 +800,8 @@ class PRMP_Widget(PRMP_Theme):
         for one in group: one.addToggleGroup(group)
 
     def useFont(self, font=None):
+        if font == None: return
+
         if font: font = self.parseFont(font)
         if font: self['font'] = font
 
@@ -1206,6 +1223,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                     widget.set(value)
                 else: print(f'Error [{widgetName}, {widget}]', __file__)
             if isinstance(values, dict): self.values.update(values)
+            else: self.values = values
             return True
         else:
             if self.values: return self.set(self.values)
@@ -1229,7 +1247,7 @@ class PRMP_FillWidgets(PRMP_Mixins):
                         except: pass
 
                         from .dialogs import PRMP_MsgBox
-                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()}* is required to proceed!', _type='error', okText='Understood')
+                        PRMP_MsgBox(self, title='Required Input', message=f'{widgetName.title()}* is required to proceed!', _type='error', yes=dict(text='Understood'))
                         return
                 else: result[widgetName] = get
         return result

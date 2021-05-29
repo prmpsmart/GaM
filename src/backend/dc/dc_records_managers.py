@@ -8,7 +8,8 @@ class DCRecordsManager(RecordsManager):
 
     def __init__(self, account, lastRecord=False):
         self._lastRecord = lastRecord
-        super().__init__(account, date=account.date)
+        # super().__init__(account, date=account.date)
+        super().__init__(account)
 
     def __int__(self):
         if self._lastRecord: return int(self.lastMoney)

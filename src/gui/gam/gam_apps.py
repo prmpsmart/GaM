@@ -137,7 +137,7 @@ class RegionLookUp(GaM_App, PRMP_FillWidgets):
         person = region.person
         if person: self.set(dict(image=person.image))
 
-        # self.loadAccounts(region)
+        self.loadAccounts(region)
 
     def _setupApp(self):
         # hierachy
@@ -488,7 +488,8 @@ class ManagerHome(TreeColumns, GaM_App):
                         dialog(self, manager=manager)
                 except Exception as er: PRMP_MsgBox(self, title=er.__class__.__name__, message=er, _type='error')
         else:
-            subs = self.getSubs()
+            try: subs = self.getSubs()
+            except: return
             if subs: self.subsList.set(subs, showAttr='name')
             columns = self.columns(self.obj)
             # print(columns)

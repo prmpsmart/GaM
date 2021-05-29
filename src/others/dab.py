@@ -1,9 +1,6 @@
 # Daily Analysis Book for the Daily Contribution department
 
-
-from prmp_lib.prmp_miscs.prmp_mixins import PRMP_AdvMixins, PRMP_StrMixins, PRMP_TkMixins
-from prmp_lib.prmp_miscs.prmp_datetime import PRMP_DateTime
-from prmp_lib.prmp_miscs.prmp_exts import PRMP_File
+from prmp_miscs import *
 import threading, os, sqlite3
 
 
@@ -64,6 +61,10 @@ class Area(PRMP_AdvMixins, PRMP_StrMixins):
         if self.balance < 0: return abs(self.balance)
         return 0
 
+    @property
+    def unique(self): return str(self)
+
+
 
 class Areas:
     join = lambda file: os.path.join(os.path.dirname(__file__), file)
@@ -75,11 +76,20 @@ class Areas:
     meths = dict(date='isSameDate', week='isSameWeekMonthYear', month='isSameMonthYear', year='isSameYear')
 
     @classmethod
+    def remove(cls, area):
+        if area:
+            # areas = []
+            # for ar in Areas.areas:
+            #     if ar.unique != area.unique: areas.append(ar)
+            # Areas.areas = areas
+            Areas.areas = [ar for ar in Areas.areas if ar.unique != area.unique]
+
+    @classmethod
     def createArea(cls, number, date, **datas):
         areas = cls.sort(date, 'date')
         if areas:
             for area in areas:
-                if area.number  == number and area.date.date == date.date: raise ValueError('An Area with same number and date already exists.')
+                if area.number == number and area.date.date == date.date: raise ValueError('An Area with same number and date already exists.')
 
         area = Area(number, date, **datas)
         cls.areas.append(area)
@@ -147,25 +157,26 @@ class Areas:
     @classmethod
     def save1(cls):
         'uses the pickle protocol'
-        
-        def save(obj):
-            if not obj: return
-
+        print('Saving Started')
+        obj = Areas.areas
+        if obj:
             db = PRMP_File()
             db.saveObj(obj)
             db.save(cls.DAB_FILE1)
-
-        threading.Thread(target=save, args=[cls.areas]).start()
+        print('Saving Completed')
     
     @classmethod
     def load1(cls):
         'uses the pickle protocol'
+        print('Loading Started')
         db = PRMP_File(cls.DAB_FILE1)
         cls.areas = db.loadObj()
+        print('Loading Completed')
     
     @classmethod
     def save2(cls):
         'uses the sqlite3 protocol'
+        print('Saving Started')
         if not cls.areas: return
         
         try: os.remove(cls.DAB_FILE2)
@@ -182,10 +193,14 @@ class Areas:
         cursor.executemany('INSERT INTO areas VALUES (?,?,?,?,?,?,?,?,?,?,?)', areas_cols)
         connection.commit()
         connection.close()
+        print('Saving Completed')
+
     
     @classmethod
     def load2(cls):
         'uses the sqlite3 protocol'
+        print('Loading Started')
+
         connection = sqlite3.connect(cls.DAB_FILE2)
         cursor = connection.cursor()
 
@@ -195,6 +210,7 @@ class Areas:
             number, date, *data = area
             datas = dict(zip(Area.columns, data))
             area = cls.createArea(number, date, **datas)
+        print('Loading Completed')
     
     @classmethod
     def load3(cls):
@@ -204,38 +220,33 @@ class Areas:
             for number, datas in number_d.items(): Areas.createArea(number, date, **datas)
         cls.save()
     
-    save = save1
-    load = load1
+    save = save2
+    load = load2
 
 if 0:
-    Areas.load()
-    # Areas.areas = Areas.areas[:-2]
-    Areas.save1()
-    Areas.save2()
+    Areas.load1()
+    Areas.save()
     exit()
 
-Areas.load()
-SAVE_DAB_DB = Areas.save
+LOAD = Areas.load
+SAVE = Areas.save
+THREAD_LOAD = threading.Thread(target=LOAD).start
+THREAD_SAVE = threading.Thread(target=SAVE).start
 
 
-from prmp_lib.prmp_gui import *
-from prmp_lib.prmp_gui.scrollables import PRMP_ListBox, Table
-from prmp_lib.prmp_gui.two_widgets import TwoWidgets, LabelCombo, LabelEntry, LabelSpin, DateWidget
-from prmp_lib.prmp_gui.tushed_widgets import Hierachy
-from prmp_lib.prmp_gui.dialogs import PRMP_Dialog, PRMP_MsgBox
-from prmp_lib.prmp_gui.plot_canvas import OptPlot, PlotDatas
+from prmp_gui import *
 
 
 class DAB_Input(PRMP_FillWidgets, Frame):
     fields = ['date', 'number', *Area.columns]
     
-    def __init__(self, master, area=None, **kwargs):
+    def __init__(self, master, area=None, date_callback=None, **kwargs):
         Frame.__init__(self, master, **kwargs)
         PRMP_FillWidgets.__init__(self, area)
         
         self.area = area
 
-        self.date = DateWidget(self, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4)
+        self.date = DateWidget(self, topKwargs={'text': 'Date'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4, bottomKwargs=dict(callback=date_callback))
         
         self.number = LabelSpin(self, topKwargs={'text': 'Number'}, place=dict(x=10, y=60, w=190, h=40), orient='h', bottomKwargs=dict(_type='number', very=1, from_=1, to=100))
 
@@ -268,23 +279,23 @@ class DAB_Input(PRMP_FillWidgets, Frame):
         if self.validateData(data):
             try:
                 area = Areas.createArea(**data)
-                SAVE_DAB_DB()
+                # THREAD_SAVE()
                 return area
 
-            except Exception as error: PRMP_MsgBox(self, title=error.__class__.__name__, msg=error, _type='error')
+            except Exception as error: PRMP_MsgBox(self, title=error.__class__.__name__, msg=error, _type='error', yes=dict(text='Ok'))
         return False
 
     def validateData(self, data):
         data = data or self.get()
         if not isinstance(data['date'], PRMP_DateTime):
-            PRMP_MsgBox(self, title='Invalid Date', msg='Provided date is of invalid type.', _type='error')
+            PRMP_MsgBox(self, title='Invalid Date', msg='Provided date is of invalid type.', _type='error', yes=dict(text='Ok'))
             return False
         if not data['number']:
-            PRMP_MsgBox(self, title='Invalid Number', msg='Provide number above zero.', _type='error')
+            PRMP_MsgBox(self, title='Invalid Number', msg='Provide number above zero.', _type='error', yes=dict(text='Ok'))
             return False
         data = list({k: v for k, v in data.items() if k not in ['date', 'number']}.values())
         if data.count(None) == len(data):
-            PRMP_MsgBox(self, title='Invalid Transaction', msg='Provide atleast a transaction.', _type='error')
+            PRMP_MsgBox(self, title='Invalid Transaction', msg='Provide atleast a transaction.', _type='error', yes=dict(text='Ok'))
             return False
         return True
 
@@ -308,13 +319,13 @@ class DAB_Dialog(PRMP_Dialog):
         if area and data:
             if self.input.validateData(data):
                 area.__dict__.update(data)
-                SAVE_DAB_DB()
+                # THREAD_SAVE()
             self.tree.reload()
     
     def action(self):
         self.destroyDialog()
     
-    def save(self): SAVE_DAB_DB()
+    def save(self): SAVE()
 
 
 class DAB_Hierachy(Hierachy):
@@ -357,22 +368,23 @@ class DAB_Ui(PRMP_MainWindow):
         
         note = Notebook(self.cont, place=dict(x=0, rely=relh, relw=.5, relh=1-relh))
 
-        self.input = DAB_Input(note)
+        self.input = DAB_Input(note, date_callback=self.date_chosen)
         note.add(self.input)
         note.tab(0, text='Input')
         Button(self.input, text='Add', place=dict(x=650, y=20, w=50, h=30), command=self.add)
         self.bind('<Return>', lambda e: self.add())
 
+        self.last_list = []
         self.list = PRMP_ListBox(self.cont, place=dict(relx=.5, rely=relh, relw=.15, relh=1-relh), listboxConfig=dict(values=self.columns_lists, selectmode='multiple'))
 
-        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1), command=self.loadPlot)
+        Button(self.list, text='Load', place=dict(relx=.6, rely=.8, relw=.25, relh=.1), command=lambda: self.loadPlot())
 
         sort = Frame(note)
         note.add(sort)
         note.tab(1, text='Sort')
 
         self.sort_type = LabelCombo(sort, topKwargs={'text': 'Sorts'}, place=dict(x=10, y=10, w=180, h=40), orient='h', longent=.4, bottomKwargs=dict(values=Areas.sorts), func=self.sort)
-        self.sort_date = DateWidget(sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4)
+        self.sort_date = DateWidget(sort, topKwargs={'text': 'Date'}, place=dict(x=10, y=50, w=220, h=40), orient='h', longent=.4, bottomKwargs=dict(callback=lambda e: self.sort(quiet=1)))
         
         Button(sort, text='Sort', place=dict(x=250, y=10, w=60, h=30), command=self.sort)
         Button(sort, text='View All', place=dict(x=10, y=200, w=220, h=40), command=lambda: self.updateTable(Areas.areas, 'All Areas.'))
@@ -386,40 +398,67 @@ class DAB_Ui(PRMP_MainWindow):
 
         self.after(100, self.loadUI)
         # self.after(200, os.sys.exit)
-        self.bind('<<DropDown_value_changed>>', self.date_chosen)
+        self.after(3000, self.setDef)
+
+        self.bind('<Control-S>', self.savings)
+        self.bind('<Control-s>', self.savings)
 
         self.start()
     
-    def deleteArea(self): pass
-    
-    def loadUI(self):
-        self.sort_type.set('date')
+    def savings(self, e=0):
+        SAVE()
+        PRMP_MsgBox(self, title='Save Successful', msg='Saving is successful', _type='info', yes=dict(text='Ok'))
 
-        date = PRMP_DateTime.now().addTimes(days=-1)
+    def deleteArea(self):
+        self._delarea = self.table.tree.selected()
+        if not self._delarea: return
+
+        areas = Areas.sort(self._delarea.date, 'date')
+        for area in areas:
+            if area is self._delarea: PRMP_MsgBox(self, title='Delete?', msg=f'Are you sure to delete this {self._delarea}', ask=1, callback=self._delete, yes=dict(text='Yes'), no=dict(text='No'))
+    
+    def _delete(self, w):
+        if not w: return
+
+        Areas.remove(self._delarea)
+        THREAD_SAVE()
+        # THREAD_LOAD()
+
+    def setDef(self):
+        LOAD()
+
+        self.sort_type.set('date')
+        
+        date = PRMP_DateTime.now()
+
+        areas = Areas.sort(date, 'date')
+
+        if not areas: date = date.addTimes(days=-1)
+
         self.input.date.set(date)
         self.sort_date.set(date)
         
         self._sort(date, 'date')
-        
+    
+    def loadUI(self):
         relh = .6
         self.plot = OptPlot(self.cont, place=dict(relx=.65, rely=relh, relw=.35, relh=1-relh))
         self.plot.paint()
-
         self.loaded = 1
 
-    def date_chosen(self, event=None):
-        if event and (str(event.widget) == str(self.sort_date.B)): self.sort(quiet=1)
-        else:
-            date = self.input.date.get()
-            if date: self._sort(date, 'date')
+    def date_chosen(self, date):
+        
+        if date: self._sort(date, 'date')
 
     def sort(self, event=None, quiet=0):
+        if not hasattr(self, 'sort_date'): return
+
         date = self.sort_date.get()
         if not date:
-            if not quiet: PRMP_MsgBox(self, title='Invalid Date', msg='Choose a valid date.', _type='error')
+            if not quiet: PRMP_MsgBox(self, title='Invalid Date', msg='Choose a valid date.', _type='error', yes=dict(text='Yes'))
             
         sort_type = self.sort_type.get()
-        if sort_type not in self.sort_type.B.values: PRMP_MsgBox(self, title='Invalid Sort Type', msg='Choose a valid Sort Type.', _type='error')
+        if sort_type not in self.sort_type.B.values: PRMP_MsgBox(self, title='Invalid Sort Type', msg='Choose a valid Sort Type.', _type='error', yes=dict(text='Yes'))
 
         self._sort(date, sort_type)
 
@@ -446,13 +485,16 @@ class DAB_Ui(PRMP_MainWindow):
 
     def loadPlot(self, areas=[]):
         if not self.plot: return
+
+        if areas: self.last_list = self.list.selected or self.last_list or self.columns_lists
+        else: self.last_list = self.list.selected or self.columns_lists
+
         areas = areas or self._areas
 
-        lists = self.list.selected or self.columns_lists
-        datas = [area[lists] for area in areas]
+        datas = [area[self.last_list] for area in areas]
         names = [f'Area {int(area.number)}' for area in areas]
 
-        if self.loaded and self.plot and self._sort_type != 'years': self.plot.load(xticks=lists, ys=datas, labels=names, xlabel='Areas', ylabel='Amounts', title=self._title)
+        if self.loaded and self.plot and self._sort_type != 'years': self.plot.load(xticks=self.last_list, ys=datas, labels=names, xlabel='Areas', ylabel='Amounts', title=self._title)
 
     def add(self):
         area = self.input.createArea()
@@ -492,7 +534,7 @@ class DAB_Ui(PRMP_MainWindow):
         return themeIndex
 
     def save(self):
-        SAVE_DAB_DB()
+        SAVE()
         self.save1()
 
 
@@ -500,7 +542,6 @@ class DAB_Ui(PRMP_MainWindow):
 if __name__ == '__main__':
     themeIndex = DAB_Ui.load()
     DAB_Ui(themeIndex=themeIndex)
-
 
 
 

@@ -5,12 +5,14 @@ from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins, PRMP_AdvMixins
 import tkinter.messagebox as messagebox
 import tkinter.filedialog as filedialog
 import tkinter.simpledialog as simpledialog
+from tkfontchooser import askfont
 from . import *
 from .core import PRMP_FillWidgets
 from .date_widgets import PRMP_Calendar
 from .image_widgets import PRMP_ImageSLabel
 from .tushed_widgets import *
 from .miscs import Columns, Column
+
 
 
 
@@ -141,9 +143,9 @@ class PRMP_Dialog(PRMP_MainWindow, PRMP_FillWidgets, PRMP_ClassMixins):
         # if self.callback:
         #     self.callback(self.result)
         #     return
-        print('redefine this method for functionality')
+        print('redefine this method for functionality', self.action)
 
-    def save(self): print('redefine this method for functionality')
+    def save(self): print('redefine this method for functionality', self.save)
 
     def editInput(self, e=0):
         if self.editBtn == None: return
@@ -195,7 +197,7 @@ CD = PRMP_CalendarDialog
 
 class PRMP_MessageDialog(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(350, 170), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, okText='', msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, **kwargs):
+    def __init__(self, master=None, geo=(350, 170), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, yes=dict(text='Yes'), no=dict(text='No'), msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, images=(), **kwargs):
 
         message = msg or message
 
@@ -203,40 +205,42 @@ class PRMP_MessageDialog(PRMP_Dialog):
         self.message = message
         self.msgFont = msgFont
         self._type = _type
-        self.okText = okText
+        self.yes = yes
+        self.no = no
         self._cancel = cancel
+        self.images = images
 
         if kwargs.get('callback'): ask = 1
-        if okText: ask = 0
 
         if ask: delay = 0
         self.ask = ask
 
-        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, delay=delay, hl=0, **kwargs)
+        super().__init__(master, title=title, geo=geo, tm=1, asb=0, editable=False, grab=1, bell=bell, delay=delay, **kwargs)
 
     def _setupDialog(self):
         self.placeContainer(h=0)
+        x, y = self.geo[:2]
 
         if self.plenty: self.label = PRMP_Text(self.container, state='disabled')
         else: self.label = PRMP_Label(self.container, config=dict(bitmap='', wraplength=250), font='PRMP_FONT', relief='flat', hl=0)
 
         self.label.set(self.message)
-        self.label.place(x=0, y=0, relh=.75, relw=.85)
+        self.label.place(x=2, y=2, h=y-64, w=x-56)
 
-        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)), hl=0, relief='flat')
-        self.bitmap.place(relx=.85, y=0, relh=.8, relw=.15)
+        self.bitmap = PRMP_Label(self.container, config=dict(bitmap=self.getType(self._type)), relief='flat')
+        self.bitmap.place(x=x-54, y=2, h=y-64, w=48)
 
-        self.yes = PRMP_Button(self, config=dict(text='Yes' if self.ask else self.okText or 'Ok', command=self.yesCom), relief='flat', hl=0)
+        self.yes = PRMP_Button(self, command=self.yesCom, relief='groove', **self.yes)
 
         if not self.ask:
             self.yes.place(relx=.3, rely=.83, relh=.15, relw=.37)
             self.bind('<Return>', lambda e: self.yes.invoke())
         else:
-            self.yes.place(relx=.06, rely=.83, relh=.15, relw=.17)
+            self.yes.place(relx=.2, rely=.83, relh=.15, relw=.17)
             self.bind('<Y>', lambda e: self.yes.invoke())
             self.bind('<y>', lambda e: self.yes.invoke())
 
-            self.no = PRMP_Button(self, config=dict(text='No', command=self.noCom), place=dict(relx=.63, rely=.83, relh=.15, relw=.17))
+            self.no = PRMP_Button(self, command=self.noCom, place=dict(relx=.63, rely=.83, relh=.15, relw=.17), **self.no)
             self.bind('<N>', lambda e: self.no.invoke())
             self.bind('<n>', lambda e: self.no.invoke())
 
@@ -346,7 +350,7 @@ class Splash(PRMP_Dialog):
     def set(self): pass
 
 
-def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, edit=False, **kwargs):
+def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, edit=False, font=None, **kwargs):
     from .extensions_dialogs import ColumnsExplorerDialog, ColumnViewerDialog
     if obj:
         if isinstance(obj, PRMP_DateTime): PRMP_CalendarDialog(month=obj, **kwargs)
@@ -366,6 +370,7 @@ def dialogFunc(*args, ask=0, path=0, obj=None, int_=0, float_=0, string=0, edit=
     elif string: return askstring(*args, **kwargs)
     elif float_: return askfloat(*args, **kwargs)
     elif int_: return askinteger(*args, **kwargs)
+    elif font: return askfont(**kwargs)
     else: return showDialog(**kwargs)
 
 

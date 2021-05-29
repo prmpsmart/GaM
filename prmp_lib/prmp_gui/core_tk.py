@@ -1,6 +1,6 @@
 from .core import *
 
-__all__ = ['PRMP_Button', 'PRMP_Checkbutton', 'PRMP_Entry', 'PRMP_Frame', 'PRMP_Label', 'PRMP_LabelFrame', 'PRMP_Menu', 'PRMP_OptionMenu', 'PRMP_PanedWindow', 'PRMP_Radiobutton', 'PRMP_Scale', 'PRMP_Scrollbar', 'PRMP_Spinbox', 'PRMP_Canvas', 'PRMP_Message', 'PRMP_Text', 'PRMP_Listbox', 'Button', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Menu', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'Canvas', 'Message', 'Text', 'Listbox', 'ttk']
+__all__ = ['PRMP_Button', 'PRMP_Checkbutton', 'PRMP_Entry', 'PRMP_Frame', 'PRMP_Label', 'PRMP_LabelFrame', 'PRMP_Menu', 'PRMP_OptionMenu', 'PRMP_PanedWindow', 'PRMP_Radiobutton', 'PRMP_Scale', 'PRMP_Scrollbar', 'PRMP_Spinbox', 'PRMP_Canvas', 'PRMP_Message', 'PRMP_Text', 'PRMP_Listbox', 'Button', 'Checkbutton', 'Entry', 'Frame', 'Label', 'LabelFrame', 'Menu', 'OptionMenu', 'PanedWindow', 'Radiobutton', 'Scale', 'Scrollbar', 'Spinbox', 'Canvas', 'Message', 'Text', 'Listbox', 'ttk', 'picTypes']
 
 
 picTypes = ['Pictures {.jpg .png .jpeg .gif .xbm}']
@@ -12,7 +12,7 @@ class PRMP_(PRMP_Widget):
     '''
 
     def __init__(self, master=None, **kwargs):
-        super().__init__(master, _ttk_=False, **kwargs)
+        PRMP_Widget.__init__(self, master, _ttk_=False, **kwargs)
 P_ = PRMP_
 
 #   from tk widgets --> PRMP_

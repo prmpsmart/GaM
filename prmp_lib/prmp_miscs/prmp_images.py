@@ -280,7 +280,7 @@ class PRMP_Images:
         palette.save(outfile, "PNG")
 
     @classmethod
-    def images_into_py(cls, folder='', files=[], pyfile='pyized_images.py', merge={}, prefix='PRMP', space=10, add_all=0):
+    def images_into_py(cls, folder='', files=[], pyfile='pyized_images.py', merge={}, prefix='PRMP', space=10, add_all=0, all_files=False):
         '''
         _author_ = PRMPSmart
 
@@ -304,17 +304,18 @@ class PRMP_Images:
 
         pixs = {}
         if folder or files:
-            _files = files.copy()
+            _files = list(files).copy()
             del files
 
             if folder:
                 for file in os.listdir(folder):
                     file = os.path.join(folder, file)
                     if PRMP_ImageType.get(file): _files.append(file)
+                    elif all_files: _files.append(file); print(file)
             
             for file in _files:
                 # get image type
-                ext = PRMP_ImageType.get(file)
+                ext = PRMP_ImageType.get(file) or PRMP_File(file).ext
                 # get usable name
                 name = PRMP_Exts.getname(file)
 
@@ -759,7 +760,7 @@ class PRMP_ImageFile(PRMP_File):
 
 class PRMP_Image:
     count = 0
-    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, b64=b'', name='', for_tk=False, array=None):
+    def __init__(self, filename='', inbuilt=False, inExt='png', resize=(), thumb=(), image=None, b64=b'', name='', for_tk=False, array=None, bmp=False):
 
         pic = None
         self.imageFile = None
@@ -773,6 +774,8 @@ class PRMP_Image:
         self.image = image
         self.for_tk = for_tk
         self.tkImage = None
+        self.bmp = bmp
+        self.ext = ''
 
         filename = filename or ''
 
@@ -818,12 +821,10 @@ class PRMP_Image:
         else: raise ValueError('imageFile is None')
     
     def setTkImgClass(self):
-        if _PIL_:
-            if self.ext == 'xbm': self.tkImgClass = BitmapImage
-            else: self.tkImgClass = PhotoImage
-        else:
-            self.tkImgClass = tk.PhotoImage
-            if self.ext == 'xbm': self.tkImgClass = tk.BitmapImage
+        if _PIL_: pi, bi = PhotoImage, BitmapImage
+        else: pi, bi = tk.PhotoImage, tk.BitmapImage
+
+        self.tkImgClass = bi if self.ext in ['xbm', 'ico'] or self.bmp else pi
 
     def createTkImage(self, name=''):
         self.setTkImgClass()
@@ -919,7 +920,7 @@ class PRMP_Image:
 
         faceCascade = cv2.CascadeClassifier(cascPath)
 
-        if image: array = cls(image=age).toarray()
+        if image: array = cls(image=image).toarray()
         
         gray = cv2.cvtColor(array, cv2.COLOR_BGR2GRAY)
 

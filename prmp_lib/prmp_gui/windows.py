@@ -4,6 +4,7 @@ from .core_ttk import *
 import ctypes, subprocess, functools, os
 from prmp_lib.prmp_miscs.prmp_mixins import PRMP_ClassMixins
 from prmp_lib.prmp_miscs.prmp_images import PRMP_Images
+from prmp_lib.prmp_miscs.prmp_exts import PRMP_File
 
 __all__ = ['PRMP_Window', 'PRMP_Tk', 'PRMP_Toplevel', 'PRMP_MainWindow', 'PRMP_ToolTip', 'PRMP_ToolTipsManager', 'Tk', 'Toplevel']
 
@@ -112,7 +113,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
     change_color = change2Imgcolor
 
-    def __init__(self, master=None, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=True, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, promptExit=False, pe=None, **kwargs):
+    def __init__(self, master=None, container=True, containerConfig={'relief': 'groove'},  gaw=None, ntb=None, tm=None, tw=None, grabAnyWhere=True, geo=(500, 500), geometry=(), noTitleBar=True, topMost=False, alpha=1, toolWindow=False, side='center', title='Window', bindExit=False, nrz=None, notResizable=False, atb=None, asb=None, be=None, resize=(1, 1), addStatusBar=True, addTitleBar=True, tkIcon='', prmpIcon='', grab=False, b4t=None, bind4Theme=1, toggleMenuBar=False, tbm=None, normTk=False, normStyle=False, tipping=False, tt=None, tooltype=False, noWindowButtons=False, nwb=None, themeIndex=0, theme='', canvas_as_container=False, cac=None, label_as_container=False, lac=None, containerClass=None, cc=None, promptExit=False, pe=None, sizegrip=True, **kwargs):
         '''
         PRMP_Window a base class for all window class for common behaviours.
 
@@ -171,7 +172,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
             if not normStyle: PRMP_Window.STYLE = PRMP_Style(self)
             
-            if tipping: PRMP_Window.TIPSMANAGER = PRMP_ToolTipsManager(self)
+            if tipping and not PRMP_Window.TIPSMANAGER: PRMP_Window.TIPSMANAGER = PRMP_ToolTipsManager(self)
 
         self.container = None
         self.zoomed = False
@@ -246,6 +247,8 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.placeOnScreen(side, geometry)
         self.bind('<Control-E>', self.destroySelf)
         self.bind('<Control-e>', self.destroySelf)
+        
+        if sizegrip: self.bind('<FocusIn>', lambda e: ttk.Sizegrip(self).place(anchor='se', relx=1.0, rely=1.0))
 
         # whether to grab all event to this window
         if grab: self.grab_set()
@@ -287,7 +290,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             elif self.resize.count(True) > 1: self.__r = 2
             else: self.__r = 0
             self.addTitleBar()
-            self.setPRMPIcon(prmpIcon or PRMP_Window.PRMPICON)
+            self.setPRMPIcon(prmpIcon or PRMP_Window.PRMPICON or tkIcon)
 
         if addStatusBar: self.addStatusBar()
 
@@ -297,7 +300,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
         else: self.setAttributes()
 
-        self.setTkIcon(tkIcon or PRMP_Window.TKICON)
+        self.setTkIcon(tkIcon or PRMP_Window.TKICON or prmpIcon)
         
         if self.topMost: self.topmost()
     
@@ -327,7 +330,7 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
 
     # positioning of window
 
-    def placeOnScreen(self, side='', geometry=(500, 500)):
+    def placeOnScreen(self, side='center', geometry=(500, 500)):
         error_string = f'side must be of {self._sides} or combination of "center-{self._sides[:-1]}" delimited by "-". e.g center-right. but the two must not be the same.'
         if len(geometry) == 4:
             self.lastPoints = geometry
@@ -544,14 +547,17 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         self.titleText = title
         if self.titleBar: self.titleBar.set(title or self.titleText)
 
-    def setTkIcon(self, icon):
+    def setTkIcon(self, icon, **kwargs):
+        if kwargs: PRMP_File(icon, **kwargs).save()
+
         if icon: self.iconbitmap(icon)
 
-    def setPRMPIcon(self, icon):
+    def setPRMPIcon(self, icon, new=1, **kwargs):
         if icon and _PIL_:
-            self.imgIcon = PRMP_Image(icon, resize=(20, 20), for_tk=1)
-            self._icon['image'] = self.imgIcon
-
+            self.imgIcon = PRMP_Image(icon, resize=(20, 20), for_tk=1, **kwargs) if new else icon
+            try: self._icon['image'] = self.imgIcon or 'none'
+            except: ...
+            
     def addTitleBar(self, title=''):
         if self.titleBar:
             self.placeTitlebar()
@@ -799,8 +805,8 @@ class PRMP_ToolTip(Toplevel):
         k = {}
         if Toplevel != tk.Toplevel: k.update(normTk=1)
 
-        super().__init__(master, background=background, padx=0, pady=0, tooltype=True, **k)
-        self.transient(master)
+        super().__init__(master, background=background, padx=0, pady=0, tooltype=True, sizegrip=False, **k)
+        # self.transient(master)
         # self.overrideredirect(True)
         self.update_idletasks()
         self.attributes('-alpha', alpha or 0.8, '-topmost', 1)
@@ -846,6 +852,7 @@ class PRMP_ToolTip(Toplevel):
 
     def configure(self, **kwargs):
         if 'alpha' in kwargs: self.attributes('-alpha', kwargs.pop('alpha'))
+        kwargs = {k: v for k, v in kwargs.items() if v}
         self.label.configure(**kwargs)
 
     config = configure

@@ -394,7 +394,7 @@ class Image_Renamer(Tk, Background):
         
         for a in os.listdir(self.folder):
             f = os.path.join(path, a)
-            if PRMP_ImageType.get(f): self.image_paths.append(f)
+            if os.path.isfile(f) and PRMP_ImageType.get(f): self.image_paths.append(f)
         self.current = 0
         self.total_images = len(self.image_paths)
         
@@ -463,12 +463,12 @@ class Image_Renamer(Tk, Background):
 
         rename = os.path.join(self.folder, rename)
 
-        os.rename(self.current_file, rename)
-
-        self.image_paths[self.current-1] = rename
-
-        self.rename.set('')
-        self.loadIndex(0)
+        try:
+            os.rename(self.current_file, rename)
+            self.image_paths[self.current-1] = rename
+            self.rename.set('')
+            self.loadIndex(0)
+        except Exception as error: PRMP_MsgBox(self, title=error.__class__.__name__, msg=error, _type='error', geo=(400, 200), plenty=1)
 
 
 app = Image_Renamer
@@ -477,6 +477,6 @@ app = Image_Renamer
 # app = PRMP_ImageDialog
 
 side = 'center'
-app(side=side, callback=9)
+app(side=side, callback=9, themeIndex=38)
 
 

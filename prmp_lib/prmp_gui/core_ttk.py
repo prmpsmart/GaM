@@ -114,7 +114,8 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
         elements_creating.update(settings)
         settings = elements_creating
 
-        self.theme_create('prmp', settings=settings)
+        try: self.theme_create('prmp', settings=settings)
+        except: pass
         PRMP_Style.LOADED = True
 
     @property
@@ -492,6 +493,11 @@ class PRMP_Style(ttk.Style, PRMP_Mixins):
                 'layout': [('border', {'children': [('Horizontal.Scale.trough', {'sticky': 'nswe', 'children': [('Horizontal.Scale.slider', {'side': 'left', 'sticky': ''})]})]})],
                 'map': {
                     'sliderrelief': [('hover', 'solid')]
+                }
+            },
+            'TSizegrip': {
+                'configure': {
+                    'background': background,
                 }
             },
             'TPanedwindow': {

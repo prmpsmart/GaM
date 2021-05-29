@@ -62,7 +62,8 @@ class TwoWidgets(PRMP_Frame):
             placeholder = bottomKwargs.get('placeholder', f'Enter {text}.')
 
             if bottom in ['label', 'datebutton', 'button']:
-                bottomKw = dict(**self.bottom_defaults, **bottomKwargs)
+                bottomKw = dict(**self.bottom_defaults)
+                bottomKw.update(bottomKwargs)
                 if self._ttk_: bottomKw['style'] = 'entry.Label'
             else:
                 if bottomKwargs.get('placeholder', None) != None: bottomKw = dict(**bottomKwargs)
@@ -241,8 +242,8 @@ LMYB = LabelMonthYearButton
 
 class DateWidget(TwoWidgets):
     
-    def __init__(self, master, **kwargs):
-        super().__init__(master, top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', required=1), **kwargs)
+    def __init__(self, master, bottomKwargs={}, **kwargs):
+        super().__init__(master, top='label', bottom=PRMP_DropDownCalendarEntry, bottomKwargs=dict(attr='date', required=1, **bottomKwargs), **kwargs)
     
     def set(self, date): self.B.set(date)
 

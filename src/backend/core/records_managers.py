@@ -349,7 +349,7 @@ class RecordsManager(ObjectsManager):
 
     def recordsAsRecordsManager(self, records, date):
         newRecM = self.class_(self.manager)
-        newRecM.date = date
+        newRecM._date = date
         if records:
             rec = self.recordsAsRecord(records, date)
             newRecM.addSub(rec)

@@ -501,7 +501,7 @@ class DailyContributionDailog(GaM_Dialog):
 
 class FillTable:
 
-    def getDatas(self, columns=[], plot=0, heads=[],season='', which='', **kwargs):
+    def getDatas(self, columns=[], plot=0, heads=[], season='', which='', **kwargs):
 
         datas = self.obj.objectSort.fillColumns(_type=int, columns=columns, heads=heads, season=season, which=which, **kwargs)
         ticks = []
@@ -510,6 +510,7 @@ class FillTable:
             num = len(heads)
             _num = 0
             if season == 'month' and  which == 'days': _num = 1
+            print(datas)
 
             ticks = [data[_num] for data in datas]
             datas = [data[num:] for data in datas]

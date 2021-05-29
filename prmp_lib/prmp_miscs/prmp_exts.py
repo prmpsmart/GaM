@@ -137,8 +137,11 @@ class PRMP_File(io.BytesIO, PRMP_AdvMixins, PRMP_ClassMixins):
         file = file or self
         try: f = open(file, 'wb')
         except: f = file
+
         try: return pickle.load(f)
-        except: return None
+        except Exception as er:
+            print(er)
+            return None
 
     def save(self, file=''):
         file = file or self.name
