@@ -1036,7 +1036,7 @@ class PRMP_Input:
         self._add_placeholder()
 
     def green(self):
-        foreground = self.kwargs.get('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR if self.fg_as_very else 'green')
+        foreground = self.kwargs.get('foreground', PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR if self.fg_as_very else 'green')
 
         if self.very: self.configure(foreground=foreground)
         return True

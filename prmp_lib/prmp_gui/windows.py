@@ -590,8 +590,10 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             tipm.add_tooltip(self._max, text='Maximize')
             tipm.add_tooltip(self._min, text='Minimize')
             tipm.add_tooltip(self._exit, text='Exit')
-            tipm.add_tooltip(self.titleBar, text='Right click for MENU bar')
-            tipm.add_tooltip(self.menuBar, text='Right click for TITLE bar')
+            
+            if self.toggleMenuBar:
+                tipm.add_tooltip(self.titleBar, text='Right click for MENU bar')
+                tipm.add_tooltip(self.menuBar, text='Right click for TITLE bar')
 
         for bar in [self.titleBar, self.menuBar]:
             bar.bind('<Double-1>', self.maximize, '+')
@@ -786,7 +788,7 @@ class PRMP_ToolTip(Toplevel):
         if key == self.key: return self.keyval() if callable(self.keyval) else self.keyval
         else: return self.cgetsub(key) if self.cgetsub else self.cgetsub
 
-    def __init__(self, master, alpha=.8, bg='', background='', fg='', font='', foreground='', pos=None, position=(), relief='flat', text='', _ttk_=0, **kwargs):
+    def __init__(self, master, alpha=.8, bg='', background='', fg='', font="-family {Segoe UI} -size 9", foreground='', pos=None, position=(), relief='flat', text='', _ttk_=0, **kwargs):
         '''
         Construct a Tooltip with parent master.
         alpha: float. Tooltip opacity between 0 and 1.

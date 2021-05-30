@@ -133,7 +133,7 @@ class PRMP_AdvMixins(PRMP_ClassMixins):
     def getDate(self, date=None):
         from .prmp_datetime import PRMP_DateTime
 
-        if date == None: date = PRMP_DateTime.now()
+        if not date: date = PRMP_DateTime.now()
 
         elif isinstance(date, (str, bytes)): date = PRMP_DateTime.getDMYFromString(date)
         PRMP_DateTime.checkDateTime(date, 1)
