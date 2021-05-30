@@ -7,11 +7,11 @@ from prmp_lib.prmp_gui import *
 from prmp_lib.prmp_gui.image_widgets import *
 from prmp_lib.prmp_gui.tushed_widgets import *
 
+
 class Background:
     img_count = 0
     def load(self):
         if not PRMP_DB: return
-        return
 
         i = 'red'
         size = self.cont.width, self.cont.height
@@ -21,7 +21,7 @@ class Background:
         img = self.cont.image
         self.change2Imgcolor(img)
         self.img_count += 1
-        if self.img_count >20: self.img_count = 0
+        if self.img_count > 20: self.img_count = 0
 
 class MPVImage(PRMP_ImageCheckbutton):
     f = 0
@@ -358,7 +358,6 @@ class Image_Renamer(Tk, Background):
     def __init__(self, folder='', **kwargs):
         super().__init__(containerClass=PRMP_ImageSLabel, containerConfig=dict(anchor='center'), geo=(800, 500), tipping=0, **kwargs)
         self.count = 0
-        self.load()
 
         self.image_paths = []
         self.folder = folder
@@ -385,6 +384,7 @@ class Image_Renamer(Tk, Background):
         self.bind('<Down>', self.rootLoadIndex, '+')
         self.refresh()
         self.first = 0 # hack for Down event
+        self.after(50, self.load)
         self.start()
 
     def loadFolder(self, path):
@@ -472,9 +472,9 @@ class Image_Renamer(Tk, Background):
 
 
 app = Image_Renamer
-# app = Massive_Photo_Viewer
-# app = Database_Images
-# app = PRMP_ImageDialog
+app = Massive_Photo_Viewer
+app = Database_Images
+app = PRMP_ImageDialog
 
 side = 'center'
 app(side=side, callback=9, themeIndex=38)

@@ -388,7 +388,7 @@ class PRMP_Theme(PRMP_GuiMixins):
     def _paint(self):
         'paints the widget with _ttk_ = False'
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback', 'fg_as_very']}
 
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
@@ -941,7 +941,7 @@ PWd = PRMP_Widget
 
 class PRMP_Input:
 
-    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, fg_as_very=False, **kwargs):
         _type = _type.lower()
 
         state = self.kwargs.get('state', state)
@@ -949,6 +949,7 @@ class PRMP_Input:
 
         self.values = values
         self.very = very
+        self.fg_as_very = fg_as_very
 
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
@@ -1035,7 +1036,8 @@ class PRMP_Input:
         self._add_placeholder()
 
     def green(self):
-        foreground = self.kwargs.get('foreground', 'green')
+        foreground = self.kwargs.get('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR if self.fg_as_very else 'green')
+
         if self.very: self.configure(foreground=foreground)
         return True
 

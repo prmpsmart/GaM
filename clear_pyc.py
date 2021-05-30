@@ -26,9 +26,10 @@ def main():
 # if __name__ == '__main__': main()
 
 # os.system(r'C:\Users\Administrator\Desktop\Clear_pyc C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM')
+# 
+# g = ['1', '2', '3', '4', 5]
 
-g = ['1', '2', '3', '4', 5]
-
-g.remove(5)
-print(g)
+# g.remove(5)
+# print(g)
+clear_pyc()
 

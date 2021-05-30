@@ -418,6 +418,7 @@ class PRMP_Images:
 
 class PRMP_ImagesDB(PRMP_AdvMixins, PRMP_StrMixins):
     defaultDB = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'images_db.prmp_db')
+    defaultDB = r'C:\Users\Administrator\Coding_Projects\Python\Dev_Workspace\GaM\images_db.prmp_db'
 
     @classmethod
     def PRMP_DB(cls): return cls(cls.defaultDB)
