@@ -598,7 +598,7 @@ class PRMP_Theme(PRMP_GuiMixins):
     def _paint(self):
         'paints the widget with _ttk_ = False'
         if not self._ttk_:
-            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback']}
+            kwargs = {k: v for k, v in self.kwargs.items() if k not in ['font', 'required', 'placeholder', '_type', 'default', 'tipKwargs', 'very', 'callback', 'fg_as_very']}
 
             foreground = kwargs.pop('foreground', PRMP_Theme.DEFAULT_FOREGROUND_COLOR)
 
@@ -1149,7 +1149,7 @@ PWd = PRMP_Widget
 
 class PRMP_Input:
 
-    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, **kwargs):
+    def __init__(self, placeholder='', _type='text', values=[], required=False, default=None, state='normal', very=False, fg_as_very=False, **kwargs):
         _type = _type.lower()
 
         state = self.kwargs.get('state', state)
@@ -1157,6 +1157,7 @@ class PRMP_Input:
 
         self.values = values
         self.very = very
+        self.fg_as_very = fg_as_very
 
         self.bind("<FocusIn>", self._clear_placeholder, '+')
         self.bind("<FocusOut>", self._add_placeholder, '+')
@@ -1243,7 +1244,8 @@ class PRMP_Input:
         self._add_placeholder()
 
     def green(self):
-        foreground = self.kwargs.get('foreground', 'green')
+        foreground = self.kwargs.get('foreground', PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR if self.fg_as_very else 'green')
+
         if self.very: self.configure(foreground=foreground)
         return True
 
@@ -3212,8 +3214,10 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
             tipm.add_tooltip(self._max, text='Maximize')
             tipm.add_tooltip(self._min, text='Minimize')
             tipm.add_tooltip(self._exit, text='Exit')
-            tipm.add_tooltip(self.titleBar, text='Right click for MENU bar')
-            tipm.add_tooltip(self.menuBar, text='Right click for TITLE bar')
+            
+            if self.toggleMenuBar:
+                tipm.add_tooltip(self.titleBar, text='Right click for MENU bar')
+                tipm.add_tooltip(self.menuBar, text='Right click for TITLE bar')
 
         for bar in [self.titleBar, self.menuBar]:
             bar.bind('<Double-1>', self.maximize, '+')
@@ -3407,7 +3411,7 @@ class PRMP_ToolTip(Toplevel):
         if key == self.key: return self.keyval() if callable(self.keyval) else self.keyval
         else: return self.cgetsub(key) if self.cgetsub else self.cgetsub
 
-    def __init__(self, master, alpha=.8, bg='', background='', fg='', font='', foreground='', pos=None, position=(), relief='flat', text='', _ttk_=0, **kwargs):
+    def __init__(self, master, alpha=.8, bg='', background='', fg='', font="-family {Segoe UI} -size 9", foreground='', pos=None, position=(), relief='flat', text='', _ttk_=0, **kwargs):
         '''
         Construct a Tooltip with parent master.
         alpha: float. Tooltip opacity between 0 and 1.
@@ -6566,7 +6570,7 @@ CD = PRMP_CalendarDialog
 
 class PRMP_MessageDialog(PRMP_Dialog):
     _bitmaps = ['info', 'question', 'error', 'warning']
-    def __init__(self, master=None, geo=(350, 170), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, yes={}, no={}, msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, images=(), **kwargs):
+    def __init__(self, master=None, geo=(350, 170), title='Message Dialog', message='Put your message here.', _type='info', cancel=0, ask=0, yes=dict(text='Yes'), no=dict(text='No'), msgFont='DEFAULT_FONT', plenty=0, bell=0, msg='', delay=3000, images=(), **kwargs):
 
         message = msg or message
 
