@@ -180,7 +180,9 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
 
     def _get(self): return tk.Text.get(self, '0.0', 'end').strip('\n')
 
-    def set(self, values): self.clear(); self.insert('0.0', str(values))
+    def insert(self, values):
+        print(value, 'value')
+        self.TkClass.insert(self, '0.0', str(values))
 
     def clear(self): self.delete('0.0', 'end')
 

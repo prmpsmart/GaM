@@ -252,7 +252,7 @@ ISB = PRMP_ImageSCheckbutton
 
 class PRMP_Camera(PRMP_Style_Frame):
 
-    def __init__(self, master, source=0, frameUpdateRate=10, callback=None, face=False, **kwargs):
+    def __init__(self, master, source=0, frameUpdateRate=10, callback=None, face=False, flip=True, **kwargs):
         import cv2
         self.cv2 = cv2
         self.cam = None
@@ -261,6 +261,7 @@ class PRMP_Camera(PRMP_Style_Frame):
         self._image = None
         self._set = None
         self.callback = callback
+        self.flip = flip
         self.face = face
         self.pause = False
         self.opened = False
@@ -373,6 +374,7 @@ class PRMP_Camera(PRMP_Style_Frame):
     def getFrame(self):
         if self.cam and self.cam.isOpened():
             success, frame = self.cam.read()
+            if self.flip: frame = self.cv2.flip(frame, 1)
             if success: return (success, self.cv2.cvtColor(frame, self.cv2.COLOR_BGR2RGB))
             else: return (success, None)
         else: return (False, None)
