@@ -244,7 +244,8 @@ class PRMP_Window(PRMP_Widget, PRMP_TkReloader):
         # window's postion and title
         self.setTitle(title)
 
-        self.placeOnScreen(side, geometry)
+        if geometry: self.placeOnScreen(side, geometry)
+
         self.bind('<Control-E>', self.destroySelf)
         self.bind('<Control-e>', self.destroySelf)
         

@@ -462,9 +462,14 @@ class PRMP_Theme(PRMP_GuiMixins):
                             font=font,
                             **kwargs)
 
-            elif wt in ['Scrollbar']:
+            elif wt == 'Scrollbar':
                 if foreground == PRMP_Theme.DEFAULT_FOREGROUND_COLOR: foreground = PRMP_Theme.DEFAULT_INPUT_TEXT_COLOR
                 if background == PRMP_Theme.DEFAULT_BACKGROUND_COLOR: background = PRMP_Theme.DEFAULT_INPUT_ELEMENTS_COLOR
+
+            elif wt == 'PanedWindow':
+                dic = {k: v for k, v in self.kwargs.items() if k in ['handlepad', 'handlesize', 'sashpad', 'sashwidth', 'sashrelief', 'showhandle', 'orient']}
+                
+                self.configure(**dic, **_dict)
 
             else:
                 # try: 
@@ -653,6 +658,7 @@ class PRMP_Widget(PRMP_Theme):
             except: pass
 
     def get(self): return self['text']
+    
     def clear(self): self['text'] = ''
     empty = clear
 
@@ -663,13 +669,11 @@ class PRMP_Widget(PRMP_Theme):
 
     @property
     def width(self):
-        self.update()
         try: return int(self.winfo_width())
         except: return -1
 
     @property
     def height(self):
-        self.update()
         try: return int(self.winfo_height())
         except: return -1
 
@@ -1112,7 +1116,8 @@ class PRMP_Input:
         former_state = self.current_state
         if former_state != 1: self.normal(1)
         self.clear()
-        self.insert(0, str(values))
+        if self.PRMP_WIDGET != 'Text': self.insert(0, str(values))
+        else: self.insert(str(values))
         if former_state == 0: self.disabled()
         elif former_state == 2: self.readonly()
 

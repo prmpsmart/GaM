@@ -8,6 +8,7 @@ from prmp_lib.prmp_gui.image_widgets import *
 from prmp_lib.prmp_gui.tushed_widgets import *
 
 
+
 class Background:
     img_count = 0
     def load(self):
@@ -473,8 +474,8 @@ class Image_Renamer(Tk, Background):
 
 app = Image_Renamer
 app = Massive_Photo_Viewer
-app = Database_Images
-app = PRMP_ImageDialog
+# app = Database_Images
+# app = PRMP_ImageDialog
 
 side = 'center'
 app(side=side, callback=9, themeIndex=38)

@@ -106,15 +106,16 @@ class PRMP_PanedWindow(PRMP_, tk.PanedWindow):
     TkClass = tk.PanedWindow
 
     def __init__(self, master, **kwargs):
-
         PRMP_.__init__(self, master, **kwargs)
+    
+    @property
+    def PRMP_WIDGET(self): return 'PanedWindow'
 PanedWindow = PP = PRMP_PanedWindow
 
 class PRMP_Radiobutton(PRMP_InputButtons, PRMP_, tk.Radiobutton):
     TkClass = tk.Radiobutton
 
     def __init__(self, master, **kwargs):
-
         PRMP_.__init__(self, master, **kwargs)
 
     @property
@@ -125,7 +126,6 @@ class PRMP_Scale(PRMP_, tk.Scale):
     TkClass = tk.Scale
 
     def __init__(self, master, **kwargs):
-
         PRMP_.__init__(self, master, **kwargs)
 Scale = PS = PRMP_Scale
 
@@ -133,7 +133,6 @@ class PRMP_Scrollbar(PRMP_, tk.Scrollbar):
     TkClass = tk.Scrollbar
 
     def __init__(self, master, **kwargs):
-
         PRMP_.__init__(self, master, **kwargs)
 
     def set(self, first, last): return tk.Scrollbar.set(self, first, last)
@@ -180,9 +179,7 @@ class PRMP_Text(PRMP_Input, PRMP_, tk.Text):
 
     def _get(self): return tk.Text.get(self, '0.0', 'end').strip('\n')
 
-    def insert(self, values):
-        print(value, 'value')
-        self.TkClass.insert(self, '0.0', str(values))
+    def insert(self, values): self.TkClass.insert(self, '0.0', str(values))
 
     def clear(self): self.delete('0.0', 'end')
 
